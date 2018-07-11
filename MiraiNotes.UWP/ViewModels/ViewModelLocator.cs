@@ -1,0 +1,87 @@
+﻿using AutoMapper;
+using CommonServiceLocator;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Ioc;
+using GalaSoft.MvvmLight.Views;
+using MiraiNotes.UWP.Handlers;
+using MiraiNotes.UWP.Helpers;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Pages;
+using MiraiNotes.UWP.Services;
+
+namespace MiraiNotes.UWP.ViewModels
+{
+    public class ViewModelLocator
+    {
+        #region Constants
+        public const string HOME_PAGE = "HomePage";
+        public const string LOGIN_PAGE = "LoginPage";
+        #endregion
+
+        #region Properties
+        public NavigationService NavigationService
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<NavigationService>();
+            }
+        }
+
+        public LoginViewModel Login
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<LoginViewModel>();
+            }
+        }
+
+        public HomeViewModel Home
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<HomeViewModel>();
+            }
+        } 
+        #endregion
+
+        public ViewModelLocator()
+        {
+            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            var navigation = new NavigationService();
+            navigation.Configure(HOME_PAGE, typeof(MainPage));
+            navigation.Configure(LOGIN_PAGE, typeof(LoginPage));
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                // Add all profiles in current assembly
+                cfg.AddProfiles(GetType().Assembly);
+            });
+                
+            if (ViewModelBase.IsInDesignModeStatic)
+            {
+                // SimpleIoc.Default.Register<IDataService, Design.DesignDataService>();
+            }
+            else
+            {
+                //   SimpleIoc.Default.Register<IDataService, DataService>();
+            }
+            
+            SimpleIoc.Default.Register<IDialogService, DialogService>();
+            SimpleIoc.Default.Register<INavigationService>(() => navigation);
+            SimpleIoc.Default.Register<IUserCredentialService, UserCredentialService>();
+            SimpleIoc.Default.Register(() => config.CreateMapper());
+
+            SimpleIoc.Default.Register<AuthorizationHandler>();
+            SimpleIoc.Default.Register<IHttpClientsFactory, HttpClientsFactory>();
+
+            SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
+            SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
+            SimpleIoc.Default.Register<IGoogleTaskListService, GoogleTaskListService>();
+            SimpleIoc.Default.Register<IGoogleTaskService, GoogleTaskService>();
+            SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
+
+            SimpleIoc.Default.Register<LoginViewModel>();
+            SimpleIoc.Default.Register<HomeViewModel>();
+        }
+    }
+}
