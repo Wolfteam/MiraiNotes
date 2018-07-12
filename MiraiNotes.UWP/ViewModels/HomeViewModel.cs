@@ -47,7 +47,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Members
-        private readonly IDialogService _dialogService;
+        private readonly ICustomDialogService _dialogService;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleApiService _googleApiService;
@@ -159,13 +159,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region NavigationView Content Commands
-        public ICommand NewTaskListCommand
-        {
-            get
-            {
-                return new RelayCommand(CreateNewTaskList);
-            }
-        }
+        public ICommand NewTaskListCommand { get; set; }
 
         public ICommand NewTaskCommand
         {
@@ -216,7 +210,7 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand SortTasksCommand { get; set; }
         #endregion
 
-        public HomeViewModel(IDialogService dialogService,
+        public HomeViewModel(ICustomDialogService dialogService,
                             INavigationService navigationService,
                             IUserCredentialService userCredentialService,
                             IGoogleApiService googleApiService,
@@ -245,6 +239,11 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 (async (text) => await OnTaskAutoSuggestBoxTextChange(text));
 
+            NewTaskListCommand = new RelayCommand(() =>
+            {
+
+            });
+
             RefreshTasksCommand = new RelayCommand(async() => await RefreshTasks());
 
             SortTasksCommand = new RelayCommand<TaskSortType>((sortBy) => SortTasks(sortBy));
@@ -264,9 +263,9 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = false;
             if (!response.Succeed)
             {
-                await _dialogService.ShowMessage(
-                    $"An error occurred while trying to get the tasks for the selected tasklist = {taskList.Title}",
-                    "Error");
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An error occurred while trying to get the tasks for the selected tasklist = {taskList.Title}");
                 return;
             }
             Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items);
@@ -297,7 +296,7 @@ namespace MiraiNotes.UWP.ViewModels
         public async Task OnNavigationViewSelectionChange(object selectedItem)
         {
             if (selectedItem is NavigationViewItem navViewItem)
-                _dialogService.ShowMessage($"Seleccionaste {navViewItem.Name}", "Hola");
+               await _dialogService.ShowMessageDialogAsync($"Seleccionaste {navViewItem.Name}", "Hola");
             else if (selectedItem is GoogleTaskListModel taskList)
             {
                 _currentTaskList = taskList;
@@ -307,21 +306,19 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async void LogoutAsync()
         {
-            await _dialogService.ShowMessage("Are you sure you wanna log out?", "Sign out", "Yes", "No", (logout) =>
+            bool logout = await _dialogService
+                .ShowConfirmationDialogAsync("Are you sure you wanna log out?", "Yes", "No");
+            if (logout)
             {
-                if (logout)
-                {
-                    //TODO: DELETE ALL !!
-                    //delete all from the db
-                    //delete user settings
-                    //delete all view models
-                    _userCredentialService.DeleteUserCredentials();
-                    _navigationService.GoBack();
-                }
-            });
+                //TODO: DELETE ALL !!
+                //delete all from the db
+                //delete user settings
+                //delete all view models
+                _userCredentialService.DeleteUserCredentials();
+                _navigationService.GoBack();
+            }
         }
         #endregion
-
 
         #region NavigationView Content Methods
         public async Task OnTaskListViewSelectedItem(TaskModel task)
@@ -338,7 +335,7 @@ namespace MiraiNotes.UWP.ViewModels
             IsPaneOpen = true;
 
             if (Tasks.Any(t => t.IsSelected))
-                await _dialogService.ShowMessage("Hay algo seleccionado", "");
+                await _dialogService.ShowMessageDialogAsync("Hay algo seleccionado", "");
         }
 
         public async Task OnTaskAutoSuggestBoxTextChange(string currentText)
@@ -348,9 +345,9 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = false;
             if (!response.Succeed)
             {
-                await _dialogService.ShowMessage(
-                    $"An error occurred while trying to get the tasks for the selected tasklist = {_currentTaskList.Title}",
-                    "Error");
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An error occurred while trying to get the tasks for the selected tasklist = {_currentTaskList.Title}");
                 return;
             }
             var filteredItems = string.IsNullOrEmpty(currentText) ?
@@ -367,6 +364,8 @@ namespace MiraiNotes.UWP.ViewModels
                 .Where(t => filteredItems.Any(fi => fi.ItemID == t.TaskID)));
         }
 
+        
+
         public async Task RefreshTasks()
         {
             ShowTaskListViewProgressRing = true;
@@ -374,9 +373,9 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskListViewProgressRing = false;
             if (!response.Succeed)
             {
-                await _dialogService.ShowMessage(
-                    $"An error occurred while trying to refresh the tasks for the selected tasklist = {_currentTaskList.Title}",
-                    "Error");
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An error occurred while trying to refresh the tasks for the selected tasklist = {_currentTaskList.Title}");
                 return;
             }
             Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items);
@@ -425,9 +424,9 @@ namespace MiraiNotes.UWP.ViewModels
             var response = await _googleApiService.TaskListService.GetAllAsync();
             if (!response.Succeed)
             {
-                await _dialogService.ShowMessage(
-                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}",
-                    "Coudn't get the task lists");
+                await _dialogService.ShowMessageDialogAsync(
+                    "Coudn't get the task lists",
+                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 ShowTaskListViewProgressRing = false;
                 return;
             }
@@ -445,9 +444,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (!response2.Succeed)
             {
-                await _dialogService.ShowMessage(
-                    $"Status Code: {response2.Errors.ApiError.Code}. {response2.Errors.ApiError.Message}",
-                    "Couldn't get the tasks for the selected task list");
+                await _dialogService.ShowMessageDialogAsync(
+                    "Couldn't get the tasks for the selected task list",
+                    $"Status Code: {response2.Errors.ApiError.Code}. {response2.Errors.ApiError.Message}");
                 ShowTaskListViewProgressRing = false;
                 return;
             }
@@ -462,21 +461,21 @@ namespace MiraiNotes.UWP.ViewModels
             Debug.WriteLine($"You typed {TaskAutoSuggestBoxText}");
         }
 
-        public void CreateNewTaskList() => _dialogService.ShowMessage("You clicked on a item", "Clicked");
+        public void CreateNewTaskList() => _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
 
         public void CreateNewTask()
         {
-            _dialogService.ShowMessage("You clicked on a item", "Clicked");
+            _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
         }
 
         public void ProcessQuery()
         {
-            _dialogService.ShowMessage("You clicked on a item", "Clicked");
+            _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
         }
 
         public void ProcessChoice()
         {
-            _dialogService.ShowMessage("You clicked on a item", "Clicked");
+            _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
         }
 
         #endregion

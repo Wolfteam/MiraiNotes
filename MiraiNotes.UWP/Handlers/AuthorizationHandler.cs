@@ -15,11 +15,11 @@ namespace MiraiNotes.UWP.Handlers
     {
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleAuthService _googleAuthService;
-        private readonly IDialogService _dialogService;
+        private readonly ICustomDialogService _dialogService;
 
         public AuthorizationHandler(IUserCredentialService userCredentialService,
                                     IGoogleAuthService googleAuthService,
-                                    IDialogService dialogService)
+                                    ICustomDialogService dialogService)
         {
             _userCredentialService = userCredentialService;
             _googleAuthService = googleAuthService;
@@ -43,7 +43,7 @@ namespace MiraiNotes.UWP.Handlers
                     token = await _googleAuthService.GetNewTokenAsync(token.RefreshToken);
                     if (token == null)
                     {
-                        await _dialogService.ShowMessage("Could't get a new token. Did you remove access to our app :C?", "Error");
+                        await _dialogService.ShowMessageDialogAsync("Error", "Could't get a new token. Did you remove access to our app :C?");
                         return response;
                     }
 
