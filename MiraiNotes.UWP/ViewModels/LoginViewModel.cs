@@ -21,7 +21,7 @@ namespace MiraiNotes.UWP.ViewModels
     {
         #region Members
         private bool _showLoading;
-        private readonly IDialogService _dialogService;
+        private readonly ICustomDialogService _dialogService;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleAuthService _googleAuthService;
@@ -49,7 +49,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get
             {
-                return new RelayCommand(() => 
+                return new RelayCommand(() =>
                 {
                     bool isUserLoggedIn = _userCredentialService.IsUserLoggedIn();
                     if (isUserLoggedIn)
@@ -63,9 +63,9 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Constructors
         public LoginViewModel(
-            IDialogService dialogService,
+            ICustomDialogService dialogService,
             INavigationService navigationService,
-            IUserCredentialService userCredentialService, 
+            IUserCredentialService userCredentialService,
             IGoogleAuthService googleAuthService,
             IGoogleUserService googleUserService)
         {
@@ -96,13 +96,13 @@ namespace MiraiNotes.UWP.ViewModels
 
                         if (queryParams.ContainsKey("error"))
                         {
-                            await _dialogService.ShowMessage($"OAuth authorization error: {queryParams["error"]}", "Error");
+                            await _dialogService.ShowMessageDialogAsync("Error", $"OAuth authorization error: {queryParams["error"]}");
                             return;
                         }
 
                         if (!queryParams.ContainsKey("approvalCode"))
                         {
-                            await _dialogService.ShowMessage("Malformed authorization response.", "Error");
+                            await _dialogService.ShowMessageDialogAsync("Error", "Malformed authorization response.");
                             return;
                         }
 
@@ -111,7 +111,7 @@ namespace MiraiNotes.UWP.ViewModels
                         var tokenResponse = await _googleAuthService.GetTokenAsync(approvalCode);
                         if (tokenResponse == null)
                         {
-                            await _dialogService.ShowMessage("Couldn't get a token", "Something happended...!");
+                            await _dialogService.ShowMessageDialogAsync("Something happended...!", "Couldn't get a token");
                             return;
                         }
 
@@ -119,26 +119,26 @@ namespace MiraiNotes.UWP.ViewModels
                         var user = await _googleUserService.GetUserInfoAsync(tokenResponse.AccessToken);
                         if (user == null)
                         {
-                            await _dialogService.ShowMessage("User info not found", "Something happended...!");
+                            await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
                             return;
                         }
-                        
+
                         //TODO: SAVE THE USER TO THE DB
                         _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
                         break;
                     case WebAuthenticationStatus.UserCancel:
                         break;
                     case WebAuthenticationStatus.ErrorHttp:
-                        await _dialogService.ShowMessage(result.ResponseErrorDetail.ToString(), "Error");
+                        await _dialogService.ShowMessageDialogAsync("Error", result.ResponseErrorDetail.ToString());
                         break;
                     default:
-                        await _dialogService.ShowMessage(result.ResponseData.ToString(), "Error");
+                        await _dialogService.ShowMessageDialogAsync("Error", result.ResponseData.ToString());
                         break;
                 }
             }
             catch (Exception ex)
             {
-                await _dialogService.ShowError(ex, "An unknown error occurred", null, () => { });
+                await _dialogService.ShowErrorMessageDialogAsync(ex, "An unknown error occurred");
             }
             finally
             {
