@@ -8,8 +8,10 @@ namespace MiraiNotes.UWP.Models.API
         [JsonProperty(PropertyName = "id")]
         public string TaskListID { get; set; }
 
+        [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
+        [JsonProperty(PropertyName = "selfLink")]
         public string SelfLink { get; set; }
 
         [JsonProperty(PropertyName = "updated")]
