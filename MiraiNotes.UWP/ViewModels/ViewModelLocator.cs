@@ -2,6 +2,7 @@
 using CommonServiceLocator;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
+using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.UWP.Handlers;
 using MiraiNotes.UWP.Helpers;
@@ -65,8 +66,8 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 //   SimpleIoc.Default.Register<IDataService, DataService>();
             }
-            
-            SimpleIoc.Default.Register<IDialogService, DialogService>();
+            SimpleIoc.Default.Register<IMessenger, Messenger>();
+            SimpleIoc.Default.Register<ICustomDialogService, CustomDialogService>();
             SimpleIoc.Default.Register<INavigationService>(() => navigation);
             SimpleIoc.Default.Register<IUserCredentialService, UserCredentialService>();
             SimpleIoc.Default.Register(() => config.CreateMapper());
