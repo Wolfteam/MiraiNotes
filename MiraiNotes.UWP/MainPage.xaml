@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:MiraiNotes.UWP"
+    xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -24,6 +25,8 @@
         <converters:NavigationViewSelectionChangedEventArgsConverter x:Key="NavigationViewSelectionChangedEventArgsConverter" />
         <converters:TestConverter x:Key="TestConverter" />
     </Page.Resources>
+
+
 
     <NavigationView
         x:Name="NavigationView"
@@ -100,26 +103,52 @@
         </NavigationView.AutoSuggestBox>
         <NavigationView.MenuItemTemplate>
             <DataTemplate>
-                <Grid
+                <StackPanel
                     Height="40"
                     Margin="-16,0,0,0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="48" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Viewbox
-                        Grid.Column="0"
-                        Margin="16,12"
-                        VerticalAlignment="Center" ToolTipService.ToolTip="{Binding Title}">
-                        <SymbolIcon Symbol="List" />
-                    </Viewbox>
-                    <ContentPresenter
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Content="{Binding Title}" />
-                </Grid>
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Grid Width="320">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
+
+                            <Viewbox
+                                Margin="16,12"
+                                HorizontalAlignment="Left"
+                                ToolTipService.ToolTip="{Binding Title}">
+                                <SymbolIcon Symbol="List" />
+                            </Viewbox>
+
+                            <TextBlock
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Text="{Binding Title}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+                            <Button
+                                HorizontalAlignment="Right"
+                                HorizontalContentAlignment="Right"
+                                Background="Transparent"
+                                Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskListCommand}"
+                                CommandParameter="{Binding TaskListID}">
+                                <SymbolIcon Symbol="Delete" />
+                            </Button>
+                        </StackPanel>
+
+                    </Grid>
+                </StackPanel>
             </DataTemplate>
         </NavigationView.MenuItemTemplate>
         <!--<NavigationView.MenuItems>
@@ -179,19 +208,13 @@
         <NavigationView.Content>
             <Frame>
                 <SplitView
+                    x:Name="MainSplitView"
                     DisplayMode="Inline"
                     IsPaneOpen="{Binding IsPaneOpen, Mode=OneWay}"
-                    OpenPaneLength="620"
                     PaneBackground="{StaticResource SystemControlPageBackgroundListLowBrush}"
                     PanePlacement="Right">
                     <SplitView.Pane>
-                        <Grid>
-                            <!--<Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Stretch"/>
-                                </Style>
-                            </Grid.Style>-->
+                        <Grid x:Name="MainSplitViewPane">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -207,8 +230,10 @@
                                 IsActive="True"
                                 Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
                             <TextBox
+                                x:Name="CurrentTaskTitle"
                                 Grid.Row="1"
                                 Margin="20,20,20,0"
+                                localExtensions:FocusExtension.IsFocused="{Binding IsCurrentTaskTitleFocused, Mode=TwoWay}"
                                 AcceptsReturn="True"
                                 IsSpellCheckEnabled="False"
                                 MaxLength="50"
@@ -220,6 +245,7 @@
                                 Margin="20"
                                 IsSpellCheckEnabled="False"
                                 PlaceholderText="Enter your task text here"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
                                 Text="{Binding CurrentTaskText, Mode=TwoWay}"
                                 TextWrapping="Wrap" />
                             <StackPanel
@@ -234,6 +260,7 @@
                                     ToolTipService.ToolTip="Save your task changes" />
                                 <AppBarSeparator />
                                 <AppBarButton
+                                    Command="{Binding ClosePaneCommand}"
                                     Icon="Cancel"
                                     Label="Cancel"
                                     ToolTipService.ToolTip="Cancel your task changes" />
@@ -241,7 +268,7 @@
                         </Grid>
                     </SplitView.Pane>
                     <SplitView.Content>
-                        <Grid>
+                        <Grid x:Name="MainSplitViewContent">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -296,7 +323,7 @@
                                         <StackPanel>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="3*" />
+                                                    <ColumnDefinition Width="2*" />
                                                     <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock
@@ -304,17 +331,26 @@
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
                                                     FontSize="16"
-                                                    Text="{Binding Title}"
-                                                    TextWrapping="NoWrap" />
-                                                <Button
+                                                    Text="{Binding Title}" />
+                                                <StackPanel
                                                     Grid.Column="1"
                                                     HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Background="Transparent"
-                                                    IsTabStop="False"
-                                                    IsTapEnabled="False">
-                                                    <SymbolIcon Symbol="Edit" />
-                                                </Button>
+                                                    Orientation="Horizontal">
+                                                    <Button
+                                                        VerticalAlignment="Center"
+                                                        Background="Transparent"
+                                                        Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskCommand}"
+                                                        CommandParameter="{Binding TaskID}"
+                                                        ToolTipService.ToolTip="Delete this task">
+                                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" />
+                                                    </Button>
+                                                    <Button
+                                                        VerticalAlignment="Center"
+                                                        Background="Transparent"
+                                                        ToolTipService.ToolTip="Mark as completed">
+                                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;" />
+                                                    </Button>
+                                                </StackPanel>
                                             </Grid>
                                         </StackPanel>
                                     </DataTemplate>
@@ -324,7 +360,8 @@
                                 Grid.Row="3"
                                 Margin="20,20,20,0"
                                 HorizontalAlignment="Left"
-                                Text="You have selected X item(s)." />
+                                Text="You have selected X item(s)."
+                                Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
                             <AutoSuggestBox
                                 x:Name="TaskAutoSuggestBox"
                                 Grid.Row="4"
@@ -377,10 +414,10 @@
                                         Label="Delete"
                                         ToolTipService.ToolTip="Delete selected task(s)." />
                                     <AppBarButton
+                                        Command="{Binding RefreshTasksCommand}"
                                         Icon="Refresh"
                                         IsCompact="{Binding IsTaskListCommandBarCompact}"
                                         Label="Refresh"
-                                        Command="{Binding RefreshTasksCommand}"
                                         ToolTipService.ToolTip="Refresh the tasks from the current task list. Requieres a network connection." />
                                     <AppBarButton
                                         Icon="Sort"
@@ -389,39 +426,39 @@
                                         ToolTipService.ToolTip="Sort the task by name, creation date or your order">
                                         <AppBarButton.Flyout>
                                             <MenuFlyout>
-                                                <MenuFlyoutSubItem Text ="By name">
-                                                    <MenuFlyoutItem Text="Asc" Command="{Binding SortTasksCommand}">
+                                                <MenuFlyoutSubItem Text="By name">
+                                                    <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
                                                         <MenuFlyoutItem.CommandParameter>
                                                             <localModels:TaskSortType>BY_NAME_ASC</localModels:TaskSortType>
                                                         </MenuFlyoutItem.CommandParameter>
                                                     </MenuFlyoutItem>
-                                                    <MenuFlyoutItem Text="Desc" Command="{Binding SortTasksCommand}">
+                                                    <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
                                                         <MenuFlyoutItem.CommandParameter>
                                                             <localModels:TaskSortType>BY_NAME_DESC</localModels:TaskSortType>
                                                         </MenuFlyoutItem.CommandParameter>
                                                     </MenuFlyoutItem>
                                                 </MenuFlyoutSubItem>
 
-                                                <MenuFlyoutSubItem Text ="By updated date">
-                                                    <MenuFlyoutItem Text="Asc" Command="{Binding SortTasksCommand}">
+                                                <MenuFlyoutSubItem Text="By updated date">
+                                                    <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
                                                         <MenuFlyoutItem.CommandParameter>
                                                             <localModels:TaskSortType>BY_UPDATED_DATE_ASC</localModels:TaskSortType>
                                                         </MenuFlyoutItem.CommandParameter>
                                                     </MenuFlyoutItem>
-                                                    <MenuFlyoutItem Text="Desc" Command="{Binding SortTasksCommand}">
+                                                    <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
                                                         <MenuFlyoutItem.CommandParameter>
                                                             <localModels:TaskSortType>BY_UPDATED_DATE_DESC</localModels:TaskSortType>
                                                         </MenuFlyoutItem.CommandParameter>
                                                     </MenuFlyoutItem>
                                                 </MenuFlyoutSubItem>
 
-                                                <MenuFlyoutSubItem Text ="By my order">
-                                                    <MenuFlyoutItem Text="Asc" Command="{Binding SortTasksCommand}">
+                                                <MenuFlyoutSubItem Text="By my order">
+                                                    <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
                                                         <MenuFlyoutItem.CommandParameter>
                                                             <localModels:TaskSortType>CUSTOM_ASC</localModels:TaskSortType>
                                                         </MenuFlyoutItem.CommandParameter>
                                                     </MenuFlyoutItem>
-                                                    <MenuFlyoutItem Text="Desc" Command="{Binding SortTasksCommand}">
+                                                    <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
                                                         <MenuFlyoutItem.CommandParameter>
                                                             <localModels:TaskSortType>CUSTOM_DESC</localModels:TaskSortType>
                                                         </MenuFlyoutItem.CommandParameter>
@@ -439,7 +476,10 @@
                                     <AppBarButton Icon="SelectAll" Label="Mark as completed" />
                                     <AppBarSeparator />
                                     <AppBarButton Icon="Edit" Label="Change current task list name" />
-                                    <AppBarButton Icon="Delete" Label="Delete current task list" />
+                                    <AppBarButton
+                                        Command="{Binding DeleteCurrentTaskListCommand}"
+                                        Icon="Delete"
+                                        Label="Delete current task list" />
                                     <AppBarSeparator />
                                     <AppBarButton Icon="ReShare" Label="Share" />
                                     <AppBarButton Icon="Setting" Label="Settings" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight.Messaging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,9 +23,44 @@ namespace MiraiNotes.UWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private const double PANE_WIDTH_PERCENTAGE = .45;
+
         public MainPage()
         {
             this.InitializeComponent();
+            MainSplitView.RegisterPropertyChangedCallback(SplitView.IsPaneOpenProperty, IsPaneOpenPropertyChanged);
+            MainSplitView.SizeChanged += (sender, e) => MainSplitViewSizeChanged();
         }
+
+        /// <summary>
+        /// Updates the pane view width of the main split view
+        /// </summary>
+        private void MainSplitViewSizeChanged()
+        {
+            //TODO: When the hamburger is open and you minimize the screen, a bug appears
+            if (!MainSplitView.IsPaneOpen)
+                return;
+            
+            if (MainSplitViewPane.ActualWidth == 0 || MainSplitViewContent.ActualWidth == 0)
+            {
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitView.ActualWidth);
+                return;
+            }
+
+            if (MainSplitViewPane.ActualWidth <= MainSplitViewContent.ActualWidth * PANE_WIDTH_PERCENTAGE)
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitViewContent.ActualWidth);
+            else if (MainSplitViewPane.ActualWidth * PANE_WIDTH_PERCENTAGE > MainSplitViewContent.ActualWidth)
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitViewContent.ActualWidth);
+        }
+
+        private void IsPaneOpenPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            if (MainSplitView.IsPaneOpen)
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitViewContent.ActualWidth);
+            else
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(0);
+        }
+
+        private double CalculatePaneWidth(double actualWidth) => actualWidth * PANE_WIDTH_PERCENTAGE;
     }
 }

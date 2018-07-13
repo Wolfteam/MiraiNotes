@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -46,8 +47,11 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _isPaneOpen;
         #endregion
 
+        private bool _isCurrentTaskTitleFocused;
+
         #region Members
         private readonly ICustomDialogService _dialogService;
+        private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleApiService _googleApiService;
@@ -65,6 +69,12 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _taskListsAutoSuggestBoxItems; }
             set { SetValue(ref _taskListsAutoSuggestBoxItems, value); }
+        }
+
+        public GoogleTaskListModel CurrentTaskList
+        {
+            get { return _currentTaskList; }
+            set { SetValue(ref _currentTaskList, value); }
         }
 
         public string TaskListkAutoSuggestBoxText
@@ -148,6 +158,14 @@ namespace MiraiNotes.UWP.ViewModels
         }
         #endregion
 
+        #region NavigationView Pane Properties
+        public bool IsCurrentTaskTitleFocused
+        {
+            get { return _isCurrentTaskTitleFocused; }
+            set { SetValue(ref _isCurrentTaskTitleFocused, value); }
+        }
+        #endregion
+
         #region NavigationView Commands
         public ICommand TaskListAutoSuggestBoxTextChangedCommand { get; set; }
 
@@ -155,31 +173,17 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand NavigationViewSelectionChanged { get; set; }
 
-        public ICommand LogoutCommand => new RelayCommand(LogoutAsync);
+        public ICommand LogoutCommand { get; set; }
         #endregion
 
         #region NavigationView Content Commands
         public ICommand NewTaskListCommand { get; set; }
 
-        public ICommand NewTaskCommand
-        {
-            get
-            {
-                return new RelayCommand(CreateNewTask);
-            }
-        }
-
-        public ICommand TaskAutoSuggestBoxCommand
-        {
-            get
-            {
-                return new RelayCommand(TaskAutoSuggestBox);
-            }
-        }
+        public ICommand NewTaskCommand { get; set; }
 
         public ICommand OpenPaneCommand { get; set; }
 
-        public ICommand ClosePaneCommand => new RelayCommand(ClosePane);
+        public ICommand ClosePaneCommand { get; set; } 
 
         public ICommand TaskListViewSelectedItemCommand { get; set; }
 
@@ -205,6 +209,12 @@ namespace MiraiNotes.UWP.ViewModels
             //}
         });
 
+        public ICommand DeleteTaskListCommand { get; set; }
+
+        public ICommand DeleteCurrentTaskListCommand { get; set; }
+
+        public ICommand DeleteTaskCommand { get; set; }
+
         public ICommand RefreshTasksCommand { get; set; }
 
         public ICommand SortTasksCommand { get; set; }
@@ -212,11 +222,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         public HomeViewModel(ICustomDialogService dialogService,
                             INavigationService navigationService,
+                            IMessenger messenger,
                             IUserCredentialService userCredentialService,
                             IGoogleApiService googleApiService,
                             IMapper mapper)
         {
             _dialogService = dialogService;
+            _messenger = messenger;
             _navigationService = navigationService;
             _userCredentialService = userCredentialService;
             _googleApiService = googleApiService;
@@ -224,32 +236,40 @@ namespace MiraiNotes.UWP.ViewModels
 
             //NavigationView Commands
             TaskListAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
-                ((text) => OnTaskListAutoSuggestBoxTextChange(text));
+                ((text) => OnTaskListAutoSuggestBoxTextChangeAsync(text));
 
             TaskListAutoSuggestBoxQuerySubmittedCommand = new RelayCommand<ItemModel>
-                (async (selectedItem) => await OnTaskListAutoSuggestBoxQuerySubmitted(selectedItem));
+                (async (selectedItem) => await OnTaskListAutoSuggestBoxQuerySubmittedAsync(selectedItem));
+
+            TaskListViewSelectedItemCommand = new RelayCommand<TaskModel>
+                (async (task) => await OnTaskListViewSelectedItemAsync(task));
 
             NavigationViewSelectionChanged = new RelayCommand<object>
-                (async (selectedItem) => await OnNavigationViewSelectionChange(selectedItem));
+                (async (selectedItem) => await OnNavigationViewSelectionChangeAsync(selectedItem));
+
+            LogoutCommand = new RelayCommand(LogoutAsync);
 
             //NavigationView Content Commands
-            TaskListViewSelectedItemCommand = new RelayCommand<TaskModel>
-                (async (task) => await OnTaskListViewSelectedItem(task));
-
             TaskAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
-                (async (text) => await OnTaskAutoSuggestBoxTextChange(text));
+                (async (text) => await OnTaskAutoSuggestBoxTextChangeAsync(text));
 
-            NewTaskListCommand = new RelayCommand(() =>
-            {
+            NewTaskListCommand = new RelayCommand(async () => await SaveNewTaskListAsync());
 
-            });
+            NewTaskCommand = new RelayCommand(OpenPane);
 
-            RefreshTasksCommand = new RelayCommand(async() => await RefreshTasks());
+            DeleteTaskListCommand = new RelayCommand<string>(async (taskListID) => await DeleteTaskList(taskListID));
+
+            DeleteCurrentTaskListCommand = new RelayCommand(async () => await DeleteCurrentTaskListAsync());
+
+            DeleteTaskCommand = new RelayCommand<string>(async (taskID) => await DeleteTask(taskID));
+
+            RefreshTasksCommand = new RelayCommand(async () => await RefreshTasksAsync());
 
             SortTasksCommand = new RelayCommand<TaskSortType>((sortBy) => SortTasks(sortBy));
 
             OpenPaneCommand = new RelayCommand(OpenPane);
-
+            ClosePaneCommand = new RelayCommand(ClosePane);
+            
             //Others
             InitView();
         }
@@ -271,7 +291,7 @@ namespace MiraiNotes.UWP.ViewModels
             Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items);
         }
 
-        public void OnTaskListAutoSuggestBoxTextChange(string currentText)
+        public void OnTaskListAutoSuggestBoxTextChangeAsync(string currentText)
         {
             var filteredItems = string.IsNullOrEmpty(currentText) ?
             _mapper.Map<ObservableCollection<ItemModel>>(TaskLists
@@ -285,22 +305,22 @@ namespace MiraiNotes.UWP.ViewModels
             TaskListsAutoSuggestBoxItems = filteredItems;
         }
 
-        public async Task OnTaskListAutoSuggestBoxQuerySubmitted(ItemModel selectedItem)
+        public async Task OnTaskListAutoSuggestBoxQuerySubmittedAsync(ItemModel selectedItem)
         {
             if (selectedItem == null)
                 return;
-            _currentTaskList = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
-            await OnSelectedTaskListAsync(_currentTaskList);
+            CurrentTaskList = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
+            await OnSelectedTaskListAsync(CurrentTaskList);
         }
 
-        public async Task OnNavigationViewSelectionChange(object selectedItem)
+        public async Task OnNavigationViewSelectionChangeAsync(object selectedItem)
         {
             if (selectedItem is NavigationViewItem navViewItem)
-               await _dialogService.ShowMessageDialogAsync($"Seleccionaste {navViewItem.Name}", "Hola");
+                await _dialogService.ShowMessageDialogAsync($"Seleccionaste {navViewItem.Name}", "Hola");
             else if (selectedItem is GoogleTaskListModel taskList)
             {
-                _currentTaskList = taskList;
-                await OnSelectedTaskListAsync(_currentTaskList);
+                CurrentTaskList = taskList;
+                await OnSelectedTaskListAsync(CurrentTaskList);
             }
         }
 
@@ -321,7 +341,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region NavigationView Content Methods
-        public async Task OnTaskListViewSelectedItem(TaskModel task)
+        public async Task OnTaskListViewSelectedItemAsync(TaskModel task)
         {
             if (task == null)
             {
@@ -338,16 +358,16 @@ namespace MiraiNotes.UWP.ViewModels
                 await _dialogService.ShowMessageDialogAsync("Hay algo seleccionado", "");
         }
 
-        public async Task OnTaskAutoSuggestBoxTextChange(string currentText)
+        public async Task OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
         {
             ShowTaskProgressRing = true;
-            var response = await _googleApiService.TaskService.GetAllAsync(_currentTaskList.TaskListID);
+            var response = await _googleApiService.TaskService.GetAllAsync(CurrentTaskList.TaskListID);
             ShowTaskProgressRing = false;
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"An error occurred while trying to get the tasks for the selected tasklist = {_currentTaskList.Title}");
+                    $"An error occurred while trying to get the tasks for the selected tasklist = {CurrentTaskList.Title}");
                 return;
             }
             var filteredItems = string.IsNullOrEmpty(currentText) ?
@@ -364,18 +384,144 @@ namespace MiraiNotes.UWP.ViewModels
                 .Where(t => filteredItems.Any(fi => fi.ItemID == t.TaskID)));
         }
 
-        
-
-        public async Task RefreshTasks()
+        public async Task SaveNewTaskListAsync()
         {
+            string taskListName = await _dialogService
+                .ShowInputStringDialogAsync("Type the task list name", string.Empty, "Save", "Cancel");
+
+            if (string.IsNullOrEmpty(taskListName))
+                return;
+
             ShowTaskListViewProgressRing = true;
-            var response = await _googleApiService.TaskService.GetAllAsync(_currentTaskList.TaskListID);
+            var response = await _googleApiService
+                .TaskListService
+                .SaveAsync(new GoogleTaskListModel
+                {
+                    Title = taskListName,
+                    UpdatedAt = DateTime.Now
+                });
             ShowTaskListViewProgressRing = false;
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"An error occurred while trying to refresh the tasks for the selected tasklist = {_currentTaskList.Title}");
+                    $"Coudln't create the task list. Error code = {response.Errors.ApiError.Code}," +
+                    $" message = {response.Errors.ApiError.Message}");
+                return;
+            }
+
+            TaskLists.Add(response.Result);
+            await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
+        }
+
+        public async Task DeleteTaskList(string taskListID)
+        {
+            var taskListToDelete = TaskLists
+                .FirstOrDefault(tl => tl.TaskListID == taskListID);
+
+            if (taskListToDelete == null)
+                throw new NullReferenceException("The selected task list doesnt exists");
+
+            bool deleteCurrentTaskList = await _dialogService
+                .ShowConfirmationDialogAsync($"Are you sure you wanna delete {taskListToDelete.Title} task list?", "Yes", "No");
+
+            if (!deleteCurrentTaskList)
+                return;
+
+            ShowTaskProgressRing = true;
+            var response = await _googleApiService
+                .TaskListService.DeleteAsync(taskListID);
+            ShowTaskProgressRing = false;
+
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"Coudln't delete the task list {taskListToDelete.Title}. Error code = {response.Errors.ApiError.Code}," +
+                    $" message = {response.Errors.ApiError.Message}");
+                return;
+            }
+
+            await _dialogService
+                .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskListToDelete.Title} task list");
+            TaskLists.Remove(taskListToDelete);
+        }
+
+        public async Task DeleteCurrentTaskListAsync()
+        {
+            if (CurrentTaskList == null)
+                throw new NullReferenceException("There is no current selected task list");
+
+            var taskListToDelete = TaskLists
+                .FirstOrDefault(tl => tl.TaskListID == CurrentTaskList.TaskListID);
+
+            if (taskListToDelete == null)
+                throw new NullReferenceException("The selected task list doesnt exists");
+
+            bool deleteCurrentTaskList = await _dialogService
+                .ShowConfirmationDialogAsync($"Are you sure you wanna delete {taskListToDelete.Title} task list?", "Yes", "No");
+
+            if (!deleteCurrentTaskList)
+                return;
+
+            ShowTaskProgressRing = true;
+            var response = await _googleApiService
+                .TaskListService.DeleteAsync(taskListToDelete.TaskListID);
+            ShowTaskProgressRing = false;
+
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"Coudln't delete the task list {taskListToDelete.Title}. Error code = {response.Errors.ApiError.Code}," +
+                    $" message = {response.Errors.ApiError.Message}");
+                return;
+            }
+
+            await _dialogService
+                .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskListToDelete.Title} task list");
+            CurrentTaskList = null;
+            TaskLists.Remove(taskListToDelete);
+        }
+
+        public async Task DeleteTask (string taskID)
+        {
+            bool deleteTask = await _dialogService
+                .ShowConfirmationDialogAsync("Are you sure you wanna delete this tasks?", "Yes", "No");
+
+            if (!deleteTask)
+                return;
+            var taskToDelete = Tasks.FirstOrDefault(t => t.TaskID == taskID);
+            if (taskToDelete == null)
+                throw new KeyNotFoundException($"Couldn't find a task with the id {taskID}");
+
+            ShowTaskListViewProgressRing = true;
+            var response = await _googleApiService
+                .TaskService.DeleteAsync(CurrentTaskList.TaskListID, taskID);
+            ShowTaskListViewProgressRing = false;
+
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"Coudln't delete the selected task. Error code = {response.Errors.ApiError.Code}," +
+                    $" message = {response.Errors.ApiError.Message}");
+                return;
+            }
+
+            Tasks.Remove(taskToDelete);
+        }
+
+        public async Task RefreshTasksAsync()
+        {
+            ShowTaskListViewProgressRing = true;
+            var response = await _googleApiService.TaskService.GetAllAsync(CurrentTaskList.TaskListID);
+            ShowTaskListViewProgressRing = false;
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An error occurred while trying to refresh the tasks for the selected tasklist = {CurrentTaskList.Title}");
                 return;
             }
             Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items);
@@ -408,13 +554,30 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        private void OpenPane() => IsPaneOpen = true;
+        private void OpenPane()
+        {
+            CleanPanel();
+            IsPaneOpen = true;
+            IsCurrentTaskTitleFocused = true;
+        }
 
-        private void ClosePane() => IsPaneOpen = false;
+        private void ClosePane()
+        {
+            CleanPanel();
+            IsPaneOpen = false;
+        }
+
+        private void CleanPanel()
+        {
+            if (!string.IsNullOrEmpty(CurrentTaskText))
+                CurrentTaskText = string.Empty;
+
+            if (!string.IsNullOrEmpty(CurrentTaskTitle))
+                CurrentTaskTitle = string.Empty;
+        }
         #endregion
 
         #region NavigationView Pane Methods
-
         #endregion
 
         #region Methods
@@ -435,7 +598,7 @@ namespace MiraiNotes.UWP.ViewModels
             TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items.OrderBy(t => t.Title));
 
             var taskList = TaskLists.FirstOrDefault();
-            _currentTaskList = taskList;
+            CurrentTaskList = taskList;
             if (string.IsNullOrEmpty(taskList?.Title))
             {
                 return;
@@ -454,11 +617,6 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTaskListTitle = taskList.Title;
             Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response2.Result.Items);
             TaskAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(response2.Result.Items.OrderBy(t => t.Title));
-        }
-
-        public void TaskAutoSuggestBox()
-        {
-            Debug.WriteLine($"You typed {TaskAutoSuggestBoxText}");
         }
 
         public void CreateNewTaskList() => _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
