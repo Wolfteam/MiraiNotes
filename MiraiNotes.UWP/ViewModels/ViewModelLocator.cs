@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.UWP.Design;
 using MiraiNotes.UWP.Handlers;
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
@@ -36,13 +37,29 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public HomeViewModel Home
+        public NavViewModel Home
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<HomeViewModel>();
+                return ServiceLocator.Current.GetInstance<NavViewModel>();
             }
         } 
+
+        public TasksViewModel Tasks
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<TasksViewModel>();
+            }
+        }
+
+        public NewTaskViewModel NewTask
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<NewTaskViewModel>();
+            }
+        }
         #endregion
 
         public ViewModelLocator()
@@ -60,11 +77,13 @@ namespace MiraiNotes.UWP.ViewModels
                 
             if (ViewModelBase.IsInDesignModeStatic)
             {
-                // SimpleIoc.Default.Register<IDataService, Design.DesignDataService>();
+                SimpleIoc.Default.Register<IGoogleTaskListService, DesignGoogleTaskListService>();
+                SimpleIoc.Default.Register<IGoogleTaskService, DesignGoogleTaskService>();
             }
             else
             {
-                //   SimpleIoc.Default.Register<IDataService, DataService>();
+                SimpleIoc.Default.Register<IGoogleTaskListService, GoogleTaskListService>();
+                SimpleIoc.Default.Register<IGoogleTaskService, GoogleTaskService>();
             }
             SimpleIoc.Default.Register<IMessenger, Messenger>();
             SimpleIoc.Default.Register<ICustomDialogService, CustomDialogService>();
@@ -77,12 +96,12 @@ namespace MiraiNotes.UWP.ViewModels
 
             SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
             SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
-            SimpleIoc.Default.Register<IGoogleTaskListService, GoogleTaskListService>();
-            SimpleIoc.Default.Register<IGoogleTaskService, GoogleTaskService>();
             SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
 
             SimpleIoc.Default.Register<LoginViewModel>();
-            SimpleIoc.Default.Register<HomeViewModel>();
+            SimpleIoc.Default.Register<NavViewModel>();
+            SimpleIoc.Default.Register<TasksViewModel>();
+            SimpleIoc.Default.Register<NewTaskViewModel>();
         }
     }
 }

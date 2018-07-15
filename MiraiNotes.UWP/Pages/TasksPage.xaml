@@ -1,0 +1,241 @@
+﻿<Page
+    x:Class="MiraiNotes.UWP.Pages.TasksPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Extensions="using:WinRTXamlToolkit.Controls.Extensions"
+    xmlns:converters="using:MiraiNotes.UWP.Converters"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:MiraiNotes.UWP.Pages"
+    xmlns:localModels="using:MiraiNotes.UWP.Models"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding Tasks, Source={StaticResource Locator}}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:AutoSuggestQueryParameterConverter x:Key="AutoSuggestQueryParameterConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter
+            x:Key="BoolToVisibilityConverterInverse"
+            OnFalse="Visible"
+            OnTrue="Collapsed" />
+    </Page.Resources>
+
+
+    <Grid x:Name="MainSplitViewContent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ProgressRing
+            Grid.RowSpan="5"
+            Width="75"
+            Height="75"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsActive="True"
+            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <TextBlock
+            Grid.Row="1"
+            Margin="60,12,60,0"
+            HorizontalTextAlignment="Center"
+            Style="{StaticResource TitleTextBlockStyle}"
+            Text="{Binding CurrentTaskList.Title}"
+            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+        <ListView
+            x:Name="TaskListView"
+            Grid.Row="2"
+            Width="{Binding ElementName=MainGrid, Path=ActualWidth}"
+            Margin="0,12,0,0"
+            Extensions:ListViewExtensions.BindableSelection="{Binding SelectedTasks, Mode=TwoWay}"
+            IsItemClickEnabled="True"
+            IsTextScaleFactorEnabled="True"
+            ItemsSource="{Binding Tasks}"
+            SelectionMode="Extended"
+            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}">
+            <interactivity:Interaction.Behaviors>
+                <core:EventTriggerBehavior EventName="SelectionChanged">
+                    <core:EventTriggerBehavior.Actions>
+                        <core:InvokeCommandAction Command="{Binding TaskListViewSelectedItemCommand}" CommandParameter="{Binding ElementName=TaskListView, Path=SelectedItem}" />
+                    </core:EventTriggerBehavior.Actions>
+                </core:EventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                Text="{Binding Title}" />
+                            <StackPanel
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                                <Button
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskCommand}"
+                                    CommandParameter="{Binding TaskID}"
+                                    ToolTipService.ToolTip="Delete this task">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" />
+                                </Button>
+                                <Button
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    ToolTipService.ToolTip="Mark as completed">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <TextBlock
+            Grid.Row="3"
+            Margin="20,20,20,0"
+            HorizontalAlignment="Left"
+            Text="You have selected X item(s)."
+            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+        <AutoSuggestBox
+            x:Name="TaskAutoSuggestBox"
+            Grid.Row="4"
+            Margin="20"
+            DisplayMemberPath="Text"
+            Header="Type here to filter"
+            ItemsSource="{Binding TaskAutoSuggestBoxItems}"
+            PlaceholderText="Search a task..."
+            QueryIcon="Find"
+            TextMemberPath="Text"
+            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}">
+            <interactivity:Interaction.Behaviors>
+                <core:EventTriggerBehavior EventName="TextChanged">
+                    <core:EventTriggerBehavior.Actions>
+                        <core:InvokeCommandAction Command="{Binding TaskAutoSuggestBoxTextChangedCommand}" CommandParameter="{Binding ElementName=TaskAutoSuggestBox, Path=Text}" />
+                    </core:EventTriggerBehavior.Actions>
+                </core:EventTriggerBehavior>
+                <core:EventTriggerBehavior EventName="QuerySubmitted">
+                    <core:EventTriggerBehavior.Actions>
+                        <core:InvokeCommandAction Command="{Binding TaskAutoSuggestBoxQuerySubmittedCommand}" InputConverter="{StaticResource AutoSuggestQueryParameterConverter}" />
+                    </core:EventTriggerBehavior.Actions>
+                </core:EventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+        </AutoSuggestBox>
+        <CommandBar
+            Grid.Row="5"
+            Background="{StaticResource SystemControlBaseLowAcrylicWindowBrush}"
+            DefaultLabelPosition="Bottom"
+            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton
+                    Icon="Add"
+                    Label="Add"
+                    ToolTipService.ToolTip="Add a new task list or task.">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Command="{Binding NewTaskListCommand}" Text="New list" />
+                            <MenuFlyoutItem Command="{Binding NewTaskCommand}" Text="New task" />
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton
+                    Icon="Edit"
+                    IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    Label="Edit"
+                    LabelPosition="Default" />
+                <AppBarButton
+                    Icon="Delete"
+                    IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    Label="Delete"
+                    ToolTipService.ToolTip="Delete selected task(s)." />
+                <AppBarButton
+                    Command="{Binding RefreshTasksCommand}"
+                    Icon="Refresh"
+                    IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    Label="Refresh"
+                    ToolTipService.ToolTip="Refresh the tasks from the current task list. Requieres a network connection." />
+                <AppBarButton
+                    Icon="Sort"
+                    IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    Label="Sort"
+                    ToolTipService.ToolTip="Sort the task by name, creation date or your order">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutSubItem Text="By name">
+                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
+                                    <MenuFlyoutItem.CommandParameter>
+                                        <localModels:TaskSortType>BY_NAME_ASC</localModels:TaskSortType>
+                                    </MenuFlyoutItem.CommandParameter>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
+                                    <MenuFlyoutItem.CommandParameter>
+                                        <localModels:TaskSortType>BY_NAME_DESC</localModels:TaskSortType>
+                                    </MenuFlyoutItem.CommandParameter>
+                                </MenuFlyoutItem>
+                            </MenuFlyoutSubItem>
+
+                            <MenuFlyoutSubItem Text="By updated date">
+                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
+                                    <MenuFlyoutItem.CommandParameter>
+                                        <localModels:TaskSortType>BY_UPDATED_DATE_ASC</localModels:TaskSortType>
+                                    </MenuFlyoutItem.CommandParameter>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
+                                    <MenuFlyoutItem.CommandParameter>
+                                        <localModels:TaskSortType>BY_UPDATED_DATE_DESC</localModels:TaskSortType>
+                                    </MenuFlyoutItem.CommandParameter>
+                                </MenuFlyoutItem>
+                            </MenuFlyoutSubItem>
+
+                            <MenuFlyoutSubItem Text="By my order">
+                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
+                                    <MenuFlyoutItem.CommandParameter>
+                                        <localModels:TaskSortType>CUSTOM_ASC</localModels:TaskSortType>
+                                    </MenuFlyoutItem.CommandParameter>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
+                                    <MenuFlyoutItem.CommandParameter>
+                                        <localModels:TaskSortType>CUSTOM_DESC</localModels:TaskSortType>
+                                    </MenuFlyoutItem.CommandParameter>
+                                </MenuFlyoutItem>
+                            </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton
+                    Command="{Binding SelectAllTaskCommand}"
+                    Icon="SelectAll"
+                    Label="Select all" />
+                <AppBarButton Icon="SelectAll" Label="Mark as completed" />
+                <AppBarSeparator />
+                <AppBarButton Icon="Edit" Label="Change current task list name" />
+                <AppBarSeparator />
+                <AppBarButton Icon="ReShare" Label="Share" />
+                <AppBarButton Icon="Setting" Label="Settings" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Grid>
+</Page>

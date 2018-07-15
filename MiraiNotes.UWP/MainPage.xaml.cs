@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
+using MiraiNotes.UWP.Pages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,6 +29,8 @@ namespace MiraiNotes.UWP
         public MainPage()
         {
             this.InitializeComponent();
+            ContentFrame.Navigate(typeof(TasksPage));
+            PaneFrame.Navigate(typeof(NewTaskPage));
             MainSplitView.RegisterPropertyChangedCallback(SplitView.IsPaneOpenProperty, IsPaneOpenPropertyChanged);
             MainSplitView.SizeChanged += (sender, e) => MainSplitViewSizeChanged();
         }
@@ -41,22 +44,22 @@ namespace MiraiNotes.UWP
             if (!MainSplitView.IsPaneOpen)
                 return;
             
-            if (MainSplitViewPane.ActualWidth == 0 || MainSplitViewContent.ActualWidth == 0)
+            if (PaneFrame.ActualWidth == 0 || ContentFrame.ActualWidth == 0)
             {
                 MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitView.ActualWidth);
                 return;
             }
 
-            if (MainSplitViewPane.ActualWidth <= MainSplitViewContent.ActualWidth * PANE_WIDTH_PERCENTAGE)
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitViewContent.ActualWidth);
-            else if (MainSplitViewPane.ActualWidth * PANE_WIDTH_PERCENTAGE > MainSplitViewContent.ActualWidth)
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitViewContent.ActualWidth);
+            if (PaneFrame.ActualWidth <= ContentFrame.ActualWidth * PANE_WIDTH_PERCENTAGE)
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(ContentFrame.ActualWidth);
+            else if (PaneFrame.ActualWidth * PANE_WIDTH_PERCENTAGE > ContentFrame.ActualWidth)
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(ContentFrame.ActualWidth);
         }
 
         private void IsPaneOpenPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             if (MainSplitView.IsPaneOpen)
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitViewContent.ActualWidth);
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(ContentFrame.ActualWidth);
             else
                 MainSplitView.OpenPaneLength = CalculatePaneWidth(0);
         }
