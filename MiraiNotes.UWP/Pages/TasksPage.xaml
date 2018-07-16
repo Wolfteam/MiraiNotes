@@ -95,7 +95,7 @@
                                 <Button
                                     VerticalAlignment="Center"
                                     Background="Transparent"
-                                    Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskCommand}"
+                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
                                     CommandParameter="{Binding TaskID}"
                                     ToolTipService.ToolTip="Delete this task">
                                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" />

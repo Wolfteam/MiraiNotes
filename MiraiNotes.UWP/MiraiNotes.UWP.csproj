@@ -275,6 +275,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
+    <PackageReference Include="Template10-Validation">
+      <Version>1.0.2</Version>
+    </PackageReference>
     <PackageReference Include="winrtxamltoolkit">
       <Version>2.3.0</Version>
     </PackageReference>

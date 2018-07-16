@@ -1,15 +1,13 @@
-﻿using GalaSoft.MvvmLight;
-using MiraiNotes.UWP.ViewModels;
-using System;
+﻿using System;
+using Template10.Validation;
 
 namespace MiraiNotes.UWP.Models
 {
-    public class TaskModel : BaseViewModel
-
+    public class TaskModel : ValidatableModelBase
     {
         public string TaskID { get; set; }
 
-        public string Title { get; set; }
+        public string Title { get { return Read<string>(); } set { Write(value); } }
 
         public DateTime UpdatedAt { get; set; }
 
@@ -19,23 +17,16 @@ namespace MiraiNotes.UWP.Models
 
         public string Position { get; set; }
 
-        public string Notes { get; set; }
+        public string Notes { get { return Read<string>(); } set { Write(value); } }
 
         public string Status { get; set; }
 
-        public DateTime? ToBeCompletedOn { get; set; }
+        public DateTimeOffset? ToBeCompletedOn { get; set; }
 
         public DateTime? CompletedOn { get; set; }
 
         public bool IsDeleted { get; set; }
 
         public bool IsHidden { get; set; }
-
-        private bool isSelected;
-        public bool IsSelected
-        {
-            get { return isSelected; }
-            set { SetValue(ref isSelected, value); }
-        }
     }
 }

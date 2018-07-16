@@ -172,7 +172,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            _messenger.Send(taskList, "GetAllTasksAsync");
+            _messenger.Send(taskList, "OnNavigationViewSelectionChange");
         }
 
         public void OnTaskListAutoSuggestBoxTextChangeAsync(string currentText)
@@ -204,7 +204,7 @@ namespace MiraiNotes.UWP.ViewModels
             else if (selectedItem is GoogleTaskListModel taskList)
             {
                 CurrentTaskList = taskList;
-                _messenger.Send(taskList, "GetAllTasksAsync");
+                _messenger.Send(taskList, "OnNavigationViewSelectionChange");
             }
         }
 

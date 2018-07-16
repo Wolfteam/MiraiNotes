@@ -146,26 +146,26 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<GoogleTaskListModel>(this, "GetAllTasksAsync", GetAllTasksAsync);
-            _messenger.Register<bool>(this, "ShowTaskListViewProgressRing", (show) => ShowTaskListViewProgressRing = show);
+            _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange",
+                async (taskList) => await GetAllTasksAsync(taskList));
+            _messenger.Register<bool>(this, "ShowTaskListViewProgressRing",
+                (show) => ShowTaskListViewProgressRing = show);
+
+            _messenger.Register<TaskModel>(this, "TaskSaved", OnTaskSaved);
 
             TaskListViewSelectedItemCommand = new RelayCommand<TaskModel>
-                (async (task) => await OnTaskListViewSelectedItemAsync(task));
+                ((task) => OnTaskListViewSelectedItem(task));
 
             TaskAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 (async (text) => await OnTaskAutoSuggestBoxTextChangeAsync(text));
 
-            NewTaskCommand = new RelayCommand(() =>
-            {
-                _messenger.Send(true, "OpenPane");
-                _messenger.Send(new TaskModel(), "NewTask");
-            });
+            NewTaskCommand = new RelayCommand(() => OnTaskListViewSelectedItem(new TaskModel()));
 
             NewTaskListCommand = new RelayCommand(async () => await SaveNewTaskListAsync());
 
             DeleteTaskCommand = new RelayCommand<string>(async (taskID) => await DeleteTask(taskID));
 
-            RefreshTasksCommand = new RelayCommand(async () => await RefreshTasksAsync());
+            RefreshTasksCommand = new RelayCommand(async () => await GetAllTasksAsync(CurrentTaskList));
 
             SortTasksCommand = new RelayCommand<TaskSortType>((sortBy) => SortTasks(sortBy));
 
@@ -174,7 +174,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Methods
-        public async void GetAllTasksAsync(GoogleTaskListModel taskList)
+        public async Task GetAllTasksAsync(GoogleTaskListModel taskList)
         {
             ShowTaskListViewProgressRing = true;
             var response = await _googleApiService.TaskService.GetAllAsync(taskList.TaskListID);
@@ -201,23 +201,19 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTaskList = taskList;
         }
 
-        public async Task OnTaskListViewSelectedItemAsync(TaskModel task)
+        public void OnTaskListViewSelectedItem(TaskModel task)
         {
+            //When a list contains no items, and you switch to that list
+            //the event raises, thats why whe do this check here
             if (task == null)
-            {
-                _messenger.Send(false, "OpenPane");
-                //_messenger.Send(task, "NewTask");
-                //return;
-            }
-            else
-                _messenger.Send(true, "OpenPane");
+                return;
+            _messenger.Send(true, "OpenPane");
             _messenger.Send(task, "NewTask");
-            if (Tasks.Any(t => t.IsSelected))
-                await _dialogService.ShowMessageDialogAsync("Hay algo seleccionado", "");
         }
 
         public async Task OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
         {
+            //TODO: Refactor this
             ShowTaskProgressRing = true;
             var response = await _googleApiService.TaskService.GetAllAsync(CurrentTaskList.TaskListID);
             ShowTaskProgressRing = false;
@@ -240,6 +236,16 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxItems = filteredItems;
             Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items
                 .Where(t => filteredItems.Any(fi => fi.ItemID == t.TaskID)));
+        }
+
+        public void OnTaskSaved(TaskModel task)
+        {
+            var modifiedTask = Tasks.FirstOrDefault(t => t.TaskID == task.TaskID);
+            if (modifiedTask != null)
+            {
+                Tasks.Remove(modifiedTask);
+            }
+            Tasks.Add(task);
         }
 
         public async Task SaveNewTaskListAsync()
@@ -297,21 +303,6 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             Tasks.Remove(taskToDelete);
-        }
-
-        public async Task RefreshTasksAsync()
-        {
-            ShowTaskListViewProgressRing = true;
-            var response = await _googleApiService.TaskService.GetAllAsync(CurrentTaskList.TaskListID);
-            ShowTaskListViewProgressRing = false;
-            if (!response.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"An error occurred while trying to refresh the tasks for the selected tasklist = {CurrentTaskList.Title}");
-                return;
-            }
-            Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items);
         }
 
         public void SortTasks(TaskSortType sortType)

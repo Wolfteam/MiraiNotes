@@ -7,6 +7,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages"
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:validate="using:Template10.Controls.Validation"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding NewTask, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -15,7 +16,7 @@
         <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Page.Resources>
 
-    <Grid x:Name="MainSplitViewPane">
+    <Grid x:Name="MainSplitViewPane" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -31,40 +32,64 @@
             IsActive="True"
             Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
         <TextBox
-            x:Name="CurrentTaskTitle"
-            Grid.Row="1"
             Margin="20,20,20,0"
             localExtensions:FocusExtension.IsFocused="{Binding IsCurrentTaskTitleFocused, Mode=TwoWay}"
             AcceptsReturn="True"
+            Header="Task Title:"
             IsSpellCheckEnabled="False"
             MaxLength="50"
             SelectionHighlightColor="Green"
-            Text="{Binding CurrentTask.Title, Mode=OneWay}"
+            Text="{Binding CurrentTask.Title, Mode=TwoWay}"
             TextWrapping="NoWrap" />
         <TextBox
             Grid.Row="2"
             Margin="20"
+            Header="Notes:"
             IsSpellCheckEnabled="False"
             PlaceholderText="Enter your task text here"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             Text="{Binding CurrentTask.Notes, Mode=TwoWay}"
             TextWrapping="Wrap" />
-        <StackPanel
+        <CommandBar
             Grid.Row="3"
-            Margin="0,0,0,20"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Orientation="Horizontal">
-            <AppBarButton
-                Icon="Save"
-                Label="Save"
-                ToolTipService.ToolTip="Save your task changes" />
-            <AppBarSeparator />
-            <AppBarButton
-                Command="{Binding ClosePaneCommand}"
-                Icon="Cancel"
-                Label="Cancel"
-                ToolTipService.ToolTip="Cancel your task changes" />
-        </StackPanel>
+            Background="{StaticResource SystemControlBaseLowAcrylicWindowBrush}"
+            DefaultLabelPosition="Bottom">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton
+                    Command="{Binding SaveChangesCommand}"
+                    Icon="Save"
+                    Label="Save"
+                    ToolTipService.ToolTip="Save your task changes" />
+                <AppBarButton
+                    Command="{Binding ClosePaneCommand}"
+                    Icon="Cancel"
+                    Label="Cancel"
+                    ToolTipService.ToolTip="Discard your task changes" />
+                <AppBarButton
+                    Icon="Delete"
+                    Label="Delete"
+                    ToolTipService.ToolTip="Delete this task." />
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Mark as completed" ToolTipService.ToolTip="Mark this task as completed.">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton
+                    Icon="Calendar"
+                    Label="To be completed on"
+                    ToolTipService.ToolTip="Choose the date this task should be completed">
+                    <AppBarButton.Flyout>
+                        <Flyout>
+                            <CalendarDatePicker
+                                Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay}"
+                                MinDate="{Binding MinDate, Mode=TwoWay}"
+                                PlaceholderText="To be completed on" />
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
     </Grid>
 </Page>

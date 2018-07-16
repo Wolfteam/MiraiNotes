@@ -9,6 +9,7 @@ namespace MiraiNotes.UWP.Helpers
         public MappingProfile()
         {
             CreateMap<GoogleTaskModel, TaskModel>();
+            CreateMap<TaskModel, GoogleTaskModel>();
 
             CreateMap<GoogleTaskListModel, ItemModel>()
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))

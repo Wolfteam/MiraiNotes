@@ -17,6 +17,7 @@
 
     <Page.Resources>
         <converters:AutoSuggestQueryParameterConverter x:Key="AutoSuggestQueryParameterConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:NavigationViewSelectionChangedEventArgsConverter x:Key="NavigationViewSelectionChangedEventArgsConverter" />
     </Page.Resources>
 
