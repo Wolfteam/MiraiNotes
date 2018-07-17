@@ -121,14 +121,14 @@
                             <Viewbox
                                 Margin="16,12"
                                 HorizontalAlignment="Left"
-                                ToolTipService.ToolTip="{Binding Title}">
+                                ToolTipService.ToolTip="{Binding Title, Mode=TwoWay}">
                                 <SymbolIcon Symbol="List" />
                             </Viewbox>
 
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                Text="{Binding Title}"
+                                Text="{Binding Title, Mode=TwoWay}"
                                 TextWrapping="Wrap" />
                         </StackPanel>
 
@@ -140,8 +140,18 @@
                                 HorizontalAlignment="Right"
                                 HorizontalContentAlignment="Right"
                                 Background="Transparent"
+                                Command="{Binding ElementName=NavigationView, Path=DataContext.UpdateTaskListCommand}"
+                                CommandParameter="{Binding}"
+                                ToolTipService.ToolTip="Update task list's title">
+                                <SymbolIcon Symbol="Edit" />
+                            </Button>
+                            <Button
+                                HorizontalAlignment="Right"
+                                HorizontalContentAlignment="Right"
+                                Background="Transparent"
                                 Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskListCommand}"
-                                CommandParameter="{Binding TaskListID}">
+                                CommandParameter="{Binding}"
+                                ToolTipService.ToolTip="Delete this task list">
                                 <SymbolIcon Symbol="Delete" />
                             </Button>
                         </StackPanel>

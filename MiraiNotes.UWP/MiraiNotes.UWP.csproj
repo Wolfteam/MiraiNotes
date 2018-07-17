@@ -99,6 +99,7 @@
     <Compile Include="Controls\TasksListView.cs" />
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\NavigationViewSelectionChangedEventArgsConverter.cs" />
     <Compile Include="Converters\TestConverter.cs" />
     <Compile Include="Design\DesignGoogleTaskListService.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
+    <Compile Include="Helpers\GoogleTaskStatusHelper.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
     <Compile Include="Interfaces\IGoogleTaskService.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="Models\API\GoogleTaskModel.cs" />
     <Compile Include="Models\API\GoogleTaskApiResponseModel.cs" />
     <Compile Include="Models\API\GoogleTaskListModel.cs" />
+    <Compile Include="Models\GoogleTaskStatus.cs" />
     <Compile Include="Models\API\GoogleUserModel.cs" />
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />

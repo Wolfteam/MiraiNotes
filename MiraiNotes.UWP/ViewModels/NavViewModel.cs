@@ -90,13 +90,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand LogoutCommand { get; set; }
 
-        public ICommand NewTaskCommand { get; set; }
+        public ICommand UpdateTaskListCommand { get; set; }
+
+        public ICommand DeleteTaskListCommand { get; set; }
 
         public ICommand OpenPaneCommand { get; set; }
 
         public ICommand ClosePaneCommand { get; set; }
-
-        public ICommand DeleteTaskListCommand { get; set; }
         #endregion
 
         public NavViewModel(
@@ -135,17 +135,16 @@ namespace MiraiNotes.UWP.ViewModels
             NavigationViewSelectionChanged = new RelayCommand<object>
                 (async (selectedItem) => await OnNavigationViewSelectionChangeAsync(selectedItem));
 
-            DeleteTaskListCommand = new RelayCommand<string>
-                (async (taskListID) => await DeleteTaskList(taskListID));
+            UpdateTaskListCommand = new RelayCommand<GoogleTaskListModel>
+                (async (taskList) => await UpdateTaskListAsync(taskList));
+
+            DeleteTaskListCommand = new RelayCommand<GoogleTaskListModel>
+                (async (taskList) => await DeleteTaskList(taskList));
 
             LogoutCommand = new RelayCommand(LogoutAsync);
 
-            NewTaskCommand = new RelayCommand(() => OpenPane(true));
-
             OpenPaneCommand = new RelayCommand(() => OpenPane(true));
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
-
-            //InitView();
         }
 
         #region Methods
@@ -223,37 +222,63 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public async Task DeleteTaskList(string taskListID)
+        public async Task UpdateTaskListAsync(GoogleTaskListModel taskList)
         {
-            var taskListToDelete = TaskLists
-                .FirstOrDefault(tl => tl.TaskListID == taskListID);
+            int index = TaskLists.IndexOf(taskList);
+            string currentTitle = taskList.Title;
+            string newTitle = await _dialogService
+                .ShowInputStringDialogAsync("Type the new task list name", taskList.Title, "Update", "Cancel");
 
-            if (taskListToDelete == null)
-                throw new NullReferenceException("The selected task list doesnt exists");
+            if (string.IsNullOrEmpty(newTitle))
+                return;
 
+            taskList.Title = newTitle;
+            taskList.UpdatedAt = DateTime.Now;
+
+            _messenger.Send(true, "ShowTaskListViewProgressRing");
+            var response = await _googleApiService
+                .TaskListService
+                .UpdateAsync(taskList.TaskListID, taskList);
+            _messenger.Send(false, "ShowTaskListViewProgressRing");
+
+            if (!response.Succeed)
+            {
+                taskList.Title = currentTitle;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"Coudln't update the task list {taskList.Title}. Error code = {response.Errors.ApiError.Code}," +
+                    $" message = {response.Errors.ApiError.Message}");
+                return;
+            }
+            TaskLists[index] = taskList;
+            _messenger.Send(taskList, "UpdatedTaskList");
+        }
+
+        public async Task DeleteTaskList(GoogleTaskListModel taskList)
+        {
             bool deleteCurrentTaskList = await _dialogService
-                .ShowConfirmationDialogAsync($"Are you sure you wanna delete {taskListToDelete.Title} task list?", "Yes", "No");
+                .ShowConfirmationDialogAsync($"Are you sure you wanna delete {taskList.Title} task list?", "Yes", "No");
 
             if (!deleteCurrentTaskList)
                 return;
 
             _messenger.Send(true, "ShowTaskListViewProgressRing");
             var response = await _googleApiService
-                .TaskListService.DeleteAsync(taskListID);
+                .TaskListService.DeleteAsync(taskList.TaskListID);
             _messenger.Send(false, "ShowTaskListViewProgressRing");
 
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the task list {taskListToDelete.Title}. Error code = {response.Errors.ApiError.Code}," +
+                    $"Coudln't delete the task list {taskList.Title}. Error code = {response.Errors.ApiError.Code}," +
                     $" message = {response.Errors.ApiError.Message}");
                 return;
             }
 
             await _dialogService
-                .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskListToDelete.Title} task list");
-            TaskLists.Remove(taskListToDelete);
+                .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskList.Title} task list");
+            TaskLists.Remove(taskList);
         }
 
         public async Task DeleteCurrentTaskListAsync()
