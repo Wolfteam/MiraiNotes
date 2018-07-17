@@ -14,6 +14,7 @@
 
     <Page.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </Page.Resources>
 
     <Grid x:Name="MainSplitViewPane" HorizontalAlignment="Stretch">
@@ -33,9 +34,10 @@
             Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
         <TextBox
             Margin="20,20,20,0"
-            localExtensions:FocusExtension.IsFocused="{Binding IsCurrentTaskTitleFocused, Mode=TwoWay}"
+            localExtensions:FocusExtension.IsFocused="{Binding IsCurrentTaskTitleFocused, Mode=OneWay}"
             AcceptsReturn="True"
             Header="Task Title:"
+            IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
             IsSpellCheckEnabled="False"
             MaxLength="50"
             SelectionHighlightColor="Green"
@@ -44,7 +46,9 @@
         <TextBox
             Grid.Row="2"
             Margin="20"
+            AcceptsReturn="True"
             Header="Notes:"
+            IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
             IsSpellCheckEnabled="False"
             PlaceholderText="Enter your task text here"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -53,7 +57,8 @@
         <CommandBar
             Grid.Row="3"
             Background="{StaticResource SystemControlBaseLowAcrylicWindowBrush}"
-            DefaultLabelPosition="Bottom">
+            DefaultLabelPosition="Bottom"
+            IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}">
             <CommandBar.PrimaryCommands>
                 <AppBarButton
                     Command="{Binding SaveChangesCommand}"
@@ -66,14 +71,20 @@
                     Label="Cancel"
                     ToolTipService.ToolTip="Discard your task changes" />
                 <AppBarButton
+                    Command="{Binding DeleteTaskCommand}"
                     Icon="Delete"
+                    IsEnabled="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                     Label="Delete"
                     ToolTipService.ToolTip="Delete this task." />
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Mark as completed" ToolTipService.ToolTip="Mark this task as completed.">
+                <AppBarButton
+                    Command="{Binding MarkAsCompletedCommand}"
+                    IsEnabled="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    Label="Mark as completed"
+                    ToolTipService.ToolTip="Mark this task as completed.">
                     <AppBarButton.Icon>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;" />
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton

@@ -33,7 +33,6 @@ namespace MiraiNotes.UWP.ViewModels
         private string _taskAutoSuggestBoxText;
 
         private bool _showTaskListViewProgressRing;
-        private bool _showTaskProgressRing;
         private bool _isTaskListCommandBarOpen;
         private bool _isTaskListCommandBarCompact;
         #endregion
@@ -85,12 +84,6 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _showTaskListViewProgressRing; }
             set { SetValue(ref _showTaskListViewProgressRing, value); }
-        }
-
-        public bool ShowTaskProgressRing
-        {
-            get { return _showTaskProgressRing; }
-            set { SetValue(ref _showTaskProgressRing, value); }
         }
         #endregion
 
@@ -148,10 +141,15 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange",
                 async (taskList) => await GetAllTasksAsync(taskList));
+
             _messenger.Register<bool>(this, "ShowTaskListViewProgressRing",
                 (show) => ShowTaskListViewProgressRing = show);
 
             _messenger.Register<TaskModel>(this, "TaskSaved", OnTaskSaved);
+            _messenger.Register<string>(this, "TaskDeleted", OnTaskDeleted);
+
+            _messenger.Register<GoogleTaskListModel>(this, "UpdatedTaskList", OnUpdatedTaskList);
+
 
             TaskListViewSelectedItemCommand = new RelayCommand<TaskModel>
                 ((task) => OnTaskListViewSelectedItem(task));
@@ -214,9 +212,9 @@ namespace MiraiNotes.UWP.ViewModels
         public async Task OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
         {
             //TODO: Refactor this
-            ShowTaskProgressRing = true;
+            ShowTaskListViewProgressRing = true;
             var response = await _googleApiService.TaskService.GetAllAsync(CurrentTaskList.TaskListID);
-            ShowTaskProgressRing = false;
+            ShowTaskListViewProgressRing = false;
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
@@ -245,7 +243,22 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 Tasks.Remove(modifiedTask);
             }
-            Tasks.Add(task);
+            if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
+                Tasks.Add(task);
+        }
+
+        public void OnTaskDeleted(string taskID)
+        {
+            //TODO: Fix this or rethink it
+            var taskToDelete = Tasks.FirstOrDefault(t => t.TaskID == taskID);
+            if (taskToDelete != null)
+                Tasks.Remove(taskToDelete);
+        }
+
+        public void OnUpdatedTaskList(GoogleTaskListModel taskList)
+        {
+            //if (CurrentTaskList.TaskListID == taskList.TaskListID)
+            //    CurrentTaskList = taskList;
         }
 
         public async Task SaveNewTaskListAsync()

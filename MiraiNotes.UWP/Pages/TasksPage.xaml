@@ -21,6 +21,7 @@
             x:Key="BoolToVisibilityConverterInverse"
             OnFalse="Visible"
             OnTrue="Collapsed" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </Page.Resources>
 
 
@@ -46,7 +47,7 @@
             Margin="60,12,60,0"
             HorizontalTextAlignment="Center"
             Style="{StaticResource TitleTextBlockStyle}"
-            Text="{Binding CurrentTaskList.Title}"
+            Text="{Binding CurrentTaskList.Title, Mode=TwoWay}"
             Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
         <ListView
             x:Name="TaskListView"
@@ -104,7 +105,7 @@
                                     VerticalAlignment="Center"
                                     Background="Transparent"
                                     ToolTipService.ToolTip="Mark as completed">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;" />
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -124,11 +125,11 @@
             Margin="20"
             DisplayMemberPath="Text"
             Header="Type here to filter"
-            ItemsSource="{Binding TaskAutoSuggestBoxItems}"
+            IsEnabled="{Binding ShowTaskListViewProgressRing, Converter={StaticResource InverseBooleanConverter}}"
+            ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
             PlaceholderText="Search a task..."
             QueryIcon="Find"
-            TextMemberPath="Text"
-            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}">
+            TextMemberPath="Text">
             <interactivity:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="TextChanged">
                     <core:EventTriggerBehavior.Actions>
@@ -146,7 +147,7 @@
             Grid.Row="5"
             Background="{StaticResource SystemControlBaseLowAcrylicWindowBrush}"
             DefaultLabelPosition="Bottom"
-            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}">
+            IsEnabled="{Binding ShowTaskListViewProgressRing, Converter={StaticResource InverseBooleanConverter}}">
             <CommandBar.PrimaryCommands>
                 <AppBarButton
                     Icon="Add"
@@ -229,9 +230,11 @@
                     Command="{Binding SelectAllTaskCommand}"
                     Icon="SelectAll"
                     Label="Select all" />
-                <AppBarButton Icon="SelectAll" Label="Mark as completed" />
-                <AppBarSeparator />
-                <AppBarButton Icon="Edit" Label="Change current task list name" />
+                <AppBarButton Label="Mark selected tasks as completed">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
                 <AppBarSeparator />
                 <AppBarButton Icon="ReShare" Label="Share" />
                 <AppBarButton Icon="Setting" Label="Settings" />

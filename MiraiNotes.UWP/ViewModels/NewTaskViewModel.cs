@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
@@ -65,7 +66,10 @@ namespace MiraiNotes.UWP.ViewModels
         #region Commands
         public ICommand SaveChangesCommand { get; set; }
 
+        public ICommand DeleteTaskCommand { get; set; }
+
         public ICommand MarkAsCompletedCommand { get; set; }
+
         public ICommand ClosePaneCommand { get; set; }
         #endregion
 
@@ -85,13 +89,18 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
+
+            _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange", (taskList) =>
+            {
+                CurrentTaskList = taskList;
+                _messenger.Send(false, "OpenPane");
+            });
+            _messenger.Register<TaskModel>(this, "NewTask", (task) => InitView(task));
+
             SaveChangesCommand = new RelayCommand(async () => await SaveChangesAsync());
+            DeleteTaskCommand = new RelayCommand(async () => await DeleteTask());
             MarkAsCompletedCommand = new RelayCommand(async () => await MarkAsCompletedAsync());
             ClosePaneCommand = new RelayCommand(CleanPanel);
-
-            _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange", 
-                (taskList) => CurrentTaskList = taskList);
-            _messenger.Register<TaskModel>(this, "NewTask", (task) => InitView(task));
         }
         #endregion
 
@@ -103,6 +112,7 @@ namespace MiraiNotes.UWP.ViewModels
                 TaskID = task.TaskID,
                 Title = task.Title,
                 Notes = task.Notes,
+                IsNew = string.IsNullOrEmpty(task.TaskID),
                 CompletedOn = task.CompletedOn,
                 IsDeleted = task.IsDeleted,
                 IsHidden = task.IsHidden,
@@ -129,14 +139,9 @@ namespace MiraiNotes.UWP.ViewModels
             IsCurrentTaskTitleFocused = true;
         }
 
-        public async Task MarkAsCompletedAsync()
-        {
-            CurrentTask.Status = "completed";
-            await SaveChangesAsync();
-        }
-
         private async Task SaveChangesAsync()
         {
+            //TODO: When you saves changes, if you have focus on a textbox you will loose changes
             bool isModelValid = CurrentTask.Validate();
             if (!isModelValid)
             {
@@ -147,7 +152,7 @@ namespace MiraiNotes.UWP.ViewModels
             task.UpdatedAt = DateTime.Now;
             bool isNewTask = string.IsNullOrEmpty(task.TaskID);
             if (isNewTask)
-                task.Status = "needsAction";
+                task.Status =  GoogleTaskStatus.NEEDS_ACTION.GetString();
 
             GoogleResponseModel<GoogleTaskModel> response;
             ShowTaskProgressRing = true;
@@ -173,10 +178,46 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Send(CurrentTask, "TaskSaved");
         }
 
+        public async Task DeleteTask()
+        {
+            bool deleteTask = await _dialogService
+                .ShowConfirmationDialogAsync("Are you sure you wanna delete this tasks?", "Yes", "No");
+
+            if (!deleteTask)
+                return;
+
+            ShowTaskProgressRing = true;
+            var response = await _googleApiService
+                .TaskService.DeleteAsync(CurrentTaskList.TaskListID, CurrentTask.TaskID);
+            ShowTaskProgressRing = false;
+
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"Coudln't delete the selected task. Error code = {response.Errors.ApiError.Code}," +
+                    $" message = {response.Errors.ApiError.Message}");
+                return;
+            }
+
+            _messenger.Send(CurrentTask.TaskID, "TaskDeleted");
+            CleanPanel();
+        }
+
+        public async Task MarkAsCompletedAsync()
+        {
+            CurrentTask.Status = GoogleTaskStatus.COMPLETED.GetString();
+            CurrentTask.CompletedOn = DateTime.Now;
+            await SaveChangesAsync();
+        }
+
         private void CleanPanel()
         {
-            CurrentTask.Title = string.Empty;
-            CurrentTask.Notes = string.Empty;
+            CurrentTask = new TaskModel
+            {
+                Title = string.Empty,
+                Notes = string.Empty
+            };
             _messenger.Send(false, "OpenPane");
         }
         #endregion
