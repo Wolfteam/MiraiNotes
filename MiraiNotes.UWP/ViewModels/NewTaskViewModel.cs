@@ -28,7 +28,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
 
         private string _taskOperationTitle;
-        private GoogleTaskListModel _currentTaskList;
+        private TaskListModel _currentTaskList;
         private TaskModel _currentTask;
         private DateTimeOffset _minDate = DateTime.Now;
         private bool _showTaskProgressRing;
@@ -96,7 +96,7 @@ namespace MiraiNotes.UWP.ViewModels
             _mapper = mapper;
 
 
-            _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange", (taskList) =>
+            _messenger.Register<TaskListModel>(this, "OnNavigationViewSelectionChange", (taskList) =>
             {
                 _currentTaskList = taskList;
                 _messenger.Send(false, "OpenPane");

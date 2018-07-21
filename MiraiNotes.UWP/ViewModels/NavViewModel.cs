@@ -2,10 +2,12 @@
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,10 +26,10 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
 
         private object _selectedItem;
-        private ObservableCollection<GoogleTaskListModel> _taskLists;
+        private ObservableCollection<TaskListModel> _taskLists;
         private ObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems;
 
-        private GoogleTaskListModel _currentTaskList;
+        private TaskListModel _currentTaskList;
 
         private string _taskListAutoSuggestBoxText;
 
@@ -41,7 +43,7 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _selectedItem, value); }
         }
 
-        public ObservableCollection<GoogleTaskListModel> TaskLists
+        public ObservableCollection<TaskListModel> TaskLists
         {
             get { return _taskLists; }
             set { SetValue(ref _taskLists, value); }
@@ -53,7 +55,7 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _taskListsAutoSuggestBoxItems, value); }
         }
 
-        public GoogleTaskListModel CurrentTaskList
+        public TaskListModel CurrentTaskList
         {
             get { return _currentTaskList; }
             set { SetValue(ref _currentTaskList, value); }
@@ -107,7 +109,7 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<GoogleTaskListModel>(this, "NewTaskListAdded", OnTaskListAdded);
+            _messenger.Register<TaskListModel>(this, "NewTaskListAdded", OnTaskListAdded);
             _messenger.Register<bool>(this, "OpenPane", (open) => OpenPane(open));
             //if (IsInDesignMode)
             //{
@@ -131,10 +133,10 @@ namespace MiraiNotes.UWP.ViewModels
             NavigationViewSelectionChanged = new RelayCommand<object>
                 (async (selectedItem) => await OnNavigationViewSelectionChangeAsync(selectedItem));
 
-            UpdateTaskListCommand = new RelayCommand<GoogleTaskListModel>
+            UpdateTaskListCommand = new RelayCommand<TaskListModel>
                 (async (taskList) => await UpdateTaskListAsync(taskList));
 
-            DeleteTaskListCommand = new RelayCommand<GoogleTaskListModel>
+            DeleteTaskListCommand = new RelayCommand<TaskListModel>
                 (async (taskList) => await DeleteTaskList(taskList));
 
             LogoutCommand = new RelayCommand(async () => await LogoutAsync());
@@ -160,9 +162,10 @@ namespace MiraiNotes.UWP.ViewModels
                 _messenger.Send(false, "ShowTaskListViewProgressRing");
                 return;
             }
-            TaskLists = new ObservableCollection<GoogleTaskListModel>(response.Result.Items.OrderBy(t => t.Title));
+            var orderedItems = response.Result.Items.OrderBy(t => t.Title);
+            TaskLists = _mapper.Map<ObservableCollection<TaskListModel>>(orderedItems);
 
-            TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items.OrderBy(t => t.Title));
+            TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(orderedItems);
 
             SelectedItem = TaskLists.FirstOrDefault();
         }
@@ -196,7 +199,7 @@ namespace MiraiNotes.UWP.ViewModels
                 SelectedItem = null;
                 _messenger.Send(CurrentTaskList, "OnNavigationViewSelectionChange");
             }
-            else if (selectedItem is GoogleTaskListModel taskList)
+            else if (selectedItem is TaskListModel taskList)
             {
                 CurrentTaskList = taskList;
                 _messenger.Send(taskList, "OnNavigationViewSelectionChange");
@@ -208,7 +211,7 @@ namespace MiraiNotes.UWP.ViewModels
             TaskListkAutoSuggestBoxText = string.Empty;
         }
 
-        public void OnTaskListAdded(GoogleTaskListModel taskList)
+        public void OnTaskListAdded(TaskListModel taskList)
         {
             TaskLists.Add(taskList);
             SelectedItem = taskList;
@@ -232,39 +235,45 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public async Task UpdateTaskListAsync(GoogleTaskListModel taskList)
+        public async Task UpdateTaskListAsync(TaskListModel taskList)
         {
             int index = TaskLists.IndexOf(taskList);
-            string currentTitle = taskList.Title;
-            string newTitle = await _dialogService
-                .ShowInputStringDialogAsync("Type the new task list name", taskList.Title, "Update", "Cancel");
+            string newTitle = await _dialogService.ShowInputStringDialogAsync(
+                "Type the new task list name", 
+                taskList.Title, 
+                "Update", 
+                "Cancel");
 
             if (string.IsNullOrEmpty(newTitle))
                 return;
 
-            taskList.Title = newTitle;
-            taskList.UpdatedAt = DateTime.Now;
+            var taskListToUpdate = _mapper.Map<GoogleTaskListModel>(taskList);
+
+            taskListToUpdate.Title = newTitle;
+            taskListToUpdate.UpdatedAt = DateTime.Now;
 
             _messenger.Send(true, "ShowTaskListViewProgressRing");
             var response = await _googleApiService
                 .TaskListService
-                .UpdateAsync(taskList.TaskListID, taskList);
+                .UpdateAsync(taskListToUpdate.TaskListID, taskListToUpdate);
             _messenger.Send(false, "ShowTaskListViewProgressRing");
 
             if (!response.Succeed)
             {
-                taskList.Title = currentTitle;
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
                     $"Coudln't update the task list {taskList.Title}. Error code = {response.Errors.ApiError.Code}," +
                     $" message = {response.Errors.ApiError.Message}");
                 return;
             }
-            TaskLists[index] = taskList;
-            _messenger.Send(taskList, "UpdatedTaskList");
+            TaskLists[index] = _mapper.Map<TaskListModel>(response.Result);
+            //If the updated task is the same as the selected one
+            //we update SelectedItem
+            if (SelectedItem == taskList)
+                SelectedItem = TaskLists[index];
         }
 
-        public async Task DeleteTaskList(GoogleTaskListModel taskList)
+        public async Task DeleteTaskList(TaskListModel taskList)
         {
             bool deleteCurrentTaskList = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",

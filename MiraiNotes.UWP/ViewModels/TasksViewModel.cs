@@ -25,7 +25,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IGoogleApiService _googleApiService;
         private readonly IMapper _mapper;
 
-        private GoogleTaskListModel _currentTaskList;
+        private TaskListModel _currentTaskList;
 
         private ObservableCollection<TaskModel> _tasks;
         private ObservableCollection<ItemModel> _taskAutoSuggestBoxItems;
@@ -64,7 +64,7 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _selectedTasks, value); }
         }
 
-        public GoogleTaskListModel CurrentTaskList
+        public TaskListModel CurrentTaskList
         {
             get { return _currentTaskList; }
             set { SetValue(ref _currentTaskList, value); }
@@ -196,7 +196,7 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange",
+            _messenger.Register<TaskListModel>(this, "OnNavigationViewSelectionChange",
                 async (taskList) => await GetAllTasksAsync(taskList));
 
             _messenger.Register<bool>(this, "ShowTaskListViewProgressRing",
@@ -204,9 +204,6 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Register<TaskModel>(this, "TaskSaved", OnTaskSaved);
             _messenger.Register<string>(this, "TaskDeleted", OnTaskDeleted);
-
-            _messenger.Register<GoogleTaskListModel>(this, "UpdatedTaskList", OnUpdatedTaskList);
-
 
             TaskListViewSelectedItemCommand = new RelayCommand<TaskModel>
                 ((task) => OnTaskListViewSelectedItem(task));
@@ -237,7 +234,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Methods
-        public async Task GetAllTasksAsync(GoogleTaskListModel taskList)
+        public async Task GetAllTasksAsync(TaskListModel taskList)
         {
             if (taskList == null)
             {
@@ -278,7 +275,7 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTaskList = null;
             Tasks.Clear();
             TaskAutoSuggestBoxItems.Clear();
-            //this is not being instanciated
+            //this needs to be clear one i complete the autosuggestbox
             //SelectedTasks.Clear();
             _messenger.Send(false, "OpenPane");
         }
@@ -339,12 +336,6 @@ namespace MiraiNotes.UWP.ViewModels
                 Tasks.Remove(taskToDelete);
         }
 
-        public void OnUpdatedTaskList(GoogleTaskListModel taskList)
-        {
-            //if (CurrentTaskList.TaskListID == taskList.TaskListID)
-            //    CurrentTaskList = taskList;
-        }
-
         public async Task SaveNewTaskListAsync()
         {
             string taskListName = await _dialogService
@@ -371,7 +362,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
             await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
-            _messenger.Send(response.Result, "NewTaskListAdded");
+            _messenger.Send(_mapper.Map<TaskListModel>(response.Result), "NewTaskListAdded");
         }
 
         public async Task MarkAsCompleted(TaskModel task)

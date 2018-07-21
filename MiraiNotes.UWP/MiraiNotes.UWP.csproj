@@ -105,6 +105,7 @@
     <Compile Include="Design\DesignGoogleTaskListService.cs" />
     <Compile Include="Design\DesignGoogleTaskService.cs" />
     <Compile Include="Extensions\FocusExtension.cs" />
+    <Compile Include="Extensions\ObservableCollectionExtension.cs" />
     <Compile Include="Handlers\AuthorizationHandler.cs" />
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="Models\TaskListModel.cs" />
     <Compile Include="Models\TaskModel.cs" />
     <Compile Include="Models\TaskSortType.cs" />
     <Compile Include="Pages\LoginPage.xaml.cs">
