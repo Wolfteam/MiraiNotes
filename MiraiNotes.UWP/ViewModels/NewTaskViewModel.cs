@@ -27,6 +27,8 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IGoogleApiService _googleApiService;
         private readonly IMapper _mapper;
 
+        private string _taskOperationTitle;
+        private GoogleTaskListModel _currentTaskList;
         private TaskModel _currentTask;
         private DateTimeOffset _minDate = DateTime.Now;
         private bool _showTaskProgressRing;
@@ -36,7 +38,11 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Properties
-        public GoogleTaskListModel CurrentTaskList { get; set; }
+        public string TaskOperationTitle
+        {
+            get { return _taskOperationTitle; }
+            set { Set(ref _taskOperationTitle, value); }
+        }
 
         public TaskModel CurrentTask
         {
@@ -92,7 +98,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Register<GoogleTaskListModel>(this, "OnNavigationViewSelectionChange", (taskList) =>
             {
-                CurrentTaskList = taskList;
+                _currentTaskList = taskList;
                 _messenger.Send(false, "OpenPane");
             });
             _messenger.Register<TaskModel>(this, "NewTask", (task) => InitView(task));
@@ -122,32 +128,33 @@ namespace MiraiNotes.UWP.ViewModels
                 Status = task.Status,
                 ToBeCompletedOn = task.ToBeCompletedOn,
                 UpdatedAt = task.UpdatedAt,
-                Validator = i =>
-                {
-                    //TODO: Validation is not working
-                    var u = i as TaskModel;
-                    if (string.IsNullOrEmpty(u.Title))
-                    {
-                        u.Properties[nameof(u.Title)].Errors.Add("Title is required");
-                    }
-                    if (string.IsNullOrEmpty(u.Notes))
-                    {
-                        u.Properties[nameof(u.Notes)].Errors.Add("Notes are required");
-                    }
-                }
+                //Validator = i =>
+                //{
+                //    //TODO: Validation is not working
+                //    var u = i as TaskModel;
+                //    if (string.IsNullOrEmpty(u.Title))
+                //    {
+                //        u.Properties[nameof(u.Title)].Errors.Add("Title is required");
+                //    }
+                //    if (string.IsNullOrEmpty(u.Notes))
+                //    {
+                //        u.Properties[nameof(u.Notes)].Errors.Add("Notes are required");
+                //    }
+                //}
             };
+            UpdateTaskOperationTitle(CurrentTask.IsNew);
             IsCurrentTaskTitleFocused = true;
         }
 
         private async Task SaveChangesAsync()
         {
             //TODO: When you saves changes, if you have focus on a textbox you will loose changes
-            bool isModelValid = CurrentTask.Validate();
-            if (!isModelValid)
-            {
-                await _dialogService.ShowMessageDialogAsync("Error", "Faltan campos");
-                return;
-            }
+            //bool isModelValid = CurrentTask.Validate();
+            //if (!isModelValid)
+            //{
+            //    await _dialogService.ShowMessageDialogAsync("Error", "Faltan campos");
+            //    return;
+            //}
             var task = _mapper.Map<GoogleTaskModel>(CurrentTask);
             task.UpdatedAt = DateTime.Now;
             bool isNewTask = string.IsNullOrEmpty(task.TaskID);
@@ -158,11 +165,11 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = true;
             if (isNewTask)
             {
-                response = await _googleApiService.TaskService.SaveAsync(CurrentTaskList.TaskListID, task);
+                response = await _googleApiService.TaskService.SaveAsync(_currentTaskList.TaskListID, task);
             }
             else
             {
-                response = await _googleApiService.TaskService.UpdateAsync(CurrentTaskList.TaskListID, task.TaskID, task);
+                response = await _googleApiService.TaskService.UpdateAsync(_currentTaskList.TaskListID, task.TaskID, task);
             }
             ShowTaskProgressRing = false;
 
@@ -176,6 +183,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             CurrentTask = _mapper.Map<TaskModel>(response.Result);
             _messenger.Send(CurrentTask, "TaskSaved");
+            UpdateTaskOperationTitle(isNewTask);
         }
 
         public async Task DeleteTask()
@@ -188,7 +196,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskProgressRing = true;
             var response = await _googleApiService
-                .TaskService.DeleteAsync(CurrentTaskList.TaskListID, CurrentTask.TaskID);
+                .TaskService.DeleteAsync(_currentTaskList.TaskListID, CurrentTask.TaskID);
             ShowTaskProgressRing = false;
 
             if (!response.Succeed)
@@ -206,6 +214,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task MarkAsCompletedAsync()
         {
+            bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
+                $"Mark {CurrentTask.Title} as completed?", 
+                "Yes", 
+                "No");
+            if (!markAsCompleted)
+                return;
+
             CurrentTask.Status = GoogleTaskStatus.COMPLETED.GetString();
             CurrentTask.CompletedOn = DateTime.Now;
             await SaveChangesAsync();
@@ -219,6 +234,14 @@ namespace MiraiNotes.UWP.ViewModels
                 Notes = string.Empty
             };
             _messenger.Send(false, "OpenPane");
+        }
+
+        private void UpdateTaskOperationTitle(bool isNewTask)
+        {
+            if (CurrentTask.IsNew)
+                TaskOperationTitle = "New Task:";
+            else
+                TaskOperationTitle = "Update task:";
         }
         #endregion
     }

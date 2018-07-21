@@ -44,10 +44,11 @@
             Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
         <TextBlock
             Grid.Row="1"
-            Margin="60,12,60,0"
-            HorizontalTextAlignment="Center"
+            HorizontalAlignment="Center"
+            FontSize="20"
+            FontWeight="SemiBold"
             Style="{StaticResource TitleTextBlockStyle}"
-            Text="{Binding CurrentTaskList.Title, Mode=TwoWay}"
+            Text="To be completed:"
             Visibility="{Binding IsTaskListTitleVisible, Mode=OneWay}" />
         <ListView
             x:Name="TaskListView"
@@ -104,7 +105,10 @@
                                 <Button
                                     VerticalAlignment="Center"
                                     Background="Transparent"
-                                    ToolTipService.ToolTip="Mark as completed">
+                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
+                                    CommandParameter="{Binding}"
+                                    ToolTipService.ToolTip="Mark as completed"
+                                    Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
                                 </Button>
                             </StackPanel>
@@ -129,6 +133,7 @@
             ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
             PlaceholderText="Search a task..."
             QueryIcon="Find"
+            Text="{Binding TaskAutoSuggestBoxText, Mode=TwoWay}"
             TextMemberPath="Text">
             <interactivity:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="TextChanged">

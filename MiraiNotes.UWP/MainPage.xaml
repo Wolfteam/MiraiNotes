@@ -11,6 +11,7 @@
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="MainContentPage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Home, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -23,6 +24,7 @@
 
     <NavigationView
         x:Name="NavigationView"
+        AlwaysShowHeader="True"
         Background="{ThemeResource SystemControlBaseLowAcrylicWindowBrush}"
         CompactModeThresholdWidth="1280"
         ExpandedModeThresholdWidth="1280"
@@ -63,8 +65,9 @@
                     <TextBlock
                         Grid.Column="0"
                         HorizontalAlignment="Center"
-                        Text="{Binding CurrentTaskListTitle}"
-                        TextDecorations="Underline" />
+                        FontSize="30"
+                        FontWeight="Bold"
+                        Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}" />
                     <Button
                         Grid.Column="1"
                         HorizontalAlignment="Right"
@@ -119,11 +122,9 @@
                         <StackPanel
                             Grid.Column="0"
                             HorizontalAlignment="Left"
-                            Orientation="Horizontal">
-                            <Viewbox
-                                Margin="16,12"
-                                HorizontalAlignment="Left"
-                                ToolTipService.ToolTip="{Binding Title, Mode=OneWay}">
+                            Orientation="Horizontal"
+                            ToolTipService.ToolTip="{Binding Title, Mode=OneWay}">
+                            <Viewbox Margin="16,12" HorizontalAlignment="Left">
                                 <SymbolIcon Symbol="List" />
                             </Viewbox>
                             <TextBlock
@@ -184,7 +185,8 @@
                     HorizontalContentAlignment="Stretch"
                     Background="Transparent"
                     Command="{Binding LogoutCommand}"
-                    CommandParameter="24">
+                    CommandParameter="24"
+                    ToolTipService.ToolTip="Sign out">
                     <Grid Height="40" Margin="-9,0,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="48" />
@@ -194,11 +196,7 @@
                             Grid.Column="0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Symbol="People">
-                            <ToolTipService.ToolTip>
-                                <ToolTip Content="Sign out" />
-                            </ToolTipService.ToolTip>
-                        </SymbolIcon>
+                            Symbol="People" />
                         <TextBlock
                             Grid.Column="1"
                             HorizontalAlignment="Left"

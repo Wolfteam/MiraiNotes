@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
@@ -172,6 +173,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand DeleteTaskCommand { get; set; }
 
+        public ICommand MarkAsCompletedCommand { get; set; }
+
         public ICommand RefreshTasksCommand { get; set; }
 
         public ICommand SortTasksCommand { get; set; }
@@ -211,15 +214,23 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 (async (text) => await OnTaskAutoSuggestBoxTextChangeAsync(text));
 
-            NewTaskCommand = new RelayCommand(() => OnTaskListViewSelectedItem(new TaskModel()));
+            NewTaskCommand = new RelayCommand
+                (() => OnTaskListViewSelectedItem(new TaskModel()));
 
-            NewTaskListCommand = new RelayCommand(async () => await SaveNewTaskListAsync());
+            NewTaskListCommand = new RelayCommand
+                (async () => await SaveNewTaskListAsync());
 
-            DeleteTaskCommand = new RelayCommand<string>(async (taskID) => await DeleteTask(taskID));
+            DeleteTaskCommand = new RelayCommand<string>
+                (async (taskID) => await DeleteTask(taskID));
 
-            RefreshTasksCommand = new RelayCommand(async () => await GetAllTasksAsync(CurrentTaskList));
+            MarkAsCompletedCommand = new RelayCommand<TaskModel>
+                (async (task) => await MarkAsCompleted(task));
 
-            SortTasksCommand = new RelayCommand<TaskSortType>((sortBy) => SortTasks(sortBy));
+            RefreshTasksCommand = new RelayCommand
+                (async () => await GetAllTasksAsync(CurrentTaskList));
+
+            SortTasksCommand = new RelayCommand<TaskSortType>
+                ((sortBy) => SortTasks(sortBy));
 
             IsTaskListCommandBarCompact = true;
         }
@@ -253,8 +264,8 @@ namespace MiraiNotes.UWP.ViewModels
             }
             else
             {
-                Tasks.Clear();
-                TaskAutoSuggestBoxItems.Clear();
+                Tasks?.Clear();
+                TaskAutoSuggestBoxItems?.Clear();
             }
             CurrentTaskList = taskList;
         }
@@ -311,7 +322,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public void OnTaskSaved(TaskModel task)
         {
-            var modifiedTask = Tasks.FirstOrDefault(t => t.TaskID == task.TaskID);
+            var modifiedTask = Tasks?.FirstOrDefault(t => t.TaskID == task.TaskID);
             if (modifiedTask != null)
             {
                 Tasks.Remove(modifiedTask);
@@ -361,6 +372,38 @@ namespace MiraiNotes.UWP.ViewModels
             }
             await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
             _messenger.Send(response.Result, "NewTaskListAdded");
+        }
+
+        public async Task MarkAsCompleted(TaskModel task)
+        {
+            bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
+                $"Mark {task.Title} as completed?",
+                "Yes",
+                "No");
+            if (!markAsCompleted)
+                return;
+
+            var taskToUpdate = _mapper.Map<GoogleTaskModel>(task);
+            taskToUpdate.Status = GoogleTaskStatus.COMPLETED.GetString();
+            taskToUpdate.CompletedOn = DateTime.Now;
+            taskToUpdate.UpdatedAt = DateTime.Now;
+
+            ShowTaskListViewProgressRing = true;
+            var response = await _googleApiService
+                .TaskService.UpdateAsync(_currentTaskList.TaskListID, task.TaskID, taskToUpdate);
+            ShowTaskListViewProgressRing = false;
+
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    $"An error occurred while trying to mark as completed the task.",
+                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                return;
+            }
+            task.Status = response.Result.Status;
+            task.CompletedOn = response.Result.CompletedOn;
+            task.UpdatedAt = response.Result.UpdatedAt;
+            task.CanBeMarkedAsCompleted = false;
         }
 
         public async Task DeleteTask(string taskID)

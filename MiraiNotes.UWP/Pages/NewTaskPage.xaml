@@ -32,10 +32,17 @@
             VerticalAlignment="Center"
             IsActive="True"
             Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <TextBlock
+            Grid.Row="0"
+            Margin="20,20,20,0"
+            FontSize="24"
+            Text="{Binding TaskOperationTitle, Mode=OneWay}" />
         <TextBox
+            Grid.Row="1"
             Margin="20,20,20,0"
             localExtensions:FocusExtension.IsFocused="{Binding IsCurrentTaskTitleFocused, Mode=OneWay}"
             AcceptsReturn="True"
+            FontWeight="SemiBold"
             Header="Task Title:"
             IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
             IsSpellCheckEnabled="False"
@@ -80,7 +87,7 @@
             <CommandBar.SecondaryCommands>
                 <AppBarButton
                     Command="{Binding MarkAsCompletedCommand}"
-                    IsEnabled="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"
                     Label="Mark as completed"
                     ToolTipService.ToolTip="Mark this task as completed.">
                     <AppBarButton.Icon>

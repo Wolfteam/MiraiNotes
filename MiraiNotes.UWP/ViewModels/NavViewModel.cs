@@ -23,8 +23,6 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IGoogleApiService _googleApiService;
         private readonly IMapper _mapper;
 
-        private RelayCommand _pageLoadedCommand;
-
         private object _selectedItem;
         private ObservableCollection<GoogleTaskListModel> _taskLists;
         private ObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems;
@@ -152,6 +150,8 @@ namespace MiraiNotes.UWP.ViewModels
         {
             _messenger.Send(true, "ShowTaskListViewProgressRing");
             var response = await _googleApiService.TaskListService.GetAllAsync();
+            _messenger.Send(false, "ShowTaskListViewProgressRing");
+
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
@@ -164,8 +164,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items.OrderBy(t => t.Title));
 
-            var taskList = TaskLists.FirstOrDefault();
-            SelectedItem = taskList;
+            SelectedItem = TaskLists.FirstOrDefault();
         }
 
         public void OnTaskListAutoSuggestBoxTextChangeAsync(string currentText)
@@ -269,6 +268,12 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (!deleteCurrentTaskList)
                 return;
+
+            //If we are deleting the tasklist that is selected
+            //lets close the panel to avoid creating new tasks
+            //in the CurrentTaskList
+            if (CurrentTaskList == taskList)
+                OpenPane(false);
 
             _messenger.Send(true, "ShowTaskListViewProgressRing");
             var response = await _googleApiService
