@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.UI.Xaml.Controls;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -26,6 +25,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         private RelayCommand _pageLoadedCommand;
 
+        private object _selectedItem;
         private ObservableCollection<GoogleTaskListModel> _taskLists;
         private ObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems;
 
@@ -37,6 +37,12 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Properties
+        public object SelectedItem
+        {
+            get { return _selectedItem; }
+            set { SetValue(ref _selectedItem, value); }
+        }
+
         public ObservableCollection<GoogleTaskListModel> TaskLists
         {
             get { return _taskLists; }
@@ -69,18 +75,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Commands
-        public ICommand PageLoadedCommand
-        {
-            get
-            {
-                if (_pageLoadedCommand == null)
-                {
-                    _pageLoadedCommand = new RelayCommand(InitView);
-                }
-
-                return _pageLoadedCommand;
-            }
-        }
+        public ICommand PageLoadedCommand { get; set; }
 
         public ICommand TaskListAutoSuggestBoxTextChangedCommand { get; set; }
 
@@ -114,7 +109,7 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<GoogleTaskListModel>(this, "NewTaskListAdded", (taskList) => TaskLists.Add(taskList));
+            _messenger.Register<GoogleTaskListModel>(this, "NewTaskListAdded", OnTaskListAdded);
             _messenger.Register<bool>(this, "OpenPane", (open) => OpenPane(open));
             //if (IsInDesignMode)
             //{
@@ -126,6 +121,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             //    Tasks = new ObservableCollection<TaskModel>(_mapper.Map<TaskModel>())
             //}
+            PageLoadedCommand = new RelayCommand
+                (async () => await InitViewAsync());
+
             TaskListAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 ((text) => OnTaskListAutoSuggestBoxTextChangeAsync(text));
 
@@ -141,14 +139,16 @@ namespace MiraiNotes.UWP.ViewModels
             DeleteTaskListCommand = new RelayCommand<GoogleTaskListModel>
                 (async (taskList) => await DeleteTaskList(taskList));
 
-            LogoutCommand = new RelayCommand(LogoutAsync);
+            LogoutCommand = new RelayCommand(async () => await LogoutAsync());
 
             OpenPaneCommand = new RelayCommand(() => OpenPane(true));
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
+
+            //TODO: TaskAutoSuggestBoxItems should be updated when a Task list is added/updated/modified
         }
 
         #region Methods
-        private async void InitView()
+        private async Task InitViewAsync()
         {
             _messenger.Send(true, "ShowTaskListViewProgressRing");
             var response = await _googleApiService.TaskListService.GetAllAsync();
@@ -165,13 +165,7 @@ namespace MiraiNotes.UWP.ViewModels
             TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items.OrderBy(t => t.Title));
 
             var taskList = TaskLists.FirstOrDefault();
-            CurrentTaskList = taskList;
-            if (string.IsNullOrEmpty(taskList?.Title))
-            {
-                return;
-            }
-
-            _messenger.Send(taskList, "OnNavigationViewSelectionChange");
+            SelectedItem = taskList;
         }
 
         public void OnTaskListAutoSuggestBoxTextChangeAsync(string currentText)
@@ -192,22 +186,36 @@ namespace MiraiNotes.UWP.ViewModels
         {
             if (selectedItem == null)
                 return;
-            CurrentTaskList = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
-            _messenger.Send(CurrentTaskList, "GetAllTasksAsync");
+            SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
         }
 
         public async Task OnNavigationViewSelectionChangeAsync(object selectedItem)
         {
-            if (selectedItem is NavigationViewItem navViewItem)
-                await _dialogService.ShowMessageDialogAsync($"Seleccionaste {navViewItem.Name}", "Hola");
+            if (selectedItem == null)
+            {
+                CurrentTaskList = null;
+                SelectedItem = null;
+                _messenger.Send(CurrentTaskList, "OnNavigationViewSelectionChange");
+            }
             else if (selectedItem is GoogleTaskListModel taskList)
             {
                 CurrentTaskList = taskList;
                 _messenger.Send(taskList, "OnNavigationViewSelectionChange");
             }
+            else
+            {
+                await _dialogService.ShowMessageDialogAsync($"Seleccionaste a navigation item", "Hola");
+            }
+            TaskListkAutoSuggestBoxText = string.Empty;
         }
 
-        public async void LogoutAsync()
+        public void OnTaskListAdded(GoogleTaskListModel taskList)
+        {
+            TaskLists.Add(taskList);
+            SelectedItem = taskList;
+        }
+
+        public async Task LogoutAsync()
         {
             bool logout = await _dialogService
                 .ShowConfirmationDialogAsync("Are you sure you wanna log out?", "Yes", "No");
@@ -278,67 +286,23 @@ namespace MiraiNotes.UWP.ViewModels
 
             await _dialogService
                 .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskList.Title} task list");
+
+            //Here we select the previoues task list only if the 
+            //selected item = the task list to be removed
+            if (SelectedItem == taskList)
+            {
+                int removedIndex = TaskLists.IndexOf(taskList);
+                if (removedIndex != -1 && removedIndex > 0)
+                    SelectedItem = TaskLists[removedIndex - 1];
+                else
+                    await OnNavigationViewSelectionChangeAsync(null);
+            }
+            else if (TaskLists.Count == 1)
+                await OnNavigationViewSelectionChangeAsync(null);
             TaskLists.Remove(taskList);
         }
 
-        public async Task DeleteCurrentTaskListAsync()
-        {
-            if (CurrentTaskList == null)
-                throw new NullReferenceException("There is no current selected task list");
-
-            var taskListToDelete = TaskLists
-                .FirstOrDefault(tl => tl.TaskListID == CurrentTaskList.TaskListID);
-
-            if (taskListToDelete == null)
-                throw new NullReferenceException("The selected task list doesnt exists");
-
-            bool deleteCurrentTaskList = await _dialogService
-                .ShowConfirmationDialogAsync($"Are you sure you wanna delete {taskListToDelete.Title} task list?", "Yes", "No");
-
-            if (!deleteCurrentTaskList)
-                return;
-
-            _messenger.Send(true, "ShowTaskListViewProgressRing");
-            var response = await _googleApiService
-                .TaskListService.DeleteAsync(taskListToDelete.TaskListID);
-            _messenger.Send(false, "ShowTaskListViewProgressRing");
-
-            if (!response.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"Coudln't delete the task list {taskListToDelete.Title}. Error code = {response.Errors.ApiError.Code}," +
-                    $" message = {response.Errors.ApiError.Message}");
-                return;
-            }
-
-            await _dialogService
-                .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskListToDelete.Title} task list");
-            CurrentTaskList = null;
-            TaskLists.Remove(taskListToDelete);
-        }
-
-        public void CreateNewTaskList() => _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
-
-        public void CreateNewTask()
-        {
-            _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
-        }
-
-        public void ProcessQuery()
-        {
-            _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
-        }
-
-        public void ProcessChoice()
-        {
-            _dialogService.ShowMessageDialogAsync("You clicked on a item", "Clicked");
-        }
-
-        private void OpenPane(bool isPaneOpen)
-        {
-            IsPaneOpen = isPaneOpen;
-        }
+        private void OpenPane(bool isPaneOpen) => IsPaneOpen = isPaneOpen;
         #endregion
     }
 }

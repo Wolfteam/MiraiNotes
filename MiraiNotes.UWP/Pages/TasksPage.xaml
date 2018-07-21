@@ -48,7 +48,7 @@
             HorizontalTextAlignment="Center"
             Style="{StaticResource TitleTextBlockStyle}"
             Text="{Binding CurrentTaskList.Title, Mode=TwoWay}"
-            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+            Visibility="{Binding IsTaskListTitleVisible, Mode=OneWay}" />
         <ListView
             x:Name="TaskListView"
             Grid.Row="2"
@@ -59,7 +59,7 @@
             IsTextScaleFactorEnabled="True"
             ItemsSource="{Binding Tasks}"
             SelectionMode="Extended"
-            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}">
+            Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}">
             <interactivity:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="SelectionChanged">
                     <core:EventTriggerBehavior.Actions>
@@ -118,14 +118,14 @@
             Margin="20,20,20,0"
             HorizontalAlignment="Left"
             Text="You have selected X item(s)."
-            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+            Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}" />
         <AutoSuggestBox
             x:Name="TaskAutoSuggestBox"
             Grid.Row="4"
             Margin="20"
             DisplayMemberPath="Text"
             Header="Type here to filter"
-            IsEnabled="{Binding ShowTaskListViewProgressRing, Converter={StaticResource InverseBooleanConverter}}"
+            IsEnabled="{Binding IsAutoSuggestBoxEnabled, Mode=OneWay}"
             ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
             PlaceholderText="Search a task..."
             QueryIcon="Find"
@@ -155,71 +155,69 @@
                     ToolTipService.ToolTip="Add a new task list or task.">
                     <AppBarButton.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Command="{Binding NewTaskListCommand}" Text="New list" />
-                            <MenuFlyoutItem Command="{Binding NewTaskCommand}" Text="New task" />
+                            <MenuFlyoutItem
+                                Command="{Binding NewTaskListCommand}"
+                                IsEnabled="{Binding CanAddMoreTaskList, Mode=OneWay}"
+                                Text="New list" />
+                            <MenuFlyoutItem
+                                Command="{Binding NewTaskCommand}"
+                                IsEnabled="{Binding CanAddMoreTasks, Mode=OneWay}"
+                                Text="New task" />
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
                 <AppBarButton
-                    Icon="Edit"
-                    IsCompact="{Binding IsTaskListCommandBarCompact}"
-                    Label="Edit"
-                    LabelPosition="Default" />
-                <AppBarButton
                     Icon="Delete"
                     IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    IsEnabled="{Binding CanDeleteTasks, Mode=OneWay}"
                     Label="Delete"
                     ToolTipService.ToolTip="Delete selected task(s)." />
                 <AppBarButton
                     Command="{Binding RefreshTasksCommand}"
                     Icon="Refresh"
                     IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    IsEnabled="{Binding CanRefreshTaskListView, Mode=OneWay}"
                     Label="Refresh"
                     ToolTipService.ToolTip="Refresh the tasks from the current task list. Requieres a network connection." />
                 <AppBarButton
                     Icon="Sort"
                     IsCompact="{Binding IsTaskListCommandBarCompact}"
+                    IsEnabled="{Binding CanSortTaskListView, Mode=OneWay}"
                     Label="Sort"
                     ToolTipService.ToolTip="Sort the task by name, creation date or your order">
                     <AppBarButton.Flyout>
                         <MenuFlyout>
                             <MenuFlyoutSubItem Text="By name">
-                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
-                                    <MenuFlyoutItem.CommandParameter>
-                                        <localModels:TaskSortType>BY_NAME_ASC</localModels:TaskSortType>
-                                    </MenuFlyoutItem.CommandParameter>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
-                                    <MenuFlyoutItem.CommandParameter>
-                                        <localModels:TaskSortType>BY_NAME_DESC</localModels:TaskSortType>
-                                    </MenuFlyoutItem.CommandParameter>
-                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Command="{Binding SortTasksCommand}"
+                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_ASC}"
+                                    Text="Asc" />
+                                <MenuFlyoutItem
+                                    Command="{Binding SortTasksCommand}"
+                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_DESC}"
+                                    Text="Desc" />
                             </MenuFlyoutSubItem>
 
                             <MenuFlyoutSubItem Text="By updated date">
-                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
-                                    <MenuFlyoutItem.CommandParameter>
-                                        <localModels:TaskSortType>BY_UPDATED_DATE_ASC</localModels:TaskSortType>
-                                    </MenuFlyoutItem.CommandParameter>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
-                                    <MenuFlyoutItem.CommandParameter>
-                                        <localModels:TaskSortType>BY_UPDATED_DATE_DESC</localModels:TaskSortType>
-                                    </MenuFlyoutItem.CommandParameter>
-                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Command="{Binding SortTasksCommand}"
+                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_ASC}"
+                                    Text="Asc" />
+                                <MenuFlyoutItem
+                                    Command="{Binding SortTasksCommand}"
+                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_DESC}"
+                                    Text="Desc" />
                             </MenuFlyoutSubItem>
 
                             <MenuFlyoutSubItem Text="By my order">
-                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Asc">
-                                    <MenuFlyoutItem.CommandParameter>
-                                        <localModels:TaskSortType>CUSTOM_ASC</localModels:TaskSortType>
-                                    </MenuFlyoutItem.CommandParameter>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Command="{Binding SortTasksCommand}" Text="Desc">
-                                    <MenuFlyoutItem.CommandParameter>
-                                        <localModels:TaskSortType>CUSTOM_DESC</localModels:TaskSortType>
-                                    </MenuFlyoutItem.CommandParameter>
-                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Command="{Binding SortTasksCommand}"
+                                    CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_ASC}"
+                                    Text="Asc" />
+                                <MenuFlyoutItem
+                                    Command="{Binding SortTasksCommand}"
+                                    CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_DESC}"
+                                    Text="Desc" />
                             </MenuFlyoutSubItem>
                         </MenuFlyout>
                     </AppBarButton.Flyout>
@@ -229,8 +227,9 @@
                 <AppBarButton
                     Command="{Binding SelectAllTaskCommand}"
                     Icon="SelectAll"
+                    IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
                     Label="Select all" />
-                <AppBarButton Label="Mark selected tasks as completed">
+                <AppBarButton IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}" Label="Mark selected tasks as completed">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
                     </AppBarButton.Icon>

@@ -30,8 +30,9 @@
         IsBackEnabled="False"
         IsSettingsVisible="True"
         IsTabStop="True"
-        MenuItemsSource="{Binding TaskLists}"
-        PaneTitle="Mirai Notes">
+        MenuItemsSource="{Binding TaskLists, Mode=OneWay}"
+        PaneTitle="Mirai Notes"
+        SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
         <interactivity:Interaction.Behaviors>
             <core:EventTriggerBehavior EventName="SelectionChanged">
                 <core:EventTriggerBehavior.Actions>
@@ -85,7 +86,9 @@
                 ItemsSource="{Binding TaskListsAutoSuggestBoxItems, Mode=OneWay}"
                 PlaceholderText="Search a task list..."
                 QueryIcon="Find"
-                TextMemberPath="Text">
+                Text="{Binding TaskListkAutoSuggestBoxText, Mode=TwoWay}"
+                TextMemberPath="Text"
+                UpdateTextOnSelect="False">
                 <interactivity:Interaction.Behaviors>
                     <core:EventTriggerBehavior EventName="TextChanged">
                         <core:EventTriggerBehavior.Actions>
@@ -117,18 +120,16 @@
                             Grid.Column="0"
                             HorizontalAlignment="Left"
                             Orientation="Horizontal">
-
                             <Viewbox
                                 Margin="16,12"
                                 HorizontalAlignment="Left"
-                                ToolTipService.ToolTip="{Binding Title, Mode=TwoWay}">
+                                ToolTipService.ToolTip="{Binding Title, Mode=OneWay}">
                                 <SymbolIcon Symbol="List" />
                             </Viewbox>
-
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                Text="{Binding Title, Mode=TwoWay}"
+                                Text="{Binding Title, Mode=OneWay}"
                                 TextWrapping="Wrap" />
                         </StackPanel>
 
@@ -155,7 +156,6 @@
                                 <SymbolIcon Symbol="Delete" />
                             </Button>
                         </StackPanel>
-
                     </Grid>
                 </StackPanel>
             </DataTemplate>

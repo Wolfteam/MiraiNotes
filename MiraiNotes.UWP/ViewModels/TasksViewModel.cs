@@ -32,8 +32,15 @@ namespace MiraiNotes.UWP.ViewModels
 
         private string _taskAutoSuggestBoxText;
 
+        private bool _isTaskListTitleVisible;
+        private bool _isTaskListViewVisible;
+        private bool _isAutoSuggestBoxEnabled;
+        private bool _canAddMoreTaskList;
+        private bool _canAddMoreTasks;
+        private bool _canDeleteTasks;
+        private bool _canRefreshTaskListView;
+        private bool _canSortTaskListView;
         private bool _showTaskListViewProgressRing;
-        private bool _isTaskListCommandBarOpen;
         private bool _isTaskListCommandBarCompact;
         #endregion
 
@@ -68,22 +75,69 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _taskAutoSuggestBoxText, value); }
         }
 
+        public bool IsTaskListTitleVisible
+        {
+            get { return _isTaskListTitleVisible; }
+            set { SetValue(ref _isTaskListTitleVisible, value); }
+        }
+
+        public bool IsTaskListViewVisible
+        {
+            get { return _isTaskListViewVisible; }
+            set { SetValue(ref _isTaskListViewVisible, value); }
+        }
+
+        public bool IsAutoSuggestBoxEnabled
+        {
+            get { return _isAutoSuggestBoxEnabled; }
+            set { SetValue(ref _isAutoSuggestBoxEnabled, value); }
+        }
+
+        public bool CanAddMoreTaskList
+        {
+            get { return _canAddMoreTaskList; }
+            set { SetValue(ref _canAddMoreTaskList, value); }
+        }
+
+        public bool CanAddMoreTasks
+        {
+            get { return _canAddMoreTasks; }
+            set { SetValue(ref _canAddMoreTasks, value); }
+        }
+
+        public bool CanDeleteTasks
+        {
+            get { return _canDeleteTasks; }
+            set { SetValue(ref _canDeleteTasks, value); }
+        }
+
+        public bool CanRefreshTaskListView
+        {
+            get { return _canRefreshTaskListView; }
+            set { SetValue(ref _canRefreshTaskListView, value); }
+        }
+
+        public bool CanSortTaskListView
+        {
+            get { return _canSortTaskListView; }
+            set { SetValue(ref _canSortTaskListView, value); }
+        }
+
         public bool IsTaskListCommandBarCompact
         {
             get { return _isTaskListCommandBarCompact; }
             set { SetValue(ref _isTaskListCommandBarCompact, value); }
         }
 
-        public bool IsTaskListCommandBarOpen
-        {
-            get { return _isTaskListCommandBarOpen; }
-            set { SetValue(ref _isTaskListCommandBarOpen, value); }
-        }
-
         public bool ShowTaskListViewProgressRing
         {
             get { return _showTaskListViewProgressRing; }
-            set { SetValue(ref _showTaskListViewProgressRing, value); }
+            set
+            {
+                HideControls(!value);
+                DisableControls(!value);
+                SetValue(ref _showTaskListViewProgressRing, value);
+            }
         }
         #endregion
 
@@ -174,6 +228,12 @@ namespace MiraiNotes.UWP.ViewModels
         #region Methods
         public async Task GetAllTasksAsync(GoogleTaskListModel taskList)
         {
+            if (taskList == null)
+            {
+                OnNoTaskListAvailable();
+                return;
+            }
+
             ShowTaskListViewProgressRing = true;
             var response = await _googleApiService.TaskService.GetAllAsync(taskList.TaskListID);
             ShowTaskListViewProgressRing = false;
@@ -197,6 +257,19 @@ namespace MiraiNotes.UWP.ViewModels
                 TaskAutoSuggestBoxItems.Clear();
             }
             CurrentTaskList = taskList;
+        }
+
+        private void OnNoTaskListAvailable()
+        {
+            HideControls(false);
+            DisableControls(false);
+            CanAddMoreTaskList = true;
+            CurrentTaskList = null;
+            Tasks.Clear();
+            TaskAutoSuggestBoxItems.Clear();
+            //this is not being instanciated
+            //SelectedTasks.Clear();
+            _messenger.Send(false, "OpenPane");
         }
 
         public void OnTaskListViewSelectedItem(TaskModel task)
@@ -286,8 +359,8 @@ namespace MiraiNotes.UWP.ViewModels
                     $" message = {response.Errors.ApiError.Message}");
                 return;
             }
-            _messenger.Send(response.Result, "NewTaskListAdded");
             await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
+            _messenger.Send(response.Result, "NewTaskListAdded");
         }
 
         public async Task DeleteTask(string taskID)
@@ -343,6 +416,22 @@ namespace MiraiNotes.UWP.ViewModels
                 default:
                     throw new ArgumentOutOfRangeException("The TaskSortType doesnt have a default sort type");
             }
+        }
+
+        private void DisableControls(bool isEnabled)
+        {
+            IsAutoSuggestBoxEnabled = isEnabled;
+            CanAddMoreTaskList = isEnabled;
+            CanAddMoreTasks = isEnabled;
+            CanDeleteTasks = isEnabled;
+            CanRefreshTaskListView = isEnabled;
+            CanSortTaskListView = isEnabled;
+        }
+
+        private void HideControls(bool isVisible)
+        {
+            IsTaskListTitleVisible = isVisible;
+            IsTaskListViewVisible = isVisible;
         }
         #endregion
     }
