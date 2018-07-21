@@ -188,8 +188,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task DeleteTask()
         {
-            bool deleteTask = await _dialogService
-                .ShowConfirmationDialogAsync("Are you sure you wanna delete this tasks?", "Yes", "No");
+            bool deleteTask = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation", 
+                "Are you sure you wanna delete this task?",
+                "Yes",
+                "No");
 
             if (!deleteTask)
                 return;
@@ -215,6 +218,7 @@ namespace MiraiNotes.UWP.ViewModels
         public async Task MarkAsCompletedAsync()
         {
             bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation",
                 $"Mark {CurrentTask.Title} as completed?", 
                 "Yes", 
                 "No");

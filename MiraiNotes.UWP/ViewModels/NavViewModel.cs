@@ -216,8 +216,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task LogoutAsync()
         {
-            bool logout = await _dialogService
-                .ShowConfirmationDialogAsync("Are you sure you wanna log out?", "Yes", "No");
+            bool logout = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation",
+                "Are you sure you want to log out?", 
+                "Yes", 
+                "No");
             if (logout)
             {
                 //TODO: DELETE ALL !!
@@ -263,8 +266,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task DeleteTaskList(GoogleTaskListModel taskList)
         {
-            bool deleteCurrentTaskList = await _dialogService
-                .ShowConfirmationDialogAsync($"Are you sure you wanna delete {taskList.Title} task list?", "Yes", "No");
+            bool deleteCurrentTaskList = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation",
+                $"Are you sure you want to delete {taskList.Title}?",
+                "Yes",
+                "No");
 
             if (!deleteCurrentTaskList)
                 return;

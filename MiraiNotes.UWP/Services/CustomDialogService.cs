@@ -30,21 +30,22 @@ namespace MiraiNotes.UWP.Services
             await dialog.ShowAsync();
         }
 
-        public async Task<bool?> ShowConfirmationDialogAsync(string title)
+        public async Task<bool?> ShowConfirmationDialogAsync(string title, string message)
         {
-            return await ShowConfirmationDialogAsync(title, "OK", string.Empty, "Cancel");
+            return await ShowConfirmationDialogAsync(title, message, "OK", string.Empty, "Cancel");
         }
 
-        public async Task<bool> ShowConfirmationDialogAsync(string title, string yesButtonText, string noButtonText)
+        public async Task<bool> ShowConfirmationDialogAsync(string title, string message, string yesButtonText, string noButtonText)
         {
-            return (await ShowConfirmationDialogAsync(title, yesButtonText, noButtonText, string.Empty)).Value;
+            return (await ShowConfirmationDialogAsync(title, message, yesButtonText, noButtonText, string.Empty)).Value;
         }
 
-        public async Task<bool?> ShowConfirmationDialogAsync(string title, string yesButtonText, string noButtonText, string cancelButtonText)
+        public async Task<bool?> ShowConfirmationDialogAsync(string title, string message, string yesButtonText, string noButtonText, string cancelButtonText)
         {
             var dialog = new ContentDialog
             {
                 Title = title,
+                Content = message,
                 //IsPrimaryButtonEnabled = true,
                 PrimaryButtonText = yesButtonText,
                 //IsSecondaryButtonEnabled = true,

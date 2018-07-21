@@ -34,27 +34,30 @@ namespace MiraiNotes.UWP.Interfaces
         /// Opens a modal confirmation dialog.
         /// </summary>
         /// <param name="title">The title.</param>
+        /// <param name="message">The message.</param>
         /// <returns>Task&lt;System.Nullable&lt;System.Boolean&gt;&gt;.</returns>
-        Task<bool?> ShowConfirmationDialogAsync(string title);
+        Task<bool?> ShowConfirmationDialogAsync(string title, string message);
 
         /// <summary>
         /// Opens a modal confirmation dialog.
         /// </summary>
         /// <param name="title">The title.</param>
+        /// <param name="message">The message.</param>
         /// <param name="yesButtonText">The 'Yes' button text.</param>
         /// <param name="noButtonText">The 'No' button text.</param>
         /// <returns>Task&lt;System.Boolean&gt;.</returns>
-        Task<bool> ShowConfirmationDialogAsync(string title, string yesButtonText, string noButtonText);
+        Task<bool> ShowConfirmationDialogAsync(string title, string message, string yesButtonText, string noButtonText);
 
         /// <summary>
         /// Opens a modal confirmation dialog.
         /// </summary>
         /// <param name="title">The title.</param>
+        /// <param name="message">The message.</param>
         /// <param name="yesButtonText">The 'Yes' button text.</param>
         /// <param name="noButtonText">The 'No' button text.</param>
         /// <param name="cancelButtonText">The cancel button text.</param>
         /// <returns>Task&lt;System.Nullable&lt;System.Boolean&gt;&gt;.</returns>
-        Task<bool?> ShowConfirmationDialogAsync(string title, string yesButtonText, string noButtonText, string cancelButtonText);
+        Task<bool?> ShowConfirmationDialogAsync(string title, string message, string yesButtonText, string noButtonText, string cancelButtonText);
 
         /// <summary>
         /// Opens a modal input dialog for a string.
