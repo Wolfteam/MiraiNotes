@@ -11,6 +11,9 @@ namespace MiraiNotes.UWP.Helpers
             CreateMap<GoogleTaskModel, TaskModel>();
             CreateMap<TaskModel, GoogleTaskModel>();
 
+            CreateMap<GoogleTaskListModel, TaskListModel>();
+            CreateMap<TaskListModel, GoogleTaskListModel>();
+
             CreateMap<GoogleTaskListModel, ItemModel>()
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
@@ -19,8 +22,13 @@ namespace MiraiNotes.UWP.Helpers
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
-            CreateMap<GoogleTaskListModel, TaskListModel>();
-            CreateMap<TaskListModel, GoogleTaskListModel>();
+            CreateMap<TaskListModel, ItemModel>()
+                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
+                .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
+
+            CreateMap<TaskModel, ItemModel>()
+                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
+                .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
         }
     }
 }
