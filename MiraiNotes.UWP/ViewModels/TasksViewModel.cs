@@ -402,7 +402,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             bool deleteTask = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
-                "Are you sure you wanna delete this tasks?",
+                "Are you sure you wanna delete this task?",
                 "Yes",
                 "No");
 
@@ -412,10 +412,12 @@ namespace MiraiNotes.UWP.ViewModels
             if (taskToDelete == null)
                 throw new KeyNotFoundException($"Couldn't find a task with the id {taskID}");
 
+            _messenger.Send(true, "ShowTaskProgressRing");
             ShowTaskListViewProgressRing = true;
             var response = await _googleApiService
                 .TaskService.DeleteAsync(CurrentTaskList.TaskListID, taskID);
             ShowTaskListViewProgressRing = false;
+            _messenger.Send(false, "ShowTaskProgressRing");
 
             if (!response.Succeed)
             {
@@ -425,7 +427,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $" message = {response.Errors.ApiError.Message}");
                 return;
             }
-
+            _messenger.Send(taskToDelete.TaskID, "OnTaskRemoved");
             Tasks.Remove(taskToDelete);
         }
 

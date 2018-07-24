@@ -1,20 +1,11 @@
-﻿using GalaSoft.MvvmLight;
-using System;
+﻿using System;
 using Template10.Validation;
 
 namespace MiraiNotes.UWP.Models
 {
-    public class TaskModel : ViewModelBase
+    public class TaskModel : ValidatableModelBase
     {
         #region Members
-        private string _title;
-        private DateTime updatedAt;
-        private string _notes;
-        private DateTimeOffset? _toBeCompletedOn;
-        private DateTime? _completedOn;
-        private bool _isDeleted;
-        private bool _isHidden;
-        private bool _isNew;
         private bool _canBeMarkedAsCompleted;
         #endregion
 
@@ -23,14 +14,14 @@ namespace MiraiNotes.UWP.Models
 
         public string Title
         {
-            get { return _title; }
-            set { Set(ref _title, value); }
+            get { return Read<string>(); }
+            set { Write(value); }
         }
 
         public DateTime UpdatedAt
         {
-            get { return updatedAt; }
-            set { Set(ref updatedAt, value); }
+            get { return Read<DateTime>(); }
+            set { Write(value); }
         }
 
         public string SelfLink { get; set; }
@@ -41,8 +32,8 @@ namespace MiraiNotes.UWP.Models
 
         public string Notes
         {
-            get { return _notes; }
-            set { Set(ref _notes, value); }
+            get { return Read<string>(); }
+            set { Write(value); }
         }
 
         public string Status { get; set; }
@@ -63,32 +54,32 @@ namespace MiraiNotes.UWP.Models
 
         public DateTimeOffset? ToBeCompletedOn
         {
-            get { return _toBeCompletedOn; }
-            set { Set(ref _toBeCompletedOn, value); }
+            get { return Read<DateTimeOffset?>(); }
+            set { Write(value); }
         }
 
         public DateTime? CompletedOn
         {
-            get { return _completedOn; }
-            set { Set(ref _completedOn, value); }
+            get { return Read<DateTime?>(); }
+            set { Write(value); }
         }
 
         public bool IsDeleted
         {
-            get { return _isDeleted; }
-            set { Set(ref _isDeleted, value); }
+            get { return Read<bool>(); }
+            set { Write(value); }
         }
 
         public bool IsHidden
         {
-            get { return _isHidden; }
-            set { Set(ref _isHidden, value); }
+            get { return Read<bool>(); }
+            set { Write(value); }
         }
 
         public bool IsNew
         {
-            get { return _isNew; }
-            set { Set(ref _isNew, value); }
+            get { return Read<bool>(); }
+            set { Write(value); }
         }
 
         public bool CanBeMarkedAsCompleted
@@ -96,15 +87,24 @@ namespace MiraiNotes.UWP.Models
             get
             {
                 if (!IsNew && TaskStatus != GoogleTaskStatus.COMPLETED)
+                {
                     _canBeMarkedAsCompleted = true;
+
+                }
                 else
+                {
                     _canBeMarkedAsCompleted = false;
-                return _canBeMarkedAsCompleted;
+                }
+                CanBeMarkedAsCompleted = _canBeMarkedAsCompleted;
+
+                return Read<bool>();
             }
             set
             {
-                Set(ref _canBeMarkedAsCompleted, value);
+                Write(value);
+                _canBeMarkedAsCompleted = value;
             }
         }
+
     }
 }

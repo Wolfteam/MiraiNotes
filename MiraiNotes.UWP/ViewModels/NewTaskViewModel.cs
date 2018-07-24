@@ -102,10 +102,15 @@ namespace MiraiNotes.UWP.ViewModels
                 _messenger.Send(false, "OpenPane");
             });
             _messenger.Register<TaskModel>(this, "NewTask", (task) => InitView(task));
+            _messenger.Register<string>(this, "OnTaskRemoved", OnTaskRemoved);
+            _messenger.Register<bool>(this, "ShowTaskProgressRing", (show) => ShowTaskProgressRing = show);
 
-            SaveChangesCommand = new RelayCommand(async () => await SaveChangesAsync());
-            DeleteTaskCommand = new RelayCommand(async () => await DeleteTask());
-            MarkAsCompletedCommand = new RelayCommand(async () => await MarkAsCompletedAsync());
+            SaveChangesCommand = new RelayCommand
+                (async () => await SaveChangesAsync());
+            DeleteTaskCommand = new RelayCommand
+                (async () => await DeleteTask());
+            MarkAsCompletedCommand = new RelayCommand
+                (async () => await MarkAsCompletedAsync());
             ClosePaneCommand = new RelayCommand(CleanPanel);
         }
         #endregion
@@ -128,38 +133,31 @@ namespace MiraiNotes.UWP.ViewModels
                 Status = task.Status,
                 ToBeCompletedOn = task.ToBeCompletedOn,
                 UpdatedAt = task.UpdatedAt,
-                //Validator = i =>
-                //{
-                //    //TODO: Validation is not working
-                //    var u = i as TaskModel;
-                //    if (string.IsNullOrEmpty(u.Title))
-                //    {
-                //        u.Properties[nameof(u.Title)].Errors.Add("Title is required");
-                //    }
-                //    if (string.IsNullOrEmpty(u.Notes))
-                //    {
-                //        u.Properties[nameof(u.Notes)].Errors.Add("Notes are required");
-                //    }
-                //}
+                Validator = i =>
+                {
+                    var u = i as TaskModel;
+                    if (string.IsNullOrEmpty(u.Title) || u.Title.Length < 2)
+                    {
+                        u.Properties[nameof(u.Title)].Errors.Add("Title is required");
+                    }
+                    if (string.IsNullOrEmpty(u.Notes) || u.Notes.Length < 2)
+                    {
+                        u.Properties[nameof(u.Notes)].Errors.Add("Notes are required");
+                    }
+                }
             };
             UpdateTaskOperationTitle(CurrentTask.IsNew);
             IsCurrentTaskTitleFocused = true;
+            CurrentTask.Validate();
         }
 
         private async Task SaveChangesAsync()
         {
-            //TODO: When you saves changes, if you have focus on a textbox you will loose changes
-            //bool isModelValid = CurrentTask.Validate();
-            //if (!isModelValid)
-            //{
-            //    await _dialogService.ShowMessageDialogAsync("Error", "Faltan campos");
-            //    return;
-            //}
             var task = _mapper.Map<GoogleTaskModel>(CurrentTask);
             task.UpdatedAt = DateTime.Now;
             bool isNewTask = string.IsNullOrEmpty(task.TaskID);
             if (isNewTask)
-                task.Status =  GoogleTaskStatus.NEEDS_ACTION.GetString();
+                task.Status = GoogleTaskStatus.NEEDS_ACTION.GetString();
 
             GoogleResponseModel<GoogleTaskModel> response;
             ShowTaskProgressRing = true;
@@ -189,7 +187,7 @@ namespace MiraiNotes.UWP.ViewModels
         public async Task DeleteTask()
         {
             bool deleteTask = await _dialogService.ShowConfirmationDialogAsync(
-                "Confirmation", 
+                "Confirmation",
                 "Are you sure you wanna delete this task?",
                 "Yes",
                 "No");
@@ -219,8 +217,8 @@ namespace MiraiNotes.UWP.ViewModels
         {
             bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
-                $"Mark {CurrentTask.Title} as completed?", 
-                "Yes", 
+                $"Mark {CurrentTask.Title} as completed?",
+                "Yes",
                 "No");
             if (!markAsCompleted)
                 return;
@@ -246,6 +244,14 @@ namespace MiraiNotes.UWP.ViewModels
                 TaskOperationTitle = "New Task:";
             else
                 TaskOperationTitle = "Update task:";
+        }
+
+        private void OnTaskRemoved(string taskID)
+        {
+            if (CurrentTask?.TaskID == taskID)
+            {
+                CleanPanel();
+            }
         }
         #endregion
     }
