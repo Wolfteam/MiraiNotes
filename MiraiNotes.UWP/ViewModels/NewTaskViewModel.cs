@@ -121,8 +121,8 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTask = new TaskModel
             {
                 TaskID = task.TaskID,
-                Title = task.Title,
-                Notes = task.Notes,
+                Title = string.IsNullOrEmpty(task.Title) ? "Task title" : task.Title,
+                Notes = string.IsNullOrEmpty(task.Notes) ?  "Task body" : task.Notes,
                 IsNew = string.IsNullOrEmpty(task.TaskID),
                 CompletedOn = task.CompletedOn,
                 IsDeleted = task.IsDeleted,
