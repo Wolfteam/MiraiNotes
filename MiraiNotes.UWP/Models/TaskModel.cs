@@ -95,16 +95,19 @@ namespace MiraiNotes.UWP.Models
                 {
                     _canBeMarkedAsCompleted = false;
                 }
-                CanBeMarkedAsCompleted = _canBeMarkedAsCompleted;
-
-                return Read<bool>();
+                return _canBeMarkedAsCompleted;
             }
             set
             {
-                Write(value);
                 _canBeMarkedAsCompleted = value;
+                RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
             }
         }
 
+        public bool IsSelected
+        {
+            get { return Read<bool>(); }
+            set { Write(value); }
+        }
     }
 }

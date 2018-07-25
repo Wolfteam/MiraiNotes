@@ -104,6 +104,7 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Register<TaskModel>(this, "NewTask", (task) => InitView(task));
             _messenger.Register<string>(this, "OnTaskRemoved", OnTaskRemoved);
             _messenger.Register<bool>(this, "ShowTaskProgressRing", (show) => ShowTaskProgressRing = show);
+            _messenger.Register<string>(this, "OnSelectedTasksRemoved", OnSelectedTasksRemoved);
 
             SaveChangesCommand = new RelayCommand
                 (async () => await SaveChangesAsync());
@@ -249,6 +250,15 @@ namespace MiraiNotes.UWP.ViewModels
         private void OnTaskRemoved(string taskID)
         {
             if (CurrentTask?.TaskID == taskID)
+            {
+                CleanPanel();
+            }
+        }
+
+        private void OnSelectedTasksRemoved(string tasksIds)
+        {
+            var removedTasksIds = tasksIds.Split(',');
+            if (removedTasksIds.Contains(CurrentTask?.TaskID))
             {
                 CleanPanel();
             }

@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -29,7 +30,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         private ObservableCollection<TaskModel> _tasks;
         private ObservableCollection<ItemModel> _taskAutoSuggestBoxItems;
-        private ObservableCollection<TaskModel> _selectedTasks;
+        private ObservableCollection<TaskModel> _selectedTasks = new ObservableCollection<TaskModel>();
 
         private string _taskAutoSuggestBoxText;
 
@@ -43,6 +44,7 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _canSortTaskListView;
         private bool _showTaskListViewProgressRing;
         private bool _isTaskListCommandBarCompact;
+        private string _selectedTasksText;
         #endregion
 
         #region Properties
@@ -140,6 +142,12 @@ namespace MiraiNotes.UWP.ViewModels
                 SetValue(ref _showTaskListViewProgressRing, value);
             }
         }
+
+        public string SelectedTasksText
+        {
+            get { return _selectedTasksText; }
+            set { SetValue(ref _selectedTasksText, value); }
+        }
         #endregion
 
         #region Commands
@@ -149,31 +157,21 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand TaskListViewSelectedItemCommand { get; set; }
 
-        public ICommand TaskListViewSelectedItemsCommand => new RelayCommand<object>((selectedTasks) =>
-        {
-            if (selectedTasks == null)
-                return;
-            //SelectedTasks = selectedTasks.ToList();
-        });
-
         public ICommand TaskAutoSuggestBoxTextChangedCommand { get; set; }
 
         public ICommand TaskAutoSuggestBoxQuerySubmittedCommand => new RelayCommand<ItemModel>((itemSelected) =>
         {
         });
 
-        public ICommand SelectAllTaskCommand => new RelayCommand(() =>
-        {
-            SelectedTasks = Tasks;
-            //foreach (var task in Tasks)
-            //{
-            //    task.IsSelected = true;
-            //}
-        });
+        public ICommand SelectAllTaskCommand { get; set; }
 
         public ICommand DeleteTaskCommand { get; set; }
 
+        public ICommand DeleteSelectedTasksCommand { get; set; }
+
         public ICommand MarkAsCompletedCommand { get; set; }
+
+        public ICommand MarkAsCompletedSelectedTasksCommand { get; set; }
 
         public ICommand RefreshTasksCommand { get; set; }
 
@@ -220,14 +218,26 @@ namespace MiraiNotes.UWP.ViewModels
             DeleteTaskCommand = new RelayCommand<string>
                 (async (taskID) => await DeleteTask(taskID));
 
+            DeleteSelectedTasksCommand = new RelayCommand
+                (async () => await DeleteSelectedTasks());
+
             MarkAsCompletedCommand = new RelayCommand<TaskModel>
                 (async (task) => await MarkAsCompleted(task));
+
+            MarkAsCompletedSelectedTasksCommand = new RelayCommand
+                (async () => await MarkAsCompletedeSelectedTasks());
 
             RefreshTasksCommand = new RelayCommand
                 (async () => await GetAllTasksAsync(CurrentTaskList));
 
             SortTasksCommand = new RelayCommand<TaskSortType>
                 ((sortBy) => SortTasks(sortBy));
+
+            SelectAllTaskCommand = new RelayCommand(() =>
+            {
+                foreach (var task in Tasks)
+                    task.IsSelected = true;
+            });
 
             IsTaskListCommandBarCompact = true;
         }
@@ -261,8 +271,8 @@ namespace MiraiNotes.UWP.ViewModels
             }
             else
             {
-                Tasks?.Clear();
-                TaskAutoSuggestBoxItems?.Clear();
+                Tasks = new ObservableCollection<TaskModel>();
+                TaskAutoSuggestBoxItems = new ObservableCollection<ItemModel>();
             }
             CurrentTaskList = taskList;
         }
@@ -282,10 +292,15 @@ namespace MiraiNotes.UWP.ViewModels
 
         public void OnTaskListViewSelectedItem(TaskModel task)
         {
+            int selectedTasks = GetSelectedTasks()
+                .Count();
+            UpdateSelectedTasksText(selectedTasks);
             //When a list contains no items, and you switch to that list
-            //the event raises, thats why whe do this check here
-            if (task == null)
+            //or when you change the selected items, the event raises.
+            if (task == null || selectedTasks > 1)
                 return;
+            //TODO: When you unselect an item this method gets called opening the pane
+
             _messenger.Send(true, "OpenPane");
             _messenger.Send(task, "NewTask");
         }
@@ -398,6 +413,65 @@ namespace MiraiNotes.UWP.ViewModels
             task.CanBeMarkedAsCompleted = false;
         }
 
+        public async Task MarkAsCompletedeSelectedTasks()
+        {
+            var selectedTasks = GetSelectedTasks()
+                .Where(t => t.CanBeMarkedAsCompleted);
+            int numberOfSelectedTasks = selectedTasks.Count();
+
+            if (numberOfSelectedTasks == 0)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "You need to select at least one task that is not already completed");
+                return;
+            }
+
+            bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation",
+                $"Are you sure you want to mark {numberOfSelectedTasks} task(s) as completed?",
+                "Yes",
+                "No");
+            if (!markAsCompleted)
+                return;
+
+            ShowTaskListViewProgressRing = true;
+
+            var tasksNotCompleted = new List<string>();
+            foreach (var task in selectedTasks)
+            {
+                var taskToUpdate = _mapper.Map<GoogleTaskModel>(task);
+                taskToUpdate.Status = GoogleTaskStatus.COMPLETED.GetString();
+                taskToUpdate.CompletedOn = DateTime.Now;
+                taskToUpdate.UpdatedAt = DateTime.Now;
+
+                var response = await _googleApiService
+                    .TaskService
+                    .UpdateAsync(CurrentTaskList.TaskListID, task.TaskID, taskToUpdate);
+
+                if (!response.Succeed)
+                {
+                    tasksNotCompleted.Add(task.Title);
+                    continue;
+                }
+                task.Status = response.Result.Status;
+                task.CompletedOn = response.Result.CompletedOn;
+                task.UpdatedAt = response.Result.UpdatedAt;
+                task.CanBeMarkedAsCompleted = false;
+                task.IsSelected = false;
+            }
+
+            ShowTaskListViewProgressRing = false;
+
+            if (tasksNotCompleted.Count > 0)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    $"Error",
+                    $"An error occurred, coudln't mark as completed the following tasks: {string.Join(",", tasksNotCompleted)}");
+                return;
+            }
+        }
+
         public async Task DeleteTask(string taskID)
         {
             bool deleteTask = await _dialogService.ShowConfirmationDialogAsync(
@@ -427,8 +501,63 @@ namespace MiraiNotes.UWP.ViewModels
                     $" message = {response.Errors.ApiError.Message}");
                 return;
             }
-            _messenger.Send(taskToDelete.TaskID, "OnTaskRemoved");
             Tasks.Remove(taskToDelete);
+            _messenger.Send(taskToDelete.TaskID, "OnTaskRemoved");
+        }
+
+        public async Task DeleteSelectedTasks()
+        {
+            var tasksToDelete = GetSelectedTasks();
+            int numberOfTasksToDelete = tasksToDelete.Count();
+
+            if (numberOfTasksToDelete == 0)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "You need to select at least one task");
+                return;
+            }
+
+            bool deleteSelectedTasks = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation",
+                $"Are you sure you wanna delete {numberOfTasksToDelete} task(s)?",
+                "Yes",
+                "No");
+
+            if (!deleteSelectedTasks)
+                return;
+
+            _messenger.Send(true, "ShowTaskProgressRing");
+            ShowTaskListViewProgressRing = true;
+
+            var tasksNotRemoved = new List<string>();
+            var tasksRemoved = new List<string>();
+            foreach (var task in tasksToDelete)
+            {
+                var response = await _googleApiService
+                     .TaskService
+                     .DeleteAsync(CurrentTaskList.TaskListID, task.TaskID);
+
+                if (!response.Succeed)
+                    tasksNotRemoved.Add(task.Title);
+                else
+                    tasksRemoved.Add(task.TaskID);
+            }
+            ShowTaskListViewProgressRing = false;
+            _messenger.Send(false, "ShowTaskProgressRing");
+
+            if (tasksRemoved.Count > 0)
+                _messenger.Send(string.Join(",", tasksRemoved), "OnSelectedTasksRemoved");
+
+            Tasks.RemoveAll(t => tasksRemoved.Any(tr => t.TaskID == tr));
+
+            if (tasksNotRemoved.Count > 0)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An error occurred, coudln't delete tasks: {string.Join(",", tasksNotRemoved)}");
+                return;
+            }
         }
 
         public void SortTasks(TaskSortType sortType)
@@ -472,6 +601,16 @@ namespace MiraiNotes.UWP.ViewModels
         {
             IsTaskListTitleVisible = isVisible;
             IsTaskListViewVisible = isVisible;
+        }
+
+        private IEnumerable<TaskModel> GetSelectedTasks() => Tasks.Where(t => t.IsSelected);
+
+        private void UpdateSelectedTasksText(int selectedTasks)
+        {
+            if (selectedTasks > 0)
+                SelectedTasksText = $"You have selected {selectedTasks} task(s)";
+            else
+                SelectedTasksText = string.Empty;
         }
         #endregion
     }

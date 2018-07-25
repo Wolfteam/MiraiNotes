@@ -10,6 +10,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages"
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:uc="using:MiraiNotes.UWP.Controls"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Tasks, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -50,12 +51,12 @@
             Style="{StaticResource TitleTextBlockStyle}"
             Text="To be completed:"
             Visibility="{Binding IsTaskListTitleVisible, Mode=OneWay}" />
-        <ListView
+
+        <uc:TasksListView
             x:Name="TaskListView"
             Grid.Row="2"
             Width="{Binding ElementName=MainGrid, Path=ActualWidth}"
             Margin="0,12,0,0"
-            Extensions:ListViewExtensions.BindableSelection="{Binding SelectedTasks, Mode=TwoWay}"
             IsItemClickEnabled="True"
             IsTextScaleFactorEnabled="True"
             ItemsSource="{Binding Tasks}"
@@ -68,15 +69,15 @@
                     </core:EventTriggerBehavior.Actions>
                 </core:EventTriggerBehavior>
             </interactivity:Interaction.Behaviors>
-            <ListView.ItemContainerStyle>
+            <uc:TasksListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="VerticalAlignment" Value="Center" />
                 </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
+            </uc:TasksListView.ItemContainerStyle>
+            <uc:TasksListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
                         <Grid>
@@ -115,13 +116,13 @@
                         </Grid>
                     </StackPanel>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </uc:TasksListView.ItemTemplate>
+        </uc:TasksListView>
         <TextBlock
             Grid.Row="3"
             Margin="20,20,20,0"
             HorizontalAlignment="Left"
-            Text="You have selected X item(s)."
+            Text="{Binding SelectedTasksText, Mode=OneWay}"
             Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}" />
         <AutoSuggestBox
             x:Name="TaskAutoSuggestBox"
@@ -172,6 +173,7 @@
                     </AppBarButton.Flyout>
                 </AppBarButton>
                 <AppBarButton
+                    Command="{Binding DeleteSelectedTasksCommand}"
                     Icon="Delete"
                     IsCompact="{Binding IsTaskListCommandBarCompact}"
                     IsEnabled="{Binding CanDeleteTasks, Mode=OneWay}"
@@ -234,7 +236,10 @@
                     Icon="SelectAll"
                     IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
                     Label="Select all" />
-                <AppBarButton IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}" Label="Mark selected tasks as completed">
+                <AppBarButton
+                    Command="{Binding MarkAsCompletedSelectedTasksCommand}"
+                    IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
+                    Label="Mark selected tasks as completed">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
                     </AppBarButton.Icon>
