@@ -28,6 +28,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
 
         private string _taskOperationTitle;
+        private bool _isNewTask;
         private TaskListModel _currentTaskList;
         private TaskModel _currentTask;
         private DateTimeOffset _minDate = DateTime.Now;
@@ -42,6 +43,12 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _taskOperationTitle; }
             set { Set(ref _taskOperationTitle, value); }
+        }
+
+        public bool IsNewTask
+        {
+            get { return _isNewTask; }
+            set { Set(ref _isNewTask, value); }
         }
 
         public TaskModel CurrentTask
@@ -148,6 +155,7 @@ namespace MiraiNotes.UWP.ViewModels
                 }
             };
             UpdateTaskOperationTitle(CurrentTask.IsNew);
+            IsNewTask = CurrentTask.IsNew;
             IsCurrentTaskTitleFocused = true;
             CurrentTask.Validate();
         }

@@ -210,14 +210,7 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxQuerySubmittedCommand = new RelayCommand<ItemModel>
                 (OnTaskAutoSuggestBoxQuerySubmitted);
 
-            NewTaskCommand = new RelayCommand(() =>
-            {
-                var task = new TaskModel
-                {
-                    IsSelected = true
-                };
-                OnTaskListViewSelectedItem(task);
-            });
+            NewTaskCommand = new RelayCommand(NewTask);
 
             NewTaskListCommand = new RelayCommand
                 (async () => await SaveNewTaskListAsync());
@@ -362,6 +355,16 @@ namespace MiraiNotes.UWP.ViewModels
             var taskToDelete = Tasks.FirstOrDefault(t => t.TaskID == taskID);
             if (taskToDelete != null)
                 Tasks.Remove(taskToDelete);
+        }
+
+        public void NewTask()
+        {
+            MarkAsSelectedAllTasks(false);
+            var task = new TaskModel
+            {
+                IsSelected = true
+            };
+            OnTaskListViewSelectedItem(task);
         }
 
         public async Task SaveNewTaskListAsync()
@@ -619,7 +622,7 @@ namespace MiraiNotes.UWP.ViewModels
         private IEnumerable<TaskModel> GetSelectedTasks() => Tasks.Where(t => t.IsSelected);
 
         private void MarkAsSelectedAllTasks(bool isSelected) => Tasks.ForEach(t => t.IsSelected = isSelected);
-        
+
         private void UpdateSelectedTasksText(int selectedTasks)
         {
             if (selectedTasks > 0)
