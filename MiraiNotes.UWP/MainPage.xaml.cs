@@ -32,36 +32,23 @@ namespace MiraiNotes.UWP
             ContentFrame.Navigate(typeof(TasksPage));
             PaneFrame.Navigate(typeof(NewTaskPage));
             MainSplitView.RegisterPropertyChangedCallback(SplitView.IsPaneOpenProperty, IsPaneOpenPropertyChanged);
-            MainSplitView.SizeChanged += (sender, e) => MainSplitViewSizeChanged();
-        }
-
-        /// <summary>
-        /// Updates the pane view width of the main split view
-        /// </summary>
-        private void MainSplitViewSizeChanged()
-        {
-            //TODO: When the hamburger is open and you minimize the screen, a bug appears
-            if (!MainSplitView.IsPaneOpen)
-                return;
-            
-            if (PaneFrame.ActualWidth == 0 || ContentFrame.ActualWidth == 0)
-            {
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitView.ActualWidth);
-                return;
-            }
-
-            if (PaneFrame.ActualWidth <= ContentFrame.ActualWidth * PANE_WIDTH_PERCENTAGE)
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(ContentFrame.ActualWidth);
-            else if (PaneFrame.ActualWidth * PANE_WIDTH_PERCENTAGE > ContentFrame.ActualWidth)
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(ContentFrame.ActualWidth);
+            MainSplitView.SizeChanged += (sender, e) => UpdatePaneWidth();
         }
 
         private void IsPaneOpenPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
+            UpdatePaneWidth();
+        }
+
+        /// <summary>
+        /// Updates the pane width of the main split view
+        /// </summary>
+        private void UpdatePaneWidth()
+        {
             if (MainSplitView.IsPaneOpen)
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(ContentFrame.ActualWidth);
+                MainSplitView.OpenPaneLength = CalculatePaneWidth(MainSplitView.ActualWidth);
             else
-                MainSplitView.OpenPaneLength = CalculatePaneWidth(0);
+                MainSplitView.OpenPaneLength = 0;
         }
 
         private double CalculatePaneWidth(double actualWidth) => actualWidth * PANE_WIDTH_PERCENTAGE;

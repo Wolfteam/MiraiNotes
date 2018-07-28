@@ -107,7 +107,7 @@
             </AutoSuggestBox>
         </NavigationView.AutoSuggestBox>
         <NavigationView.MenuItemTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="localModels:TaskListModel">
                 <StackPanel
                     Height="40"
                     Margin="-16,0,0,0"
@@ -162,21 +162,19 @@
             </DataTemplate>
         </NavigationView.MenuItemTemplate>
         <NavigationView.Content>
-            <Frame>
-                <SplitView
-                    x:Name="MainSplitView"
-                    DisplayMode="Inline"
-                    IsPaneOpen="{Binding IsPaneOpen, Mode=OneWay}"
-                    PaneBackground="{StaticResource SystemControlPageBackgroundListLowBrush}"
-                    PanePlacement="Right">
-                    <SplitView.Pane>
-                        <Frame x:Name="PaneFrame" />
-                    </SplitView.Pane>
-                    <SplitView.Content>
-                        <Frame x:Name="ContentFrame" />
-                    </SplitView.Content>
-                </SplitView>
-            </Frame>
+            <SplitView
+                x:Name="MainSplitView"
+                DisplayMode="Inline"
+                IsPaneOpen="{Binding IsPaneOpen, Mode=OneWay}"
+                PaneBackground="{StaticResource SystemControlPageBackgroundListLowBrush}"
+                PanePlacement="Right">
+                <SplitView.Pane>
+                    <Frame x:Name="PaneFrame" />
+                </SplitView.Pane>
+                <SplitView.Content>
+                    <Frame x:Name="ContentFrame" />
+                </SplitView.Content>
+            </SplitView>
         </NavigationView.Content>
         <NavigationView.PaneFooter>
             <StackPanel>
