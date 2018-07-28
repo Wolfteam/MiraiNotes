@@ -159,9 +159,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand TaskAutoSuggestBoxTextChangedCommand { get; set; }
 
-        public ICommand TaskAutoSuggestBoxQuerySubmittedCommand => new RelayCommand<ItemModel>((itemSelected) =>
-        {
-        });
+        public ICommand TaskAutoSuggestBoxQuerySubmittedCommand { get; set; }
 
         public ICommand SelectAllTaskCommand { get; set; }
 
@@ -209,8 +207,17 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 (async (text) => await OnTaskAutoSuggestBoxTextChangeAsync(text));
 
-            NewTaskCommand = new RelayCommand
-                (() => OnTaskListViewSelectedItem(new TaskModel()));
+            TaskAutoSuggestBoxQuerySubmittedCommand = new RelayCommand<ItemModel>
+                (OnTaskAutoSuggestBoxQuerySubmitted);
+
+            NewTaskCommand = new RelayCommand(() =>
+            {
+                var task = new TaskModel
+                {
+                    IsSelected = true
+                };
+                OnTaskListViewSelectedItem(task);
+            });
 
             NewTaskListCommand = new RelayCommand
                 (async () => await SaveNewTaskListAsync());
@@ -233,11 +240,8 @@ namespace MiraiNotes.UWP.ViewModels
             SortTasksCommand = new RelayCommand<TaskSortType>
                 ((sortBy) => SortTasks(sortBy));
 
-            SelectAllTaskCommand = new RelayCommand(() =>
-            {
-                foreach (var task in Tasks)
-                    task.IsSelected = true;
-            });
+            SelectAllTaskCommand = new RelayCommand
+                (() => MarkAsSelectedAllTasks(true));
 
             IsTaskListCommandBarCompact = true;
         }
@@ -295,41 +299,50 @@ namespace MiraiNotes.UWP.ViewModels
             int selectedTasks = GetSelectedTasks()
                 .Count();
             UpdateSelectedTasksText(selectedTasks);
+
+            //When you delete/mark as completed multiple tasks, at some point 
+            //the selectedTasks count = 0, so lets close the panel
+            if (task == null && selectedTasks == 0)
+            {
+                _messenger.Send(false, "OpenPane");
+                return;
+            }
+
             //When a list contains no items, and you switch to that list
             //or when you change the selected items, the event raises.
             if (task == null || selectedTasks > 1)
                 return;
-            //TODO: When you unselect an item this method gets called opening the pane
 
-            _messenger.Send(true, "OpenPane");
-            _messenger.Send(task, "NewTask");
+            _messenger.Send(task.IsSelected, "OpenPane");
+            if (task.IsSelected)
+                _messenger.Send(task, "NewTask");
         }
 
         public async Task OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
         {
             //TODO: Refactor this
-            ShowTaskListViewProgressRing = true;
-            var response = await _googleApiService.TaskService.GetAllAsync(CurrentTaskList.TaskListID);
-            ShowTaskListViewProgressRing = false;
-            if (!response.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"An error occurred while trying to get the tasks for the selected tasklist = {CurrentTaskList.Title}");
-                return;
-            }
+            await Task.Delay(1);
             var filteredItems = string.IsNullOrEmpty(currentText) ?
-                _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items
+                _mapper.Map<ObservableCollection<ItemModel>>(Tasks
                     .OrderBy(t => t.Title)
                     .Take(10)) :
-                _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items
+                _mapper.Map<ObservableCollection<ItemModel>>(Tasks
                     .Where(t => t.Title.ToLowerInvariant().Contains(currentText.ToLowerInvariant()))
                     .OrderBy(t => t.Title)
                     .Take(10));
 
             TaskAutoSuggestBoxItems = filteredItems;
-            Tasks = _mapper.Map<ObservableCollection<TaskModel>>(response.Result.Items
-                .Where(t => filteredItems.Any(fi => fi.ItemID == t.TaskID)));
+        }
+
+        public void OnTaskAutoSuggestBoxQuerySubmitted(ItemModel selectedItem)
+        {
+            if (selectedItem == null)
+                return;
+
+            MarkAsSelectedAllTasks(false);
+
+            var task = Tasks.FirstOrDefault(t => t.TaskID == selectedItem.ItemID);
+            task.IsSelected = true;
         }
 
         public void OnTaskSaved(TaskModel task)
@@ -605,6 +618,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         private IEnumerable<TaskModel> GetSelectedTasks() => Tasks.Where(t => t.IsSelected);
 
+        private void MarkAsSelectedAllTasks(bool isSelected) => Tasks.ForEach(t => t.IsSelected = isSelected);
+        
         private void UpdateSelectedTasksText(int selectedTasks)
         {
             if (selectedTasks > 0)
