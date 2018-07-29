@@ -167,7 +167,7 @@
                     Label="To be completed on"
                     ToolTipService.ToolTip="Choose the date this task should be completed">
                     <AppBarButton.Flyout>
-                        <Flyout>
+                        <Flyout Placement="Left">
                             <CalendarDatePicker
                                 Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay}"
                                 MinDate="{Binding MinDate, Mode=TwoWay}"
@@ -175,9 +175,25 @@
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
+                <AppBarSeparator />
+                <AppBarButton
+                    AllowFocusOnInteraction="True"
+                    Icon="List"
+                    Label="Save to"
+                    ToolTipService.ToolTip="Select the task list where this task will be saved">
+                    <AppBarButton.Flyout>
+                        <Flyout Placement="Left">
+                            <ComboBox
+                                DisplayMemberPath="Title"
+                                Header="Task List:"
+                                ItemsSource="{Binding TaskLists, Mode=OneWay}"
+                                PlaceholderText="Pick a task list"
+                                SelectedItem="{Binding SelectedTaskList, Mode=TwoWay}"
+                                SelectedValuePath="TaskListID" />
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>
-
-
 </Page>

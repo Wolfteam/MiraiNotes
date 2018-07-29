@@ -8,10 +8,8 @@ using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -34,8 +32,8 @@ namespace MiraiNotes.UWP.ViewModels
         private DateTimeOffset _minDate = DateTime.Now;
         private bool _showTaskProgressRing;
         private bool _isCurrentTaskTitleFocused;
-
-
+        private ObservableCollection<TaskListModel> _taskLists = new ObservableCollection<TaskListModel>();
+        private TaskListModel _selectedTaskList;
         #endregion
 
         #region Properties
@@ -73,6 +71,18 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _isCurrentTaskTitleFocused; }
             set { Set(ref _isCurrentTaskTitleFocused, value); }
+        }
+
+        public ObservableCollection<TaskListModel> TaskLists
+        {
+            get { return _taskLists; }
+            set { Set(ref _taskLists, value); }
+        }
+
+        public TaskListModel SelectedTaskList
+        {
+            get { return _selectedTaskList; }
+            set { Set(ref _selectedTaskList, value); }
         }
         #endregion
 
@@ -115,22 +125,27 @@ namespace MiraiNotes.UWP.ViewModels
 
             SaveChangesCommand = new RelayCommand
                 (async () => await SaveChangesAsync());
+
             DeleteTaskCommand = new RelayCommand
                 (async () => await DeleteTask());
+
             MarkAsCompletedCommand = new RelayCommand
                 (async () => await MarkAsCompletedAsync());
+
             ClosePaneCommand = new RelayCommand(CleanPanel);
         }
         #endregion
 
         #region Methods
-        public void InitView(TaskModel task)
+        public async void InitView(TaskModel task)
         {
+            await GetAllTaskListAsync();
+
             CurrentTask = new TaskModel
             {
                 TaskID = task.TaskID,
                 Title = string.IsNullOrEmpty(task.Title) ? "Task title" : task.Title,
-                Notes = string.IsNullOrEmpty(task.Notes) ?  "Task body" : task.Notes,
+                Notes = string.IsNullOrEmpty(task.Notes) ? "Task body" : task.Notes,
                 IsNew = string.IsNullOrEmpty(task.TaskID),
                 CompletedOn = task.CompletedOn,
                 IsDeleted = task.IsDeleted,
@@ -170,13 +185,46 @@ namespace MiraiNotes.UWP.ViewModels
 
             GoogleResponseModel<GoogleTaskModel> response;
             ShowTaskProgressRing = true;
-            if (isNewTask)
+            //If the task selected in the combo is not the same as the one in the 
+            //navigation view, its because we are trying to save/update a 
+            //task intoto a different task list
+            if (SelectedTaskList.TaskListID != _currentTaskList.TaskListID)
             {
-                response = await _googleApiService.TaskService.SaveAsync(_currentTaskList.TaskListID, task);
+                if (isNewTask)
+                {
+                    response = await _googleApiService
+                        .TaskService
+                        .SaveAsync(SelectedTaskList.TaskListID, task);
+                    if (!response.Succeed)
+                    {
+                        await _dialogService.ShowMessageDialogAsync(
+                            $"An error occurred while trying to seve the task into {SelectedTaskList.Title}.",
+                            $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                        return;
+                    }
+                    _messenger.Send(false, "OpenPane");
+                    await _dialogService.ShowMessageDialogAsync(
+                        "Succeed",
+                        $"The task was sucessfully created into {SelectedTaskList.Title}");
+                    return;
+                }
+                else
+                {
+                    await MoveCurrentTaskAsync(task);
+                    return;
+                }
+            }
+            else if (isNewTask)
+            {
+                response = await _googleApiService
+                    .TaskService
+                    .SaveAsync(_currentTaskList.TaskListID, task);
             }
             else
             {
-                response = await _googleApiService.TaskService.UpdateAsync(_currentTaskList.TaskListID, task.TaskID, task);
+                response = await _googleApiService
+                    .TaskService
+                    .UpdateAsync(_currentTaskList.TaskListID, task.TaskID, task);
             }
             ShowTaskProgressRing = false;
 
@@ -270,6 +318,71 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 CleanPanel();
             }
+        }
+
+        private async Task GetAllTaskListAsync()
+        {
+            ShowTaskProgressRing = true;
+            var response = await _googleApiService
+                .TaskListService
+                .GetAllAsync();
+            ShowTaskProgressRing = false;
+
+            if (!response.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Coudn't get the task lists",
+                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                return;
+            }
+
+            TaskLists = _mapper.Map<ObservableCollection<TaskListModel>>
+                (response.Result.Items.OrderBy(t => t.Title));
+
+            SelectedTaskList = TaskLists
+                .FirstOrDefault(t => t.TaskListID == _currentTaskList.TaskListID);
+        }
+
+        private async Task MoveCurrentTaskAsync(GoogleTaskModel task)
+        {
+            task.SelfLink = 
+                task.Position = 
+                    task.ParentTask = null;
+            ShowTaskProgressRing = true;
+            var deleteResponse = await _googleApiService
+                .TaskService
+                .DeleteAsync(_currentTaskList.TaskListID, task.TaskID);
+
+            if (!deleteResponse.Succeed)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}",
+                    $"Status Code: {deleteResponse.Errors.ApiError.Code}. {deleteResponse.Errors.ApiError.Message}");
+                return;
+            }
+            _messenger.Send(CurrentTask.TaskID, "TaskDeleted");
+
+            task.TaskID = null;
+            var response = await _googleApiService
+                 .TaskService
+                 .SaveAsync(SelectedTaskList.TaskListID, task);
+
+            if (!response.Succeed)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}",
+                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                return;
+            }
+            ShowTaskProgressRing = false;
+
+            _messenger.Send(false, "OpenPane");
+
+            await _dialogService.ShowMessageDialogAsync(
+                "Succeed",
+                $"Task sucessfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}");
         }
         #endregion
     }
