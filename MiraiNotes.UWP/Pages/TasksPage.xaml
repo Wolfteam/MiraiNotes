@@ -23,6 +23,13 @@
             OnFalse="Visible"
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <Flyout x:Key="MoveTaskFlyout" Placement="Left">
+            <ComboBox
+                DisplayMemberPath="Title"
+                Header="Task List:"
+                PlaceholderText="Pick a task list"
+                SelectedValuePath="TaskListID" />
+        </Flyout>
     </Page.Resources>
 
 
@@ -79,42 +86,49 @@
             </uc:TasksListView.ItemContainerStyle>
             <uc:TasksListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                FontSize="16"
-                                Text="{Binding Title}" />
-                            <StackPanel
-                                Grid.Column="1"
-                                HorizontalAlignment="Right"
-                                Orientation="Horizontal">
-                                <Button
-                                    VerticalAlignment="Center"
-                                    Background="Transparent"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Text="{Binding Title}" />
+                        <CommandBar
+                            Grid.Column="1"
+                            Background="Transparent"
+                            DefaultLabelPosition="Collapsed">
+                            <CommandBar.PrimaryCommands>
+                                <AppBarButton
                                     Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
                                     CommandParameter="{Binding TaskID}"
-                                    ToolTipService.ToolTip="Delete this task">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" />
-                                </Button>
-                                <Button
-                                    VerticalAlignment="Center"
-                                    Background="Transparent"
+                                    Icon="Delete"
+                                    Label="Borrar"
+                                    ToolTipService.ToolTip="Delete this task" />
+                                <AppBarButton
                                     Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
                                     CommandParameter="{Binding}"
-                                    ToolTipService.ToolTip="Mark as completed"
+                                    Label="Mark as completed"
+                                    ToolTipService.ToolTip="Mark as completed this task"
                                     Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
+                                    <AppBarButton.Icon>
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                                <AppBarButton
+                                    Flyout="{StaticResource MoveTaskFlyout}"
+                                    Label="Move"
+                                    ToolTipService.ToolTip="Move this task to a different task list">
+                                    <AppBarButton.Icon>
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                            </CommandBar.PrimaryCommands>
+                        </CommandBar>
+                    </Grid>
                 </DataTemplate>
             </uc:TasksListView.ItemTemplate>
         </uc:TasksListView>
@@ -134,7 +148,6 @@
             ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
             PlaceholderText="Search a task..."
             QueryIcon="Find"
-            Text="{Binding TaskAutoSuggestBoxText, Mode=TwoWay}"
             TextMemberPath="Text">
             <interactivity:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="TextChanged">
@@ -198,33 +211,57 @@
                                 <MenuFlyoutItem
                                     Command="{Binding SortTasksCommand}"
                                     CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_ASC}"
-                                    Text="Asc" />
+                                    Text="Asc">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74A;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                                 <MenuFlyoutItem
                                     Command="{Binding SortTasksCommand}"
                                     CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_DESC}"
-                                    Text="Desc" />
+                                    Text="Desc">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74B;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                             </MenuFlyoutSubItem>
 
                             <MenuFlyoutSubItem Text="By updated date">
                                 <MenuFlyoutItem
                                     Command="{Binding SortTasksCommand}"
                                     CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_ASC}"
-                                    Text="Asc" />
+                                    Text="Asc">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74A;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                                 <MenuFlyoutItem
                                     Command="{Binding SortTasksCommand}"
                                     CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_DESC}"
-                                    Text="Desc" />
+                                    Text="Desc">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74B;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                             </MenuFlyoutSubItem>
 
                             <MenuFlyoutSubItem Text="By my order">
                                 <MenuFlyoutItem
                                     Command="{Binding SortTasksCommand}"
                                     CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_ASC}"
-                                    Text="Asc" />
+                                    Text="Asc">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74A;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                                 <MenuFlyoutItem
                                     Command="{Binding SortTasksCommand}"
                                     CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_DESC}"
-                                    Text="Desc" />
+                                    Text="Desc">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74B;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                             </MenuFlyoutSubItem>
                         </MenuFlyout>
                     </AppBarButton.Flyout>
@@ -242,6 +279,15 @@
                     Label="Mark selected tasks as completed">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton
+                    Flyout="{StaticResource MoveTaskFlyout}"
+                    IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
+                    Label="Move selected tasks"
+                    ToolTipService.ToolTip="Moves the selected tasks to a different task list">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarSeparator />

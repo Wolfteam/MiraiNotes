@@ -30,9 +30,6 @@ namespace MiraiNotes.UWP.ViewModels
 
         private ObservableCollection<TaskModel> _tasks;
         private ObservableCollection<ItemModel> _taskAutoSuggestBoxItems;
-        private ObservableCollection<TaskModel> _selectedTasks = new ObservableCollection<TaskModel>();
-
-        private string _taskAutoSuggestBoxText;
 
         private bool _isTaskListTitleVisible;
         private bool _isTaskListViewVisible;
@@ -45,6 +42,7 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _showTaskListViewProgressRing;
         private bool _isTaskListCommandBarCompact;
         private string _selectedTasksText;
+        private ObservableCollection<TaskListModel> _taskLists;
         #endregion
 
         #region Properties
@@ -60,22 +58,10 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _taskAutoSuggestBoxItems, value); }
         }
 
-        public ObservableCollection<TaskModel> SelectedTasks
-        {
-            get { return _selectedTasks; }
-            set { SetValue(ref _selectedTasks, value); }
-        }
-
         public TaskListModel CurrentTaskList
         {
             get { return _currentTaskList; }
             set { SetValue(ref _currentTaskList, value); }
-        }
-
-        public string TaskAutoSuggestBoxText
-        {
-            get { return _taskAutoSuggestBoxText; }
-            set { SetValue(ref _taskAutoSuggestBoxText, value); }
         }
 
         public bool IsTaskListTitleVisible
@@ -148,6 +134,12 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _selectedTasksText; }
             set { SetValue(ref _selectedTasksText, value); }
         }
+
+        public ObservableCollection<TaskListModel> TaskLists
+        {
+            get { return _taskLists; }
+            set { SetValue(ref _taskLists, value); }
+        }
         #endregion
 
         #region Commands
@@ -174,6 +166,8 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand RefreshTasksCommand { get; set; }
 
         public ICommand SortTasksCommand { get; set; }
+
+        public ICommand MoveComboBoxSelectionChangedCommand { get; set; }
         #endregion
 
         #region Constructors
@@ -235,6 +229,14 @@ namespace MiraiNotes.UWP.ViewModels
 
             SelectAllTaskCommand = new RelayCommand
                 (() => MarkAsSelectedAllTasks(true));
+
+            MoveComboBoxSelectionChangedCommand = new RelayCommand<TaskListModel>
+                ((selectedItem) =>
+                {
+                    if (selectedItem == null)
+                        return;
+
+                });
 
             IsTaskListCommandBarCompact = true;
         }
@@ -630,6 +632,8 @@ namespace MiraiNotes.UWP.ViewModels
             else
                 SelectedTasksText = string.Empty;
         }
+
+        //private async Task MoveTask(TaskListModel)
         #endregion
     }
 }
