@@ -23,13 +23,6 @@
             OnFalse="Visible"
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <Flyout x:Key="MoveTaskFlyout" Placement="Left">
-            <ComboBox
-                DisplayMemberPath="Title"
-                Header="Task List:"
-                PlaceholderText="Pick a task list"
-                SelectedValuePath="TaskListID" />
-        </Flyout>
     </Page.Resources>
 
 
@@ -119,12 +112,52 @@
                                     </AppBarButton.Icon>
                                 </AppBarButton>
                                 <AppBarButton
-                                    Flyout="{StaticResource MoveTaskFlyout}"
+                                    x:Name="MoveTask_AppBarButton"
+                                    AllowFocusOnInteraction="True"
+                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxClickedCommand}"
+                                    CommandParameter="{Binding}"
                                     Label="Move"
+                                    Tag="{Binding}"
                                     ToolTipService.ToolTip="Move this task to a different task list">
                                     <AppBarButton.Icon>
                                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                                     </AppBarButton.Icon>
+                                    <AppBarButton.Flyout>
+                                        <Flyout Opened="TaskList_ComboBox_DropDownOpened" Placement="Left">
+                                            <ComboBox
+                                                x:Name="TaskList_ComboBox"
+                                                DisplayMemberPath="Title"
+                                                IsEnabled="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowMoveTaskFlyoutProgressBar, Converter={StaticResource InverseBooleanConverter}}"
+                                                ItemsSource="{Binding ElementName=MainSplitViewContent, Path=DataContext.TaskLists}"
+                                                PlaceholderText="Pick a task list"
+                                                SelectedValuePath="TaskListID">
+                                                <ComboBox.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <ProgressBar
+                                                                Width="130"
+                                                                IsIndeterminate="True"
+                                                                ShowError="False"
+                                                                ShowPaused="False"
+                                                                Visibility="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowMoveTaskFlyoutProgressBar, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                            <TextBlock>
+                                                                <Run Text="Move" />
+                                                                <Run Text="{Binding ElementName=MoveTask_AppBarButton, Path=Tag.Title}" />
+                                                                <Run Text="to" />
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ComboBox.HeaderTemplate>
+                                                <interactivity:Interaction.Behaviors>
+                                                    <core:EventTriggerBehavior EventName="SelectionChanged">
+                                                        <core:EventTriggerBehavior.Actions>
+                                                            <core:InvokeCommandAction Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxSelectionChangedCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox, Path=SelectedItem}" />
+                                                        </core:EventTriggerBehavior.Actions>
+                                                    </core:EventTriggerBehavior>
+                                                </interactivity:Interaction.Behaviors>
+                                            </ComboBox>
+                                        </Flyout>
+                                    </AppBarButton.Flyout>
                                 </AppBarButton>
                             </CommandBar.PrimaryCommands>
                         </CommandBar>
@@ -164,7 +197,6 @@
         </AutoSuggestBox>
         <CommandBar
             Grid.Row="5"
-            Background="{StaticResource SystemControlBaseLowAcrylicWindowBrush}"
             DefaultLabelPosition="Bottom"
             IsEnabled="{Binding ShowTaskListViewProgressRing, Converter={StaticResource InverseBooleanConverter}}">
             <CommandBar.PrimaryCommands>
@@ -282,10 +314,42 @@
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton
-                    Flyout="{StaticResource MoveTaskFlyout}"
+                    AllowFocusOnInteraction="True"
                     IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
                     Label="Move selected tasks"
                     ToolTipService.ToolTip="Moves the selected tasks to a different task list">
+                    <AppBarButton.Flyout>
+                        <Flyout Opened="TaskList_ComboBox_DropDownOpened">
+                            <ComboBox
+                                x:Name="TaskList_ComboBox2"
+                                DisplayMemberPath="Title"
+                                IsEnabled="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                                ItemsSource="{Binding TaskLists, Mode=OneWay}"
+                                PlaceholderText="Pick a task list"
+                                SelectedValuePath="TaskListID">
+                                <ComboBox.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <ProgressBar
+                                                Width="130"
+                                                IsIndeterminate="True"
+                                                ShowError="False"
+                                                ShowPaused="False"
+                                                Visibility="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            <TextBlock Text="Move selected tasks to:" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.HeaderTemplate>
+                                <interactivity:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="SelectionChanged">
+                                        <core:EventTriggerBehavior.Actions>
+                                            <core:InvokeCommandAction Command="{Binding MoveSelectedTasksCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox2, Path=SelectedItem}" />
+                                        </core:EventTriggerBehavior.Actions>
+                                    </core:EventTriggerBehavior>
+                                </interactivity:Interaction.Behaviors>
+                            </ComboBox>
+                        </Flyout>
+                    </AppBarButton.Flyout>
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                     </AppBarButton.Icon>

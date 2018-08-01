@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiraiNotes.UWP.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,12 @@ namespace MiraiNotes.UWP.Pages
         public TasksPage()
         {
             this.InitializeComponent();
+        }
+
+        private void TaskList_ComboBox_DropDownOpened(object sender, object e)
+        {
+            var vm = (TasksViewModel)DataContext;
+            vm.MoveComboBoxOpenedCommand.Execute(null);
         }
     }
 }

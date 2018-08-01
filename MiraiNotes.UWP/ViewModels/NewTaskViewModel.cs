@@ -139,8 +139,6 @@ namespace MiraiNotes.UWP.ViewModels
         #region Methods
         public async void InitView(TaskModel task)
         {
-            await GetAllTaskListAsync();
-
             CurrentTask = new TaskModel
             {
                 TaskID = task.TaskID,
@@ -171,8 +169,10 @@ namespace MiraiNotes.UWP.ViewModels
             };
             UpdateTaskOperationTitle(CurrentTask.IsNew);
             IsNewTask = CurrentTask.IsNew;
-            IsCurrentTaskTitleFocused = true;
-            CurrentTask.Validate();
+            //IsCurrentTaskTitleFocused = true;
+            //CurrentTask.Validate();
+
+            await GetAllTaskListAsync();
         }
 
         private async Task SaveChangesAsync()
@@ -182,6 +182,14 @@ namespace MiraiNotes.UWP.ViewModels
             bool isNewTask = string.IsNullOrEmpty(task.TaskID);
             if (isNewTask)
                 task.Status = GoogleTaskStatus.NEEDS_ACTION.GetString();
+
+            if (SelectedTaskList?.TaskListID == null || _currentTaskList?.TaskListID == null)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    $"An error occurred while trying to {(string.IsNullOrEmpty(task.TaskID) ? "save" : "update")} the task.",
+                    $"The selected task list and the current task list cant be null");
+                return;
+            }
 
             GoogleResponseModel<GoogleTaskModel> response;
             ShowTaskProgressRing = true;
@@ -345,28 +353,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task MoveCurrentTaskAsync(GoogleTaskModel task)
         {
-            task.SelfLink = 
-                task.Position = 
-                    task.ParentTask = null;
             ShowTaskProgressRing = true;
-            var deleteResponse = await _googleApiService
-                .TaskService
-                .DeleteAsync(_currentTaskList.TaskListID, task.TaskID);
 
-            if (!deleteResponse.Succeed)
-            {
-                ShowTaskProgressRing = false;
-                await _dialogService.ShowMessageDialogAsync(
-                    $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}",
-                    $"Status Code: {deleteResponse.Errors.ApiError.Code}. {deleteResponse.Errors.ApiError.Message}");
-                return;
-            }
-            _messenger.Send(CurrentTask.TaskID, "TaskDeleted");
-
-            task.TaskID = null;
             var response = await _googleApiService
-                 .TaskService
-                 .SaveAsync(SelectedTaskList.TaskListID, task);
+                .TaskService
+                .MoveAsync(task, _currentTaskList.TaskListID, SelectedTaskList.TaskListID);
 
             if (!response.Succeed)
             {
@@ -376,9 +367,10 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 return;
             }
-            ShowTaskProgressRing = false;
-
+            _messenger.Send(CurrentTask.TaskID, "TaskDeleted");
             _messenger.Send(false, "OpenPane");
+
+            ShowTaskProgressRing = false;
 
             await _dialogService.ShowMessageDialogAsync(
                 "Succeed",

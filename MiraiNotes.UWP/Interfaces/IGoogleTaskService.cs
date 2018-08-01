@@ -41,5 +41,15 @@ namespace MiraiNotes.UWP.Interfaces
         /// <returns></returns>
         Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(string taskListID, string taskID, string parent = null, string previous = null);
 
+        /// <summary>
+        /// Moves the <paramref name="task"/> 
+        /// from <paramref name="currentTaskListID"/> to the <paramref name="selectedTaskListID"/>
+        /// </summary>
+        /// <param name="task">A google task object with all their properties</param>
+        /// <param name="currentTaskListID">The current task list id where this task is located</param>
+        /// <param name="selectedTaskListID">The selected task list id were this task will be stored</param>
+        /// <returns>GoogleResponseModel<GoogleTaskModel></returns>
+        Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(GoogleTaskModel task, string currentTaskListID, string selectedTaskListID);
+
     }
 }

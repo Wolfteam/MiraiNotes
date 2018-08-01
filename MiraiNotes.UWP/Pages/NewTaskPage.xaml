@@ -86,7 +86,6 @@
                     IsSpellCheckEnabled="False"
                     MaxLength="50"
                     PlaceholderText="Enter your task title here"
-                    SelectionHighlightColor="Green"
                     Text="{Binding CurrentTask.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     TextWrapping="NoWrap" />
                 <TextBlock
@@ -130,7 +129,6 @@
 
         <CommandBar
             Grid.Row="1"
-            Background="{StaticResource SystemControlBaseLowAcrylicWindowBrush}"
             DefaultLabelPosition="Bottom"
             IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}">
             <CommandBar.PrimaryCommands>

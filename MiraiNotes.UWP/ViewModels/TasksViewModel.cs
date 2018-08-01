@@ -42,7 +42,9 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _showTaskListViewProgressRing;
         private bool _isTaskListCommandBarCompact;
         private string _selectedTasksText;
+
         private ObservableCollection<TaskListModel> _taskLists;
+        private bool _showMoveTaskFlyoutProgressBar;
         #endregion
 
         #region Properties
@@ -135,10 +137,20 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _selectedTasksText, value); }
         }
 
+
+
         public ObservableCollection<TaskListModel> TaskLists
         {
             get { return _taskLists; }
             set { SetValue(ref _taskLists, value); }
+        }
+
+        public TaskModel SelectedTaskToMove { get; set; }
+
+        public bool ShowMoveTaskFlyoutProgressBar
+        {
+            get { return _showMoveTaskFlyoutProgressBar; }
+            set { SetValue(ref _showMoveTaskFlyoutProgressBar, value); }
         }
         #endregion
 
@@ -167,7 +179,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand SortTasksCommand { get; set; }
 
+        public ICommand MoveComboBoxClickedCommand { get; set; }
+
         public ICommand MoveComboBoxSelectionChangedCommand { get; set; }
+
+        public ICommand MoveComboBoxOpenedCommand { get; set; }
+
+        public ICommand MoveSelectedTasksCommand { get; set; }
         #endregion
 
         #region Constructors
@@ -230,14 +248,39 @@ namespace MiraiNotes.UWP.ViewModels
             SelectAllTaskCommand = new RelayCommand
                 (() => MarkAsSelectedAllTasks(true));
 
-            MoveComboBoxSelectionChangedCommand = new RelayCommand<TaskListModel>
-                ((selectedItem) =>
-                {
-                    if (selectedItem == null)
-                        return;
+            MoveComboBoxClickedCommand = new RelayCommand<TaskModel>
+                ((clickedItem) => SelectedTaskToMove = clickedItem);
 
-                });
+            MoveComboBoxSelectionChangedCommand = new RelayCommand<TaskListModel>(async (selectedTaskList) =>
+            {
+                if (selectedTaskList == null || SelectedTaskToMove == null)
+                    return;
+                await MoveTask(SelectedTaskToMove, selectedTaskList);
+            });
 
+            MoveComboBoxOpenedCommand = new RelayCommand(async () =>
+            {
+                ShowMoveTaskFlyoutProgressBar = true;
+                var response = await _googleApiService
+                    .TaskListService
+                    .GetAllAsync();
+                ShowMoveTaskFlyoutProgressBar = false;
+
+                if (response.Succeed)
+                    TaskLists = _mapper.Map<ObservableCollection<TaskListModel>>
+                        (response.Result.Items
+                        .Where(t => t.TaskListID != _currentTaskList.TaskListID)
+                        .OrderBy(t => t.Title));
+                else
+                    TaskLists = null;
+            });
+
+            MoveSelectedTasksCommand = new RelayCommand<TaskListModel>(async (selectedTaskList) =>
+           {
+               if (selectedTaskList == null)
+                   return;
+               await MoveSelectedTasks(selectedTaskList);
+           });
             IsTaskListCommandBarCompact = true;
         }
         #endregion
@@ -282,8 +325,8 @@ namespace MiraiNotes.UWP.ViewModels
             DisableControls(false);
             CanAddMoreTaskList = true;
             CurrentTaskList = null;
-            Tasks.Clear();
-            TaskAutoSuggestBoxItems.Clear();
+            Tasks?.Clear();
+            TaskAutoSuggestBoxItems?.Clear();
             //this needs to be clear one i complete the autosuggestbox
             //SelectedTasks.Clear();
             _messenger.Send(false, "OpenPane");
@@ -578,8 +621,103 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
+        public async Task MoveTask(TaskModel selectedTask, TaskListModel selectedTaskList)
+        {
+            bool move = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirm",
+                $"Are you sure you want to move {selectedTask.Title} to {selectedTaskList.Title}",
+                "Yes",
+                "No");
+            if (!move)
+                return;
+
+            var task = _mapper.Map<GoogleTaskModel>(selectedTask);
+
+            ShowTaskListViewProgressRing = true;
+            var response = await _googleApiService
+                .TaskService
+                .MoveAsync(task, _currentTaskList.TaskListID, selectedTaskList.TaskListID);
+
+            if (!response.Succeed)
+            {
+                ShowTaskListViewProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {selectedTaskList.Title}",
+                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                return;
+            }
+            ShowTaskListViewProgressRing = false;
+            SelectedTaskToMove = null;
+
+            Tasks.Remove(selectedTask);
+
+            _messenger.Send(selectedTask.TaskID, "OnSelectedTasksRemoved");
+
+            await _dialogService.ShowMessageDialogAsync(
+                "Succeed",
+                $"Task sucessfully moved from: {_currentTaskList.Title} to: {selectedTaskList.Title}");
+        }
+
+        public async Task MoveSelectedTasks(TaskListModel selectedTaskList)
+        {
+            var selectedTasks = GetSelectedTasks();
+            if (selectedTaskList == null || selectedTasks.Count() == 0)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "You must select at least one task");
+                return;
+            }
+
+            bool move = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirm",
+                $"Are you sure you want to move {selectedTasks.Count()} task(s) to {selectedTaskList.Title}",
+                "Yes",
+                "No");
+            if (!move)
+                return;
+
+            ShowTaskListViewProgressRing = true;
+            var tasksNotMoved = new List<string>();
+            var tasksMoved = new List<string>();
+            foreach (var selectedTask in selectedTasks)
+            {
+                var task = _mapper.Map<GoogleTaskModel>(selectedTask);
+
+                var response = await _googleApiService
+                    .TaskService
+                    .MoveAsync(task, _currentTaskList.TaskListID, selectedTaskList.TaskListID);
+
+                if (!response.Succeed)
+                    tasksNotMoved.Add(selectedTask.Title);
+                else
+                    tasksMoved.Add(selectedTask.TaskID);
+            }
+            ShowTaskListViewProgressRing = false;
+            SelectedTaskToMove = null;
+
+            if (tasksMoved.Count > 0)
+                _messenger.Send(string.Join(",", tasksMoved), "OnSelectedTasksRemoved");
+
+            Tasks.RemoveAll(t => tasksMoved.Any(tr => t.TaskID == tr));
+
+            if (tasksNotMoved.Count > 0)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An error occurred, coudln't move this tasks: {string.Join(",", tasksNotMoved)}");
+                return;
+            }
+
+            await _dialogService.ShowMessageDialogAsync(
+                "Succeed",
+                $"Moved {selectedTasks.Count()} task(s) to {selectedTaskList.Title}");
+        }
+
         public void SortTasks(TaskSortType sortType)
         {
+            if (Tasks == null)
+                return;
             switch (sortType)
             {
                 case TaskSortType.BY_NAME_ASC:
@@ -621,9 +759,11 @@ namespace MiraiNotes.UWP.ViewModels
             IsTaskListViewVisible = isVisible;
         }
 
-        private IEnumerable<TaskModel> GetSelectedTasks() => Tasks.Where(t => t.IsSelected);
-
-        private void MarkAsSelectedAllTasks(bool isSelected) => Tasks.ForEach(t => t.IsSelected = isSelected);
+        private IEnumerable<TaskModel> GetSelectedTasks() => 
+            Tasks?.Where(t => t.IsSelected) ?? Enumerable.Empty<TaskModel>();
+        
+        private void MarkAsSelectedAllTasks(bool isSelected) => 
+            Tasks?.ForEach(t => t.IsSelected = isSelected);
 
         private void UpdateSelectedTasksText(int selectedTasks)
         {
@@ -632,8 +772,6 @@ namespace MiraiNotes.UWP.ViewModels
             else
                 SelectedTasksText = string.Empty;
         }
-
-        //private async Task MoveTask(TaskListModel)
         #endregion
     }
 }

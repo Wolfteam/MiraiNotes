@@ -71,6 +71,11 @@ namespace MiraiNotes.UWP.Design
             throw new NotImplementedException();
         }
 
+        public Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(GoogleTaskModel task, string currentTaskListID, string selectedTaskListID)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<GoogleResponseModel<GoogleTaskModel>> SaveAsync(string taskListID, GoogleTaskModel task, string parent = null, string previous = null)
         {
             throw new NotImplementedException();
