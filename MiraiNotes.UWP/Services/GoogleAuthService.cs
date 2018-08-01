@@ -46,7 +46,7 @@ namespace MiraiNotes.UWP.Services
 
         public string RedirectUrl => "urn:ietf:wg:oauth:2.0:oob:auto";
 
-        public string ApprovalUrl => "https://accounts.google.com/o/oauth2/approval"; 
+        public string ApprovalUrl => "https://accounts.google.com/o/oauth2/approval";
         #endregion
 
         public string GetAuthorizationUrl()
@@ -70,16 +70,23 @@ namespace MiraiNotes.UWP.Services
             var httpClient = _httpClientsFactory.GetHttpClient();
             httpClient.DefaultRequestHeaders.Authorization = null;
 
-            var response = await httpClient.PostAsync(RefreshTokenEndpoint, content);
-            if (!response.IsSuccessStatusCode)
+            try
+            {
+                var response = await httpClient.PostAsync(RefreshTokenEndpoint, content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
+                tokenResponse.RefreshToken = refreshToken;
+                return tokenResponse;
+            }
+            catch (Exception)
             {
                 return null;
             }
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
-            tokenResponse.RefreshToken = refreshToken;
-            return tokenResponse;
         }
 
         public async Task<TokenResponse> GetTokenAsync(string approvalCode)
@@ -100,14 +107,21 @@ namespace MiraiNotes.UWP.Services
             };
             HttpClient client = new HttpClient(handler);
 
-            var response = await client.PostAsync(TokenEndpoint, content);
-            if (!response.IsSuccessStatusCode)
+            try
+            {
+                var response = await client.PostAsync(TokenEndpoint, content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
+                return tokenResponse;
+            }
+            catch (Exception)
             {
                 return null;
             }
-            string responseBody = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
-            return tokenResponse;
         }
     }
 }
