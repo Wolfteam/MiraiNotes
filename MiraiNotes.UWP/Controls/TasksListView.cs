@@ -1,4 +1,4 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.UWP.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -13,7 +13,7 @@ namespace MiraiNotes.UWP.Controls
         {
             base.PrepareContainerForItemOverride(element, item);
 
-            if (item is TaskModel)
+            if (item is TaskItemViewModel)
             {
                 var binding = new Binding
                 {

@@ -1,9 +1,9 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 
-namespace MiraiNotes.UWP.Models
+namespace MiraiNotes.UWP.ViewModels
 {
-    public class TaskListModel : ViewModelBase
+    public class TaskListItemViewModel : ViewModelBase
     {
         private string _title;
 

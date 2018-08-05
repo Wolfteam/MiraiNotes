@@ -1,14 +1,14 @@
-﻿using System;
+﻿using MiraiNotes.UWP.Models;
+using System;
 using Template10.Validation;
 
-namespace MiraiNotes.UWP.Models
+namespace MiraiNotes.UWP.ViewModels
 {
-    public class TaskModel : ValidatableModelBase
+    public class TaskItemViewModel : ValidatableModelBase
     {
         #region Members
         private bool _canBeMarkedAsCompleted;
         #endregion
-
 
         public string TaskID { get; set; }
 

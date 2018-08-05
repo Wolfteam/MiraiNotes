@@ -29,35 +29,35 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public LoginViewModel Login
+        public LoginPageViewModel Login
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<LoginViewModel>();
+                return ServiceLocator.Current.GetInstance<LoginPageViewModel>();
             }
         }
 
-        public NavViewModel Home
+        public NavPageViewModel Home
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<NavViewModel>();
+                return ServiceLocator.Current.GetInstance<NavPageViewModel>();
             }
         } 
 
-        public TasksViewModel Tasks
+        public TasksPageViewModel Tasks
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<TasksViewModel>();
+                return ServiceLocator.Current.GetInstance<TasksPageViewModel>();
             }
         }
 
-        public NewTaskViewModel NewTask
+        public NewTaskPageViewModel NewTask
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<NewTaskViewModel>();
+                return ServiceLocator.Current.GetInstance<NewTaskPageViewModel>();
             }
         }
         #endregion
@@ -98,10 +98,10 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
             SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
 
-            SimpleIoc.Default.Register<LoginViewModel>();
-            SimpleIoc.Default.Register<NavViewModel>();
-            SimpleIoc.Default.Register<TasksViewModel>();
-            SimpleIoc.Default.Register<NewTaskViewModel>();
+            SimpleIoc.Default.Register<LoginPageViewModel>();
+            SimpleIoc.Default.Register<NavPageViewModel>();
+            SimpleIoc.Default.Register<TasksPageViewModel>();
+            SimpleIoc.Default.Register<NewTaskPageViewModel>();
         }
     }
 }

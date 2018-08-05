@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
+using MiraiNotes.UWP.ViewModels;
 
 namespace MiraiNotes.UWP.Helpers
 {
@@ -8,11 +9,11 @@ namespace MiraiNotes.UWP.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<GoogleTaskModel, TaskModel>();
-            CreateMap<TaskModel, GoogleTaskModel>();
+            CreateMap<GoogleTaskModel, TaskItemViewModel>();
+            CreateMap<TaskItemViewModel, GoogleTaskModel>();
 
-            CreateMap<GoogleTaskListModel, TaskListModel>();
-            CreateMap<TaskListModel, GoogleTaskListModel>();
+            CreateMap<GoogleTaskListModel, TaskListItemViewModel>();
+            CreateMap<TaskListItemViewModel, GoogleTaskListModel>();
 
             CreateMap<GoogleTaskListModel, ItemModel>()
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
@@ -22,11 +23,11 @@ namespace MiraiNotes.UWP.Helpers
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
-            CreateMap<TaskListModel, ItemModel>()
+            CreateMap<TaskListItemViewModel, ItemModel>()
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
-            CreateMap<TaskModel, ItemModel>()
+            CreateMap<TaskItemViewModel, ItemModel>()
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
         }

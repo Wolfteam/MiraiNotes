@@ -15,7 +15,7 @@ using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
-    public class NewTaskViewModel : ViewModelBase
+    public class NewTaskPageViewModel : ViewModelBase
     {
         #region Members
         private readonly ICustomDialogService _dialogService;
@@ -27,13 +27,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         private string _taskOperationTitle;
         private bool _isNewTask;
-        private TaskListModel _currentTaskList;
-        private TaskModel _currentTask;
+        private TaskListItemViewModel _currentTaskList;
+        private TaskItemViewModel _currentTask;
         private DateTimeOffset _minDate = DateTime.Now;
         private bool _showTaskProgressRing;
         private bool _isCurrentTaskTitleFocused;
-        private ObservableCollection<TaskListModel> _taskLists = new ObservableCollection<TaskListModel>();
-        private TaskListModel _selectedTaskList;
+        private ObservableCollection<TaskListItemViewModel> _taskLists = new ObservableCollection<TaskListItemViewModel>();
+        private TaskListItemViewModel _selectedTaskList;
         #endregion
 
         #region Properties
@@ -49,7 +49,7 @@ namespace MiraiNotes.UWP.ViewModels
             set { Set(ref _isNewTask, value); }
         }
 
-        public TaskModel CurrentTask
+        public TaskItemViewModel CurrentTask
         {
             get { return _currentTask; }
             set { Set(ref _currentTask, value); }
@@ -73,13 +73,13 @@ namespace MiraiNotes.UWP.ViewModels
             set { Set(ref _isCurrentTaskTitleFocused, value); }
         }
 
-        public ObservableCollection<TaskListModel> TaskLists
+        public ObservableCollection<TaskListItemViewModel> TaskLists
         {
             get { return _taskLists; }
             set { Set(ref _taskLists, value); }
         }
 
-        public TaskListModel SelectedTaskList
+        public TaskListItemViewModel SelectedTaskList
         {
             get { return _selectedTaskList; }
             set { Set(ref _selectedTaskList, value); }
@@ -97,7 +97,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Constructor
-        public NewTaskViewModel(
+        public NewTaskPageViewModel(
             ICustomDialogService dialogService,
             IMessenger messenger,
             INavigationService navigationService,
@@ -112,14 +112,14 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<TaskListModel>(this, $"{MessageTypes.NAVIGATIONVIEW_SELECTION_CHANGED}", (taskList) =>
+            _messenger.Register<TaskListItemViewModel>(this, $"{MessageType.NAVIGATIONVIEW_SELECTION_CHANGED}", (taskList) =>
             {
                 _currentTaskList = taskList;
-                _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
+                _messenger.Send(false, $"{MessageType.OPEN_PANE}");
             });
-            _messenger.Register<TaskModel>(this, $"{MessageTypes.NEW_TASK}", (task) => InitView(task));
-            _messenger.Register<string>(this, $"{MessageTypes.TASK_DELETED_FROM_CONTENT_FRAME}", OnTaskRemoved);
-            _messenger.Register<bool>(this, $"{MessageTypes.SHOW_PANE_FRAME_PROGRESS_RING}", (show) => ShowTaskProgressRing = show);
+            _messenger.Register<TaskItemViewModel>(this, $"{MessageType.NEW_TASK}", (task) => InitView(task));
+            _messenger.Register<string>(this, $"{MessageType.TASK_DELETED_FROM_CONTENT_FRAME}", OnTaskRemoved);
+            _messenger.Register<bool>(this, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}", (show) => ShowTaskProgressRing = show);
 
             SaveChangesCommand = new RelayCommand
                 (async () => await SaveChangesAsync());
@@ -135,9 +135,9 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Methods
-        public async void InitView(TaskModel task)
+        public async void InitView(TaskItemViewModel task)
         {
-            CurrentTask = new TaskModel
+            CurrentTask = new TaskItemViewModel
             {
                 TaskID = task.TaskID,
                 Title = string.IsNullOrEmpty(task.Title) ? "Task title" : task.Title,
@@ -154,7 +154,7 @@ namespace MiraiNotes.UWP.ViewModels
                 UpdatedAt = task.UpdatedAt,
                 Validator = i =>
                 {
-                    var u = i as TaskModel;
+                    var u = i as TaskItemViewModel;
                     if (string.IsNullOrEmpty(u.Title) || u.Title.Length < 2)
                     {
                         u.Properties[nameof(u.Title)].Errors.Add("Title is required");
@@ -208,7 +208,7 @@ namespace MiraiNotes.UWP.ViewModels
                             $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                         return;
                     }
-                    _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
+                    _messenger.Send(false, $"{MessageType.OPEN_PANE}");
                     await _dialogService.ShowMessageDialogAsync(
                         "Succeed",
                         $"The task was sucessfully created into {SelectedTaskList.Title}");
@@ -242,8 +242,8 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            CurrentTask = _mapper.Map<TaskModel>(response.Result);
-            _messenger.Send(CurrentTask, $"{MessageTypes.TASK_SAVED}");
+            CurrentTask = _mapper.Map<TaskItemViewModel>(response.Result);
+            _messenger.Send(CurrentTask, $"{MessageType.TASK_SAVED}");
             UpdateTaskOperationTitle(isNewTask);
         }
 
@@ -272,7 +272,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            _messenger.Send(CurrentTask.TaskID, $"{MessageTypes.TASK_DELETED}");
+            _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED}");
             CleanPanel();
         }
 
@@ -293,12 +293,12 @@ namespace MiraiNotes.UWP.ViewModels
 
         private void CleanPanel()
         {
-            CurrentTask = new TaskModel
+            CurrentTask = new TaskItemViewModel
             {
                 Title = string.Empty,
                 Notes = string.Empty
             };
-            _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
+            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
         }
 
         private void UpdateTaskOperationTitle(bool isNewTask)
@@ -339,7 +339,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            TaskLists = _mapper.Map<ObservableCollection<TaskListModel>>
+            TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>
                 (response.Result.Items.OrderBy(t => t.Title));
 
             SelectedTaskList = TaskLists
@@ -362,8 +362,8 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 return;
             }
-            _messenger.Send(CurrentTask.TaskID, $"{MessageTypes.TASK_DELETED}");
-            _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
+            _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED}");
+            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             ShowTaskProgressRing = false;
 

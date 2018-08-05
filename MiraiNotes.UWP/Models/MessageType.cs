@@ -1,6 +1,6 @@
 ﻿namespace MiraiNotes.UWP.Models
 {
-    public enum MessageTypes
+    public enum MessageType
     {
         OPEN_PANE = 0,
         NAVIGATIONVIEW_SELECTION_CHANGED = 1,

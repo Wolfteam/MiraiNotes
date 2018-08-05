@@ -30,7 +30,7 @@ namespace MiraiNotes.UWP.Pages
 
         private void TaskList_ComboBox_DropDownOpened(object sender, object e)
         {
-            var vm = (TasksViewModel)DataContext;
+            var vm = (TasksPageViewModel)DataContext;
             vm.MoveComboBoxOpenedCommand.Execute(null);
         }
     }

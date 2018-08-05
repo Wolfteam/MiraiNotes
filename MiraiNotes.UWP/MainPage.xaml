@@ -11,6 +11,7 @@
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="using:MiraiNotes.UWP.ViewModels"
     x:Name="MainContentPage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Home, Source={StaticResource Locator}}"
@@ -107,7 +108,7 @@
             </AutoSuggestBox>
         </NavigationView.AutoSuggestBox>
         <NavigationView.MenuItemTemplate>
-            <DataTemplate x:DataType="localModels:TaskListModel">
+            <DataTemplate x:DataType="viewModels:TaskListItemViewModel">
                 <StackPanel
                     Height="40"
                     Margin="-16,0,0,0"

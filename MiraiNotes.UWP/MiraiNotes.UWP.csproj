@@ -131,9 +131,9 @@
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
     <Compile Include="Models\ItemModel.cs" />
-    <Compile Include="Models\MessageTypes.cs" />
-    <Compile Include="Models\TaskListModel.cs" />
-    <Compile Include="Models\TaskModel.cs" />
+    <Compile Include="Models\MessageType.cs" />
+    <Compile Include="ViewModels\TaskListItemViewModel.cs" />
+    <Compile Include="ViewModels\TaskItemViewModel.cs" />
     <Compile Include="Models\TaskSortType.cs" />
     <Compile Include="Pages\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
@@ -157,10 +157,10 @@
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="Interfaces\IUserCredentialService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
-    <Compile Include="ViewModels\NavViewModel.cs" />
-    <Compile Include="ViewModels\LoginViewModel.cs" />
-    <Compile Include="ViewModels\NewTaskViewModel.cs" />
-    <Compile Include="ViewModels\TasksViewModel.cs" />
+    <Compile Include="ViewModels\NavPageViewModel.cs" />
+    <Compile Include="ViewModels\LoginPageViewModel.cs" />
+    <Compile Include="ViewModels\NewTaskPageViewModel.cs" />
+    <Compile Include="ViewModels\TasksPageViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
   </ItemGroup>
   <ItemGroup>

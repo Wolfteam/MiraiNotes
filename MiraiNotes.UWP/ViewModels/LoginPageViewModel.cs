@@ -8,7 +8,7 @@ using Windows.Security.Authentication.Web;
 
 namespace MiraiNotes.UWP.ViewModels
 {
-    public class LoginViewModel : BaseViewModel
+    public class LoginPageViewModel : BaseViewModel
     {
         #region Members
         private bool _showLoading;
@@ -53,7 +53,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Constructors
-        public LoginViewModel(
+        public LoginPageViewModel(
             ICustomDialogService dialogService,
             INavigationService navigationService,
             IUserCredentialService userCredentialService,
