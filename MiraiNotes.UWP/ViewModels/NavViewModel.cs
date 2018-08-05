@@ -2,12 +2,10 @@
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
-using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -109,8 +107,8 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<TaskListModel>(this, "NewTaskListAdded", OnTaskListAdded);
-            _messenger.Register<bool>(this, "OpenPane", (open) => OpenPane(open));
+            _messenger.Register<TaskListModel>(this, $"{MessageTypes.TASK_LIST_ADDED}", OnTaskListAdded);
+            _messenger.Register<bool>(this, $"{MessageTypes.OPEN_PANE}", (open) => OpenPane(open));
             //if (IsInDesignMode)
             //{
             //    var task = _googleApiService.TaskListService.GetAllAsync();
@@ -150,16 +148,16 @@ namespace MiraiNotes.UWP.ViewModels
         #region Methods
         private async Task InitViewAsync()
         {
-            _messenger.Send(true, "ShowTaskListViewProgressRing");
+            _messenger.Send(true, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
             var response = await _googleApiService.TaskListService.GetAllAsync();
-            _messenger.Send(false, "ShowTaskListViewProgressRing");
+            _messenger.Send(false, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {
+                _messenger.Send(false, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 await _dialogService.ShowMessageDialogAsync(
                     "Coudn't get the task lists",
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
-                _messenger.Send(false, "ShowTaskListViewProgressRing");
                 return;
             }
             var orderedItems = response.Result.Items.OrderBy(t => t.Title);
@@ -197,12 +195,12 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 CurrentTaskList = null;
                 SelectedItem = null;
-                _messenger.Send(CurrentTaskList, "OnNavigationViewSelectionChange");
+                _messenger.Send(CurrentTaskList, $"{MessageTypes.NAVIGATIONVIEW_SELECTION_CHANGED}");
             }
             else if (selectedItem is TaskListModel taskList)
             {
                 CurrentTaskList = taskList;
-                _messenger.Send(taskList, "OnNavigationViewSelectionChange");
+                _messenger.Send(taskList, $"{MessageTypes.NAVIGATIONVIEW_SELECTION_CHANGED}");
             }
             else
             {
@@ -252,11 +250,11 @@ namespace MiraiNotes.UWP.ViewModels
             taskListToUpdate.Title = newTitle;
             taskListToUpdate.UpdatedAt = DateTime.Now;
 
-            _messenger.Send(true, "ShowTaskListViewProgressRing");
+            _messenger.Send(true, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
             var response = await _googleApiService
                 .TaskListService
                 .UpdateAsync(taskListToUpdate.TaskListID, taskListToUpdate);
-            _messenger.Send(false, "ShowTaskListViewProgressRing");
+            _messenger.Send(false, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {
@@ -290,10 +288,10 @@ namespace MiraiNotes.UWP.ViewModels
             if (CurrentTaskList == taskList)
                 OpenPane(false);
 
-            _messenger.Send(true, "ShowTaskListViewProgressRing");
+            _messenger.Send(true, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
             var response = await _googleApiService
                 .TaskListService.DeleteAsync(taskList.TaskListID);
-            _messenger.Send(false, "ShowTaskListViewProgressRing");
+            _messenger.Send(false, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {

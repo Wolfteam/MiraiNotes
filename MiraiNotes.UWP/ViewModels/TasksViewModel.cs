@@ -204,14 +204,14 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<TaskListModel>(this, "OnNavigationViewSelectionChange",
+            _messenger.Register<TaskListModel>(this, $"{MessageTypes.NAVIGATIONVIEW_SELECTION_CHANGED}",
                 async (taskList) => await GetAllTasksAsync(taskList));
 
-            _messenger.Register<bool>(this, "ShowTaskListViewProgressRing",
+            _messenger.Register<bool>(this, $"{MessageTypes.SHOW_CONTENT_FRAME_PROGRESS_RING}",
                 (show) => ShowTaskListViewProgressRing = show);
 
-            _messenger.Register<TaskModel>(this, "TaskSaved", OnTaskSaved);
-            _messenger.Register<string>(this, "TaskDeleted", OnTaskDeleted);
+            _messenger.Register<TaskModel>(this, $"{MessageTypes.TASK_SAVED}", OnTaskSaved);
+            _messenger.Register<string>(this, $"{MessageTypes.TASK_DELETED}", OnTaskDeleted);
 
             TaskListViewSelectedItemCommand = new RelayCommand<TaskModel>
                 ((task) => OnTaskListViewSelectedItem(task));
@@ -329,7 +329,7 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxItems?.Clear();
             //this needs to be clear one i complete the autosuggestbox
             //SelectedTasks.Clear();
-            _messenger.Send(false, "OpenPane");
+            _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
         }
 
         public void OnTaskListViewSelectedItem(TaskModel task)
@@ -342,7 +342,7 @@ namespace MiraiNotes.UWP.ViewModels
             //the selectedTasks count = 0, so lets close the panel
             if (task == null && selectedTasks == 0)
             {
-                _messenger.Send(false, "OpenPane");
+                _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
                 return;
             }
 
@@ -351,9 +351,9 @@ namespace MiraiNotes.UWP.ViewModels
             if (task == null || selectedTasks > 1)
                 return;
 
-            _messenger.Send(task.IsSelected, "OpenPane");
+            _messenger.Send(task.IsSelected, $"{MessageTypes.OPEN_PANE}");
             if (task.IsSelected)
-                _messenger.Send(task, "NewTask");
+                _messenger.Send(task, $"{MessageTypes.NEW_TASK}");
         }
 
         public async Task OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
@@ -390,8 +390,9 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 Tasks.Remove(modifiedTask);
             }
-            if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
-                Tasks.Add(task);
+            //TODO: I should show a different list for completed tasks
+            //if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
+            Tasks.Add(task);
         }
 
         public void OnTaskDeleted(string taskID)
@@ -438,7 +439,9 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
             await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
-            _messenger.Send(_mapper.Map<TaskListModel>(response.Result), "NewTaskListAdded");
+            _messenger.Send(
+                _mapper.Map<TaskListModel>(response.Result), 
+                $"{MessageTypes.TASK_LIST_ADDED}");
         }
 
         public async Task MarkAsCompleted(TaskModel task)
@@ -547,12 +550,12 @@ namespace MiraiNotes.UWP.ViewModels
             if (taskToDelete == null)
                 throw new KeyNotFoundException($"Couldn't find a task with the id {taskID}");
 
-            _messenger.Send(true, "ShowTaskProgressRing");
+            _messenger.Send(true, $"{MessageTypes.SHOW_PANE_FRAME_PROGRESS_RING}");
             ShowTaskListViewProgressRing = true;
             var response = await _googleApiService
                 .TaskService.DeleteAsync(CurrentTaskList.TaskListID, taskID);
             ShowTaskListViewProgressRing = false;
-            _messenger.Send(false, "ShowTaskProgressRing");
+            _messenger.Send(false, $"{MessageTypes.SHOW_PANE_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {
@@ -563,7 +566,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
             Tasks.Remove(taskToDelete);
-            _messenger.Send(taskToDelete.TaskID, "OnTaskRemoved");
+            _messenger.Send(taskToDelete.TaskID, $"{MessageTypes.TASK_DELETED_FROM_CONTENT_FRAME}");
         }
 
         public async Task DeleteSelectedTasks()
@@ -588,7 +591,7 @@ namespace MiraiNotes.UWP.ViewModels
             if (!deleteSelectedTasks)
                 return;
 
-            _messenger.Send(true, "ShowTaskProgressRing");
+            _messenger.Send(true, $"{MessageTypes.SHOW_PANE_FRAME_PROGRESS_RING}");
             ShowTaskListViewProgressRing = true;
 
             var tasksNotRemoved = new List<string>();
@@ -605,10 +608,12 @@ namespace MiraiNotes.UWP.ViewModels
                     tasksRemoved.Add(task.TaskID);
             }
             ShowTaskListViewProgressRing = false;
-            _messenger.Send(false, "ShowTaskProgressRing");
+            _messenger.Send(false, $"{MessageTypes.SHOW_PANE_FRAME_PROGRESS_RING}");
 
             if (tasksRemoved.Count > 0)
-                _messenger.Send(string.Join(",", tasksRemoved), "OnSelectedTasksRemoved");
+                _messenger.Send(
+                    string.Join(",", tasksRemoved), 
+                    $"{MessageTypes.TASK_DELETED_FROM_CONTENT_FRAME}");
 
             Tasks.RemoveAll(t => tasksRemoved.Any(tr => t.TaskID == tr));
 
@@ -651,7 +656,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             Tasks.Remove(selectedTask);
 
-            _messenger.Send(selectedTask.TaskID, "OnSelectedTasksRemoved");
+            _messenger.Send(selectedTask.TaskID, $"{MessageTypes.TASK_DELETED_FROM_CONTENT_FRAME}");
 
             await _dialogService.ShowMessageDialogAsync(
                 "Succeed",
@@ -697,7 +702,9 @@ namespace MiraiNotes.UWP.ViewModels
             SelectedTaskToMove = null;
 
             if (tasksMoved.Count > 0)
-                _messenger.Send(string.Join(",", tasksMoved), "OnSelectedTasksRemoved");
+                _messenger.Send(
+                    string.Join(",", tasksMoved), 
+                    $"{MessageTypes.TASK_DELETED_FROM_CONTENT_FRAME}");
 
             Tasks.RemoveAll(t => tasksMoved.Any(tr => t.TaskID == tr));
 

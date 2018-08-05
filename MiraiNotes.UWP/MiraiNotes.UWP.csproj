@@ -131,6 +131,7 @@
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="Models\MessageTypes.cs" />
     <Compile Include="Models\TaskListModel.cs" />
     <Compile Include="Models\TaskModel.cs" />
     <Compile Include="Models\TaskSortType.cs" />

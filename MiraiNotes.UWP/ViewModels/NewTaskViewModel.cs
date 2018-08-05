@@ -112,16 +112,14 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-
-            _messenger.Register<TaskListModel>(this, "OnNavigationViewSelectionChange", (taskList) =>
+            _messenger.Register<TaskListModel>(this, $"{MessageTypes.NAVIGATIONVIEW_SELECTION_CHANGED}", (taskList) =>
             {
                 _currentTaskList = taskList;
-                _messenger.Send(false, "OpenPane");
+                _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
             });
-            _messenger.Register<TaskModel>(this, "NewTask", (task) => InitView(task));
-            _messenger.Register<string>(this, "OnTaskRemoved", OnTaskRemoved);
-            _messenger.Register<bool>(this, "ShowTaskProgressRing", (show) => ShowTaskProgressRing = show);
-            _messenger.Register<string>(this, "OnSelectedTasksRemoved", OnSelectedTasksRemoved);
+            _messenger.Register<TaskModel>(this, $"{MessageTypes.NEW_TASK}", (task) => InitView(task));
+            _messenger.Register<string>(this, $"{MessageTypes.TASK_DELETED_FROM_CONTENT_FRAME}", OnTaskRemoved);
+            _messenger.Register<bool>(this, $"{MessageTypes.SHOW_PANE_FRAME_PROGRESS_RING}", (show) => ShowTaskProgressRing = show);
 
             SaveChangesCommand = new RelayCommand
                 (async () => await SaveChangesAsync());
@@ -210,7 +208,7 @@ namespace MiraiNotes.UWP.ViewModels
                             $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                         return;
                     }
-                    _messenger.Send(false, "OpenPane");
+                    _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
                     await _dialogService.ShowMessageDialogAsync(
                         "Succeed",
                         $"The task was sucessfully created into {SelectedTaskList.Title}");
@@ -245,7 +243,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             CurrentTask = _mapper.Map<TaskModel>(response.Result);
-            _messenger.Send(CurrentTask, "TaskSaved");
+            _messenger.Send(CurrentTask, $"{MessageTypes.TASK_SAVED}");
             UpdateTaskOperationTitle(isNewTask);
         }
 
@@ -274,7 +272,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            _messenger.Send(CurrentTask.TaskID, "TaskDeleted");
+            _messenger.Send(CurrentTask.TaskID, $"{MessageTypes.TASK_DELETED}");
             CleanPanel();
         }
 
@@ -300,7 +298,7 @@ namespace MiraiNotes.UWP.ViewModels
                 Title = string.Empty,
                 Notes = string.Empty
             };
-            _messenger.Send(false, "OpenPane");
+            _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
         }
 
         private void UpdateTaskOperationTitle(bool isNewTask)
@@ -311,17 +309,14 @@ namespace MiraiNotes.UWP.ViewModels
                 TaskOperationTitle = "Update task";
         }
 
-        private void OnTaskRemoved(string taskID)
+        /// <summary>
+        /// Cleans the panel if the ids in <paramref name="taskIDs"/> is
+        /// in the current task
+        /// </summary>
+        /// <param name="taskIDs">Comma separated tasks ids</param>
+        private void OnTaskRemoved(string taskIDs)
         {
-            if (CurrentTask?.TaskID == taskID)
-            {
-                CleanPanel();
-            }
-        }
-
-        private void OnSelectedTasksRemoved(string tasksIds)
-        {
-            var removedTasksIds = tasksIds.Split(',');
+            var removedTasksIds = taskIDs.Split(',');
             if (removedTasksIds.Contains(CurrentTask?.TaskID))
             {
                 CleanPanel();
@@ -367,8 +362,8 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 return;
             }
-            _messenger.Send(CurrentTask.TaskID, "TaskDeleted");
-            _messenger.Send(false, "OpenPane");
+            _messenger.Send(CurrentTask.TaskID, $"{MessageTypes.TASK_DELETED}");
+            _messenger.Send(false, $"{MessageTypes.OPEN_PANE}");
 
             ShowTaskProgressRing = false;
 
