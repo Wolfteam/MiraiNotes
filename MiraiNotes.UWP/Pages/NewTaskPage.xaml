@@ -51,26 +51,45 @@
                 IsActive="True"
                 Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <StackPanel
-                Grid.Row="0"
-                Margin="0,0,0,10"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Orientation="Horizontal">
-                <FontIcon
-                    FontFamily="Segoe MDL2 Assets"
-                    Glyph="&#xE710;"
-                    Visibility="{Binding IsNewTask, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                <FontIcon
-                    FontFamily="Segoe MDL2 Assets"
-                    Glyph="&#xE70F;"
-                    Visibility="{Binding IsNewTask, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
-                <TextBlock
-                    Grid.Row="0"
-                    Margin="5,0"
-                    FontSize="24"
-                    Text="{Binding TaskOperationTitle, Mode=OneWay}" />
-            </StackPanel>
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <FontIcon
+                        FontFamily="Segoe MDL2 Assets"
+                        Glyph="&#xE710;"
+                        Visibility="{Binding IsNewTask, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <FontIcon
+                        FontFamily="Segoe MDL2 Assets"
+                        Glyph="&#xE70F;"
+                        Visibility="{Binding IsNewTask, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="5,0"
+                        FontSize="24"
+                        Text="{Binding TaskOperationTitle, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Visibility="{Binding CurrentTask.IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE787;" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="5,0"
+                        FontSize="24"
+                        Text="{Binding CurrentTask.CompletitionDateTodayOrAlreadyPassedText, Mode=OneWay}" />
+                </StackPanel>
+            </Grid>
+
 
             <StackPanel Grid.Row="1" Margin="0,0,0,10">
                 <TextBox
@@ -168,6 +187,8 @@
                         <Flyout Placement="Left">
                             <CalendarDatePicker
                                 Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay}"
+                                DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
+                                Header="This task will be completed on:"
                                 MinDate="{Binding MinDate, Mode=TwoWay}"
                                 PlaceholderText="To be completed on" />
                         </Flyout>

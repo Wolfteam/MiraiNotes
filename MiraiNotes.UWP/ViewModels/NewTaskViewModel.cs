@@ -306,9 +306,9 @@ namespace MiraiNotes.UWP.ViewModels
         private void UpdateTaskOperationTitle(bool isNewTask)
         {
             if (CurrentTask.IsNew)
-                TaskOperationTitle = "New Task:";
+                TaskOperationTitle = "New Task";
             else
-                TaskOperationTitle = "Update task:";
+                TaskOperationTitle = "Update task";
         }
 
         private void OnTaskRemoved(string taskID)

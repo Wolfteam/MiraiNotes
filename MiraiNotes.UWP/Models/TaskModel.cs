@@ -55,7 +55,11 @@ namespace MiraiNotes.UWP.Models
         public DateTimeOffset? ToBeCompletedOn
         {
             get { return Read<DateTimeOffset?>(); }
-            set { Write(value); }
+            set
+            {
+                Write(value);
+                RaisePropertyChanged(nameof(ToBeCompletedOn));
+            }
         }
 
         public DateTime? CompletedOn
@@ -108,6 +112,33 @@ namespace MiraiNotes.UWP.Models
         {
             get { return Read<bool>(); }
             set { Write(value); }
+        }
+
+        public bool IsCompletitionDateTodayOrAlreadyPassed
+        {
+            get
+            {
+                return ToBeCompletedOn?.Date <= DateTimeOffset.Now;
+            }
+        }
+
+        public string CompletitionDateTodayOrAlreadyPassedText
+        {
+            get
+            {
+                if (!ToBeCompletedOn.HasValue)
+                    return string.Empty;
+                else
+                {
+                    var difference = DateTimeOffset.Now.DayOfYear - ToBeCompletedOn.Value.DayOfYear;
+                    if (difference == 0)
+                        return "Today";
+                    else if (difference == 1)
+                        return $"{difference} day ago";
+                    else
+                        return $"{difference} days ago";
+                }
+            }
         }
     }
 }
