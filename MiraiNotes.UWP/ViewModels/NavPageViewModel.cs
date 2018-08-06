@@ -154,7 +154,6 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (!response.Succeed)
             {
-                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 await _dialogService.ShowMessageDialogAsync(
                     "Coudn't get the task lists",
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");

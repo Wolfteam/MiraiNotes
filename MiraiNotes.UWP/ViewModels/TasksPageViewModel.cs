@@ -186,6 +186,8 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand MoveComboBoxOpenedCommand { get; set; }
 
         public ICommand MoveSelectedTasksCommand { get; set; }
+
+        public ICommand ShowSubTasksCommand { get; set; }
         #endregion
 
         #region Constructors
@@ -276,11 +278,15 @@ namespace MiraiNotes.UWP.ViewModels
             });
 
             MoveSelectedTasksCommand = new RelayCommand<TaskListItemViewModel>(async (selectedTaskList) =>
-           {
-               if (selectedTaskList == null)
-                   return;
-               await MoveSelectedTasks(selectedTaskList);
-           });
+            {
+                if (selectedTaskList == null)
+                    return;
+                await MoveSelectedTasks(selectedTaskList);
+            });
+
+            ShowSubTasksCommand = new RelayCommand<TaskItemViewModel>
+                ((task) => task.ShowSubTasks = !task.ShowSubTasks);
+
             IsTaskListCommandBarCompact = true;
         }
         #endregion
@@ -308,8 +314,21 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (response.Result.Items != null && response.Result.Items.Count() > 0)
             {
-                Tasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(response.Result.Items);
-                TaskAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(response.Result.Items.OrderBy(t => t.Title));
+                var mainTasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(
+                    response.Result.Items
+                    .Where(t => t.ParentTask == null)
+                    .ToList());
+
+                mainTasks.ForEach(t =>
+                {
+                    t.SubTasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(
+                        response.Result.Items
+                        .Where(st => st.ParentTask == t.TaskID)
+                        .OrderBy(st => st.Position));
+                });
+
+                Tasks = mainTasks;
+                TaskAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(mainTasks.OrderBy(t => t.Title));
             }
             else
             {
@@ -440,7 +459,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
             await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
             _messenger.Send(
-                _mapper.Map<TaskListItemViewModel>(response.Result), 
+                _mapper.Map<TaskListItemViewModel>(response.Result),
                 $"{MessageType.TASK_LIST_ADDED}");
         }
 
@@ -612,7 +631,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (tasksRemoved.Count > 0)
                 _messenger.Send(
-                    string.Join(",", tasksRemoved), 
+                    string.Join(",", tasksRemoved),
                     $"{MessageType.TASK_DELETED_FROM_CONTENT_FRAME}");
 
             Tasks.RemoveAll(t => tasksRemoved.Any(tr => t.TaskID == tr));
@@ -703,7 +722,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (tasksMoved.Count > 0)
                 _messenger.Send(
-                    string.Join(",", tasksMoved), 
+                    string.Join(",", tasksMoved),
                     $"{MessageType.TASK_DELETED_FROM_CONTENT_FRAME}");
 
             Tasks.RemoveAll(t => tasksMoved.Any(tr => t.TaskID == tr));
@@ -766,10 +785,10 @@ namespace MiraiNotes.UWP.ViewModels
             IsTaskListViewVisible = isVisible;
         }
 
-        private IEnumerable<TaskItemViewModel> GetSelectedTasks() => 
+        private IEnumerable<TaskItemViewModel> GetSelectedTasks() =>
             Tasks?.Where(t => t.IsSelected) ?? Enumerable.Empty<TaskItemViewModel>();
-        
-        private void MarkAsSelectedAllTasks(bool isSelected) => 
+
+        private void MarkAsSelectedAllTasks(bool isSelected) =>
             Tasks?.ForEach(t => t.IsSelected = isSelected);
 
         private void UpdateSelectedTasksText(int selectedTasks)

@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.UWP.Models;
 using System;
+using System.Collections.ObjectModel;
 using Template10.Validation;
 
 namespace MiraiNotes.UWP.ViewModels
@@ -139,6 +140,18 @@ namespace MiraiNotes.UWP.ViewModels
                         return $"{difference} days ago";
                 }
             }
+        }
+
+        public ObservableCollection<TaskItemViewModel> SubTasks
+        {
+            get { return Read<ObservableCollection<TaskItemViewModel>>(); }
+            set { Write(value); }
+        }
+
+        public bool ShowSubTasks
+        {
+            get { return Read<bool>(); }
+            set { Write(value); }
         }
     }
 }
