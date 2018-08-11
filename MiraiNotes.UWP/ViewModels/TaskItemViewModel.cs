@@ -142,6 +142,11 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
+        public bool HasSubTasks
+        {
+            get => SubTasks != null && SubTasks.Count > 0;
+        }
+
         public ObservableCollection<TaskItemViewModel> SubTasks
         {
             get { return Read<ObservableCollection<TaskItemViewModel>>(); }
