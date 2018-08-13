@@ -21,6 +21,7 @@
             OnFalse="Visible"
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+
         <Style x:Key="ValidationErrorLabelStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Red" />
             <Setter Property="FontSize" Value="12" />
@@ -40,6 +41,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="2*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <ProgressRing
@@ -64,11 +66,11 @@
                     <FontIcon
                         FontFamily="Segoe MDL2 Assets"
                         Glyph="&#xE710;"
-                        Visibility="{Binding IsNewTask, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        Visibility="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <FontIcon
                         FontFamily="Segoe MDL2 Assets"
                         Glyph="&#xE70F;"
-                        Visibility="{Binding IsNewTask, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+                        Visibility="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
                     <TextBlock
                         Grid.Row="0"
                         Margin="5,0"
@@ -89,7 +91,6 @@
                         Text="{Binding CurrentTask.CompletitionDateTodayOrAlreadyPassedText, Mode=OneWay}" />
                 </StackPanel>
             </Grid>
-
 
             <StackPanel Grid.Row="1" Margin="0,0,0,10">
                 <TextBox
@@ -113,7 +114,7 @@
                     Visibility="{Binding (extensions:FieldValidationExtensions.ValidationMessageVisibility), ElementName=TaskTitle_TextBox}" />
             </StackPanel>
 
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="2" Margin="0,0,0,10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*" />
@@ -144,6 +145,63 @@
                         Visibility="{Binding (extensions:FieldValidationExtensions.ValidationMessageVisibility), ElementName=TaskBody_TextBox}" />
                 </Grid>
             </Grid>
+
+            <ListView
+                Grid.Row="3"
+                Header="Sub Tasks:"
+                IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
+                ItemsSource="{Binding CurrentTask.SubTasks, Mode=OneWay}"
+                SelectionMode="None"
+                Visibility="{Binding CurrentTask.HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Title}" />
+                            <CommandBar
+                                Grid.Column="1"
+                                Background="Transparent"
+                                DefaultLabelPosition="Collapsed">
+                                <CommandBar.PrimaryCommands>
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.DeleteSubTaskCommand}"
+                                        CommandParameter="{Binding}"
+                                        Icon="Delete"
+                                        ToolTipService.ToolTip="Delete this sub task" />
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.MarkSubTaskAsCompletedCommand}"
+                                        CommandParameter="{Binding}"
+                                        Label="Mark as completed"
+                                        ToolTipService.ToolTip="Mark as completed this sub task"
+                                        Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                </CommandBar.PrimaryCommands>
+                            </CommandBar>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock
+                Grid.Row="3"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="Task does not contains sub tasks"
+                TextAlignment="Center"
+                Visibility="{Binding CurrentTask.HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
         </Grid>
 
         <CommandBar
@@ -170,6 +228,13 @@
                     ToolTipService.ToolTip="Delete this task." />
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
+                <AppBarButton
+                    Command="{Binding NewSubTaskCommand}"
+                    Icon="Add"
+                    IsEnabled="{Binding CurrentTask.HasParentTask, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    Label="Add a sub task"
+                    ToolTipService.ToolTip="Add a sub task to this task list" />
+                <AppBarSeparator />
                 <AppBarButton
                     Command="{Binding MarkAsCompletedCommand}"
                     IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"

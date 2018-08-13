@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
@@ -13,7 +14,7 @@ using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
-    public class NavPageViewModel : BaseViewModel
+    public class NavPageViewModel : ViewModelBase
     {
         #region Members
         private readonly ICustomDialogService _dialogService;
@@ -38,37 +39,37 @@ namespace MiraiNotes.UWP.ViewModels
         public object SelectedItem
         {
             get { return _selectedItem; }
-            set { SetValue(ref _selectedItem, value); }
+            set { Set(ref _selectedItem, value); }
         }
 
         public ObservableCollection<TaskListItemViewModel> TaskLists
         {
             get { return _taskLists; }
-            set { SetValue(ref _taskLists, value); }
+            set { Set(ref _taskLists, value); }
         }
 
         public ObservableCollection<ItemModel> TaskListsAutoSuggestBoxItems
         {
             get { return _taskListsAutoSuggestBoxItems; }
-            set { SetValue(ref _taskListsAutoSuggestBoxItems, value); }
+            set { Set(ref _taskListsAutoSuggestBoxItems, value); }
         }
 
         public TaskListItemViewModel CurrentTaskList
         {
             get { return _currentTaskList; }
-            set { SetValue(ref _currentTaskList, value); }
+            set { Set(ref _currentTaskList, value); }
         }
 
         public string TaskListkAutoSuggestBoxText
         {
             get { return _taskListAutoSuggestBoxText; }
-            set { SetValue(ref _taskListAutoSuggestBoxText, value); }
+            set { Set(ref _taskListAutoSuggestBoxText, value); }
         }
 
         public bool IsPaneOpen
         {
             get { return _isPaneOpen; }
-            set { SetValue(ref _isPaneOpen, value); }
+            set { Set(ref _isPaneOpen, value); }
         }
         #endregion
 
@@ -107,18 +108,34 @@ namespace MiraiNotes.UWP.ViewModels
             _googleApiService = googleApiService;
             _mapper = mapper;
 
-            _messenger.Register<TaskListItemViewModel>(this, $"{MessageType.TASK_LIST_ADDED}", OnTaskListAdded);
-            _messenger.Register<bool>(this, $"{MessageType.OPEN_PANE}", (open) => OpenPane(open));
-            //if (IsInDesignMode)
-            //{
-            //    var task = _googleApiService.TaskListService.GetAllAsync();
-            //    task.Wait();
-            //    TaskLists = new ObservableCollection<GoogleTaskListModel>(task.Result.Result.Items);
-            //    var task2 = _googleApiService.TaskService.GetAllAsync(TaskLists.First().TaskListID);
-            //    task2.Wait();
+            if (IsInDesignModeStatic)
+            {
+                var items = _googleApiService.TaskListService.GetAllAsync().Result.Result.Items;
+                TaskLists = new ObservableCollection<TaskListItemViewModel>(items.Select(tl => new TaskListItemViewModel
+                {
+                    TaskListID = tl.TaskListID,
+                    Title = tl.Title
+                }));
+                return;
+                //TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(response.Result.Items);
+            }
 
-            //    Tasks = new ObservableCollection<TaskModel>(_mapper.Map<TaskModel>())
-            //}
+            RegisterMessages();
+            SetCommands();            
+        }
+
+        #region Methods
+        private void RegisterMessages()
+        {
+            _messenger.Register<TaskListItemViewModel>(
+                this, 
+                $"{MessageType.TASK_LIST_ADDED}",
+                OnTaskListAdded);
+            _messenger.Register<bool>(this, $"{MessageType.OPEN_PANE}", (open) => OpenPane(open));
+        }
+
+        private void SetCommands()
+        {
             PageLoadedCommand = new RelayCommand
                 (async () => await InitViewAsync());
 
@@ -145,12 +162,12 @@ namespace MiraiNotes.UWP.ViewModels
             //TODO: TaskAutoSuggestBoxItems should be updated when a Task list is added/updated/modified
         }
 
-        #region Methods
         private async Task InitViewAsync()
         {
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
             var response = await _googleApiService.TaskListService.GetAllAsync();
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            await Task.Delay(80);
 
             if (!response.Succeed)
             {
@@ -218,8 +235,8 @@ namespace MiraiNotes.UWP.ViewModels
         {
             bool logout = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
-                "Are you sure you want to log out?", 
-                "Yes", 
+                "Are you sure you want to log out?",
+                "Yes",
                 "No");
             if (logout)
             {
@@ -236,9 +253,9 @@ namespace MiraiNotes.UWP.ViewModels
         {
             int index = TaskLists.IndexOf(taskList);
             string newTitle = await _dialogService.ShowInputStringDialogAsync(
-                "Type the new task list name", 
-                taskList.Title, 
-                "Update", 
+                "Type the new task list name",
+                taskList.Title,
+                "Update",
                 "Cancel");
 
             if (string.IsNullOrEmpty(newTitle))

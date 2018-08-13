@@ -1,4 +1,5 @@
 ﻿using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,11 @@ namespace MiraiNotes.UWP.Design
 {
     public class DesignGoogleTaskService : IGoogleTaskService
     {
+        public Task<GoogleResponseModel<GoogleTaskModel>> ChangeStatus(string taskListID, string taskID, GoogleTaskStatus taskStatus)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<GoogleEmptyResponseModel> ClearAsync(string taskListID)
         {
             throw new NotImplementedException();
@@ -71,7 +77,7 @@ namespace MiraiNotes.UWP.Design
             throw new NotImplementedException();
         }
 
-        public Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(GoogleTaskModel task, string currentTaskListID, string selectedTaskListID)
+        public Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(GoogleTaskModel task, string currentTaskListID, string selectedTaskListID, string parent = null, string previous = null)
         {
             throw new NotImplementedException();
         }

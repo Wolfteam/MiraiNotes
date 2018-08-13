@@ -24,6 +24,7 @@
             OnFalse="Visible"
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />
     </Page.Resources>
 
 
@@ -111,6 +112,7 @@
                                     Background="Transparent"
                                     Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowSubTasksCommand}"
                                     CommandParameter="{Binding}"
+                                    ToolTipService.ToolTip="Show / hide sub tasks"
                                     Visibility="{Binding HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <interactivity:Interaction.Behaviors>
                                         <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="True">
@@ -174,7 +176,11 @@
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                                         </AppBarButton.Icon>
                                         <AppBarButton.Flyout>
-                                            <Flyout Opened="TaskList_ComboBox_DropDownOpened" Placement="Left">
+                                            <Flyout
+                                                x:Name="MoveTask_Flyout"
+                                                LightDismissOverlayMode="Off"
+                                                Opened="TaskList_ComboBox_DropDownOpened"
+                                                Placement="Left">
                                                 <ComboBox
                                                     x:Name="TaskList_ComboBox"
                                                     DisplayMemberPath="Title"
@@ -203,6 +209,7 @@
                                                         <core:EventTriggerBehavior EventName="SelectionChanged">
                                                             <core:EventTriggerBehavior.Actions>
                                                                 <core:InvokeCommandAction Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxSelectionChangedCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox, Path=SelectedItem}" />
+                                                                <core:CallMethodAction MethodName="Hide" TargetObject="{Binding ElementName=MoveTask_Flyout}" />
                                                             </core:EventTriggerBehavior.Actions>
                                                         </core:EventTriggerBehavior>
                                                     </interactivity:Interaction.Behaviors>
@@ -217,7 +224,7 @@
                             Margin="20,0,0,0"
                             IsItemClickEnabled="False"
                             ItemsSource="{Binding SubTasks, Mode=OneWay}"
-                            SelectionMode="None"
+                            SelectionMode="Single"
                             Visibility="{Binding ShowSubTasks, Converter={StaticResource BoolToVisibilityConverter}}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -234,6 +241,13 @@
                 </DataTemplate>
             </uc:TasksListView.ItemTemplate>
         </uc:TasksListView>
+        <!--<TextBlock
+            Grid.Row="2"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Text="There are no items...."
+            TextAlignment="Center"
+            Visibility="{Binding ShowNoContentText, Converter={StaticResource BoolToVisibilityConverter}}" />-->
         <TextBlock
             Grid.Row="3"
             Margin="20,20,20,0"

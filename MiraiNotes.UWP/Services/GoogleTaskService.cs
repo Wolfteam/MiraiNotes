@@ -1,9 +1,9 @@
-﻿using MiraiNotes.UWP.Interfaces;
+﻿using MiraiNotes.UWP.Helpers;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -146,7 +146,11 @@ namespace MiraiNotes.UWP.Services
             throw new NotImplementedException();
         }
 
-        public async Task<GoogleResponseModel<GoogleTaskModel>> SaveAsync(string taskListID, GoogleTaskModel task, string parent = null, string previous = null)
+        public async Task<GoogleResponseModel<GoogleTaskModel>> SaveAsync(
+            string taskListID,
+            GoogleTaskModel task,
+            string parent = null,
+            string previous = null)
         {
             var result = new GoogleResponseModel<GoogleTaskModel>();
             var httpClient = _httpClientsFactory.GetHttpClient();
@@ -155,7 +159,9 @@ namespace MiraiNotes.UWP.Services
 
             try
             {
-                var response = await httpClient.PostAsync($"{BASE_ADDRESS}/{taskListID}/tasks", stringContent);
+                var response = await httpClient.PostAsync(
+                    $"{BASE_ADDRESS}/{taskListID}/tasks?parent={parent}&previous={previous}",
+                    stringContent);
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
@@ -177,7 +183,10 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        public async Task<GoogleResponseModel<GoogleTaskModel>> UpdateAsync(string taskListID, string taskID, GoogleTaskModel task)
+        public async Task<GoogleResponseModel<GoogleTaskModel>> UpdateAsync(
+            string taskListID,
+            string taskID,
+            GoogleTaskModel task)
         {
             var result = new GoogleResponseModel<GoogleTaskModel>();
             var httpClient = _httpClientsFactory.GetHttpClient();
@@ -208,7 +217,12 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        public async Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(GoogleTaskModel task, string currentTaskListID, string selectedTaskListID)
+        public async Task<GoogleResponseModel<GoogleTaskModel>> MoveAsync(
+            GoogleTaskModel task,
+            string currentTaskListID,
+            string selectedTaskListID,
+            string parent = null,
+            string previous = null)
         {
             var deleteResponse = await DeleteAsync(currentTaskListID, task.TaskID);
             if (!deleteResponse.Succeed)
@@ -220,11 +234,49 @@ namespace MiraiNotes.UWP.Services
                 };
             }
             task.SelfLink =
-                task.Position =
-                    task.ParentTask =
-                        task.TaskID = null;
+                task.TaskID = null;
             task.UpdatedAt = DateTime.Now;
-            return await SaveAsync(selectedTaskListID, task);
+            return await SaveAsync(selectedTaskListID, task, parent, previous);
+        }
+
+        public async Task<GoogleResponseModel<GoogleTaskModel>> ChangeStatus(
+            string taskListID,
+            string taskID,
+            GoogleTaskStatus newTaskStatus)
+        {
+            var result = new GoogleResponseModel<GoogleTaskModel>();
+            var httpClient = _httpClientsFactory.GetHttpClient();
+            var data = new
+            {
+                updated = DateTime.Now,
+                completed = newTaskStatus == GoogleTaskStatus.COMPLETED ? DateTime.Now : (DateTime?)null,
+                status = newTaskStatus.GetString()
+            };
+            string json = JsonConvert.SerializeObject(data);
+            var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                var response = await httpClient.PatchAsync($"{BASE_ADDRESS}/{taskListID}/tasks/{taskID}", stringContent);
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode)
+                {
+                    result.Errors = JsonConvert.DeserializeObject<GoogleResponseErrorModel>(responseBody);
+                    return result;
+                }
+                result.Succeed = true;
+                result.Result = JsonConvert.DeserializeObject<GoogleTaskModel>(responseBody);
+            }
+            catch (Exception ex)
+            {
+                result.Errors = new GoogleResponseErrorModel
+                {
+                    ApiError = new GoogleApiErrorModel { Message = ex.Message },
+                    ErrorDescription = ex.Message
+                };
+            }
+            return result;
         }
     }
 }

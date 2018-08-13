@@ -9,6 +9,7 @@ namespace MiraiNotes.UWP.ViewModels
     {
         #region Members
         private bool _canBeMarkedAsCompleted;
+        private bool _hasSubTasks;
         #endregion
 
         public string TaskID { get; set; }
@@ -144,19 +145,45 @@ namespace MiraiNotes.UWP.ViewModels
 
         public bool HasSubTasks
         {
-            get => SubTasks != null && SubTasks.Count > 0;
+            get
+            {
+                _hasSubTasks = SubTasks != null && SubTasks.Count > 0;
+                return _hasSubTasks;
+            }
+            set
+            {
+                _hasSubTasks = value;
+                RaisePropertyChanged(nameof(HasSubTasks));
+            }
         }
 
         public ObservableCollection<TaskItemViewModel> SubTasks
         {
-            get { return Read<ObservableCollection<TaskItemViewModel>>(); }
-            set { Write(value); }
+            get
+            {
+                var items = Read<ObservableCollection<TaskItemViewModel>>();
+                if (items?.Count > 0)
+                    HasSubTasks = true;
+                else
+                    HasSubTasks = false;
+                return items;
+            }
+            set
+            {
+                Write(value);
+                RaisePropertyChanged(nameof(SubTasks));
+            }
         }
 
         public bool ShowSubTasks
         {
             get { return Read<bool>(); }
             set { Write(value); }
+        }
+
+        public bool HasParentTask
+        {
+            get => !string.IsNullOrEmpty(ParentTask);
         }
     }
 }
