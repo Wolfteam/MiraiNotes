@@ -30,6 +30,8 @@ namespace MiraiNotes.UWP.Helpers
             CreateMap<TaskItemViewModel, ItemModel>()
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
+
+            CreateMap<TaskItemViewModel, TaskItemViewModel>();
         }
     }
 }
