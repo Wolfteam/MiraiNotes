@@ -98,6 +98,7 @@
     </Compile>
     <Compile Include="Controls\TasksListView.cs" />
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
+    <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\VisibleWhenZeroConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />

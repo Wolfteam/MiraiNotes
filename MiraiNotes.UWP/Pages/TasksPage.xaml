@@ -25,6 +25,17 @@
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />
+        <converters:BooleanToTextDecorationConverter
+            x:Key="BooleanToTextDecorationConverterInverse"
+            OnFalse="None"
+            OnTrue="Strikethrough" />
+
+        <Style x:Key="TaskListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </Page.Resources>
 
 
@@ -61,6 +72,7 @@
             Margin="0,12,0,0"
             IsItemClickEnabled="True"
             IsTextScaleFactorEnabled="True"
+            ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
             ItemsSource="{Binding Tasks}"
             SelectionMode="Extended"
             Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}">
@@ -71,14 +83,6 @@
                     </core:EventTriggerBehavior.Actions>
                 </core:EventTriggerBehavior>
             </interactivity:Interaction.Behaviors>
-            <uc:TasksListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                </Style>
-            </uc:TasksListView.ItemContainerStyle>
             <uc:TasksListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
@@ -152,13 +156,13 @@
                                         Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
                                         CommandParameter="{Binding TaskID}"
                                         Icon="Delete"
-                                        Label="Borrar"
+                                        Label="Delete"
                                         ToolTipService.ToolTip="Delete this task" />
                                     <AppBarButton
                                         Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
                                         CommandParameter="{Binding}"
                                         Label="Mark as completed"
-                                        ToolTipService.ToolTip="Mark as completed this task"
+                                        ToolTipService.ToolTip="Mark this task as completed"
                                         Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <AppBarButton.Icon>
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
@@ -223,6 +227,7 @@
                         <ListView
                             Margin="20,0,0,0"
                             IsItemClickEnabled="False"
+                            ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
                             ItemsSource="{Binding SubTasks, Mode=OneWay}"
                             SelectionMode="Single"
                             Visibility="{Binding ShowSubTasks, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -230,9 +235,37 @@
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Title}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontStyle="Italic"
+                                            Text="{Binding Title}"
+                                            TextDecorations="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BooleanToTextDecorationConverterInverse}}" />
+                                        <CommandBar
+                                            Grid.Column="1"
+                                            Background="Transparent"
+                                            DefaultLabelPosition="Collapsed">
+                                            <CommandBar.PrimaryCommands>
+                                                <AppBarButton
+                                                    Label="Mark as completed"
+                                                    ToolTipService.ToolTip="Mark this sub task as completed"
+                                                    Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <AppBarButton.Icon>
+                                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                                    </AppBarButton.Icon>
+                                                </AppBarButton>
+                                                <AppBarButton
+                                                    Label="Mark as incompleted"
+                                                    ToolTipService.ToolTip="Mark this sub task as incompleted"
+                                                    Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <AppBarButton.Icon>
+                                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
+                                                    </AppBarButton.Icon>
+                                                </AppBarButton>
+                                            </CommandBar.PrimaryCommands>
+                                        </CommandBar>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

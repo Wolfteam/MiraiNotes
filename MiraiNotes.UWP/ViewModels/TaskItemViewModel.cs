@@ -8,7 +8,6 @@ namespace MiraiNotes.UWP.ViewModels
     public class TaskItemViewModel : ValidatableModelBase
     {
         #region Members
-        private bool _canBeMarkedAsCompleted;
         private bool _hasSubTasks;
         #endregion
 
@@ -93,20 +92,28 @@ namespace MiraiNotes.UWP.ViewModels
             get
             {
                 if (!IsNew && TaskStatus != GoogleTaskStatus.COMPLETED)
-                {
-                    _canBeMarkedAsCompleted = true;
-
-                }
+                    return true;
                 else
-                {
-                    _canBeMarkedAsCompleted = false;
-                }
-                return _canBeMarkedAsCompleted;
+                    return false;
             }
             set
             {
-                _canBeMarkedAsCompleted = value;
                 RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
+            }
+        }
+
+        public bool CanBeMarkedAsIncompleted
+        {
+            get
+            {
+                if (!IsNew && TaskStatus == GoogleTaskStatus.COMPLETED)
+                    return true;
+                else
+                    return false;
+            }
+            set
+            {
+                RaisePropertyChanged(nameof(CanBeMarkedAsIncompleted));
             }
         }
 

@@ -21,6 +21,10 @@
             OnFalse="Visible"
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:BooleanToTextDecorationConverter
+            x:Key="BooleanToTextDecorationConverterInverse"
+            OnFalse="None"
+            OnTrue="Strikethrough" />
 
         <Style x:Key="ValidationErrorLabelStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Red" />
@@ -168,7 +172,11 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Title}" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontStyle="Italic"
+                                Text="{Binding Title}"
+                                TextDecorations="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BooleanToTextDecorationConverterInverse}}" />
                             <CommandBar
                                 Grid.Column="1"
                                 Background="Transparent"
@@ -178,15 +186,26 @@
                                         Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.DeleteSubTaskCommand}"
                                         CommandParameter="{Binding}"
                                         Icon="Delete"
+                                        Label="Delete"
                                         ToolTipService.ToolTip="Delete this sub task" />
                                     <AppBarButton
                                         Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.MarkSubTaskAsCompletedCommand}"
                                         CommandParameter="{Binding}"
                                         Label="Mark as completed"
-                                        ToolTipService.ToolTip="Mark as completed this sub task"
+                                        ToolTipService.ToolTip="Mark this sub task as completed"
                                         Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <AppBarButton.Icon>
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.MarkSubTaskAsIncompletedCommand}"
+                                        CommandParameter="{Binding}"
+                                        Label="Mark as incompleted"
+                                        ToolTipService.ToolTip="Mark this sub task as incompleted"
+                                        Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
                                         </AppBarButton.Icon>
                                     </AppBarButton>
                                 </CommandBar.PrimaryCommands>

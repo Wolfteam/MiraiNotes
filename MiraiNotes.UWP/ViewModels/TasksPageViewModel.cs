@@ -232,8 +232,8 @@ namespace MiraiNotes.UWP.ViewModels
                 (kvp) => OnSubTaskDeleted(kvp.Key, kvp.Value));
             _messenger.Register<Tuple<TaskItemViewModel, bool>>(
                 this,
-                $"{MessageType.TASK_MARKED_AS_COMPLETED}",
-                (tuple) => OnTaskMarkedAsCompleted(tuple.Item1, tuple.Item2));
+                $"{MessageType.TASK_STATUS_CHANGED}",
+                (tuple) => OnTaskStatusChanged(tuple.Item1, tuple.Item2));
         }
 
         private void SetCommands()
@@ -259,10 +259,10 @@ namespace MiraiNotes.UWP.ViewModels
                 (async () => await DeleteSelectedTasksAsync());
 
             MarkAsCompletedCommand = new RelayCommand<TaskItemViewModel>
-                (async (task) => await MarkAsCompletedAsync(task));
+                (async (task) => await ChangeTaskStatusAsync(task, GoogleTaskStatus.COMPLETED));
 
             MarkAsCompletedSelectedTasksCommand = new RelayCommand
-                (async () => await MarkAsCompletedeSelectedTasksAsync());
+                (async () => await ChangeSelectedTasksStatusAsync(GoogleTaskStatus.COMPLETED));
 
             RefreshTasksCommand = new RelayCommand
                 (async () => await GetAllTasksAsync(CurrentTaskList));
@@ -449,8 +449,11 @@ namespace MiraiNotes.UWP.ViewModels
                 .RemoveAll(st => st.TaskID == subTaskID);
         }
 
-        public void OnTaskMarkedAsCompleted(TaskItemViewModel task, bool isSubTask)
+        public void OnTaskStatusChanged(TaskItemViewModel task, bool isSubTask)
         {
+            bool canBeMarkedAsCompleted = task.TaskStatus == GoogleTaskStatus.COMPLETED ? 
+                false : true;
+
             if (!isSubTask)
             {
                 var updatedTask = Tasks.FirstOrDefault(t => t.TaskID == task.TaskID);
@@ -459,7 +462,8 @@ namespace MiraiNotes.UWP.ViewModels
                 updatedTask.CompletedOn = task.CompletedOn;
                 updatedTask.UpdatedAt = task.UpdatedAt;
                 updatedTask.Status = task.Status;
-                updatedTask.CanBeMarkedAsCompleted = false;
+                updatedTask.CanBeMarkedAsCompleted = canBeMarkedAsCompleted;
+                updatedTask.CanBeMarkedAsIncompleted = !canBeMarkedAsCompleted;
             }
             else
             {
@@ -473,7 +477,8 @@ namespace MiraiNotes.UWP.ViewModels
                 subTask.CompletedOn = task.CompletedOn;
                 subTask.UpdatedAt = task.UpdatedAt;
                 subTask.Status = task.Status;
-                subTask.CanBeMarkedAsCompleted = false;
+                subTask.CanBeMarkedAsCompleted = canBeMarkedAsCompleted;
+                subTask.CanBeMarkedAsIncompleted = !canBeMarkedAsCompleted;
             }
         }
 
@@ -518,42 +523,45 @@ namespace MiraiNotes.UWP.ViewModels
                 $"{MessageType.TASK_LIST_ADDED}");
         }
 
-        public async Task MarkAsCompletedAsync(TaskItemViewModel task)
+        public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus  taskStatus)
         {
-            bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
+            string statusMessage =
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+
+            bool changeStatus = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
-                $"Are you sure you want to mark {task.Title} as completed?",
+                $"Are you sure you want to mark {task.Title} as {statusMessage}?",
                 "Yes",
                 "No");
-            if (!markAsCompleted)
+            if (!changeStatus)
                 return;
 
             ShowTaskListViewProgressRing = true;
             var response = await _googleApiService
                 .TaskService
-                .ChangeStatus(_currentTaskList.TaskListID, task.TaskID, GoogleTaskStatus.COMPLETED);
+                .ChangeStatus(_currentTaskList.TaskListID, task.TaskID, taskStatus);
 
             if (!response.Succeed)
             {
                 ShowTaskListViewProgressRing = false;
                 await _dialogService.ShowMessageDialogAsync(
-                    $"An error occurred while trying to mark as completed the task.",
+                    $"An error occurred while trying to mark the task as {statusMessage}.",
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 return;
             }
-            OnTaskMarkedAsCompleted(_mapper.Map<TaskItemViewModel>(response.Result), false);
+            OnTaskStatusChanged(_mapper.Map<TaskItemViewModel>(response.Result), false);
 
             if (task.HasSubTasks)
-                await MarkSubTaskAsCompletedAsync(task.SubTasks);
+                await ChangeSubTasksStatusAsync(task.SubTasks, taskStatus);
 
             ShowTaskListViewProgressRing = false;
 
             await _dialogService.ShowMessageDialogAsync(
                 "Succeed",
-                $"{task.Title} was marked as completed");
+                $"{task.Title} was marked as {statusMessage}.");
         }
 
-        public async Task MarkAsCompletedeSelectedTasksAsync()
+        public async Task ChangeSelectedTasksStatusAsync(GoogleTaskStatus taskStatus)
         {
             var selectedTasks = GetSelectedTasks()
                 .Where(t => t.CanBeMarkedAsCompleted);
@@ -567,67 +575,73 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            bool markAsCompleted = await _dialogService.ShowConfirmationDialogAsync(
+            string statusMessage =
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+
+            bool changeStatus = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
-                $"Are you sure you want to mark {numberOfSelectedTasks} task(s) as completed?",
+                $"Are you sure you want to mark {numberOfSelectedTasks} task(s) as {statusMessage}?",
                 "Yes",
                 "No");
-            if (!markAsCompleted)
+            if (!changeStatus)
                 return;
 
             ShowTaskListViewProgressRing = true;
 
-            var tasksNotCompleted = new List<string>();
+            var tasksStatusNotChanged = new List<string>();
             foreach (var task in selectedTasks)
             {
                 var response = await _googleApiService
                     .TaskService
-                    .ChangeStatus(CurrentTaskList.TaskListID, task.TaskID, GoogleTaskStatus.COMPLETED);
+                    .ChangeStatus(CurrentTaskList.TaskListID, task.TaskID, taskStatus);
 
                 if (!response.Succeed)
                 {
-                    tasksNotCompleted.Add(task.Title);
+                    tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
 
-                OnTaskMarkedAsCompleted(_mapper.Map<TaskItemViewModel>(response.Result), false);
+                OnTaskStatusChanged(_mapper.Map<TaskItemViewModel>(response.Result), false);
                 task.IsSelected = false;
 
                 if (task.HasSubTasks)
-                    await MarkSubTaskAsCompletedAsync(task.SubTasks);
+                    await ChangeSubTasksStatusAsync(task.SubTasks, taskStatus);
             }
 
             ShowTaskListViewProgressRing = false;
 
-            if (tasksNotCompleted.Count > 0)
+            if (tasksStatusNotChanged.Count > 0)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     $"Error",
-                    $"An error occurred, coudln't mark as completed the following tasks: {string.Join(",", tasksNotCompleted)}");
+                    $"An error occurred, coudln't mark as {statusMessage} the following tasks: {string.Join(",", tasksStatusNotChanged)}");
             }
         }
 
-        private async Task MarkSubTaskAsCompletedAsync(IEnumerable<TaskItemViewModel> tasks)
+        private async Task ChangeSubTasksStatusAsync(IEnumerable<TaskItemViewModel> tasks, GoogleTaskStatus taskStatus)
         {
-            var tasksNotCompleted = new List<string>();
+            string statusMessage =
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+
+            var tasksStatusNotChanged = new List<string>();
             foreach (var task in tasks)
             {
                 var response = await _googleApiService
                     .TaskService
-                    .ChangeStatus(_currentTaskList.TaskListID, task.TaskID, GoogleTaskStatus.COMPLETED);
+                    .ChangeStatus(_currentTaskList.TaskListID, task.TaskID, taskStatus);
 
                 if (!response.Succeed)
                 {
-                    tasksNotCompleted.Add(task.Title);
+                    tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
-                OnTaskMarkedAsCompleted(_mapper.Map<TaskItemViewModel>(response.Result), true);
+                OnTaskStatusChanged(_mapper.Map<TaskItemViewModel>(response.Result), true);
             }
-            if (tasksNotCompleted.Count > 0)
+            if (tasksStatusNotChanged.Count > 0)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     $"Error",
-                    $"An error occurred, coudln't mark as completed the following tasks: {string.Join(",", tasksNotCompleted)}");
+                    $"An error occurred, coudln't mark as {statusMessage} the following tasks: {string.Join(",", tasksStatusNotChanged)}");
             }
         }
 
