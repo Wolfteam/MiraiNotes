@@ -172,6 +172,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand MarkAsCompletedCommand { get; set; }
 
+        public ICommand MarkAsIncompletedCommand { get; set; }
+
         public ICommand MarkAsCompletedSelectedTasksCommand { get; set; }
 
         public ICommand RefreshTasksCommand { get; set; }
@@ -232,7 +234,7 @@ namespace MiraiNotes.UWP.ViewModels
                 (kvp) => OnSubTaskDeleted(kvp.Key, kvp.Value));
             _messenger.Register<Tuple<TaskItemViewModel, bool>>(
                 this,
-                $"{MessageType.TASK_STATUS_CHANGED}",
+                $"{MessageType.TASK_STATUS_CHANGED_FROM_PANE_FRAME}",
                 (tuple) => OnTaskStatusChanged(tuple.Item1, tuple.Item2));
         }
 
@@ -259,7 +261,10 @@ namespace MiraiNotes.UWP.ViewModels
                 (async () => await DeleteSelectedTasksAsync());
 
             MarkAsCompletedCommand = new RelayCommand<TaskItemViewModel>
-                (async (task) => await ChangeTaskStatusAsync(task, GoogleTaskStatus.COMPLETED));
+                (async (task) => await ChangeTaskStatusAsync(task, GoogleTaskStatus.COMPLETED, task.HasParentTask));
+
+            MarkAsIncompletedCommand = new RelayCommand<TaskItemViewModel>
+                (async (task) => await ChangeTaskStatusAsync(task, GoogleTaskStatus.NEEDS_ACTION, task.HasParentTask));
 
             MarkAsCompletedSelectedTasksCommand = new RelayCommand
                 (async () => await ChangeSelectedTasksStatusAsync(GoogleTaskStatus.COMPLETED));
@@ -451,35 +456,24 @@ namespace MiraiNotes.UWP.ViewModels
 
         public void OnTaskStatusChanged(TaskItemViewModel task, bool isSubTask)
         {
-            bool canBeMarkedAsCompleted = task.TaskStatus == GoogleTaskStatus.COMPLETED ? 
-                false : true;
-
+            TaskItemViewModel taskFound = null;
             if (!isSubTask)
-            {
-                var updatedTask = Tasks.FirstOrDefault(t => t.TaskID == task.TaskID);
-                if (updatedTask == null)
-                    return;
-                updatedTask.CompletedOn = task.CompletedOn;
-                updatedTask.UpdatedAt = task.UpdatedAt;
-                updatedTask.Status = task.Status;
-                updatedTask.CanBeMarkedAsCompleted = canBeMarkedAsCompleted;
-                updatedTask.CanBeMarkedAsIncompleted = !canBeMarkedAsCompleted;
-            }
+                taskFound = Tasks
+                    .FirstOrDefault(t => t.TaskID == task.TaskID); 
             else
             {
-                var subTask = Tasks
+                taskFound = Tasks
                     .FirstOrDefault(t => t.TaskID == task.ParentTask)?
                     .SubTasks?
                     .FirstOrDefault(st => st.TaskID == task.TaskID);
-
-                if (subTask == null)
-                    return;
-                subTask.CompletedOn = task.CompletedOn;
-                subTask.UpdatedAt = task.UpdatedAt;
-                subTask.Status = task.Status;
-                subTask.CanBeMarkedAsCompleted = canBeMarkedAsCompleted;
-                subTask.CanBeMarkedAsIncompleted = !canBeMarkedAsCompleted;
             }
+
+            if (taskFound == null)
+                return;
+
+            taskFound.CompletedOn = task.CompletedOn;
+            taskFound.UpdatedAt = task.UpdatedAt;
+            taskFound.Status = task.Status;
         }
 
         public void NewTask()
@@ -523,10 +517,10 @@ namespace MiraiNotes.UWP.ViewModels
                 $"{MessageType.TASK_LIST_ADDED}");
         }
 
-        public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus  taskStatus)
+        public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus  taskStatus, bool isSubTask)
         {
             string statusMessage =
-                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
 
             bool changeStatus = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -549,9 +543,14 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 return;
             }
-            OnTaskStatusChanged(_mapper.Map<TaskItemViewModel>(response.Result), false);
+            var t = _mapper.Map<TaskItemViewModel>(response.Result);
+            OnTaskStatusChanged(t, isSubTask);
 
-            if (task.HasSubTasks)
+            _messenger.Send(
+                new Tuple<TaskItemViewModel, bool>(t, isSubTask), 
+                $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
+
+            if (!isSubTask && task.HasSubTasks)
                 await ChangeSubTasksStatusAsync(task.SubTasks, taskStatus);
 
             ShowTaskListViewProgressRing = false;
@@ -576,7 +575,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             string statusMessage =
-                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
 
             bool changeStatus = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -600,9 +599,13 @@ namespace MiraiNotes.UWP.ViewModels
                     tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
-
-                OnTaskStatusChanged(_mapper.Map<TaskItemViewModel>(response.Result), false);
+                var t = _mapper.Map<TaskItemViewModel>(response.Result);
+                OnTaskStatusChanged(t, false);
                 task.IsSelected = false;
+
+                _messenger.Send(
+                    new Tuple<TaskItemViewModel, bool>(t, false),
+                    $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
 
                 if (task.HasSubTasks)
                     await ChangeSubTasksStatusAsync(task.SubTasks, taskStatus);
@@ -621,7 +624,7 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task ChangeSubTasksStatusAsync(IEnumerable<TaskItemViewModel> tasks, GoogleTaskStatus taskStatus)
         {
             string statusMessage =
-                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
 
             var tasksStatusNotChanged = new List<string>();
             foreach (var task in tasks)
@@ -635,7 +638,13 @@ namespace MiraiNotes.UWP.ViewModels
                     tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
-                OnTaskStatusChanged(_mapper.Map<TaskItemViewModel>(response.Result), true);
+
+                var t = _mapper.Map<TaskItemViewModel>(response.Result);
+                OnTaskStatusChanged(t, true);
+
+                _messenger.Send(
+                    new Tuple<TaskItemViewModel, bool>(t, true),
+                    $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
             }
             if (tasksStatusNotChanged.Count > 0)
             {

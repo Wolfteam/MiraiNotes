@@ -8,10 +8,21 @@ namespace MiraiNotes.UWP.ViewModels
     public class TaskItemViewModel : ValidatableModelBase
     {
         #region Members
+        private string _taskID;
+        private string _status;
+        private string _parentTask;
         private bool _hasSubTasks;
         #endregion
 
-        public string TaskID { get; set; }
+        public string TaskID
+        {
+            get => _taskID; set
+            {
+                _taskID = value;
+                RaisePropertyChanged(nameof(TaskID));
+                RaisePropertyChanged(nameof(IsNew));
+            }
+        }
 
         public string Title
         {
@@ -27,7 +38,16 @@ namespace MiraiNotes.UWP.ViewModels
 
         public string SelfLink { get; set; }
 
-        public string ParentTask { get; set; }
+        public string ParentTask
+        {
+            get => _parentTask;
+            set
+            {
+                _parentTask = value;
+                RaisePropertyChanged(nameof(ParentTask));
+                RaisePropertyChanged(nameof(HasParentTask));
+            }
+        }
 
         public string Position { get; set; }
 
@@ -37,7 +57,17 @@ namespace MiraiNotes.UWP.ViewModels
             set { Write(value); }
         }
 
-        public string Status { get; set; }
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                RaisePropertyChanged(nameof(Status));
+                RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
+                RaisePropertyChanged(nameof(CanBeMarkedAsIncompleted));
+            }
+        }
 
         public GoogleTaskStatus TaskStatus
         {
@@ -83,8 +113,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public bool IsNew
         {
-            get { return Read<bool>(); }
-            set { Write(value); }
+            get { return string.IsNullOrEmpty(TaskID); }
         }
 
         public bool CanBeMarkedAsCompleted
@@ -96,10 +125,6 @@ namespace MiraiNotes.UWP.ViewModels
                 else
                     return false;
             }
-            set
-            {
-                RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
-            }
         }
 
         public bool CanBeMarkedAsIncompleted
@@ -110,10 +135,6 @@ namespace MiraiNotes.UWP.ViewModels
                     return true;
                 else
                     return false;
-            }
-            set
-            {
-                RaisePropertyChanged(nameof(CanBeMarkedAsIncompleted));
             }
         }
 

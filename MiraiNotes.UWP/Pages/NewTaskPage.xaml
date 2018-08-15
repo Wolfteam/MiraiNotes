@@ -173,10 +173,19 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock
+                                Grid.Column="0"
                                 VerticalAlignment="Center"
                                 FontStyle="Italic"
                                 Text="{Binding Title}"
-                                TextDecorations="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BooleanToTextDecorationConverterInverse}}" />
+                                TextDecorations="None"
+                                Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontStyle="Italic"
+                                Text="{Binding Title}"
+                                TextDecorations="Strikethrough"
+                                Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                             <CommandBar
                                 Grid.Column="1"
                                 Background="Transparent"

@@ -142,6 +142,10 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}",
                 (show) => ShowTaskProgressRing = show);
+            _messenger.Register<Tuple<TaskItemViewModel, bool>>(
+                this,
+                $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}",
+                (tuple) => OnTaskStatusChanged(tuple.Item1, tuple.Item2));
         }
 
         private void SetCommands()
@@ -183,7 +187,6 @@ namespace MiraiNotes.UWP.ViewModels
                 TaskID = task.TaskID,
                 Title = string.IsNullOrEmpty(task.Title) ? "Task title" : task.Title,
                 Notes = string.IsNullOrEmpty(task.Notes) ? "Task body" : task.Notes,
-                IsNew = string.IsNullOrEmpty(task.TaskID),
                 CompletedOn = task.CompletedOn,
                 IsDeleted = task.IsDeleted,
                 IsHidden = task.IsHidden,
@@ -336,9 +339,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus taskStatus)
         {
-            //TODO: Theres a bug that doesnt refresh the striked text when a subtask is completed
             string statusMessage =
-                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}?";
+                $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
 
             bool changeStatus = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -365,11 +367,10 @@ namespace MiraiNotes.UWP.ViewModels
             task.Status = response.Result.Status;
             task.CompletedOn = response.Result.CompletedOn;
             task.UpdatedAt = response.Result.UpdatedAt;
-            task.CanBeMarkedAsCompleted = taskStatus == GoogleTaskStatus.COMPLETED ? false : true;
-            task.CanBeMarkedAsIncompleted = !task.CanBeMarkedAsCompleted;
+
             _messenger.Send(
-                new Tuple<TaskItemViewModel, bool>(task, !string.IsNullOrEmpty(task.ParentTask)),
-                $"{MessageType.TASK_STATUS_CHANGED}");
+                new Tuple<TaskItemViewModel, bool>(task, task.HasParentTask),
+                $"{MessageType.TASK_STATUS_CHANGED_FROM_PANE_FRAME}");
 
             await _dialogService.ShowMessageDialogAsync(
                 "Succeed",
@@ -406,6 +407,27 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 CleanPanel();
             }
+        }
+
+        private void OnTaskStatusChanged(TaskItemViewModel task, bool isSubTask)
+        {
+            TaskItemViewModel taskFound = null;
+
+            if (!isSubTask)
+                taskFound = CurrentTask?.TaskID == task.TaskID ? CurrentTask : null;
+            else
+            {
+                taskFound = CurrentTask?
+                    .SubTasks?
+                    .FirstOrDefault(st => st.TaskID == task.TaskID);
+            }
+
+            if (taskFound == null)
+                return;
+
+            taskFound.CompletedOn = task.CompletedOn;
+            taskFound.UpdatedAt = task.UpdatedAt;
+            taskFound.Status = task.Status;
         }
 
         private async Task GetAllTaskListAsync()
@@ -480,7 +502,6 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 Title = subTaskTitle,
                 UpdatedAt = DateTime.Now,
-                IsNew = true,
                 Status = GoogleTaskStatus.NEEDS_ACTION.GetString()
             });
             if (!CurrentTask.HasSubTasks)

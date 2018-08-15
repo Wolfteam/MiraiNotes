@@ -239,16 +239,27 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <TextBlock
+                                            Grid.Column="0"
                                             VerticalAlignment="Center"
                                             FontStyle="Italic"
                                             Text="{Binding Title}"
-                                            TextDecorations="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BooleanToTextDecorationConverterInverse}}" />
+                                            TextDecorations="None"
+                                            Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            VerticalAlignment="Center"
+                                            FontStyle="Italic"
+                                            Text="{Binding Title}"
+                                            TextDecorations="Strikethrough"
+                                            Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                         <CommandBar
                                             Grid.Column="1"
                                             Background="Transparent"
                                             DefaultLabelPosition="Collapsed">
                                             <CommandBar.PrimaryCommands>
                                                 <AppBarButton
+                                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
+                                                    CommandParameter="{Binding}"
                                                     Label="Mark as completed"
                                                     ToolTipService.ToolTip="Mark this sub task as completed"
                                                     Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -257,6 +268,8 @@
                                                     </AppBarButton.Icon>
                                                 </AppBarButton>
                                                 <AppBarButton
+                                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsIncompletedCommand}"
+                                                    CommandParameter="{Binding}"
                                                     Label="Mark as incompleted"
                                                     ToolTipService.ToolTip="Mark this sub task as incompleted"
                                                     Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
