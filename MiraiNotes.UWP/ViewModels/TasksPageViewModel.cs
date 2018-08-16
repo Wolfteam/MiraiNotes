@@ -189,6 +189,8 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand MoveSelectedTasksCommand { get; set; }
 
         public ICommand ShowSubTasksCommand { get; set; }
+
+        public ICommand SubTaskSelectedItemCommand { get; set; }
         #endregion
 
         #region Constructors
@@ -227,10 +229,10 @@ namespace MiraiNotes.UWP.ViewModels
                 (show) => ShowTaskListViewProgressRing = show);
 
             _messenger.Register<TaskItemViewModel>(this, $"{MessageType.TASK_SAVED}", OnTaskSaved);
-            _messenger.Register<string>(this, $"{MessageType.TASK_DELETED}", OnTaskDeleted);
+            _messenger.Register<string>(this, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}", OnTaskDeleted);
             _messenger.Register<KeyValuePair<string, string>>(
                 this,
-                $"{MessageType.SUBTASK_DELETED}",
+                $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}",
                 (kvp) => OnSubTaskDeleted(kvp.Key, kvp.Value));
             _messenger.Register<Tuple<TaskItemViewModel, bool>>(
                 this,
@@ -241,7 +243,7 @@ namespace MiraiNotes.UWP.ViewModels
         private void SetCommands()
         {
             TaskListViewSelectedItemCommand = new RelayCommand<TaskItemViewModel>
-                ((task) => OnTaskListViewSelectedItem(task));
+                ((task) => OnTaskSelectedItem(task));
 
             TaskAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 (async (text) => await OnTaskAutoSuggestBoxTextChangeAsync(text));
@@ -314,6 +316,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowSubTasksCommand = new RelayCommand<TaskItemViewModel>
                 ((task) => task.ShowSubTasks = !task.ShowSubTasks);
+
+            SubTaskSelectedItemCommand = new RelayCommand<TaskItemViewModel>
+                ((subTask) => OnSubTaskSelected(subTask));
         }
 
         public async Task GetAllTasksAsync(TaskListItemViewModel taskList)
@@ -375,7 +380,7 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Send(false, $"{MessageType.OPEN_PANE}");
         }
 
-        public void OnTaskListViewSelectedItem(TaskItemViewModel task)
+        public void OnTaskSelectedItem(TaskItemViewModel task)
         {
             int selectedTasks = GetSelectedTasks()
                 .Count();
@@ -394,9 +399,25 @@ namespace MiraiNotes.UWP.ViewModels
             if (task == null || selectedTasks > 1)
                 return;
 
+            var selectedSubTask = GetSelectedSubTask();
+            selectedSubTask.ForEach(st => st.IsSelected = false);
+
             _messenger.Send(task.IsSelected, $"{MessageType.OPEN_PANE}");
             if (task.IsSelected)
                 _messenger.Send(task, $"{MessageType.NEW_TASK}");
+        }
+
+        public void OnSubTaskSelected(TaskItemViewModel subTask)
+        {
+            if (subTask == null)
+                return;
+
+            MarkAsSelectedAllSubTasks(false, subTask.TaskID);
+            MarkAsSelectedAllTasks(false);
+
+            _messenger.Send(subTask.IsSelected, $"{MessageType.OPEN_PANE}");
+            if (subTask.IsSelected)
+                _messenger.Send(subTask, $"{MessageType.NEW_TASK}");
         }
 
         public async Task OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
@@ -428,14 +449,36 @@ namespace MiraiNotes.UWP.ViewModels
 
         public void OnTaskSaved(TaskItemViewModel task)
         {
-            var modifiedTask = Tasks?.FirstOrDefault(t => t.TaskID == task.TaskID);
-            if (modifiedTask != null)
+            if (task.HasParentTask)
             {
-                Tasks.Remove(modifiedTask);
+                task.IsSelected = true;
+                var parentTask = Tasks?
+                    .FirstOrDefault(t => t.TaskID == task.ParentTask);
+
+                if (parentTask == null)
+                    return;
+
+                int updatedSubTaskIndex = parentTask
+                    .SubTasks?
+                    .ToList()?
+                    .FindIndex(st => st.TaskID == task.TaskID) ?? -1;
+
+                if (updatedSubTaskIndex != -1)
+                {
+                    parentTask.SubTasks[updatedSubTaskIndex] = task;
+                }
             }
-            //TODO: I should show a different list for completed tasks
-            //if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
-            Tasks.Add(task);
+            else
+            {
+                var modifiedTask = Tasks?.FirstOrDefault(t => t.TaskID == task.TaskID);
+                if (modifiedTask != null)
+                {
+                    Tasks.Remove(modifiedTask);
+                }
+                //TODO: I should show a different list for completed tasks
+                //if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
+                Tasks.Add(task);
+            }
         }
 
         public void OnTaskDeleted(string taskID)
@@ -459,7 +502,7 @@ namespace MiraiNotes.UWP.ViewModels
             TaskItemViewModel taskFound = null;
             if (!isSubTask)
                 taskFound = Tasks
-                    .FirstOrDefault(t => t.TaskID == task.TaskID); 
+                    .FirstOrDefault(t => t.TaskID == task.TaskID);
             else
             {
                 taskFound = Tasks
@@ -483,7 +526,7 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 IsSelected = true
             };
-            OnTaskListViewSelectedItem(task);
+            OnTaskSelectedItem(task);
         }
 
         public async Task SaveNewTaskListAsync()
@@ -517,7 +560,7 @@ namespace MiraiNotes.UWP.ViewModels
                 $"{MessageType.TASK_LIST_ADDED}");
         }
 
-        public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus  taskStatus, bool isSubTask)
+        public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus taskStatus, bool isSubTask)
         {
             string statusMessage =
                 $"{(taskStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
@@ -547,7 +590,7 @@ namespace MiraiNotes.UWP.ViewModels
             OnTaskStatusChanged(t, isSubTask);
 
             _messenger.Send(
-                new Tuple<TaskItemViewModel, bool>(t, isSubTask), 
+                new Tuple<TaskItemViewModel, bool>(t, isSubTask),
                 $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
 
             if (!isSubTask && task.HasSubTasks)
@@ -916,8 +959,43 @@ namespace MiraiNotes.UWP.ViewModels
         private IEnumerable<TaskItemViewModel> GetSelectedTasks()
             => Tasks?.Where(t => t.IsSelected) ?? Enumerable.Empty<TaskItemViewModel>();
 
-        private void MarkAsSelectedAllTasks(bool isSelected)
-            => Tasks?.ForEach(t => t.IsSelected = isSelected);
+        private IEnumerable<TaskItemViewModel> GetSelectedSubTask()
+        {
+            var task = Tasks?.SelectMany(t => t.SubTasks?.Where(st => st.IsSelected));
+            return task;
+        }
+
+        private void MarkAsSelectedAllTasks(bool isSelected, string exceptTaskID = null)
+        {
+            if (!string.IsNullOrEmpty(exceptTaskID))
+            {
+                Tasks?
+                    .Where(t => t.TaskID != exceptTaskID && t.IsSelected != isSelected)
+                    .ForEach(t => t.IsSelected = isSelected);
+            }
+            else
+                Tasks?
+                    .Where(t => t.IsSelected != isSelected)
+                    .ForEach(t => t.IsSelected = isSelected);
+        }
+
+        private void MarkAsSelectedAllSubTasks(bool isSelected, string exceptSubTaskID = null)
+        {
+            if (!string.IsNullOrEmpty(exceptSubTaskID))
+            {
+                Tasks?.ForEach(t => t.SubTasks?
+                    .Where(st => st.TaskID != exceptSubTaskID && st.IsSelected != isSelected)
+                    .ForEach(st => st.IsSelected = isSelected));
+            }
+            else
+            {
+                Tasks?
+                    .ForEach(t => 
+                        t.SubTasks?
+                            .Where(st => st.IsSelected != isSelected)
+                            .ForEach(st => st.IsSelected = isSelected));
+            }
+        }
 
         private void UpdateSelectedTasksText(int selectedTasks)
         {

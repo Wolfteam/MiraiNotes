@@ -12,6 +12,7 @@ namespace MiraiNotes.UWP.ViewModels
         private string _status;
         private string _parentTask;
         private bool _hasSubTasks;
+        private DateTime? _completedOn;
         #endregion
 
         public string TaskID
@@ -66,6 +67,7 @@ namespace MiraiNotes.UWP.ViewModels
                 RaisePropertyChanged(nameof(Status));
                 RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
                 RaisePropertyChanged(nameof(CanBeMarkedAsIncompleted));
+                RaisePropertyChanged(nameof(IsCompleted));
             }
         }
 
@@ -95,8 +97,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         public DateTime? CompletedOn
         {
-            get { return Read<DateTime?>(); }
-            set { Write(value); }
+            get => _completedOn;
+            set
+            {
+                _completedOn = value;
+                RaisePropertyChanged(nameof(CompletedOn));
+                RaisePropertyChanged(nameof(IsCompleted));
+            }
         }
 
         public bool IsDeleted
@@ -115,6 +122,8 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return string.IsNullOrEmpty(TaskID); }
         }
+
+        public bool IsCompleted => CompletedOn != null && TaskStatus == GoogleTaskStatus.COMPLETED;
 
         public bool CanBeMarkedAsCompleted
         {

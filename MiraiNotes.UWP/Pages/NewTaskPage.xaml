@@ -21,10 +21,6 @@
             OnFalse="Visible"
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:BooleanToTextDecorationConverter
-            x:Key="BooleanToTextDecorationConverterInverse"
-            OnFalse="None"
-            OnTrue="Strikethrough" />
 
         <Style x:Key="ValidationErrorLabelStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Red" />
@@ -178,14 +174,14 @@
                                 FontStyle="Italic"
                                 Text="{Binding Title}"
                                 TextDecorations="None"
-                                Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
                             <TextBlock
                                 Grid.Column="0"
                                 VerticalAlignment="Center"
                                 FontStyle="Italic"
                                 Text="{Binding Title}"
                                 TextDecorations="Strikethrough"
-                                Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                             <CommandBar
                                 Grid.Column="1"
                                 Background="Transparent"
@@ -274,6 +270,7 @@
                 </AppBarButton>
                 <AppBarButton
                     Icon="Calendar"
+                    IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"
                     Label="To be completed on"
                     ToolTipService.ToolTip="Choose the date this task should be completed">
                     <AppBarButton.Flyout>

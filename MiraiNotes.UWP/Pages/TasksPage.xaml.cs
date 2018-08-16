@@ -33,5 +33,12 @@ namespace MiraiNotes.UWP.Pages
             var vm = (TasksPageViewModel)DataContext;
             vm.MoveComboBoxOpenedCommand.Execute(null);
         }
+
+        private void SubTasks_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var vm = (TasksPageViewModel)DataContext;
+            var task = (sender as ListView).SelectedItem as TaskItemViewModel;
+            vm.SubTaskSelectedItemCommand.Execute(task);
+        }
     }
 }

@@ -210,7 +210,7 @@ namespace MiraiNotes.UWP.ViewModels
                     }
                 }
             };
-            UpdateTaskOperationTitle(CurrentTask.IsNew);
+            UpdateTaskOperationTitle(CurrentTask.IsNew, CurrentTask.HasParentTask);
             //IsCurrentTaskTitleFocused = true;
             //CurrentTask.Validate();
 
@@ -305,7 +305,7 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTask.SubTasks = new ObservableCollection<TaskItemViewModel>(sts);
 
             _messenger.Send(CurrentTask, $"{MessageType.TASK_SAVED}");
-            UpdateTaskOperationTitle(isNewTask);
+            UpdateTaskOperationTitle(isNewTask, CurrentTask.HasParentTask);
         }
 
         public async Task DeleteTaskAsync()
@@ -332,8 +332,13 @@ namespace MiraiNotes.UWP.ViewModels
                     $" message = {response.Errors.ApiError.Message}");
                 return;
             }
-
-            _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED}");
+            //If we are deleting a subtask
+            if (CurrentTask.HasParentTask)
+                _messenger.Send(
+                     new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID),
+                     $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
+            else
+                _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}");
             CleanPanel();
         }
 
@@ -387,12 +392,16 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Send(false, $"{MessageType.OPEN_PANE}");
         }
 
-        private void UpdateTaskOperationTitle(bool isNewTask)
+        private void UpdateTaskOperationTitle(bool isNewTask, bool isSubTask)
         {
-            if (CurrentTask.IsNew)
+            if (CurrentTask.IsNew && !isSubTask)
                 TaskOperationTitle = "New Task";
+            else if (!CurrentTask.IsNew && !isSubTask)
+                TaskOperationTitle = "Update Task";
+            else if (CurrentTask.IsNew && isSubTask)
+                TaskOperationTitle = "New Sub Task";
             else
-                TaskOperationTitle = "Update task";
+                TaskOperationTitle = "Update Sub Task";
         }
 
         /// <summary>
@@ -456,7 +465,6 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task MoveCurrentTaskAsync(GoogleTaskModel task)
         {
             ShowTaskProgressRing = true;
-
             var response = await _googleApiService
                 .TaskService
                 .MoveAsync(task, _currentTaskList.TaskListID, SelectedTaskList.TaskListID);
@@ -469,7 +477,13 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
                 return;
             }
-            _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED}");
+            if (!CurrentTask.HasParentTask)
+                _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}");
+            else
+                _messenger.Send(
+                    new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID), 
+                    $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
+
             _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             var subTasks = GetSubTasksToSave(false, true);
@@ -547,7 +561,7 @@ namespace MiraiNotes.UWP.ViewModels
             return currentSubTasks;
         }
 
-        public async Task DeleteSubTaskAsync(TaskItemViewModel subTask)
+        private async Task DeleteSubTaskAsync(TaskItemViewModel subTask)
         {
             bool deleteTask = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -581,7 +595,7 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTask.SubTasks?.Remove(subTask);
             _messenger.Send(
                 new KeyValuePair<string, string>(CurrentTask.TaskID, subTask.TaskID),
-                $"{MessageType.SUBTASK_DELETED}");
+                $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
         }
 
         private List<TaskItemViewModel> GetSubTasksToSave(bool isCurrentTaskNew, bool moveToDifferentTaskList)

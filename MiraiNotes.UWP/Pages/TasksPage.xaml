@@ -25,10 +25,6 @@
             OnTrue="Collapsed" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />
-        <converters:BooleanToTextDecorationConverter
-            x:Key="BooleanToTextDecorationConverterInverse"
-            OnFalse="None"
-            OnTrue="Strikethrough" />
 
         <Style x:Key="TaskListViewItemStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -224,34 +220,44 @@
                                 </CommandBar.PrimaryCommands>
                             </CommandBar>
                         </Grid>
-                        <ListView
+                        <uc:TasksListView
                             Margin="20,0,0,0"
-                            IsItemClickEnabled="False"
                             ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
                             ItemsSource="{Binding SubTasks, Mode=OneWay}"
+                            SelectionChanged="SubTasks_ListView_SelectionChanged"
                             SelectionMode="Single"
                             Visibility="{Binding ShowSubTasks, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <ListView.ItemTemplate>
+                            <uc:TasksListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock
+                                        <StackPanel
                                             Grid.Column="0"
                                             VerticalAlignment="Center"
-                                            FontStyle="Italic"
-                                            Text="{Binding Title}"
-                                            TextDecorations="None"
-                                            Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                        <TextBlock
-                                            Grid.Column="0"
-                                            VerticalAlignment="Center"
-                                            FontStyle="Italic"
-                                            Text="{Binding Title}"
-                                            TextDecorations="Strikethrough"
-                                            Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            Orientation="Horizontal">
+                                            <FontIcon
+                                                Margin="0,0,5,0"
+                                                FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE787;"
+                                                ToolTipService.ToolTip="Completition date is today or is already passed"
+                                                Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontStyle="Italic"
+                                                Text="{Binding Title}"
+                                                TextDecorations="None"
+                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontStyle="Italic"
+                                                Text="{Binding Title}"
+                                                TextDecorations="Strikethrough"
+                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        </StackPanel>
+
                                         <CommandBar
                                             Grid.Column="1"
                                             Background="Transparent"
@@ -281,8 +287,8 @@
                                         </CommandBar>
                                     </Grid>
                                 </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                            </uc:TasksListView.ItemTemplate>
+                        </uc:TasksListView>
                     </StackPanel>
                 </DataTemplate>
             </uc:TasksListView.ItemTemplate>
