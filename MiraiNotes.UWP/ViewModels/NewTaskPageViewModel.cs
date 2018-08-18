@@ -185,8 +185,8 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTask = new TaskItemViewModel
             {
                 TaskID = task.TaskID,
-                Title = string.IsNullOrEmpty(task.Title) ? "Task title" : task.Title,
-                Notes = string.IsNullOrEmpty(task.Notes) ? "Task body" : task.Notes,
+                Title = task.Title,
+                Notes = task.Notes,
                 CompletedOn = task.CompletedOn,
                 IsDeleted = task.IsDeleted,
                 IsHidden = task.IsHidden,
@@ -212,7 +212,7 @@ namespace MiraiNotes.UWP.ViewModels
             };
             UpdateTaskOperationTitle(CurrentTask.IsNew, CurrentTask.HasParentTask);
             //IsCurrentTaskTitleFocused = true;
-            //CurrentTask.Validate();
+            CurrentTask.Validate();
 
             await GetAllTaskListAsync();
         }

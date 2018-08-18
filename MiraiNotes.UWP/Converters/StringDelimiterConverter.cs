@@ -8,7 +8,7 @@ namespace MiraiNotes.UWP.Converters
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
-                return string.Empty;
+                return ".....";
 
             int maxCharsAllowed = int.Parse((string)(parameter ?? "0"));
 

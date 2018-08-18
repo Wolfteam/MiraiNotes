@@ -26,6 +26,8 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />
 
+        <converters:StringDelimiterConverter x:Key="StringDelimiterConverter" />
+
         <Style x:Key="TaskListViewItemStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -87,62 +89,91 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                <StackPanel.Resources>
-                                    <Storyboard x:Name="RotateButtonTo90Degrees">
-                                        <DoubleAnimation
-                                            EnableDependentAnimation="True"
-                                            Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
-                                            Storyboard.TargetProperty="Angle"
-                                            From="0"
-                                            To="90"
-                                            Duration="0:0:0.1" />
-                                    </Storyboard>
-                                    <Storyboard x:Name="RotateButtonTo0Degrees">
-                                        <DoubleAnimation
-                                            EnableDependentAnimation="True"
-                                            Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
-                                            Storyboard.TargetProperty="Angle"
-                                            From="90"
-                                            To="0"
-                                            Duration="0:0:0.1" />
-                                    </Storyboard>
-                                </StackPanel.Resources>
-                                <Button
-                                    Background="Transparent"
-                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowSubTasksCommand}"
-                                    CommandParameter="{Binding}"
-                                    ToolTipService.ToolTip="Show / hide sub tasks"
-                                    Visibility="{Binding HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <interactivity:Interaction.Behaviors>
-                                        <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="True">
-                                            <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo90Degrees}" />
-                                        </core:DataTriggerBehavior>
-                                        <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="False">
-                                            <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo0Degrees}" />
-                                        </core:DataTriggerBehavior>
-                                    </interactivity:Interaction.Behaviors>
-                                    <FontIcon
-                                        FontFamily="Segoe MDL2 Assets"
-                                        Glyph="&#xE974;"
-                                        RenderTransformOrigin="0.5, 0.5">
-                                        <FontIcon.RenderTransform>
-                                            <RotateTransform x:Name="ShowSubTasks_ButtonRotateTransform" />
-                                        </FontIcon.RenderTransform>
-                                    </FontIcon>
-                                </Button>
-                                <FontIcon
-                                    FontFamily="Segoe MDL2 Assets"
-                                    Glyph="&#xE787;"
-                                    ToolTipService.ToolTip="Completition date is today or is already passed"
-                                    Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                <TextBlock
-                                    Margin="5,0,0,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center"
-                                    FontSize="16"
-                                    Text="{Binding Title}" />
-                            </StackPanel>
+                            <Grid Grid.Column="0" VerticalAlignment="Center">
+                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                    <StackPanel.Resources>
+                                        <Storyboard x:Name="RotateButtonTo90Degrees">
+                                            <DoubleAnimation
+                                                EnableDependentAnimation="True"
+                                                Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
+                                                Storyboard.TargetProperty="Angle"
+                                                From="0"
+                                                To="90"
+                                                Duration="0:0:0.1" />
+                                        </Storyboard>
+                                        <Storyboard x:Name="RotateButtonTo0Degrees">
+                                            <DoubleAnimation
+                                                EnableDependentAnimation="True"
+                                                Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
+                                                Storyboard.TargetProperty="Angle"
+                                                From="90"
+                                                To="0"
+                                                Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </StackPanel.Resources>
+                                    <Button
+                                        Background="Transparent"
+                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowSubTasksCommand}"
+                                        CommandParameter="{Binding}"
+                                        ToolTipService.ToolTip="Show / hide sub tasks"
+                                        Visibility="{Binding HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <interactivity:Interaction.Behaviors>
+                                            <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="True">
+                                                <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo90Degrees}" />
+                                            </core:DataTriggerBehavior>
+                                            <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="False">
+                                                <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo0Degrees}" />
+                                            </core:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                        <FontIcon
+                                            FontFamily="Segoe MDL2 Assets"
+                                            Glyph="&#xE974;"
+                                            RenderTransformOrigin="0.5, 0.5">
+                                            <FontIcon.RenderTransform>
+                                                <RotateTransform x:Name="ShowSubTasks_ButtonRotateTransform" />
+                                            </FontIcon.RenderTransform>
+                                        </FontIcon>
+                                    </Button>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel
+                                            Grid.Row="0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontSize="16"
+                                                Text="{Binding Title, Mode=OneWay}"
+                                                TextDecorations="None"
+                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+                                            <TextBlock
+                                                FontSize="16"
+                                                Text="{Binding Title, Mode=OneWay}"
+                                                TextDecorations="Strikethrough"
+                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            <FontIcon
+                                                Margin="5,0,0,0"
+                                                FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE787;"
+                                                ToolTipService.ToolTip="Completition date is today or is already passed"
+                                                Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Margin="20,0,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            FontSize="12"
+                                            Text="{Binding Notes, Mode=OneWay, Converter={StaticResource StringDelimiterConverter}, ConverterParameter=10}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
                             <CommandBar
                                 Grid.Column="1"
                                 Background="Transparent"
@@ -162,6 +193,16 @@
                                         Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <AppBarButton.Icon>
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsIncompletedCommand}"
+                                        CommandParameter="{Binding}"
+                                        Label="Mark as incompleted"
+                                        ToolTipService.ToolTip="Mark this sub task as incompleted"
+                                        Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
                                         </AppBarButton.Icon>
                                     </AppBarButton>
                                     <AppBarButton
@@ -246,12 +287,14 @@
                                                 Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                             <TextBlock
                                                 VerticalAlignment="Center"
+                                                FontSize="14"
                                                 FontStyle="Italic"
                                                 Text="{Binding Title}"
                                                 TextDecorations="None"
                                                 Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
                                             <TextBlock
                                                 VerticalAlignment="Center"
+                                                FontSize="14"
                                                 FontStyle="Italic"
                                                 Text="{Binding Title}"
                                                 TextDecorations="Strikethrough"

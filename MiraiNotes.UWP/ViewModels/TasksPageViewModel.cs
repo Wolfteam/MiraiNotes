@@ -470,14 +470,21 @@ namespace MiraiNotes.UWP.ViewModels
             }
             else
             {
-                var modifiedTask = Tasks?.FirstOrDefault(t => t.TaskID == task.TaskID);
-                if (modifiedTask != null)
+                int updatedTaskIndex = Tasks?
+                    .ToList()
+                    .FindIndex(t => t.TaskID == task.TaskID) ?? -1;
+
+                if (updatedTaskIndex >= 0)
                 {
-                    Tasks.Remove(modifiedTask);
+                    task.IsSelected = true;
+                    Tasks[updatedTaskIndex] = task;
+                }
+                else
+                {
+                    Tasks.Add(task);
                 }
                 //TODO: I should show a different list for completed tasks
                 //if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
-                Tasks.Add(task);
             }
         }
 
@@ -593,7 +600,8 @@ namespace MiraiNotes.UWP.ViewModels
                 new Tuple<TaskItemViewModel, bool>(t, isSubTask),
                 $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
 
-            if (!isSubTask && task.HasSubTasks)
+            //Only update the subtasks if the new task status is completed
+            if (!isSubTask && task.HasSubTasks && taskStatus == GoogleTaskStatus.COMPLETED)
                 await ChangeSubTasksStatusAsync(task.SubTasks, taskStatus);
 
             ShowTaskListViewProgressRing = false;
@@ -918,22 +926,22 @@ namespace MiraiNotes.UWP.ViewModels
             switch (sortType)
             {
                 case TaskSortType.BY_NAME_ASC:
-                    Tasks = new ObservableCollection<TaskItemViewModel>(Tasks.OrderBy(t => t.Title));
+                    Tasks.SortBy(t => t.Title);
                     break;
                 case TaskSortType.BY_NAME_DESC:
-                    Tasks = new ObservableCollection<TaskItemViewModel>(Tasks.OrderByDescending(t => t.Title));
+                    Tasks.SortByDescending(t => t.Title);
                     break;
                 case TaskSortType.BY_UPDATED_DATE_ASC:
-                    Tasks = new ObservableCollection<TaskItemViewModel>(Tasks.OrderBy(t => t.UpdatedAt));
+                    Tasks.SortBy(t => t.UpdatedAt);
                     break;
                 case TaskSortType.BY_UPDATED_DATE_DESC:
-                    Tasks = new ObservableCollection<TaskItemViewModel>(Tasks.OrderByDescending(t => t.UpdatedAt));
+                    Tasks.SortByDescending(t => t.UpdatedAt);
                     break;
                 case TaskSortType.CUSTOM_ASC:
-                    Tasks = new ObservableCollection<TaskItemViewModel>(Tasks.OrderBy(t => t.Position));
+                    Tasks.SortBy(t => t.Position);
                     break;
                 case TaskSortType.CUSTOM_DESC:
-                    Tasks = new ObservableCollection<TaskItemViewModel>(Tasks.OrderByDescending(t => t.Position));
+                    Tasks.SortByDescending(t => t.UpdatedAt);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("The TaskSortType doesnt have a default sort type");
