@@ -3,9 +3,10 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.DataService.Interfaces;
+using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Models.API;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,8 +22,9 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
-        private readonly IGoogleApiService _googleApiService;
         private readonly IMapper _mapper;
+        private readonly IMiraiNotesDataService _dataService;
+        private readonly INetworkService _networkService;
 
         private object _selectedItem;
         private ObservableCollection<TaskListItemViewModel> _taskLists;
@@ -98,27 +100,17 @@ namespace MiraiNotes.UWP.ViewModels
             INavigationService navigationService,
             IMessenger messenger,
             IUserCredentialService userCredentialService,
-            IGoogleApiService googleApiService,
-            IMapper mapper)
+            IMapper mapper,
+            IMiraiNotesDataService dataService,
+            INetworkService networkService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
             _navigationService = navigationService;
             _userCredentialService = userCredentialService;
-            _googleApiService = googleApiService;
             _mapper = mapper;
-
-            if (IsInDesignModeStatic)
-            {
-                var items = _googleApiService.TaskListService.GetAllAsync().Result.Result.Items;
-                TaskLists = new ObservableCollection<TaskListItemViewModel>(items.Select(tl => new TaskListItemViewModel
-                {
-                    TaskListID = tl.TaskListID,
-                    Title = tl.Title
-                }));
-                return;
-                //TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(response.Result.Items);
-            }
+            _dataService = dataService;
+            _networkService = networkService;
 
             RegisterMessages();
             SetCommands();            
@@ -165,21 +157,30 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task InitViewAsync()
         {
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            var response = await _googleApiService.TaskListService.GetAllAsync();
-            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            await Task.Delay(80);
+            var currentUser = await _dataService
+                .UserService
+                .GetCurrentActiveUserAsync();
 
-            if (!response.Succeed)
+            if (currentUser == null)
             {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Coudn't get the task lists",
-                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                await _dialogService
+                    .ShowMessageDialogAsync("Error", "The current active user couldnt be found on db");
                 return;
             }
-            var orderedItems = response.Result.Items.OrderBy(t => t.Title);
-            TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(orderedItems);
 
-            TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(orderedItems);
+            var taskLists = await _dataService
+                .TaskListService
+                .GetAsNoTrackingAsync(
+                    tl => tl.User == currentUser && tl.LocalStatus != LocalStatus.DELETED,
+                    tl => tl.OrderBy(t => t.Title));
+
+            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            //kinda hack
+            await Task.Delay(80);
+
+            TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(taskLists);
+
+            TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(taskLists);
 
             SelectedItem = TaskLists.FirstOrDefault();
         }
@@ -244,6 +245,11 @@ namespace MiraiNotes.UWP.ViewModels
                 //delete all from the db
                 //delete user settings
                 //delete all view models
+                await _dataService
+                    .UserService
+                    .ChangeCurrentUserStatus(false);
+                await _dataService.SaveChangesAsync();
+
                 _userCredentialService.DeleteUserCredentials();
                 _navigationService.GoBack();
             }
@@ -261,26 +267,29 @@ namespace MiraiNotes.UWP.ViewModels
             if (string.IsNullOrEmpty(newTitle))
                 return;
 
-            var taskListToUpdate = _mapper.Map<GoogleTaskListModel>(taskList);
+            _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
+            var taskListToUpdate = (await _dataService
+                .TaskListService
+                .GetAsync(t => t.GoogleTaskListID == taskList.TaskListID, null, string.Empty))
+                .FirstOrDefault();
             taskListToUpdate.Title = newTitle;
             taskListToUpdate.UpdatedAt = DateTime.Now;
+            taskListToUpdate.ToBeSynced = true;
+            taskListToUpdate.LocalStatus = LocalStatus.UPDATED;
 
-            _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            var response = await _googleApiService
-                .TaskListService
-                .UpdateAsync(taskListToUpdate.TaskListID, taskListToUpdate);
+            var response = await _dataService.SaveChangesAsync();
+
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't update the task list {taskList.Title}. Error code = {response.Errors.ApiError.Code}," +
-                    $" message = {response.Errors.ApiError.Message}");
+                    $"Coudln't update the task list {taskList.Title}. Error = {response.Message}");
                 return;
             }
-            TaskLists[index] = _mapper.Map<TaskListItemViewModel>(response.Result);
+            TaskLists[index] = _mapper.Map<TaskListItemViewModel>(taskListToUpdate);
             //If the updated task is the same as the selected one
             //we update SelectedItem
             if (SelectedItem == taskList)
@@ -305,21 +314,38 @@ namespace MiraiNotes.UWP.ViewModels
                 OpenPane(false);
 
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            var response = await _googleApiService
-                .TaskListService.DeleteAsync(taskList.TaskListID);
+            var taskListToDelete = (await _dataService
+                .TaskListService
+                .GetAsync(tl => tl.GoogleTaskListID == taskList.TaskListID, string.Empty));
+
+            //if the task is created but wasnt synced, we remove it from the db
+            if (taskListToDelete.ToBeSynced)
+            {
+                _dataService.TaskListService.Remove(taskListToDelete);
+            }
+            else
+            {
+                taskListToDelete.LocalStatus = LocalStatus.DELETED;
+                taskListToDelete.ToBeSynced = true;
+
+                _dataService.TaskListService.Update(taskListToDelete);
+            }
+
+            var response = await _dataService.SaveChangesAsync();
+
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the task list {taskList.Title}. Error code = {response.Errors.ApiError.Code}," +
-                    $" message = {response.Errors.ApiError.Message}");
+                    $"Coudln't delete the task list {taskList.Title}. Error = {response.Message}");
                 return;
             }
 
-            await _dialogService
-                .ShowMessageDialogAsync("Succeed", $"Sucessfully removed {taskList.Title} task list");
+            await _dialogService.ShowMessageDialogAsync(
+                "Succeed",
+                $"Sucessfully removed {taskList.Title} task list");
 
             //Here we select the previoues task list only if the 
             //selected item = the task list to be removed

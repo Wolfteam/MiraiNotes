@@ -1,4 +1,4 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Models.API;
 using System.Threading.Tasks;
 

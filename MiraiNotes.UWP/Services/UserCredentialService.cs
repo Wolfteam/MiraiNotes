@@ -63,6 +63,7 @@ namespace MiraiNotes.UWP.Services
             catch (Exception)
             {
                 // When there is no matching resource an error occurs, which we ignore.
+                System.Diagnostics.Debug.WriteLine("User is not logged in");
             }
             return isUserLogged;
         }

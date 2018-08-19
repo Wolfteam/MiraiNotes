@@ -1,8 +1,10 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.UWP.Interfaces;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Security.Authentication.Web;
 
@@ -17,6 +19,10 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IGoogleUserService _googleUserService;
+
+        private readonly IMiraiNotesDataService _dataService;
+        private readonly INetworkService _networkService;
+        private readonly ISyncService _syncService;
         #endregion
 
         #region Properties
@@ -28,28 +34,9 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Commands
-        public ICommand LoginCommand
-        {
-            get
-            {
-                return new RelayCommand(SignInWithGoogleAsync);
-            }
-        }
+        public ICommand LoginCommand { get; set; }
 
-        public ICommand LoadedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    bool isUserLoggedIn = _userCredentialService.IsUserLoggedIn();
-                    if (isUserLoggedIn)
-                    {
-                        _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
-                    }
-                });
-            }
-        }
+        public ICommand LoadedCommand { get; set; }
         #endregion
 
         #region Constructors
@@ -58,17 +45,43 @@ namespace MiraiNotes.UWP.ViewModels
             INavigationService navigationService,
             IUserCredentialService userCredentialService,
             IGoogleAuthService googleAuthService,
-            IGoogleUserService googleUserService)
+            IGoogleUserService googleUserService,
+            IMiraiNotesDataService dataService,
+            INetworkService networkService,
+            ISyncService syncService)
         {
             _dialogService = dialogService;
             _navigationService = navigationService;
             _userCredentialService = userCredentialService;
             _googleAuthService = googleAuthService;
             _googleUserService = googleUserService;
+            _dataService = dataService;
+            _networkService = networkService;
+            _syncService = syncService;
+
+            SetCommands();
         }
         #endregion
 
         #region Methods    
+
+        private void SetCommands()
+        {
+            LoadedCommand = new RelayCommand(async() =>
+            {
+                bool isUserLoggedIn = _userCredentialService.IsUserLoggedIn();
+                var currentUser = await _dataService
+                    .UserService
+                    .GetCurrentActiveUserAsync();
+                if (isUserLoggedIn && currentUser != null)
+                {
+                    _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
+                }
+            });
+            LoginCommand = new RelayCommand(SignInWithGoogleAsync);
+
+        }
+
         public async void SignInWithGoogleAsync()
         {
             ShowLoading = true;
@@ -105,17 +118,10 @@ namespace MiraiNotes.UWP.ViewModels
                             await _dialogService.ShowMessageDialogAsync("Something happended...!", "Couldn't get a token");
                             return;
                         }
-
+                        //We save the token before doing any other network requst..
                         _userCredentialService.SaveUserCredentials(null, tokenResponse);
-                        var user = await _googleUserService.GetUserInfoAsync(tokenResponse.AccessToken);
-                        if (user == null)
-                        {
-                            await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
-                            return;
-                        }
 
-                        //TODO: SAVE THE USER TO THE DB
-                        _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
+                        await SignInAsync();
                         break;
                     case WebAuthenticationStatus.UserCancel:
                         break;
@@ -129,12 +135,82 @@ namespace MiraiNotes.UWP.ViewModels
             }
             catch (Exception ex)
             {
+                _userCredentialService.DeleteUserCredentials();
                 await _dialogService.ShowErrorMessageDialogAsync(ex, "An unknown error occurred");
             }
             finally
             {
                 ShowLoading = false;
             }
+        }
+
+        private async Task SignInAsync()
+        {
+            var user = await _googleUserService.GetUserInfoAsync();
+            if (user == null)
+            {
+                _userCredentialService.DeleteUserCredentials();
+                await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
+                return;
+            }
+
+            bool userIsAlreadySaved = await _dataService
+                .UserService
+                .ExistsAsync(u => u.GoogleUserID == user.ID);
+
+            if (!userIsAlreadySaved)
+            {
+                await _dataService.UserService.AddAsync(new Data.Models.GoogleUser
+                {
+                    Email = user.Email,
+                    Fullname = user.FullName,
+                    PictureUrl = user.ImageUrl,
+                    GoogleUserID = user.ID,
+                    IsActive = true
+                });
+            }
+            else
+            {
+                var userInDb = (await _dataService
+                    .UserService
+                    .GetAsync(u => u.GoogleUserID == user.ID, null, string.Empty))
+                    .FirstOrDefault();
+
+                userInDb.Fullname = user.FullName;
+                userInDb.Email = user.Email;
+                userInDb.IsActive = true;
+                userInDb.PictureUrl = user.ImageUrl;
+
+                _dataService.UserService.Update(userInDb);
+            }
+
+            var userSaved = await _dataService.SaveChangesAsync();
+            if (!userSaved.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error", 
+                    $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
+                return;
+            }
+            var syncResult = await _syncService.SyncDownTaskListsAsync(false);
+
+            if (!syncResult.Succeed)
+            {
+                await _dialogService
+                    .ShowMessageDialogAsync("Error", syncResult.Message);
+                return;
+            }
+
+            syncResult = await _syncService.SyncDownTasksAsync(false);
+
+            if (!syncResult.Succeed)
+            {
+                await _dialogService
+                    .ShowMessageDialogAsync("Error", syncResult.Message);
+                return;
+            }
+
+            _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
         }
         #endregion
     }

@@ -1,4 +1,5 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Shared.Helpers;
+using MiraiNotes.Shared.Models;
 using System;
 using System.Collections.ObjectModel;
 using Template10.Validation;
@@ -79,9 +80,7 @@ namespace MiraiNotes.UWP.ViewModels
                 //until you save it to google tasks
                 if (string.IsNullOrEmpty(Status))
                     return GoogleTaskStatus.NEEDS_ACTION;
-                string status = Status.ToUpper();
-                Enum.TryParse(status, out GoogleTaskStatus googleTaskStatus);
-                return googleTaskStatus;
+                return GoogleTaskStatusHelper.GetGoogleStatus(Status);
             }
         }
 
