@@ -4,6 +4,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.DataService.Interfaces;
+using MiraiNotes.DataService.Services;
 using MiraiNotes.UWP.Design;
 using MiraiNotes.UWP.Handlers;
 using MiraiNotes.UWP.Helpers;
@@ -97,6 +99,10 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
             SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
             SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
+
+            SimpleIoc.Default.Register<INetworkService, NetworkService>();
+            SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
+            SimpleIoc.Default.Register<ISyncService, SyncService>();
 
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();
