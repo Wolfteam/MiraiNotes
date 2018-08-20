@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiraiNotes.Shared.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -13,13 +14,13 @@ namespace MiraiNotes.DataService.Interfaces
         /// Adds a entity of type <paramref name="entity"/> to the db
         /// </summary>
         /// <param name="entity">TEntity to add</param>
-        Task AddAsync(TEntity entity);
+        Task<Result> AddAsync(TEntity entity);
 
         /// <summary>
         /// Adds multiple entities of type <paramref name="entities"/> to the db
         /// </summary>
         /// <param name="entities">Entities to add</param>
-        Task AddRangeAsync(IEnumerable<TEntity> entities);
+        Task<Result> AddRangeAsync(IEnumerable<TEntity> entities);
 
         /// <summary>
         /// Checks if a entity matches with the <paramref name="predicate"/> passed
@@ -29,13 +30,6 @@ namespace MiraiNotes.DataService.Interfaces
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
-        /// Gets an enumerable of TEntity according to <paramref name="predicate"/>
-        /// </summary>
-        /// <param name="predicate">A predicate for filtering</param>
-        /// <returns>IEnumerable of type TEntity</returns>
-        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
-
-        /// <summary>
         /// Gets the first entity that matches <paramref name="predicate"/>
         /// </summary>
         /// <param name="predicate">A predicate for filtering</param>
@@ -43,11 +37,25 @@ namespace MiraiNotes.DataService.Interfaces
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
+        /// Gets the first entity that matches <paramref name="predicate"/>
+        /// </summary>
+        /// <param name="predicate">A predicate for filtering</param>
+        /// <returns><see cref="TEntity"/></returns>
+        Task<TEntity> FirstOrDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate);
+
+        /// <summary>
         /// Gets an entity with pk equal to <paramref name="id"/>
         /// </summary>
         /// <param name="id">Entity pk</param>
         /// <returns><see cref="TEntity"/></returns>
         Task<TEntity> GetByIdAsync(object id);
+
+        /// <summary>
+        /// Gets an enumerable of TEntity according to <paramref name="predicate"/>
+        /// </summary>
+        /// <param name="predicate">A predicate for filtering</param>
+        /// <returns>IEnumerable of type TEntity</returns>
+        Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// Gets all the <see cref="TEntity"/> according to the filter
@@ -102,32 +110,39 @@ namespace MiraiNotes.DataService.Interfaces
         /// <paramref name="id"/> must be a PK
         /// </summary>
         /// <param name="id">Entity pk</param>
-        Task RemoveAsync(object id);
+        Task<Result> RemoveAsync(object id);
 
         /// <summary>
         /// Removes all the entites that matches the <paramref name="filter"/>
         /// </summary>
         /// <param name="filter">The filter that will be applied</param>
         /// <returns></returns>
-        Task RemoveAsync(Expression<Func<TEntity, bool>> filter = null);
+        Task<Result> RemoveAsync(Expression<Func<TEntity, bool>> filter = null);
 
         /// <summary>
         /// Removes a entity
         /// </summary>
         /// <param name="entity">Entity to remove</param>
-        void Remove(TEntity entity);
+        Task<Result> RemoveAsync(TEntity entity);
 
         /// <summary>
         /// Removes the entities specied in <paramref name="entities"/>
         /// </summary>
         /// <param name="entities">IEnumerable of entities to remove</param>
-        void RemoveRange(IEnumerable<TEntity> entities);
+        Task<Result> RemoveRangeAsync(IEnumerable<TEntity> entities);
         //void Update(object id, TEntity entity);
 
         /// <summary>
         /// Updates a TEntity
         /// </summary>
         /// <param name="entity"><see cref="TEntity"/> to update</param>
-        void Update(TEntity entity);
+        Task<Result> UpdateAsync(TEntity entity);
+
+        /// <summary>
+        /// Updates multiple entities
+        /// </summary>
+        /// <param name="entities"><see cref="TEntity"/> to update</param>
+        /// <returns>Result</returns>
+        Task<Result> UpdateRangeAsync(IEnumerable<TEntity> entities);
     }
 }

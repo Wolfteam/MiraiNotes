@@ -9,27 +9,33 @@ namespace MiraiNotes.Data
         public DbSet<GoogleTaskList> TaskLists { get; set; }
         public DbSet<GoogleTask> Tasks { get; set; }
 
-        protected string DatabasePath { get; set; }
-
-        //When creating a migration, uncomment this constructor
-        private MiraiNotesContext(string databasePath)
-        {
-            DatabasePath = databasePath;
-        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite($"Data Source=mirai-notes.db");
-            //optionsBuilder.UseSqlite($"{DatabasePath}");
         }
 
-        public static MiraiNotesContext Create(string databasePath)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var dbContext = new MiraiNotesContext(databasePath);
-            dbContext.Database.Migrate();
-            //dbContext.Database.EnsureCreated();
-            return dbContext;
-            //return null;
+            modelBuilder.Entity<GoogleUser>()
+              .HasIndex(b => b.GoogleUserID)
+              .IsUnique();
+
+            modelBuilder.Entity<GoogleTaskList>()
+              .HasIndex(b => b.GoogleTaskListID)
+              .IsUnique();
+
+            modelBuilder.Entity<GoogleTask>()
+              .HasIndex(b => b.GoogleTaskID)
+              .IsUnique();
+        }
+
+        public static void Init()
+        {
+            using(var context = new MiraiNotesContext())
+            {
+                context.Database.Migrate();
+            }
         }
     }
 }

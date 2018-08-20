@@ -21,6 +21,8 @@ namespace MiraiNotes.Data.Models
 
         public bool IsActive { get; set; }
 
+        //If you need to add tasklist from the user entity
+        //you need to changes this to a icollection
         public virtual IEnumerable<GoogleTaskList> TaskLists { get; set; }
     }
 }
