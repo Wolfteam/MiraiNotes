@@ -3,11 +3,13 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.Data.Models;
+using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Models.API;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,8 +26,8 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
-        private readonly IGoogleApiService _googleApiService;
         private readonly IMapper _mapper;
+        private readonly IMiraiNotesDataService _dataService;
 
         private string _taskOperationTitle;
         private TaskListItemViewModel _currentTaskList;
@@ -105,15 +107,15 @@ namespace MiraiNotes.UWP.ViewModels
             IMessenger messenger,
             INavigationService navigationService,
             IUserCredentialService userCredentialService,
-            IGoogleApiService googleApiService,
-            IMapper mapper)
+            IMapper mapper,
+            IMiraiNotesDataService dataService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
             _navigationService = navigationService;
             _userCredentialService = userCredentialService;
-            _googleApiService = googleApiService;
             _mapper = mapper;
+            _dataService = dataService;
 
             RegisterMessages();
             SetCommands();
@@ -220,87 +222,127 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task SaveChangesAsync()
         {
-            var task = _mapper.Map<GoogleTaskModel>(CurrentTask);
-            task.UpdatedAt = DateTime.Now;
-            bool moveToDifferentTaskList = SelectedTaskList.TaskListID != _currentTaskList.TaskListID;
-            bool isNewTask = string.IsNullOrEmpty(task.TaskID);
-            if (isNewTask)
-                task.Status = GoogleTaskStatus.NEEDS_ACTION.GetString();
+            bool isNewTask = CurrentTask.IsNew;
 
             if (SelectedTaskList?.TaskListID == null || _currentTaskList?.TaskListID == null)
             {
                 await _dialogService.ShowMessageDialogAsync(
-                    $"An error occurred while trying to {(string.IsNullOrEmpty(task.TaskID) ? "save" : "update")} the task.",
+                    $"An error occurred while trying to {(isNewTask ? "save" : "update")} the task.",
                     $"The selected task list and the current task list cant be null");
                 return;
             }
-
-            GoogleResponseModel<GoogleTaskModel> response;
-            ShowTaskProgressRing = true;
-            var subTasksToSave = GetSubTasksToSave(isNewTask, moveToDifferentTaskList);
-            var currentSts = GetCurrentSubTasks();
-
             //If the task selected in the combo is not the same as the one in the 
             //navigation view, its because we are trying to save/update a 
             //task into a different task list
-            if (moveToDifferentTaskList)
+            bool moveToDifferentTaskList = SelectedTaskList.TaskListID != _currentTaskList.TaskListID;
+            if (moveToDifferentTaskList && !isNewTask)
             {
-                if (isNewTask)
-                {
-                    response = await _googleApiService
-                        .TaskService
-                        .SaveAsync(SelectedTaskList.TaskListID, task);
-                    if (!response.Succeed)
-                    {
-                        await _dialogService.ShowMessageDialogAsync(
-                            $"An error occurred while trying to seve the task into {SelectedTaskList.Title}.",
-                            $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
-                        return;
-                    }
-                    _messenger.Send(false, $"{MessageType.OPEN_PANE}");
-
-                    subTasksToSave.ForEach(st => st.ParentTask = response.Result.TaskID);
-
-                    await SaveSubTasksAsync(
-                        subTasksToSave,
-                        isNewTask,
-                        moveToDifferentTaskList,
-                        Enumerable.Empty<TaskItemViewModel>().ToList());
-
-                    await _dialogService.ShowMessageDialogAsync(
-                        "Succeed",
-                        $"The task was sucessfully created into {SelectedTaskList.Title}");
-                    return;
-                }
-                else
-                {
-                    await MoveCurrentTaskAsync(task);
-                    return;
-                }
+                await MoveCurrentTaskAsync();
+                return;
             }
-            else if (isNewTask)
-            {
-                response = await _googleApiService
-                    .TaskService
-                    .SaveAsync(_currentTaskList.TaskListID, task);
-            }
+
+            GoogleTask entity;
+            ShowTaskProgressRing = true;
+            if (isNewTask)
+                entity = new GoogleTask();
             else
             {
-                response = await _googleApiService
+                entity = await _dataService
                     .TaskService
-                    .UpdateAsync(_currentTaskList.TaskListID, task.TaskID, task);
+                    .GetAsync(t => t.GoogleTaskID == CurrentTask.TaskID, string.Empty);
+                if (entity == null)
+                {
+                    ShowTaskProgressRing = false;
+                    await _dialogService.ShowMessageDialogAsync(
+                        "Error",
+                        "Couldn't find the task to update in the db");
+                    return;
+                }
             }
+            if (!moveToDifferentTaskList || moveToDifferentTaskList && isNewTask)
+            {
+                if (moveToDifferentTaskList)
+                    entity.TaskList = await _dataService
+                        .TaskListService
+                        .GetAsync(tl => tl.GoogleTaskListID == SelectedTaskList.TaskListID, string.Empty);
+                else
+                    entity.TaskList = await _dataService
+                        .TaskListService
+                        .GetAsync(tl => tl.GoogleTaskListID == _currentTaskList.TaskListID, string.Empty);
+
+                if (entity.TaskList == null)
+                {
+                    ShowTaskProgressRing = false;
+                    await _dialogService.ShowMessageDialogAsync(
+                        "Error",
+                        "Couldn't find the task list where this task is going to be saved in the db");
+                    return;
+                }
+
+                entity.CompletedOn = CurrentTask.CompletedOn;
+                entity.GoogleTaskID = CurrentTask.IsNew ? Guid.NewGuid().ToString() : CurrentTask.TaskID;
+                entity.IsDeleted = CurrentTask.IsDeleted;
+                entity.IsHidden = CurrentTask.IsHidden;
+                entity.Notes = CurrentTask.Notes;
+                entity.ParentTask = CurrentTask.ParentTask;
+                entity.Position = CurrentTask.Position;
+                entity.Status = CurrentTask.IsNew ? GoogleTaskStatus.NEEDS_ACTION.GetString() : CurrentTask.Status;
+                entity.Title = CurrentTask.Title;
+                entity.LocalStatus = CurrentTask.IsNew ? LocalStatus.CREATED : LocalStatus.UPDATED;
+                entity.ToBeSynced = true;
+                entity.UpdatedAt = DateTime.Now;
+                entity.ToBeCompletedOn = CurrentTask.ToBeCompletedOn;
+            }
+
+            Result response;
+            var subTasksToSave = GetSubTasksToSave(isNewTask, moveToDifferentTaskList);
+            var currentSts = GetCurrentSubTasks();
+            //If we are creating a new task but in a different tasklist
+            if (moveToDifferentTaskList)
+            {
+                await _dataService
+                    .TaskService
+                    .AddAsync(entity);
+                response = await _dataService.SaveChangesAsync();
+
+                if (!response.Succeed)
+                {
+                    await _dialogService.ShowMessageDialogAsync(
+                        $"An error occurred while trying to seve the task into {SelectedTaskList.Title}.",
+                        $"Error: {response.Message}.");
+                    return;
+                }
+                _messenger.Send(false, $"{MessageType.OPEN_PANE}");
+
+                subTasksToSave.ForEach(st => st.ParentTask = entity.GoogleTaskID);
+
+                await SaveSubTasksAsync(
+                    subTasksToSave,
+                    isNewTask,
+                    moveToDifferentTaskList,
+                    Enumerable.Empty<TaskItemViewModel>().ToList());
+
+                await _dialogService.ShowMessageDialogAsync(
+                    "Succeed",
+                    $"The task was sucessfully created into {SelectedTaskList.Title}");
+                return;
+            }
+            else if (isNewTask)
+                await _dataService.TaskService.AddAsync(entity);
+            else
+                _dataService.TaskService.Update(entity);
+            response = await _dataService.SaveChangesAsync();
             ShowTaskProgressRing = false;
 
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
-                    $"An error occurred while trying to {(string.IsNullOrEmpty(task.TaskID) ? "save" : "update")} the task.",
-                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                    $"An error occurred while trying to {(isNewTask ? "save" : "update")} the task.",
+                    $"Error: {response.Message}.");
                 return;
             }
 
-            CurrentTask = _mapper.Map<TaskItemViewModel>(response.Result);
+            CurrentTask = _mapper.Map<TaskItemViewModel>(entity);
 
             var sts = await SaveSubTasksAsync(subTasksToSave, isNewTask, moveToDifferentTaskList, currentSts);
             CurrentTask.SubTasks = new ObservableCollection<TaskItemViewModel>(sts);
@@ -321,16 +363,32 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
 
             ShowTaskProgressRing = true;
-            var response = await _googleApiService
-                .TaskService.DeleteAsync(_currentTaskList.TaskListID, CurrentTask.TaskID);
+
+            var entity = await _dataService
+                .TaskService
+                .GetAsync(t => t.GoogleTaskID == CurrentTask.TaskID, string.Empty);
+
+            if (entity == null)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Couldn't find the task to delete in the db");
+                return;
+            }
+
+            entity.LocalStatus = LocalStatus.DELETED;
+            entity.ToBeSynced = true;
+            entity.UpdatedAt = DateTime.Now;
+
+            var response = await _dataService.SaveChangesAsync();
             ShowTaskProgressRing = false;
 
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the selected task. Error code = {response.Errors.ApiError.Code}," +
-                    $" message = {response.Errors.ApiError.Message}");
+                    $"Coudln't delete the selected task. Error = {response.Message}.");
                 return;
             }
             //If we are deleting a subtask
@@ -357,22 +415,40 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
 
             ShowTaskProgressRing = true;
-            var response = await _googleApiService
+
+            var entity = await _dataService
                 .TaskService
-                .ChangeStatus(_currentTaskList.TaskListID, task.TaskID, taskStatus);
+                .GetAsync(t => t.GoogleTaskID == task.TaskID, string.Empty);
+
+            if (entity == null)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Couldn't find the task to change the status in the db");
+                return;
+            }
+
+            entity.CompletedOn = task.CompletedOn;
+            entity.LocalStatus = LocalStatus.UPDATED;
+            entity.Status = taskStatus.GetString();
+            entity.ToBeSynced = true;
+            entity.UpdatedAt = DateTime.Now;
+
+            var response = await _dataService.SaveChangesAsync();
             ShowTaskProgressRing = false;
 
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     $"An error occurred while trying to mark {task.Title} as {statusMessage}.",
-                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                    $"Status Code: {response.Message}.");
                 return;
             }
 
-            task.Status = response.Result.Status;
-            task.CompletedOn = response.Result.CompletedOn;
-            task.UpdatedAt = response.Result.UpdatedAt;
+            task.Status = entity.Status;
+            task.CompletedOn = entity.CompletedOn;
+            task.UpdatedAt = entity.UpdatedAt;
 
             _messenger.Send(
                 new Tuple<TaskItemViewModel, bool>(task, task.HasParentTask),
@@ -443,53 +519,89 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task GetAllTaskListAsync()
         {
             ShowTaskProgressRing = true;
-            var response = await _googleApiService
+            var taskLists = await _dataService
                 .TaskListService
-                .GetAllAsync();
+                .GetAsNoTrackingAsync(orderBy: tl => tl.OrderBy(t => t.Title));
             ShowTaskProgressRing = false;
 
-            if (!response.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Coudn't get the task lists",
-                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
-                return;
-            }
-
-            TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>
-                (response.Result.Items.OrderBy(t => t.Title));
+            TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(taskLists);
 
             SelectedTaskList = TaskLists
                 .FirstOrDefault(t => t.TaskListID == _currentTaskList.TaskListID);
         }
 
-        private async Task MoveCurrentTaskAsync(GoogleTaskModel task)
+        private async Task MoveCurrentTaskAsync()
         {
             ShowTaskProgressRing = true;
-            var response = await _googleApiService
-                .TaskService
-                .MoveAsync(task, _currentTaskList.TaskListID, SelectedTaskList.TaskListID);
+            var taskList = await _dataService
+                .TaskListService
+                .GetAsync(tl => tl.GoogleTaskListID == SelectedTaskList.TaskListID, string.Empty);
 
+            if (taskList == null)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Couldn't find the task list where this task is going to be moved in the db");
+                return;
+            }
+
+            var oldEntity = await _dataService
+                .TaskService
+                .GetAsync(t => t.GoogleTaskID == CurrentTask.TaskID, string.Empty);
+
+            if (oldEntity == null)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Couldn't find the task that is going to be removed in the move process");
+                return;
+            }
+
+            oldEntity.UpdatedAt = DateTime.Now;
+            oldEntity.LocalStatus = LocalStatus.DELETED;
+            oldEntity.ToBeSynced = true;
+
+            var entity = new GoogleTask
+            {
+                CompletedOn = CurrentTask.CompletedOn,
+                GoogleTaskID = Guid.NewGuid().ToString(),
+                IsDeleted = CurrentTask.IsDeleted,
+                IsHidden = CurrentTask.IsHidden,
+                Notes = CurrentTask.Notes,
+                ParentTask = CurrentTask.ParentTask,
+                Position = CurrentTask.Position,
+                Status = CurrentTask.Status,
+                Title = CurrentTask.Title,
+                LocalStatus = LocalStatus.CREATED,
+                ToBeSynced = true,
+                UpdatedAt = DateTime.Now,
+                ToBeCompletedOn = CurrentTask.ToBeCompletedOn,
+                TaskList = taskList
+            };
+
+            var response = await _dataService.SaveChangesAsync();
             if (!response.Succeed)
             {
                 ShowTaskProgressRing = false;
                 await _dialogService.ShowMessageDialogAsync(
                     $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}",
-                    $"Status Code: {response.Errors.ApiError.Code}. {response.Errors.ApiError.Message}");
+                    $"Error: {response.Message}.");
                 return;
             }
             if (!CurrentTask.HasParentTask)
                 _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}");
             else
                 _messenger.Send(
-                    new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID), 
+                    new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID),
                     $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
 
             _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             var subTasks = GetSubTasksToSave(false, true);
 
-            subTasks.ForEach(st => st.ParentTask = response.Result.TaskID);
+            subTasks.ForEach(st => st.ParentTask = entity.GoogleTaskID);
 
             ShowTaskProgressRing = false;
 
@@ -530,32 +642,96 @@ namespace MiraiNotes.UWP.ViewModels
             List<TaskItemViewModel> currentSubTasks)
         {
             ShowTaskProgressRing = true;
-            GoogleResponseModel<GoogleTaskModel> response;
+            string taskListID = moveToDifferentTaskList ?
+                SelectedTaskList.TaskListID :
+                _currentTaskList.TaskListID;
 
-            foreach (var subTask in subTasks)
+            var taskList = await _dataService
+                    .TaskListService
+                    .FirstOrDefaultAsync(tl => tl.GoogleTaskListID == taskListID);
+
+            if (taskList == null)
             {
-                var st = _mapper.Map<GoogleTaskModel>(subTask);
-                var lastStID = currentSubTasks.LastOrDefault()?.TaskID;
-                if (moveToDifferentTaskList)
-                {
-                    if (isNewTask)
-                        response = await _googleApiService
-                            .TaskService
-                            .SaveAsync(SelectedTaskList.TaskListID, st, st.ParentTask, lastStID);
-                    else
-                        response = await _googleApiService
-                            .TaskService
-                            .MoveAsync(st, _currentTaskList.TaskListID, SelectedTaskList.TaskListID, st.ParentTask, lastStID);
-                }
-                else
-                {
-                    response = await _googleApiService
-                        .TaskService
-                        .SaveAsync(_currentTaskList.TaskListID, st, CurrentTask.TaskID, lastStID);
-                }
+                ShowTaskProgressRing = false;
+                return currentSubTasks;
+            }
 
-                if (response.Succeed)
-                    currentSubTasks.Add(_mapper.Map<TaskItemViewModel>(response.Result));
+            if (moveToDifferentTaskList && !isNewTask)
+            {
+                var oldEntities = await _dataService
+                    .TaskService
+                    .GetAsync(t => subTasks.Any(st => st.TaskID == t.GoogleTaskID), null, string.Empty);
+
+                oldEntities.ForEach(st =>
+                {
+                    st.LocalStatus = LocalStatus.DELETED;
+                    st.ToBeSynced = true;
+                    st.UpdatedAt = DateTime.Now;
+                });
+
+                oldEntities.ForEach(async ost =>
+                {
+                    var lastStID = currentSubTasks.LastOrDefault()?.TaskID;
+                    var entity = new GoogleTask
+                    {
+                        CompletedOn = ost.CompletedOn,
+                        CreatedAt = DateTime.Now,
+                        GoogleTaskID = ost.GoogleTaskID,
+                        IsDeleted = ost.IsDeleted,
+                        IsHidden = ost.IsHidden,
+                        LocalStatus = LocalStatus.CREATED,
+                        Notes = ost.Notes,
+                        ParentTask = ost.ParentTask,
+                        Position = lastStID,
+                        Status = ost.Status,
+                        TaskList = taskList,
+                        Title = ost.Title,
+                        ToBeCompletedOn = ost.ToBeCompletedOn,
+                        ToBeSynced = true,
+                        UpdatedAt = DateTime.Now
+                    };
+
+                    await _dataService
+                        .TaskService
+                        .AddAsync(entity);
+
+                    var response = await _dataService.SaveChangesAsync();
+                    if (response.Succeed)
+                        currentSubTasks.Add(_mapper.Map<TaskItemViewModel>(entity));
+                });
+            }
+            else 
+            {
+                foreach (var subTask in subTasks)
+                {
+                    var lastStID = currentSubTasks.LastOrDefault()?.TaskID;
+                    var entity = new GoogleTask
+                    {
+                        CompletedOn = subTask.CompletedOn,
+                        CreatedAt = DateTime.Now,
+                        GoogleTaskID = subTask.TaskID,
+                        IsDeleted = subTask.IsDeleted,
+                        IsHidden = subTask.IsHidden,
+                        LocalStatus = LocalStatus.CREATED,
+                        Notes = subTask.Notes,
+                        ParentTask = isNewTask && moveToDifferentTaskList ? 
+                            subTask.ParentTask : 
+                            CurrentTask.TaskID,
+                        Position = lastStID,
+                        Status = subTask.Status,
+                        TaskList = taskList,
+                        Title = subTask.Title,
+                        ToBeCompletedOn = subTask.ToBeCompletedOn,
+                        ToBeSynced = true,
+                        UpdatedAt = DateTime.Now
+                    };
+
+                    await _dataService.TaskService.AddAsync(entity);
+                    var response = await _dataService.SaveChangesAsync();
+
+                    if (response.Succeed)
+                        currentSubTasks.Add(_mapper.Map<TaskItemViewModel>(entity));
+                }
             }
             ShowTaskProgressRing = false;
 
@@ -580,17 +756,32 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             ShowTaskProgressRing = true;
-            var response = await _googleApiService
+            var entity = await _dataService
                 .TaskService
-                .DeleteAsync(_currentTaskList.TaskListID, subTask.TaskID);
-            ShowTaskProgressRing = false;
+                .FirstOrDefaultAsync(t => t.GoogleTaskID == subTask.TaskID);
 
+            if (entity == null)
+            {
+                ShowTaskProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"Coudln't find the {subTask.Title} in the db");
+                return;
+            }
+
+            entity.LocalStatus = LocalStatus.DELETED;
+            entity.ToBeSynced = true;
+            entity.UpdatedAt = DateTime.Now;
+
+            _dataService.TaskService.Update(entity);
+            var response = await _dataService.SaveChangesAsync();
+
+            ShowTaskProgressRing = false;
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the selected sub task. Error code = {response.Errors.ApiError.Code}," +
-                    $" message = {response.Errors.ApiError.Message}");
+                    $"Coudln't delete the selected sub task. Error = {response.Message}");
                 return;
             }
             CurrentTask.SubTasks?.Remove(subTask);
