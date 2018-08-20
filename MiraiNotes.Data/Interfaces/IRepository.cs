@@ -36,6 +36,13 @@ namespace MiraiNotes.DataService.Interfaces
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
+        /// Gets the first entity that matches <paramref name="predicate"/>
+        /// </summary>
+        /// <param name="predicate">A predicate for filtering</param>
+        /// <returns><see cref="TEntity"/></returns>
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+
+        /// <summary>
         /// Gets an entity with pk equal to <paramref name="id"/>
         /// </summary>
         /// <param name="id">Entity pk</param>

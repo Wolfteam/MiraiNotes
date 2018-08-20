@@ -32,22 +32,57 @@ namespace MiraiNotes.Data
 
         public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbSet
-                .AsNoTracking()
-                .Where(predicate)
-                .CountAsync() == 1;
+            bool result = false;
+            try
+            {
+                result = await _dbSet
+                        .AsNoTracking()
+                        .Where(predicate)
+                        .CountAsync() == 1;
+            }
+            catch (Exception)
+            {
+                //TODO: ADD SOME LOGGING..
+            }
+            return result;
         }
 
         public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbSet
-                .Where(predicate)
-                .ToListAsync();
+            try
+            {
+                return await _dbSet
+                    .Where(predicate)
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return Enumerable.Empty<TEntity>();
+            }
+        }
+
+        public virtual async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            try
+            {
+                return await _dbSet.FirstOrDefaultAsync(predicate);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public virtual async Task<TEntity> GetByIdAsync(object id)
         {
-            return await _dbSet.FindAsync(id);
+            try
+            {
+                return await _dbSet.FindAsync(id);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public virtual async Task<TEntity> GetAsync(
@@ -63,26 +98,32 @@ namespace MiraiNotes.Data
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
         {
-            IQueryable<TEntity> query = _dbSet;
+            try
+            {
+                IQueryable<TEntity> query = _dbSet;
+                if (filter != null)
+                {
+                    query = query.Where(filter);
+                }
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
+                foreach (var includeProperty in includeProperties.Split
+                    (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty.Trim());
+                }
 
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty.Trim());
+                if (orderBy != null)
+                {
+                    return await orderBy(query).ToListAsync();
+                }
+                else
+                {
+                    return await query.ToListAsync();
+                }
             }
-
-            if (orderBy != null)
+            catch (Exception)
             {
-                return await orderBy(query).ToListAsync();
-            }
-            else
-            {
-                return await query.ToListAsync();
+                return Enumerable.Empty<TEntity>();
             }
         }
 
@@ -91,44 +132,65 @@ namespace MiraiNotes.Data
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
         {
-            IQueryable<TEntity> query = _dbSet;
+            try
+            {
+                IQueryable<TEntity> query = _dbSet;
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
+                if (filter != null)
+                {
+                    query = query.Where(filter);
+                }
 
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty.Trim());
-            }
+                foreach (var includeProperty in includeProperties.Split
+                    (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty.Trim());
+                }
 
-            if (orderBy != null)
-            {
-                return await orderBy(query)
-                    .AsNoTracking()
-                    .ToListAsync();
+                if (orderBy != null)
+                {
+                    return await orderBy(query)
+                        .AsNoTracking()
+                        .ToListAsync();
+                }
+                else
+                {
+                    return await query
+                        .AsNoTracking()
+                        .ToListAsync();
+                }
             }
-            else
+            catch (Exception)
             {
-                return await query
-                    .AsNoTracking()
-                    .ToListAsync();
+                return Enumerable.Empty<TEntity>();
             }
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return await _dbSet
-                .ToListAsync();
+            try
+            {
+                return await _dbSet
+                        .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return Enumerable.Empty<TEntity>();
+            }
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsNoTrackingAsync()
         {
-            return await _dbSet
-                .AsNoTracking()
-                .ToListAsync();
+            try
+            {
+                return await _dbSet
+                        .AsNoTracking()
+                        .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return Enumerable.Empty<TEntity>();
+            }
         }
 
         public virtual async Task RemoveAsync(object id)
