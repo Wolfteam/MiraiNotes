@@ -1,4 +1,5 @@
-﻿using MiraiNotes.UWP.Pages;
+﻿using GalaSoft.MvvmLight.Threading;
+using MiraiNotes.UWP.Pages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -85,6 +86,8 @@ namespace MiraiNotes.UWP
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
+
+                DispatcherHelper.Initialize();
             }
         }
 

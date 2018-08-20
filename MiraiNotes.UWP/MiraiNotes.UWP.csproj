@@ -110,11 +110,13 @@
     <Compile Include="Extensions\FocusExtension.cs" />
     <Compile Include="Extensions\ObservableCollectionExtension.cs" />
     <Compile Include="Handlers\AuthorizationHandler.cs" />
+    <Compile Include="Helpers\DispatcherHelperEx.cs" />
     <Compile Include="Helpers\HttpClientExtensions.cs" />
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
+    <Compile Include="Interfaces\IDispatcherHelper.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
     <Compile Include="Interfaces\IGoogleTaskService.cs" />
     <Compile Include="Interfaces\IGoogleUserService.cs" />
