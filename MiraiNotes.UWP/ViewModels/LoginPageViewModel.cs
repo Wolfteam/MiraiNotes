@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.DataService.Interfaces;
+using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
 using System;
 using System.Linq;
@@ -157,10 +158,10 @@ namespace MiraiNotes.UWP.ViewModels
             bool userIsAlreadySaved = await _dataService
                 .UserService
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
-
+            Result userSaved;
             if (!userIsAlreadySaved)
             {
-                await _dataService.UserService.AddAsync(new Data.Models.GoogleUser
+                userSaved = await _dataService.UserService.AddAsync(new Data.Models.GoogleUser
                 {
                     Email = user.Email,
                     Fullname = user.FullName,
@@ -181,10 +182,11 @@ namespace MiraiNotes.UWP.ViewModels
                 userInDb.IsActive = true;
                 userInDb.PictureUrl = user.ImageUrl;
 
-                _dataService.UserService.Update(userInDb);
+                userSaved = await _dataService
+                    .UserService
+                    .UpdateAsync(userInDb);
             }
 
-            var userSaved = await _dataService.SaveChangesAsync();
             if (!userSaved.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(

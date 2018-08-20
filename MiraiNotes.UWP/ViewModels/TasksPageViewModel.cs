@@ -330,13 +330,14 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             ShowTaskListViewProgressRing = true;
+
             var response = await _dataService
                 .TaskService
                 .GetAsNoTrackingAsync(
-                    t => t.TaskList.GoogleTaskListID == taskList.TaskListID,
+                    t => t.TaskList.GoogleTaskListID == taskList.TaskListID && 
+                        t.LocalStatus != LocalStatus.DELETED,
                     t => t.OrderBy(ta => ta.Position));
-            var tasks = _mapper.Map<List<TaskItemViewModel>>(response);
-            ShowTaskListViewProgressRing = false;
+            var tasks = _mapper.Map<List<TaskItemViewModel>>(response);            
 
             if (tasks.Count > 0)
             {
@@ -359,6 +360,7 @@ namespace MiraiNotes.UWP.ViewModels
                 TaskAutoSuggestBoxItems = new ObservableCollection<ItemModel>();
             }
             CurrentTaskList = taskList;
+            ShowTaskListViewProgressRing = false;
         }
 
         private void OnNoTaskListAvailable()
@@ -539,9 +541,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
 
             ShowTaskListViewProgressRing = true;
-            var currentUser = await _dataService
-                .UserService
-                .GetCurrentActiveUserAsync();
+
             var entity = new GoogleTaskList
             {
                 GoogleTaskListID = Guid.NewGuid().ToString(),
@@ -549,14 +549,11 @@ namespace MiraiNotes.UWP.ViewModels
                 UpdatedAt = DateTime.Now,
                 LocalStatus = LocalStatus.CREATED,
                 ToBeSynced = true,
-                CreatedAt = DateTime.Now,
-                User = currentUser
+                CreatedAt = DateTime.Now
             };
-            await _dataService
+            var response = await _dataService
                 .TaskListService
                 .AddAsync(entity);
-            var response = await _dataService
-                .SaveChangesAsync();
             ShowTaskListViewProgressRing = false;
             if (!response.Succeed)
             {
@@ -587,7 +584,7 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskListViewProgressRing = true;
             var taskToUpdate = await _dataService
                 .TaskService
-                .GetAsync(tx => tx.GoogleTaskID == task.TaskID, string.Empty);
+                .FirstOrDefaultAsNoTrackingAsync(tx => tx.GoogleTaskID == task.TaskID);
 
             if (taskToUpdate == null)
             {
@@ -602,8 +599,9 @@ namespace MiraiNotes.UWP.ViewModels
             taskToUpdate.LocalStatus = LocalStatus.UPDATED;
             taskToUpdate.ToBeSynced = true;
 
-            _dataService.TaskService.Update(taskToUpdate);
-            var response = await _dataService.SaveChangesAsync();
+            var response = await _dataService
+                .TaskService
+                .UpdateAsync(taskToUpdate);
 
             if (!response.Succeed)
             {
@@ -659,18 +657,36 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskListViewProgressRing = true;
 
             var tasksStatusNotChanged = new List<string>();
+            //var tasksToUpdate = await _dataService
+            //    .TaskService
+            //    .GetAsync(t => selectedTasks.Any(st => st.TaskID == t.GoogleTaskID));
+
+            //tasksToUpdate.ForEach(t =>
+            //{
+            //    t.Status = taskStatus.GetString();
+            //    t.UpdatedAt = DateTime.Now;
+            //    t.LocalStatus = LocalStatus.UPDATED;
+            //    t.ToBeSynced = true;
+            //});
+
+            //var response = await _dataService
+            //    .TaskService
+            //    .UpdateRangeAsync(tasksToUpdate)
+
             foreach (var task in selectedTasks)
             {
                 var taskToUpdate = await _dataService
                     .TaskService
-                    .GetAsync(ta => ta.GoogleTaskID == task.TaskID, string.Empty);
+                    .FirstOrDefaultAsNoTrackingAsync(ta => ta.GoogleTaskID == task.TaskID);
 
                 taskToUpdate.Status = taskStatus.GetString();
                 taskToUpdate.UpdatedAt = DateTime.Now;
                 taskToUpdate.LocalStatus = LocalStatus.UPDATED;
                 taskToUpdate.ToBeSynced = true;
 
-                var response = await _dataService.SaveChangesAsync();
+                var response = await _dataService
+                    .TaskService
+                    .UpdateAsync(taskToUpdate);
 
                 if (!response.Succeed)
                 {
@@ -709,14 +725,16 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 var taskToUpdate = await _dataService
                     .TaskService
-                    .GetAsync(ta => ta.GoogleTaskID == task.TaskID, string.Empty);
+                    .FirstOrDefaultAsNoTrackingAsync(ta => ta.GoogleTaskID == task.TaskID);
 
                 taskToUpdate.Status = taskStatus.GetString();
                 taskToUpdate.UpdatedAt = DateTime.Now;
                 taskToUpdate.LocalStatus = LocalStatus.UPDATED;
                 taskToUpdate.ToBeSynced = true;
 
-                var response = await _dataService.SaveChangesAsync();
+                var response = await _dataService
+                    .TaskService
+                    .UpdateAsync(taskToUpdate);
 
                 if (!response.Succeed)
                 {
@@ -756,11 +774,27 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Send(true, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
             ShowTaskListViewProgressRing = true;
 
-            await _dataService
+            var entity = await _dataService
                 .TaskService
-                .RemoveAsync(t => t.GoogleTaskID == taskID);
+                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskID == taskID);
+
+            if (entity == null)
+            {
+                ShowTaskListViewProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Task couldn't be found in the db");
+                return;
+            }
+
+            entity.LocalStatus = LocalStatus.DELETED;
+            entity.UpdatedAt = DateTime.Now;
+            entity.ToBeSynced = true;
+
             var response = await _dataService
-                .SaveChangesAsync();
+                .TaskService
+                .UpdateAsync(entity);
+
             ShowTaskListViewProgressRing = false;
             _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
 
@@ -802,9 +836,10 @@ namespace MiraiNotes.UWP.ViewModels
 
             var tasks = await _dataService
                 .TaskService
-                .GetAsync(t =>
-                    tasksToDelete
-                        .Any(td => t.GoogleTaskID == td.TaskID), null, string.Empty);
+                .GetAsNoTrackingAsync(
+                    t => tasksToDelete.Any(td => t.GoogleTaskID == td.TaskID),
+                    null,
+                    string.Empty);
 
             tasks.ForEach(t =>
             {
@@ -813,7 +848,9 @@ namespace MiraiNotes.UWP.ViewModels
                 t.ToBeSynced = true;
             });
 
-            var response = await _dataService.SaveChangesAsync();
+            var response = await _dataService
+                .TaskService
+                .UpdateRangeAsync(tasks);
 
             ShowTaskListViewProgressRing = false;
             _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
@@ -847,17 +884,35 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskListViewProgressRing = true;
 
-            var taskList = await _dataService
-                .TaskListService
-                .GetAsync(tl => tl.GoogleTaskListID == selectedTaskList.TaskListID, string.Empty);
-
             var oldEntity = await _dataService
                 .TaskService
-                .GetAsync(t => t.GoogleTaskID == task.TaskID, string.Empty);
+                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskID == task.TaskID);
+
+            if (oldEntity == null)
+            {
+                ShowTaskListViewProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Couldn't find the task to delete in the move process in the db");
+                return;
+            }
 
             oldEntity.LocalStatus = LocalStatus.DELETED;
             oldEntity.ToBeSynced = true;
             oldEntity.UpdatedAt = DateTime.Now;
+
+            var response = await _dataService
+                .TaskService
+                .UpdateAsync(oldEntity);
+
+            if (!response.Succeed)
+            {
+                ShowTaskListViewProgressRing = false;
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    "Couldn't mark as deleted the task in the db");
+                return;
+            }
 
             var entity = new GoogleTask
             {
@@ -874,15 +929,12 @@ namespace MiraiNotes.UWP.ViewModels
                 Title = task.Title,
                 ToBeCompletedOn = task.ToBeCompletedOn,
                 ToBeSynced = true,
-                UpdatedAt = DateTime.Now,
-                TaskList = taskList
+                UpdatedAt = DateTime.Now
             };
 
-            await _dataService
+            response = await _dataService
                 .TaskService
-                .AddAsync(entity);
-
-            var response = await _dataService.SaveChangesAsync();
+                .AddAsync(selectedTaskList.TaskListID, entity);
 
             if (!response.Succeed)
             {
@@ -931,13 +983,12 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskListViewProgressRing = true;
 
-            var taskList = await _dataService
-                .TaskListService
-                .GetAsync(tl => tl.GoogleTaskListID == selectedTaskList.TaskListID, string.Empty);
-
             var oldEntities = await _dataService
                 .TaskService
-                .GetAsync(t => selectedTasks.Any(st => st.TaskID == t.GoogleTaskID), null, string.Empty);
+                .GetAsNoTrackingAsync(
+                    t => selectedTasks.Any(st => st.TaskID == t.GoogleTaskID),
+                    null,
+                    string.Empty);
 
             oldEntities.ForEach(t =>
             {
@@ -946,7 +997,9 @@ namespace MiraiNotes.UWP.ViewModels
                 t.UpdatedAt = DateTime.Now;
             });
 
-            var response = await _dataService.SaveChangesAsync();
+            var response = await _dataService
+                .TaskService
+                .UpdateRangeAsync(oldEntities);
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
@@ -974,15 +1027,12 @@ namespace MiraiNotes.UWP.ViewModels
                     Title = st.Title,
                     ToBeCompletedOn = st.ToBeCompletedOn,
                     ToBeSynced = true,
-                    UpdatedAt = DateTime.Now,
-                    TaskList = taskList
+                    UpdatedAt = DateTime.Now
                 };
 
-                await _dataService
+                response = await _dataService
                     .TaskService
-                    .AddAsync(entity);
-
-                response = await _dataService.SaveChangesAsync();
+                    .AddAsync(selectedTaskList.TaskListID, entity);
 
                 if (!response.Succeed)
                     tasksNotMoved.Add(st.Title);
@@ -1024,7 +1074,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             var oldEntities = await _dataService
                 .TaskService
-                .GetAsync(
+                .GetAsNoTrackingAsync(
                     st => subTasks.Any(subt => subt.TaskID == st.GoogleTaskID),
                     null,
                     string.Empty);
@@ -1035,7 +1085,9 @@ namespace MiraiNotes.UWP.ViewModels
                 t.ToBeSynced = true;
                 t.UpdatedAt = DateTime.Now;
             });
-            var response = await _dataService.SaveChangesAsync();
+            var response = await _dataService
+                .TaskService
+                .UpdateRangeAsync(oldEntities);
             if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
@@ -1044,9 +1096,6 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            var taskList = await _dataService
-                .TaskListService
-                .GetAsync(tl => tl.GoogleTaskListID == taskListID, string.Empty);
             var stList = new List<string>();
             foreach (var subTask in subTasks)
             {
@@ -1065,16 +1114,12 @@ namespace MiraiNotes.UWP.ViewModels
                     Title = subTask.Title,
                     ToBeCompletedOn = subTask.ToBeCompletedOn,
                     ToBeSynced = true,
-                    UpdatedAt = DateTime.Now,
-                    TaskList = taskList
+                    UpdatedAt = DateTime.Now
                 };
 
-                await _dataService
-                    .TaskService
-                    .AddAsync(entity);
-
                 response = await _dataService
-                    .SaveChangesAsync();
+                    .TaskService
+                    .AddAsync(taskListID, entity);
 
                 if (response.Succeed)
                     stList.Add(entity.GoogleTaskID);

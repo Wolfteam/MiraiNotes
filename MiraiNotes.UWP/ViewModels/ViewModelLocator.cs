@@ -101,9 +101,13 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
 
             SimpleIoc.Default.Register<INetworkService, NetworkService>();
-            SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
             SimpleIoc.Default.Register<ISyncService, SyncService>();
 
+            SimpleIoc.Default.Register<IUserDataService, UserDataService>();
+            SimpleIoc.Default.Register<ITaskListDataService, TaskListDataService>();
+            SimpleIoc.Default.Register<ITaskDataService, TaskDataService>();
+            SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
+            
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();
             SimpleIoc.Default.Register<TasksPageViewModel>();

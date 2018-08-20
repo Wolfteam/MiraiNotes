@@ -113,14 +113,14 @@ namespace MiraiNotes.UWP.ViewModels
             _networkService = networkService;
 
             RegisterMessages();
-            SetCommands();            
+            SetCommands();
         }
 
         #region Methods
         private void RegisterMessages()
         {
             _messenger.Register<TaskListItemViewModel>(
-                this, 
+                this,
                 $"{MessageType.TASK_LIST_ADDED}",
                 OnTaskListAdded);
             _messenger.Register<bool>(this, $"{MessageType.OPEN_PANE}", (open) => OpenPane(open));
@@ -157,12 +157,14 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task InitViewAsync()
         {
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+
             var currentUser = await _dataService
                 .UserService
                 .GetCurrentActiveUserAsync();
 
             if (currentUser == null)
             {
+                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 await _dialogService
                     .ShowMessageDialogAsync("Error", "The current active user couldnt be found on db");
                 return;
@@ -173,16 +175,14 @@ namespace MiraiNotes.UWP.ViewModels
                 .GetAsNoTrackingAsync(
                     tl => tl.User == currentUser && tl.LocalStatus != LocalStatus.DELETED,
                     tl => tl.OrderBy(t => t.Title));
-
-            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            //kinda hack
-            await Task.Delay(80);
-
+            
             TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(taskLists);
 
             TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(taskLists);
 
             SelectedItem = TaskLists.FirstOrDefault();
+
+            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
         }
 
         public void OnTaskListAutoSuggestBoxTextChangeAsync(string currentText)
@@ -248,7 +248,6 @@ namespace MiraiNotes.UWP.ViewModels
                 await _dataService
                     .UserService
                     .ChangeCurrentUserStatus(false);
-                await _dataService.SaveChangesAsync();
 
                 _userCredentialService.DeleteUserCredentials();
                 _navigationService.GoBack();
@@ -278,7 +277,9 @@ namespace MiraiNotes.UWP.ViewModels
             taskListToUpdate.ToBeSynced = true;
             taskListToUpdate.LocalStatus = LocalStatus.UPDATED;
 
-            var response = await _dataService.SaveChangesAsync();
+            var response = await _dataService
+                .TaskListService
+                .UpdateAsync(taskListToUpdate);
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
@@ -318,21 +319,23 @@ namespace MiraiNotes.UWP.ViewModels
                 .TaskListService
                 .GetAsync(tl => tl.GoogleTaskListID == taskList.TaskListID, string.Empty));
 
+            Result response;
             //if the task is created but wasnt synced, we remove it from the db
             if (taskListToDelete.ToBeSynced)
             {
-                _dataService.TaskListService.Remove(taskListToDelete);
+                response = await _dataService
+                    .TaskListService
+                    .RemoveAsync(taskListToDelete);
             }
             else
             {
                 taskListToDelete.LocalStatus = LocalStatus.DELETED;
                 taskListToDelete.ToBeSynced = true;
 
-                _dataService.TaskListService.Update(taskListToDelete);
+                response = await _dataService
+                    .TaskListService
+                    .UpdateAsync(taskListToDelete);
             }
-
-            var response = await _dataService.SaveChangesAsync();
-
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)

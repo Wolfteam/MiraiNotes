@@ -20,8 +20,8 @@ namespace MiraiNotes.UWP.Services
         private readonly IMapper _mapper;
 
         public SyncService(
-            IGoogleApiService apiService, 
-            IMiraiNotesDataService dataService, 
+            IGoogleApiService apiService,
+            IMiraiNotesDataService dataService,
             IMapper mapper)
         {
             //TODO: CHECK INTERNET CONNCTION IN THE API SERVICE
@@ -38,6 +38,8 @@ namespace MiraiNotes.UWP.Services
                 Succeed = false
             };
 
+            var syncDownResults = new List<Result>();
+
             var response = await _apiService
                 .TaskListService
                 .GetAllAsync();
@@ -46,16 +48,6 @@ namespace MiraiNotes.UWP.Services
             {
                 //TODO: I SHOULD DO SOMETHING HERE...
                 syncResult.Message = response.Errors?.ApiError?.Message ?? response.Errors.ErrorDescription;
-                return syncResult;
-            }
-
-            var currentActiveUser = await _dataService
-                .UserService
-                .GetCurrentActiveUserAsync();
-
-            if (currentActiveUser == null)
-            {
-                syncResult.Message = "The current active user couldnt be found on db";
                 return syncResult;
             }
 
@@ -80,23 +72,29 @@ namespace MiraiNotes.UWP.Services
                             GoogleTaskListID = t.TaskListID,
                             CreatedAt = DateTime.Now,
                             Title = t.Title,
-                            UpdatedAt = t.UpdatedAt,
-                            User = currentActiveUser
+                            UpdatedAt = t.UpdatedAt
                         });
+                    if (taskListsToSave.Count() == 0)
+                        return;
 
-                    await _dataService
+                    syncDownResults.Add(await _dataService
                         .TaskListService
-                        .AddRangeAsync(taskListsToSave);
+                        .AddRangeAsync(taskListsToSave));
                 }),
 
                 //Here we delete any task that is not in remote
-                Task.Run(() =>
+                Task.Run(async() =>
                 {
                     var deletedTaskLists = currentTaskLists
                         .Where(ct => !downloadedTaskLists
                             .Any(dt => dt.TaskListID == ct.GoogleTaskListID));
 
-                    _dataService.TaskListService.RemoveRange(deletedTaskLists);
+                    if (deletedTaskLists.Count() == 0)
+                        return;
+
+                    syncDownResults.Add(await _dataService
+                        .TaskListService
+                        .RemoveRangeAsync(deletedTaskLists));
                 }),
 
                 //Here we update the local tasklists
@@ -112,17 +110,11 @@ namespace MiraiNotes.UWP.Services
 
                         if (taskList.UpdatedAt < t.UpdatedAt)
                         {
-                            var taskToUpdate = await _dataService
+                            taskList.Title = t.Title;
+                            taskList.UpdatedAt = t.UpdatedAt;
+                            syncDownResults.Add(await _dataService
                                 .TaskListService
-                                .GetByIdAsync(taskList.ID);
-
-                            if (taskToUpdate == null)
-                                continue;
-
-                            taskToUpdate.Title = t.Title;
-                            taskToUpdate.GoogleTaskListID = t.TaskListID;
-                            taskToUpdate.UpdatedAt = t.UpdatedAt;
-                            _dataService.TaskListService.Update(taskToUpdate);
+                                .UpdateAsync(taskList));
                         }
                     }
                 })
@@ -130,7 +122,10 @@ namespace MiraiNotes.UWP.Services
 
             await Task.WhenAll(tasks);
 
-            syncResult = await _dataService.SaveChangesAsync();
+            if (syncDownResults.Any(r => !r.Succeed))
+                syncResult.Message = string.Join(",\n", syncDownResults.Select(r => r.Message));
+            else
+                syncResult.Succeed = true;
 
             return syncResult;
         }
@@ -143,9 +138,11 @@ namespace MiraiNotes.UWP.Services
                 Succeed = true
             };
 
+            var syncDownResults = new List<Result>();
+
             var taskLists = await _dataService
                 .TaskListService
-                .GetAllAsync();
+                .GetAllAsNoTrackingAsync();
 
             foreach (var taskList in taskLists)
             {
@@ -189,63 +186,64 @@ namespace MiraiNotes.UWP.Services
                                 ParentTask = t.ParentTask,
                                 Position = t.Position,
                                 Status = t.Status,
-                                ToBeCompletedOn = t.ToBeCompletedOn,
-                                TaskList = taskList
+                                ToBeCompletedOn = t.ToBeCompletedOn
                             });
 
-                        await _dataService
+                        if (tasksToSave.Count() == 0)
+                            return;
+
+                        syncDownResults.Add(await _dataService
                             .TaskService
-                            .AddRangeAsync(tasksToSave);
+                            .AddRangeAsync(taskList.GoogleTaskListID ,tasksToSave));
                     }),
 
                     //Here we delete any task that is not in remote
-                    Task.Run(() =>
+                    Task.Run(async() =>
                     {
                         var deletedTasks = currentTasks
                             .Where(ct => !downloadedTasks
                                 .Any(dt => dt.TaskID == ct.GoogleTaskID));
 
-                        _dataService.TaskService.RemoveRange(deletedTasks);
+                        if (deletedTasks.Count() == 0)
+                            return;
+
+                        syncDownResults.Add(await _dataService
+                            .TaskService
+                            .RemoveRangeAsync(deletedTasks));
                     }),
 
-                    //Here we update the local tasklists
+                    //Here we update the local tasks
                     Task.Run(async() =>
                     {
                         foreach (var task in currentTasks)
                         {
-                            var t = downloadedTasks
+                            var downloadedTask = downloadedTasks
                                 .FirstOrDefault(dt => dt.TaskID == task.GoogleTaskID);
 
-                            if (t == null)
+                            if (downloadedTask == null)
                                 return;
 
-                            if (taskList.UpdatedAt < t.UpdatedAt)
+                            if (task.UpdatedAt < downloadedTask.UpdatedAt)
                             {
-                                var taskToUpdate = await _dataService
-                                    .TaskListService
-                                    .GetByIdAsync(taskList.ID);
+                                task.Title = downloadedTask.Title;
+                                task.GoogleTaskID= downloadedTask.TaskID;
+                                task.UpdatedAt = downloadedTask.UpdatedAt;
 
-                                if (taskToUpdate == null)
-                                    continue;
-
-                                taskToUpdate.Title = t.Title;
-                                taskToUpdate.GoogleTaskListID = t.TaskID;
-                                taskToUpdate.UpdatedAt = t.UpdatedAt;
-
-                                _dataService.TaskListService.Update(taskToUpdate);
+                                syncDownResults.Add( await _dataService
+                                    .TaskService
+                                    .UpdateAsync(task));
                             }
                         }
                     })
                 };
 
                 await Task.WhenAll(tasks);
-
-                syncResult = await _dataService.SaveChangesAsync();
-                if (!syncResult.Succeed)
-                {
-                    return syncResult;
-                }
             }
+
+            if (syncDownResults.Any(r => !r.Succeed))
+                syncResult.Message = string.Join(",", syncDownResults.Select(r => r.Message));
+            else
+                syncResult.Succeed = true;
 
             return syncResult;
         }
@@ -260,7 +258,7 @@ namespace MiraiNotes.UWP.Services
 
             var taskListToSync = await _dataService
                 .TaskListService
-                .GetAsync(
+                .GetAsNoTrackingAsync(
                     taskList => taskList.ToBeSynced,
                     taskList => taskList.OrderBy(tl => tl.UpdatedAt),
                     string.Empty);
@@ -278,11 +276,7 @@ namespace MiraiNotes.UWP.Services
                         return;
 
                     foreach (var taskList in createdTaskLists)
-                    {
                         syncUpResults.Add(await SaveUpTaskList(taskList));
-                    }
-                    var dbResult = await _dataService.SaveChangesAsync();
-                    syncUpResults.Add(dbResult);
                 }),
 
                 //Here we take the tasklists that were deleted
@@ -295,12 +289,7 @@ namespace MiraiNotes.UWP.Services
                         return;
 
                     foreach (var taskList in deletedTaskLists)
-                    {
                         syncUpResults.Add(await DeleteUpTaskList(taskList));
-                    }
-
-                    var dbResult = await _dataService.SaveChangesAsync();
-                    syncUpResults.Add(dbResult);
                 }),
 
                 //Here we take the taskLists that were updated
@@ -313,11 +302,7 @@ namespace MiraiNotes.UWP.Services
                         return;
 
                     foreach (var taskList in updatedTaskLists)
-                    {
                         syncUpResults.Add(await UpdateUpTaskList(taskList));
-                    }
-                    var dbResult = await _dataService.SaveChangesAsync();
-                    syncUpResults.Add(dbResult);
                 })
 
                 //TODO: WHAT SHOULD I DO WITH MOVE IN A SYNC?
@@ -346,7 +331,7 @@ namespace MiraiNotes.UWP.Services
 
             var tasksToBeSynced = await _dataService
                 .TaskService
-                .GetAsync(
+                .GetAsNoTrackingAsync(
                     task => task.ToBeSynced,
                     task => task.OrderBy(t => t.UpdatedAt),
                     nameof(GoogleTask.TaskList));
@@ -363,11 +348,7 @@ namespace MiraiNotes.UWP.Services
                         return;
 
                     foreach (var task in tasksToCreate)
-                    {
                         syncUpResults.Add(await SaveUpTask(task));
-                    }
-
-                    syncUpResults.Add(await _dataService.SaveChangesAsync());
                 }),
 
                 //Here we save the tasks that were deleted locally
@@ -376,10 +357,7 @@ namespace MiraiNotes.UWP.Services
                     var tasksToDelete = tasksToBeSynced
                         .Where(t => t.LocalStatus == LocalStatus.DELETED);
                     foreach (var task in tasksToDelete)
-                    {
                         syncUpResults.Add(await DeleteUpTask(task));
-                    }
-                    syncUpResults.Add(await _dataService.SaveChangesAsync());
                 }),
 
                 //Here we update the tasks that were updated locally
@@ -389,10 +367,7 @@ namespace MiraiNotes.UWP.Services
                         .Where(t => t.LocalStatus == LocalStatus.UPDATED);
 
                     foreach (var task in tasksToUpdate)
-                    {
                         syncUpResults.Add(await UpdateUpTask(task));
-                    }
-                    syncUpResults.Add(await _dataService.SaveChangesAsync());
                 })
             };
 
@@ -428,7 +403,10 @@ namespace MiraiNotes.UWP.Services
                 taskList.GoogleTaskListID = response.Result.TaskListID;
                 taskList.ToBeSynced = false;
                 taskList.LocalStatus = LocalStatus.DEFAULT;
-                _dataService.TaskListService.Update(taskList);
+                taskList.UpdatedAt = response.Result.UpdatedAt;
+                result = await _dataService
+                    .TaskListService
+                    .UpdateAsync(taskList);
             }
             else
                 result.Message = response.Errors?.ApiError?.Message ??
@@ -449,7 +427,7 @@ namespace MiraiNotes.UWP.Services
             };
 
             if (response.Succeed)
-                _dataService.TaskListService.Remove(taskList);
+                result = await _dataService.TaskListService.RemoveAsync(taskList);
             else
                 result.Message = response.Errors?.ApiError?.Message ??
                     $"An unkwon error occurred while trying to delete task list {taskList.Title}";
@@ -492,7 +470,7 @@ namespace MiraiNotes.UWP.Services
                     {
                         taskList.LocalStatus = LocalStatus.DEFAULT;
                         taskList.ToBeSynced = false;
-                        _dataService.TaskListService.Update(taskList);
+                        result = await _dataService.TaskListService.UpdateAsync(taskList);
                     }
                 }
                 //we need to update the local contrapart
@@ -501,7 +479,8 @@ namespace MiraiNotes.UWP.Services
                     taskList.Title = response.Result.Title;
                     taskList.LocalStatus = LocalStatus.DEFAULT;
                     taskList.ToBeSynced = false;
-                    _dataService.TaskListService.Update(taskList);
+                    taskList.UpdatedAt = response.Result.UpdatedAt;
+                    result = await _dataService.TaskListService.UpdateAsync(taskList);
                 }
             }
 
@@ -518,7 +497,7 @@ namespace MiraiNotes.UWP.Services
                 Status = task.Status,
                 Title = task.Title,
                 ToBeCompletedOn = task.ToBeCompletedOn,
-                UpdatedAt = task.UpdatedAt
+                UpdatedAt = task.UpdatedAt                
             };
 
             var response = await _apiService
@@ -536,7 +515,7 @@ namespace MiraiNotes.UWP.Services
                 task.ToBeSynced = false;
                 task.GoogleTaskID = response.Result.TaskID;
                 task.UpdatedAt = response.Result.UpdatedAt;
-                _dataService.TaskService.Update(task);
+                result = await _dataService.TaskService.UpdateAsync(task);
             }
             else
                 result.Message = response.Errors?.ApiError?.Message ??
@@ -557,7 +536,7 @@ namespace MiraiNotes.UWP.Services
             };
 
             if (response.Succeed)
-                _dataService.TaskService.Remove(task);
+                result = await _dataService.TaskService.RemoveAsync(task);
             else
                 result.Message = response.Errors?.ApiError?.Message ??
                     $"An unkwon error occurred while trying to delete task {task.Title}";
@@ -602,7 +581,7 @@ namespace MiraiNotes.UWP.Services
                     {
                         task.LocalStatus = LocalStatus.DEFAULT;
                         task.ToBeSynced = false;
-                        _dataService.TaskService.Update(task);
+                        result = await _dataService.TaskService.UpdateAsync(task);
                     }
                     else
                         result.Message = response.Errors?.ApiError?.Message ??
@@ -619,7 +598,7 @@ namespace MiraiNotes.UWP.Services
                     task.UpdatedAt = response.Result.UpdatedAt;
                     task.LocalStatus = LocalStatus.DEFAULT;
                     task.ToBeSynced = false;
-                    _dataService.TaskService.Update(task);
+                    result = await _dataService.TaskService.UpdateAsync(task);
                 }
             }
 
