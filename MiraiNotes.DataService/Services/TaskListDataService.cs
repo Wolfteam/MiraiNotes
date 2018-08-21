@@ -24,8 +24,19 @@ namespace MiraiNotes.DataService.Services
             {
                 try
                 {
-                    await context.AddAsync(entity);
-                    result.Succeed = await context.SaveChangesAsync() > 0;
+                    var currentUser = await context.Users
+                       .FirstOrDefaultAsync(u => u.IsActive);
+
+                    if (currentUser == null)
+                    {
+                        result.Message = "Couldn't find the current active user in the db";
+                    }
+                    else
+                    {
+                        entity.User = currentUser;
+                        await context.AddAsync(entity);
+                        result.Succeed = await context.SaveChangesAsync() > 0;
+                    }
                 }
                 catch (Exception e)
                 {
