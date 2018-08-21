@@ -140,6 +140,7 @@
     <Compile Include="Models\MessageType.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
+    <Compile Include="Utils\SmartObservableCollection.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\TaskListItemViewModel.cs" />
     <Compile Include="ViewModels\TaskItemViewModel.cs" />
