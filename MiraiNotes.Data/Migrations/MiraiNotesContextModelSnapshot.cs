@@ -43,7 +43,7 @@ namespace MiraiNotes.Data.Migrations
                     b.Property<string>("Status")
                         .IsRequired();
 
-                    b.Property<int?>("TaskListID");
+                    b.Property<int>("TaskListID");
 
                     b.Property<string>("Title")
                         .IsRequired();
@@ -83,7 +83,7 @@ namespace MiraiNotes.Data.Migrations
 
                     b.Property<DateTime>("UpdatedAt");
 
-                    b.Property<int?>("UserID");
+                    b.Property<int>("UserID");
 
                     b.HasKey("ID");
 
@@ -125,14 +125,16 @@ namespace MiraiNotes.Data.Migrations
                 {
                     b.HasOne("MiraiNotes.Data.Models.GoogleTaskList", "TaskList")
                         .WithMany("Tasks")
-                        .HasForeignKey("TaskListID");
+                        .HasForeignKey("TaskListID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MiraiNotes.Data.Models.GoogleTaskList", b =>
                 {
                     b.HasOne("MiraiNotes.Data.Models.GoogleUser", "User")
                         .WithMany("TaskLists")
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

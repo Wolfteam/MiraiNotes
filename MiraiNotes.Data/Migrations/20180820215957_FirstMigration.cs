@@ -36,7 +36,7 @@ namespace MiraiNotes.Data.Migrations
                     UpdatedAt = table.Column<DateTime>(nullable: false),
                     LocalStatus = table.Column<int>(nullable: false),
                     ToBeSynced = table.Column<bool>(nullable: false),
-                    UserID = table.Column<int>(nullable: true)
+                    UserID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,7 +46,7 @@ namespace MiraiNotes.Data.Migrations
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,7 +69,7 @@ namespace MiraiNotes.Data.Migrations
                     IsHidden = table.Column<bool>(nullable: false),
                     LocalStatus = table.Column<int>(nullable: false),
                     ToBeSynced = table.Column<bool>(nullable: false),
-                    TaskListID = table.Column<int>(nullable: true)
+                    TaskListID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,8 +79,14 @@ namespace MiraiNotes.Data.Migrations
                         column: x => x.TaskListID,
                         principalTable: "TaskLists",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskLists_GoogleTaskListID",
+                table: "TaskLists",
+                column: "GoogleTaskListID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaskLists_UserID",
@@ -88,9 +94,21 @@ namespace MiraiNotes.Data.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tasks_GoogleTaskID",
+                table: "Tasks",
+                column: "GoogleTaskID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tasks_TaskListID",
                 table: "Tasks",
                 column: "TaskListID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_GoogleUserID",
+                table: "Users",
+                column: "GoogleUserID",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -28,6 +28,7 @@ namespace MiraiNotes.Data.Models
 
         public virtual IEnumerable<GoogleTask> Tasks { get; set; }
 
+        [Required]
         public virtual GoogleUser User { get; set; }
     }
 }

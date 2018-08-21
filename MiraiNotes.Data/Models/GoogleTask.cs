@@ -43,6 +43,7 @@ namespace MiraiNotes.Data.Models
 
         public bool ToBeSynced { get; set; }
 
+        [Required]
         public virtual GoogleTaskList TaskList { get; set; }
     }
 }
