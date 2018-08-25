@@ -17,12 +17,6 @@
     DataContext="{Binding Home, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
-    <Page.Resources>
-        <converters:AutoSuggestQueryParameterConverter x:Key="AutoSuggestQueryParameterConverter" />
-        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <converters:NavigationViewSelectionChangedEventArgsConverter x:Key="NavigationViewSelectionChangedEventArgsConverter" />
-    </Page.Resources>
-
     <NavigationView
         x:Name="NavigationView"
         AlwaysShowHeader="True"

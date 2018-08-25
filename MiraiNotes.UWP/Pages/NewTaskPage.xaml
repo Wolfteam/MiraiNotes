@@ -15,13 +15,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <converters:BooleanToVisibilityConverter
-            x:Key="BoolToVisibilityConverterInverse"
-            OnFalse="Visible"
-            OnTrue="Collapsed" />
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-
         <Style x:Key="ValidationErrorLabelStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Red" />
             <Setter Property="FontSize" Value="12" />
@@ -173,15 +166,7 @@
                                 VerticalAlignment="Center"
                                 FontStyle="Italic"
                                 Text="{Binding Title}"
-                                TextDecorations="None"
-                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
-                            <TextBlock
-                                Grid.Column="0"
-                                VerticalAlignment="Center"
-                                FontStyle="Italic"
-                                Text="{Binding Title}"
-                                TextDecorations="Strikethrough"
-                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                TextDecorations="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverterInverse}}" />
                             <CommandBar
                                 Grid.Column="1"
                                 Background="Transparent"

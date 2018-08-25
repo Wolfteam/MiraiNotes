@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Extensions="using:WinRTXamlToolkit.Controls.Extensions"
-    xmlns:converters="using:MiraiNotes.UWP.Converters"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
@@ -17,17 +16,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converters:AutoSuggestQueryParameterConverter x:Key="AutoSuggestQueryParameterConverter" />
-        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <converters:BooleanToVisibilityConverter
-            x:Key="BoolToVisibilityConverterInverse"
-            OnFalse="Visible"
-            OnTrue="Collapsed" />
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />
-
-        <converters:StringDelimiterConverter x:Key="StringDelimiterConverter" />
-
         <Style x:Key="TaskListViewItemStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -149,13 +137,7 @@
                                                 VerticalAlignment="Center"
                                                 FontSize="16"
                                                 Text="{Binding Title, Mode=OneWay}"
-                                                TextDecorations="None"
-                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
-                                            <TextBlock
-                                                FontSize="16"
-                                                Text="{Binding Title, Mode=OneWay}"
-                                                TextDecorations="Strikethrough"
-                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                TextDecorations="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverter}}" />
                                             <FontIcon
                                                 Margin="5,0,0,0"
                                                 FontFamily="Segoe MDL2 Assets"
@@ -290,15 +272,7 @@
                                                 FontSize="14"
                                                 FontStyle="Italic"
                                                 Text="{Binding Title}"
-                                                TextDecorations="None"
-                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                FontSize="14"
-                                                FontStyle="Italic"
-                                                Text="{Binding Title}"
-                                                TextDecorations="Strikethrough"
-                                                Visibility="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                TextDecorations="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverterInverse}}" />
                                         </StackPanel>
 
                                         <CommandBar
@@ -359,7 +333,9 @@
             ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
             PlaceholderText="Search a task..."
             QueryIcon="Find"
-            TextMemberPath="Text">
+            Text="{Binding TaskAutoSuggestBoxText, Mode=TwoWay}"
+            TextMemberPath="Text"
+            UpdateTextOnSelect="False">
             <interactivity:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="TextChanged">
                     <core:EventTriggerBehavior.Actions>
