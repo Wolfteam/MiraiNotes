@@ -1,22 +1,14 @@
-﻿using GalaSoft.MvvmLight.Threading;
+﻿using CommonServiceLocator;
+using Microsoft.Toolkit.Uwp.Helpers;
+using MiraiNotes.UWP.BackgroundTasks;
+using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Pages;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.ApplicationModel.Background;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace MiraiNotes.UWP
@@ -87,7 +79,8 @@ namespace MiraiNotes.UWP
                 // Ensure the current window is active
                 Window.Current.Activate();
 
-                DispatcherHelper.Initialize();
+                RegisterBackgroundTasks();
+                GalaSoft.MvvmLight.Threading.DispatcherHelper.Initialize();
             }
         }
 
@@ -112,6 +105,43 @@ namespace MiraiNotes.UWP
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
+            deferral.Complete();
+        }
+
+        private void RegisterBackgroundTasks()
+        {
+            if (BackgroundTaskHelper.IsBackgroundTaskRegistered(typeof(SyncBackgroundTask)))
+            {
+                // Background task already registered.
+                return;
+            }
+
+            //TODO: CHANGE THE DEFAULT TIME THAT THE BGTask WILL GET EXECUTED
+            BackgroundTaskHelper.Register(
+                nameof(SyncBackgroundTask),
+                new TimeTrigger(15,false),
+                false,
+                true,
+                new SystemCondition(SystemConditionType.FreeNetworkAvailable),
+                new SystemCondition(SystemConditionType.InternetAvailable),
+                new SystemCondition(SystemConditionType.UserNotPresent));
+        }
+
+        // Event fired when a Background Task is activated (in Single Process Model)
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+
+            var deferral = args.TaskInstance.GetDeferral();
+
+            var syncService = ServiceLocator.Current.GetInstance<ISyncService>();
+            switch (args.TaskInstance.Task.Name)
+            {
+                case nameof(SyncBackgroundTask):
+                    new SyncBackgroundTask(syncService).Run(args.TaskInstance);
+                    break;
+            }
+
             deferral.Complete();
         }
     }
