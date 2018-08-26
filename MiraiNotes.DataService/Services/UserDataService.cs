@@ -12,448 +12,570 @@ using MiraiNotes.Shared.Models;
 namespace MiraiNotes.DataService.Services
 {
     public class UserDataService : IUserDataService
-    {   
-        public async Task<GoogleUser> GetCurrentActiveUserAsync()
+    {
+        public async Task<Response<GoogleUser>> GetCurrentActiveUserAsync()
         {
-            var currentUser = await GetAsync(u => u.IsActive, null, string.Empty);
-            if (currentUser.Count() > 1)
+            return await Task.Run(async () =>
             {
-                throw new ApplicationException($"We cant have more than 1 active user. Current active users = {currentUser.Count()}");
-            }
-            var user = currentUser.FirstOrDefault();
-            return user;
+                var response = new Response<GoogleUser>
+                {
+                    Succeed = false,
+                    Message = string.Empty
+                };
+
+                var currentUserResponse = await GetAsync(u => u.IsActive, null, string.Empty);
+                if (!currentUserResponse.Succeed)
+                    response.Message = currentUserResponse.Message;
+                else if (currentUserResponse.Result.Count() > 1)
+                    response.Message = $"We cant have more than 1 active user. Current active users = {currentUserResponse.Result.Count()}";
+                else
+                {
+                    response.Result = currentUserResponse.Result.FirstOrDefault();
+                    response.Succeed = true;
+                }
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task ChangeCurrentUserStatus(bool isActive)
+        public async Task<EmptyResponse> ChangeCurrentUserStatus(bool isActive)
         {
-            var currentUser = await GetCurrentActiveUserAsync();
-            if (currentUser == null)
-                throw new NullReferenceException("The current active user couldnt be found on db");
-            currentUser.IsActive = isActive;
-//todo retun something here
-            await UpdateAsync(currentUser);
+            return await Task.Run(async () =>
+            {
+                var response = new EmptyResponse
+                {
+                    Succeed = false,
+                    Message = string.Empty
+                };
+
+                var currentUserResponse = await GetCurrentActiveUserAsync();
+                if (!currentUserResponse.Succeed)
+                    return currentUserResponse;
+
+                currentUserResponse.Result.IsActive = isActive;
+                return await UpdateAsync(currentUserResponse.Result);
+            }).ConfigureAwait(false);
         }
 
-        public async Task<Result> AddAsync(GoogleUser entity)
+        public async Task<Response<GoogleUser>> AddAsync(GoogleUser entity)
         {
-            var result = new Result
+            return await Task.Run(async () =>
             {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
+                var response = new Response<GoogleUser>
                 {
-                    await context.AddAsync(entity);
-                    result.Succeed = await context.SaveChangesAsync() > 0;
-                }
-                catch (Exception e)
-                {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
-                }
-            }
-            return result;
-        }
-
-        public async Task<Result> AddRangeAsync(IEnumerable<GoogleUser> entities)
-        {
-            var result = new Result
-            {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    await context.AddRangeAsync(entities);
-                    result.Succeed = await context.SaveChangesAsync() > 0;
-                }
-                catch (Exception e)
-                {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
-                }
-            }
-            return result;
-        }
-
-        public async Task<bool> ExistsAsync(Expression<Func<GoogleUser, bool>> predicate)
-        {
-            bool result = false;
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    result = await context.Users
-                        .AsNoTracking()
-                        .Where(predicate)
-                        .CountAsync() == 1;
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
-                }
-            }
-            return result;
-        }
-
-        public async Task<GoogleUser> FirstOrDefaultAsync(Expression<Func<GoogleUser, bool>> predicate)
-        {
-            try
-            {
+                    Message = string.Empty,
+                    Succeed = false
+                };
                 using (var context = new MiraiNotesContext())
                 {
-                    return await context
-                        .Users
-                        .FirstOrDefaultAsync(predicate);
+                    try
+                    {
+                        await context.AddAsync(entity);
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Result = entity;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<GoogleUser> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> predicate)
+        public async Task<Response<IEnumerable<GoogleUser>>> AddRangeAsync(IEnumerable<GoogleUser> entities)
         {
-            try
+            return await Task.Run(async () =>
             {
+                var response = new Response<IEnumerable<GoogleUser>>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
                 using (var context = new MiraiNotesContext())
                 {
-                    return await context
-                        .Users
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(predicate);
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public async Task<IEnumerable<GoogleUser>> GetAllAsNoTrackingAsync()
-        {
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    return await context
-                        .Users
-                        .AsNoTracking()
-                        .ToListAsync();
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<GoogleUser>();
-                }
-            }
-        }
-
-        public async Task<IEnumerable<GoogleUser>> GetAllAsync()
-        {
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    return await context
-                        .Users
-                        .ToListAsync();
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<GoogleUser>();
-                }
-            }
-        }
-
-        public async Task<IEnumerable<GoogleUser>> GetAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
-        {
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    IQueryable<GoogleUser> query = context.Users;
-                    if (filter != null)
+                    try
                     {
-                        query = query.Where(filter);
+                        await context.AddRangeAsync(entities);
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Result = entities;
                     }
-
-                    foreach (var includeProperty in includeProperties.Split
-                        (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    catch (Exception e)
                     {
-                        query = query.Include(includeProperty.Trim());
+                        response.Message = GetExceptionMessage(e);
                     }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
 
-                    if (orderBy != null)
+        public async Task<Response<bool>> ExistsAsync(Expression<Func<GoogleUser, bool>> predicate)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<bool>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
                     {
-                        return await orderBy(query)
+                        response.Result = await context.Users
+                            .AsNoTracking()
+                            .Where(predicate)
+                            .CountAsync() == 1;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<GoogleUser>> FirstOrDefaultAsync(Expression<Func<GoogleUser, bool>> predicate)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<GoogleUser>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        response.Result = await context
+                            .Users
+                            .FirstOrDefaultAsync(predicate);
+                        response.Succeed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<GoogleUser>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> predicate)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<GoogleUser>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        response.Result = await context
+                            .Users
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(predicate);
+                        response.Succeed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<IEnumerable<GoogleUser>>> GetAllAsNoTrackingAsync()
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<IEnumerable<GoogleUser>>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        response.Result =  await context
+                            .Users
                             .AsNoTracking()
                             .ToListAsync();
+                        response.Succeed = true;
                     }
-                    else
+                    catch (Exception e)
                     {
-                        return await query
-                            .AsNoTracking()
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<IEnumerable<GoogleUser>>> GetAllAsync()
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<IEnumerable<GoogleUser>>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        response.Result = await context
+                            .Users
                             .ToListAsync();
+                        response.Succeed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
                     }
                 }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<GoogleUser>();
-                }
-            }
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<GoogleUser>> GetAsync(Expression<Func<GoogleUser, bool>> predicate)
+        public async Task<Response<IEnumerable<GoogleUser>>> GetAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
         {
-            using (var context = new MiraiNotesContext())
+            return await Task.Run(async () =>
             {
-                try
+                var response = new Response<IEnumerable<GoogleUser>>
                 {
-                    return await context
-                        .Users
-                        .Where(predicate)
-                        .ToListAsync();
-                }
-                catch (Exception)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
                 {
-                    return Enumerable.Empty<GoogleUser>();
+                    try
+                    {
+                        IQueryable<GoogleUser> query = context.Users;
+                        if (filter != null)
+                        {
+                            query = query.Where(filter);
+                        }
+
+                        foreach (var includeProperty in includeProperties.Split
+                            (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            query = query.Include(includeProperty.Trim());
+                        }
+
+                        if (orderBy != null)
+                        {
+                            response.Result = await orderBy(query)
+                                .AsNoTracking()
+                                .ToListAsync();
+                        }
+                        else
+                        {
+                            response.Result = await query
+                                .AsNoTracking()
+                                .ToListAsync();
+                        }
+                        response.Succeed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
                 }
-            }
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<GoogleUser> GetAsync(Expression<Func<GoogleUser, bool>> filter, string includeProperties = "")
+        public async Task<Response<IEnumerable<GoogleUser>>> GetAsync(Expression<Func<GoogleUser, bool>> predicate)
         {
-            using (var context = new MiraiNotesContext())
+            return await Task.Run(async () =>
             {
-                try
+                var response = new Response<IEnumerable<GoogleUser>>
                 {
-                    IQueryable<GoogleUser> query = context.Users;
-                    if (filter != null)
-                    {
-                        query = query.Where(filter);
-                    }
-
-                    foreach (var includeProperty in includeProperties.Split
-                        (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        query = query.Include(includeProperty.Trim());
-                    }
-
-                    return await query
-                        .FirstOrDefaultAsync();
-
-                }
-                catch (Exception)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
                 {
-                    return null;
+                    try
+                    {
+                        response.Result = await context
+                            .Users
+                            .Where(predicate)
+                            .ToListAsync();
+                        response.Succeed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
                 }
-            }
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<GoogleUser>> GetAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
+        public async Task<Response<GoogleUser>> GetAsync(Expression<Func<GoogleUser, bool>> filter, string includeProperties = "")
         {
-            using (var context = new MiraiNotesContext())
+            return await Task.Run(async () =>
             {
-                try
+                var response = new Response<GoogleUser>
                 {
-                    IQueryable<GoogleUser> query = context.Users;
-                    if (filter != null)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
                     {
-                        query = query.Where(filter);
-                    }
+                        IQueryable<GoogleUser> query = context.Users;
+                        if (filter != null)
+                        {
+                            query = query.Where(filter);
+                        }
 
-                    foreach (var includeProperty in includeProperties.Split
-                        (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        query = query.Include(includeProperty.Trim());
-                    }
+                        foreach (var includeProperty in includeProperties.Split
+                            (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            query = query.Include(includeProperty.Trim());
+                        }
 
-                    if (orderBy != null)
-                    {
-                        return await orderBy(query).ToListAsync();
+                        response.Result = await query.FirstOrDefaultAsync();
+                        response.Succeed = true;
                     }
-                    else
+                    catch (Exception e)
                     {
-                        return await query.ToListAsync();
+                        response.Message = GetExceptionMessage(e);
                     }
                 }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<GoogleUser>();
-                }
-            }
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<GoogleUser> GetByIdAsync(object id)
+        public async Task<Response<IEnumerable<GoogleUser>>> GetAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
         {
-            using (var context = new MiraiNotesContext())
+            return await Task.Run(async () =>
             {
-                try
+                var response = new Response<IEnumerable<GoogleUser>>
                 {
-                    return await context
-                        .Users
-                        .FindAsync(id);
-                }
-                catch (Exception)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
                 {
-                    return null;
-                }
-            }
-        }
-
-        public async Task<Result> RemoveAsync(GoogleUser entity)
-        {
-            var result = new Result
-            {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    context.Remove(entity);
-                    result.Succeed = await context.SaveChangesAsync() > 0;
-                }
-                catch (Exception e)
-                {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
-                }
-            }
-            return result;
-        }
-
-        public async Task<Result> RemoveAsync(object id)
-        {
-            var result = new Result
-            {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
-                {
-                    var entity = await GetByIdAsync(id);
-                    if (entity == null)
+                    try
                     {
-                        result.Message = "Entity couldn't be removed cause it wasnt found";
+                        IQueryable<GoogleUser> query = context.Users;
+                        if (filter != null)
+                        {
+                            query = query.Where(filter);
+                        }
+
+                        foreach (var includeProperty in includeProperties.Split
+                            (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            query = query.Include(includeProperty.Trim());
+                        }
+
+                        if (orderBy != null)
+                        {
+                            response.Result = await orderBy(query).ToListAsync();
+                        }
+                        else
+                        {
+                            response.Result = await query.ToListAsync();
+                        }
+                        response.Succeed = true;
                     }
-                    else
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<GoogleUser>> GetByIdAsync(object id)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<GoogleUser>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        response.Result = await context
+                            .Users
+                            .FindAsync(id);
+                        response.Succeed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<EmptyResponse> RemoveAsync(GoogleUser entity)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new EmptyResponse
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
                     {
                         context.Remove(entity);
-                        result.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
                     }
                 }
-                catch (Exception e)
-                {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
-                }
-            }
-            return result;
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<Result> RemoveAsync(Expression<Func<GoogleUser, bool>> filter = null)
+        public async Task<EmptyResponse> RemoveAsync(object id)
         {
-            var result = new Result
+            return await Task.Run(async () =>
             {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
+                var response = new EmptyResponse
                 {
-                    var entities = await GetAsync(filter);
-                    context.RemoveRange(entities);
-                    result.Succeed = await context.SaveChangesAsync() > 0;
-                }
-                catch (Exception e)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
                 {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
+                    try
+                    {
+                        var entity = await GetByIdAsync(id);
+                        if (entity == null)
+                            response.Message = "Entity couldn't be removed cause it wasnt found";
+                        else
+                        {
+                            context.Remove(entity);
+                            response.Succeed = await context.SaveChangesAsync() > 0;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
                 }
-            }
-            return result;
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<Result> RemoveRangeAsync(IEnumerable<GoogleUser> entities)
+        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleUser, bool>> filter = null)
         {
-            var result = new Result
+            return await Task.Run(async () =>
             {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
+                var response = new EmptyResponse
                 {
-                    context.RemoveRange(entities);
-                    result.Succeed = await context.SaveChangesAsync() > 0;
-                }
-                catch (Exception e)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
                 {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
+                    try
+                    {
+                        var entities = await GetAsync(filter);
+                        context.RemoveRange(entities);
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
                 }
-            }
-            return result;
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public async Task<Result> UpdateAsync(GoogleUser entity)
+        public async Task<EmptyResponse> RemoveRangeAsync(IEnumerable<GoogleUser> entities)
         {
-            var result = new Result
+            return await Task.Run(async () =>
             {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
+                var response = new EmptyResponse
                 {
-                    context.Entry(entity).State = EntityState.Modified;
-                    result.Succeed = await context.SaveChangesAsync() > 0;
-                }
-                catch (Exception e)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
                 {
-                    string inner = e.InnerException?.Message;
-                    if (!string.IsNullOrEmpty(inner))
-                        result.Message = $"{e.Message}. Inner Exception: {inner}";
-                    else
-                        result.Message = $"{e.Message}. StackTrace: {e.StackTrace}";
+                    try
+                    {
+                        context.RemoveRange(entities);
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
                 }
-            }
-            return result;
+                return response;
+            }).ConfigureAwait(false);
         }
 
-        public Task<Result> UpdateRangeAsync(IEnumerable<GoogleUser> entities)
+        public async Task<Response<GoogleUser>> UpdateAsync(GoogleUser entity)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new Response<GoogleUser>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        context.Entry(entity).State = EntityState.Modified;
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Result = entity;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public Task<Response<IEnumerable<GoogleUser>>> UpdateRangeAsync(IEnumerable<GoogleUser> entities)
         {
             throw new NotImplementedException();
+        }
+
+        private string GetExceptionMessage(Exception e)
+        {
+            string result = string.Empty;
+            string inner = e.InnerException?.Message;
+            if (!string.IsNullOrEmpty(inner))
+                result = $"{e.Message}. Inner Exception: {inner}";
+            else
+                result = $"{e.Message}. StackTrace: {e.StackTrace}";
+            return result;
         }
     }
 }

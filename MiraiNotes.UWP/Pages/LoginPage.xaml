@@ -33,14 +33,16 @@
         <TextBlock
             FontSize="20"
             Text="Please click the button below to sign in with your google account..."
-            TextAlignment="Center" />
+            TextAlignment="Center"
+            Visibility="{Binding ShowLoginButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         <Button
             Width="300"
             Height="80"
             HorizontalAlignment="Center"
             Background="Transparent"
             BorderThickness="0"
-            Command="{Binding LoginCommand}">
+            Command="{Binding LoginCommand}"
+            Visibility="{Binding ShowLoginButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <Image Source="/Assets/btn_google_sign-in.png" Stretch="UniformToFill" />
         </Button>
 

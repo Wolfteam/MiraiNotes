@@ -88,6 +88,7 @@ namespace MiraiNotes.UWP.ViewModels
                 SimpleIoc.Default.Register<IGoogleTaskService, GoogleTaskService>();
             }
             SimpleIoc.Default.Register<IMessenger, Messenger>();
+            SimpleIoc.Default.Register<IDispatcherHelper, DispatcherHelperEx>();
             SimpleIoc.Default.Register<ICustomDialogService, CustomDialogService>();
             SimpleIoc.Default.Register<INavigationService>(() => navigation);
             SimpleIoc.Default.Register<IUserCredentialService, UserCredentialService>();

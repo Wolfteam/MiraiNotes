@@ -30,15 +30,15 @@ namespace MiraiNotes.UWP.Services
             _mapper = mapper;
         }
 
-        public async Task<Result> SyncDownTaskListsAsync(bool isInBackground)
+        public async Task<EmptyResponse> SyncDownTaskListsAsync(bool isInBackground)
         {
-            var syncResult = new Result
+            var syncResult = new EmptyResponse
             {
                 Message = string.Empty,
                 Succeed = false
             };
 
-            var syncDownResults = new List<Result>();
+            var syncDownResults = new List<EmptyResponse>();
 
             var response = await _apiService
                 .TaskListService
@@ -55,9 +55,14 @@ namespace MiraiNotes.UWP.Services
                 .Items
                 .ToList();
 
-            var currentTaskLists = await _dataService
+            var dbResponse = await _dataService
                 .TaskListService
                 .GetAllAsNoTrackingAsync();
+
+            if (!dbResponse.Succeed)
+            {
+                return dbResponse;
+            }
 
             var tasks = new List<Task>
             {
@@ -65,7 +70,7 @@ namespace MiraiNotes.UWP.Services
                 Task.Run(async () =>
                 {
                     var taskListsToSave = downloadedTaskLists
-                        .Where(dt => !currentTaskLists
+                        .Where(dt => !dbResponse.Result
                             .Any(ct => ct.GoogleTaskListID == dt.TaskListID))
                         .Select(t => new GoogleTaskList
                         {
@@ -77,30 +82,35 @@ namespace MiraiNotes.UWP.Services
                     if (taskListsToSave.Count() == 0)
                         return;
 
-                    syncDownResults.Add(await _dataService
+                    var r = await _dataService
                         .TaskListService
-                        .AddRangeAsync(taskListsToSave));
+                        .AddRangeAsync(taskListsToSave);
+                    if (r.Succeed)
+                        syncDownResults.Add(r);
                 }),
 
                 //Here we delete any task that is not in remote
                 Task.Run(async() =>
                 {
-                    var deletedTaskLists = currentTaskLists
+                    var deletedTaskLists = dbResponse.Result
                         .Where(ct => !downloadedTaskLists
                             .Any(dt => dt.TaskListID == ct.GoogleTaskListID));
 
                     if (deletedTaskLists.Count() == 0)
                         return;
 
-                    syncDownResults.Add(await _dataService
+                    var r = await _dataService
                         .TaskListService
-                        .RemoveRangeAsync(deletedTaskLists));
+                        .RemoveRangeAsync(deletedTaskLists);
+
+                    if (r.Succeed)
+                        syncDownResults.Add(r);
                 }),
 
                 //Here we update the local tasklists
                 Task.Run(async () =>
                 {
-                    foreach (var taskList in currentTaskLists)
+                    foreach (var taskList in dbResponse.Result)
                     {
                         var t = downloadedTaskLists
                             .FirstOrDefault(dt => dt.TaskListID == taskList.GoogleTaskListID);
@@ -112,9 +122,12 @@ namespace MiraiNotes.UWP.Services
                         {
                             taskList.Title = t.Title;
                             taskList.UpdatedAt = t.UpdatedAt;
-                            syncDownResults.Add(await _dataService
+                            var r = await _dataService
                                 .TaskListService
-                                .UpdateAsync(taskList));
+                                .UpdateAsync(taskList);
+
+                            if (r.Succeed)
+                                syncDownResults.Add(r);
                         }
                     }
                 })
@@ -130,21 +143,21 @@ namespace MiraiNotes.UWP.Services
             return syncResult;
         }
 
-        public async Task<Result> SyncDownTasksAsync(bool isInBackground)
+        public async Task<EmptyResponse> SyncDownTasksAsync(bool isInBackground)
         {
-            var syncResult = new Result
+            var syncResult = new EmptyResponse
             {
                 Message = string.Empty,
                 Succeed = true
             };
 
-            var syncDownResults = new List<Result>();
+            var syncDownResults = new List<EmptyResponse>();
 
-            var taskLists = await _dataService
+            var dbResponse = await _dataService
                 .TaskListService
                 .GetAllAsNoTrackingAsync();
 
-            foreach (var taskList in taskLists)
+            foreach (var taskList in dbResponse.Result)
             {
                 var response = await _apiService
                     .TaskService
@@ -160,10 +173,14 @@ namespace MiraiNotes.UWP.Services
                 var downloadedTasks = response.Result.Items;
 
                 //I think i dont need to include the tasklist property
-                var currentTasks = (await _dataService
+                var currentTasksDbResponse = (await _dataService
                    .TaskService
-                   .GetAsync(t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID, null, string.Empty))
-                   .ToList();
+                   .GetAsync(t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID, null, string.Empty));
+
+                if (!currentTasksDbResponse.Succeed)
+                {
+                    return currentTasksDbResponse;
+                }
 
                 var tasks = new List<Task>
                 {
@@ -171,7 +188,7 @@ namespace MiraiNotes.UWP.Services
                     Task.Run(async() =>
                     {
                         var tasksToSave = downloadedTasks
-                            .Where(dt => !currentTasks
+                            .Where(dt => !currentTasksDbResponse.Result
                                 .Any(ct => ct.GoogleTaskID == dt.TaskID))
                             .Select(t => new GoogleTask
                             {
@@ -200,7 +217,7 @@ namespace MiraiNotes.UWP.Services
                     //Here we delete any task that is not in remote
                     Task.Run(async() =>
                     {
-                        var deletedTasks = currentTasks
+                        var deletedTasks = currentTasksDbResponse.Result
                             .Where(ct => !downloadedTasks
                                 .Any(dt => dt.TaskID == ct.GoogleTaskID));
 
@@ -215,7 +232,7 @@ namespace MiraiNotes.UWP.Services
                     //Here we update the local tasks
                     Task.Run(async() =>
                     {
-                        foreach (var task in currentTasks)
+                        foreach (var task in currentTasksDbResponse.Result)
                         {
                             var downloadedTask = downloadedTasks
                                 .FirstOrDefault(dt => dt.TaskID == task.GoogleTaskID);
@@ -248,28 +265,33 @@ namespace MiraiNotes.UWP.Services
             return syncResult;
         }
 
-        public async Task<Result> SyncUpTaskListsAsync(bool isInBackground)
+        public async Task<EmptyResponse> SyncUpTaskListsAsync(bool isInBackground)
         {
-            var syncUpResult = new Result
+            var syncUpResult = new EmptyResponse
             {
-                Succeed = false
+                Succeed = false,
+                Message = string.Empty
             };
-            var syncUpResults = new List<Result>();
+            var syncUpResults = new List<EmptyResponse>();
 
-            var taskListToSync = await _dataService
+            var taskListToSyncDbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(
                     taskList => taskList.ToBeSynced,
                     taskList => taskList.OrderBy(tl => tl.UpdatedAt),
                     string.Empty);
 
+            if (!taskListToSyncDbResponse.Succeed)
+            {
+                return taskListToSyncDbResponse;
+            }
 
             var tasks = new List<Task>
             {
                 //Here we take the taskLists that were created
                 Task.Run(async() =>
                 {
-                    var createdTaskLists = taskListToSync
+                    var createdTaskLists = taskListToSyncDbResponse.Result
                         .Where(tl => tl.LocalStatus == LocalStatus.CREATED);
 
                     if (createdTaskLists.Count() == 0)
@@ -282,7 +304,7 @@ namespace MiraiNotes.UWP.Services
                 //Here we take the tasklists that were deleted
                 Task.Run(async() =>
                 {
-                    var deletedTaskLists = taskListToSync
+                    var deletedTaskLists = taskListToSyncDbResponse.Result
                         .Where(tl => tl.LocalStatus == LocalStatus.DELETED);
 
                     if (deletedTaskLists.Count() == 0)
@@ -295,7 +317,7 @@ namespace MiraiNotes.UWP.Services
                 //Here we take the taskLists that were updated
                 Task.Run(async() =>
                 {
-                    var updatedTaskLists = taskListToSync
+                    var updatedTaskLists = taskListToSyncDbResponse.Result
                         .Where(tl => tl.LocalStatus == LocalStatus.UPDATED);
 
                     if (updatedTaskLists.Count() == 0)
@@ -319,29 +341,32 @@ namespace MiraiNotes.UWP.Services
             return syncUpResult;
         }
 
-        public async Task<Result> SyncUpTasksAsync(bool isInBackground)
+        public async Task<EmptyResponse> SyncUpTasksAsync(bool isInBackground)
         {
-            var syncUpResult = new Result
+            var syncUpResult = new EmptyResponse
             {
                 Message = string.Empty,
                 Succeed = true
             };
 
-            var syncUpResults = new List<Result>();
+            var syncUpResults = new List<EmptyResponse>();
 
-            var tasksToBeSynced = await _dataService
+            var tasksToBeSyncedDbResponse = await _dataService
                 .TaskService
                 .GetAsNoTrackingAsync(
                     task => task.ToBeSynced,
                     task => task.OrderBy(t => t.UpdatedAt),
                     nameof(GoogleTask.TaskList));
 
+            if (!tasksToBeSyncedDbResponse.Succeed)
+                return tasksToBeSyncedDbResponse;
+
             var tasks = new List<Task>
             {
                 //Here we save the tasks that were created locally
                 Task.Run(async() =>
                 {
-                    var tasksToCreate = tasksToBeSynced
+                    var tasksToCreate = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.CREATED);
 
                     if (tasksToCreate.Count() == 0)
@@ -354,7 +379,7 @@ namespace MiraiNotes.UWP.Services
                 //Here we save the tasks that were deleted locally
                 Task.Run(async() =>
                 {
-                    var tasksToDelete = tasksToBeSynced
+                    var tasksToDelete = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.DELETED);
                     foreach (var task in tasksToDelete)
                         syncUpResults.Add(await DeleteUpTask(task));
@@ -363,7 +388,7 @@ namespace MiraiNotes.UWP.Services
                 //Here we update the tasks that were updated locally
                 Task.Run(async()=>
                 {
-                    var tasksToUpdate = tasksToBeSynced
+                    var tasksToUpdate = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.UPDATED);
 
                     foreach (var task in tasksToUpdate)
@@ -386,7 +411,7 @@ namespace MiraiNotes.UWP.Services
 
 
 
-        private async Task<Result> SaveUpTaskList(GoogleTaskList taskList)
+        private async Task<EmptyResponse> SaveUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService.TaskListService.SaveAsync(new GoogleTaskListModel
             {
@@ -394,7 +419,7 @@ namespace MiraiNotes.UWP.Services
                 UpdatedAt = taskList.UpdatedAt
             });
 
-            var result = new Result
+            var result = new EmptyResponse
             {
                 Succeed = response.Succeed
             };
@@ -415,13 +440,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<Result> DeleteUpTaskList(GoogleTaskList taskList)
+        private async Task<EmptyResponse> DeleteUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService
                 .TaskListService
                 .DeleteAsync(taskList.GoogleTaskListID);
 
-            var result = new Result
+            var result = new EmptyResponse
             {
                 Succeed = response.Succeed
             };
@@ -435,13 +460,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<Result> UpdateUpTaskList(GoogleTaskList taskList)
+        private async Task<EmptyResponse> UpdateUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService
                 .TaskListService
                 .GetAsync(taskList.GoogleTaskListID);
 
-            var result = new Result
+            var result = new EmptyResponse
             {
                 Succeed = response.Succeed
             };
@@ -489,7 +514,7 @@ namespace MiraiNotes.UWP.Services
 
 
 
-        private async Task<Result> SaveUpTask(GoogleTask task)
+        private async Task<EmptyResponse> SaveUpTask(GoogleTask task)
         {
             var t = new GoogleTaskModel
             {
@@ -497,14 +522,14 @@ namespace MiraiNotes.UWP.Services
                 Status = task.Status,
                 Title = task.Title,
                 ToBeCompletedOn = task.ToBeCompletedOn,
-                UpdatedAt = task.UpdatedAt                
+                UpdatedAt = task.UpdatedAt
             };
 
             var response = await _apiService
                 .TaskService
                 .SaveAsync(task.TaskList.GoogleTaskListID, t, task.ParentTask, task.Position);
 
-            var result = new Result
+            var result = new EmptyResponse
             {
                 Succeed = response.Succeed
             };
@@ -524,13 +549,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<Result> DeleteUpTask(GoogleTask task)
+        private async Task<EmptyResponse> DeleteUpTask(GoogleTask task)
         {
             var response = await _apiService
                 .TaskService
                 .DeleteAsync(task.TaskList.GoogleTaskListID, task.GoogleTaskID);
 
-            var result = new Result
+            var result = new EmptyResponse
             {
                 Succeed = response.Succeed
             };
@@ -544,13 +569,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<Result> UpdateUpTask(GoogleTask task)
+        private async Task<EmptyResponse> UpdateUpTask(GoogleTask task)
         {
             var response = await _apiService
                 .TaskService
                 .GetAsync(task.TaskList.GoogleTaskListID, task.GoogleTaskID);
 
-            var result = new Result
+            var result = new EmptyResponse
             {
                 Succeed = response.Succeed
             };

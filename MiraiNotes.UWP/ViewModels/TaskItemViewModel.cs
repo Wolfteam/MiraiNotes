@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.ObjectModel;
 using Template10.Validation;
@@ -14,6 +15,7 @@ namespace MiraiNotes.UWP.ViewModels
         private string _parentTask;
         private bool _hasSubTasks;
         private DateTime? _completedOn;
+        private ObservableCollection<TaskItemViewModel> _subTasks = new ObservableCollection<TaskItemViewModel>();
         #endregion
 
         public string TaskID
@@ -69,6 +71,8 @@ namespace MiraiNotes.UWP.ViewModels
                 RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
                 RaisePropertyChanged(nameof(CanBeMarkedAsIncompleted));
                 RaisePropertyChanged(nameof(IsCompleted));
+                //This is until uwp team fixes the text decoration not getting updated
+                RaisePropertyChanged(nameof(Title));
             }
         }
 
@@ -197,16 +201,15 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get
             {
-                var items = Read<ObservableCollection<TaskItemViewModel>>();
-                if (items?.Count > 0)
+                if (_subTasks?.Count > 0)
                     HasSubTasks = true;
                 else
                     HasSubTasks = false;
-                return items;
+                return _subTasks;
             }
             set
             {
-                Write(value);
+                _subTasks = value;
                 RaisePropertyChanged(nameof(SubTasks));
             }
         }

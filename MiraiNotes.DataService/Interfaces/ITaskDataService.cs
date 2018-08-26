@@ -12,16 +12,16 @@ namespace MiraiNotes.DataService.Interfaces
         /// </summary>
         /// <param name="taskListID">Id of the task list</param>
         /// <param name="task">The task to save</param>
-        /// <returns><see cref="Result"/></returns>
-        Task<Result> AddAsync(string taskListID, GoogleTask task);
+        /// <returns><see cref="Response"/></returns>
+        Task<Response<GoogleTask>> AddAsync(string taskListID, GoogleTask task);
 
         /// <summary>
         /// Adds multiple tasks to the specied task list in the db
         /// </summary>
         /// <param name="taskListID">Id of the task list</param>
         /// <param name="tasks">Task to save</param>
-        /// <returns><see cref="Result"/></returns>
-        Task<Result> AddRangeAsync(string taskListID, IEnumerable<GoogleTask> tasks);
+        /// <returns><see cref="Response"/></returns>
+        Task<Response<IEnumerable<GoogleTask>>> AddRangeAsync(string taskListID, IEnumerable<GoogleTask> tasks);
 
         /// <summary>
         /// Moves a task to the selected task list
@@ -29,7 +29,7 @@ namespace MiraiNotes.DataService.Interfaces
         /// <param name="selectedTaskListID">The selected task list where the task will be moved to</param>
         /// <param name="taskID">The id of the task to move</param>
         /// <param name="position">The position</param>
-        /// <returns><see cref="Result"/></returns>
-        //Task<Result> MoveAsync(string selectedTaskListID, string taskID, string position);
+        /// <returns><see cref="EmptyResponse"/></returns>
+        Task<Response<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string position);
     }
 }

@@ -7,7 +7,9 @@ using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,10 +27,11 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
+        private readonly IDispatcherHelper _dispatcher;
 
         private object _selectedItem;
-        private ObservableCollection<TaskListItemViewModel> _taskLists;
-        private ObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems;
+        private SmartObservableCollection<TaskListItemViewModel> _taskLists = new SmartObservableCollection<TaskListItemViewModel>();
+        private SmartObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems = new SmartObservableCollection<ItemModel>();
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -44,13 +47,13 @@ namespace MiraiNotes.UWP.ViewModels
             set { Set(ref _selectedItem, value); }
         }
 
-        public ObservableCollection<TaskListItemViewModel> TaskLists
+        public SmartObservableCollection<TaskListItemViewModel> TaskLists
         {
             get { return _taskLists; }
             set { Set(ref _taskLists, value); }
         }
 
-        public ObservableCollection<ItemModel> TaskListsAutoSuggestBoxItems
+        public SmartObservableCollection<ItemModel> TaskListsAutoSuggestBoxItems
         {
             get { return _taskListsAutoSuggestBoxItems; }
             set { Set(ref _taskListsAutoSuggestBoxItems, value); }
@@ -102,7 +105,8 @@ namespace MiraiNotes.UWP.ViewModels
             IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            INetworkService networkService)
+            INetworkService networkService,
+            IDispatcherHelper dispatcher)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -111,6 +115,7 @@ namespace MiraiNotes.UWP.ViewModels
             _mapper = mapper;
             _dataService = dataService;
             _networkService = networkService;
+            _dispatcher = dispatcher;
 
             RegisterMessages();
             SetCommands();
@@ -132,21 +137,21 @@ namespace MiraiNotes.UWP.ViewModels
                 (async () => await InitViewAsync());
 
             TaskListAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
-                ((text) => OnTaskListAutoSuggestBoxTextChangeAsync(text));
+                ((text) => OnTaskListAutoSuggestBoxTextChange(text));
 
             TaskListAutoSuggestBoxQuerySubmittedCommand = new RelayCommand<ItemModel>
-                ((selectedItem) => OnTaskListAutoSuggestBoxQuerySubmittedAsync(selectedItem));
+                ((selectedItem) => OnTaskListAutoSuggestBoxQuerySubmitted(selectedItem));
 
             NavigationViewSelectionChanged = new RelayCommand<object>
-                (async (selectedItem) => await OnNavigationViewSelectionChangeAsync(selectedItem));
+                ((selectedItem) => OnNavigationViewSelectionChangeAsync(selectedItem));
 
             UpdateTaskListCommand = new RelayCommand<TaskListItemViewModel>
-                (async (taskList) => await UpdateTaskListAsync(taskList));
+                ((taskList) => UpdateTaskListAsync(taskList));
 
             DeleteTaskListCommand = new RelayCommand<TaskListItemViewModel>
-                (async (taskList) => await DeleteTaskList(taskList));
+                ((taskList) => DeleteTaskList(taskList));
 
-            LogoutCommand = new RelayCommand(async () => await LogoutAsync());
+            LogoutCommand = new RelayCommand(() => LogoutAsync());
 
             OpenPaneCommand = new RelayCommand(() => OpenPane(true));
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
@@ -157,56 +162,55 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task InitViewAsync()
         {
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            TaskLists.Clear();
+            TaskListsAutoSuggestBoxItems.Clear();
 
-            var currentUser = await _dataService
-                .UserService
-                .GetCurrentActiveUserAsync();
+            var dbResponse = await _dataService
+                .TaskListService
+                .GetAsNoTrackingAsync(
+                    tl => tl.User.IsActive && tl.LocalStatus != LocalStatus.DELETED,
+                    tl => tl.OrderBy(t => t.Title));
 
-            if (currentUser == null)
+            if (!dbResponse.Succeed)
             {
-                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-                await _dialogService
-                    .ShowMessageDialogAsync("Error", "The current active user couldnt be found on db");
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error", 
+                    $"An unknown error occurred while trying to retrieve all the task lists from the db. Error = {dbResponse.Message}");
                 return;
             }
 
-            var taskLists = await _dataService
-                .TaskListService
-                .GetAsNoTrackingAsync(
-                    tl => tl.User == currentUser && tl.LocalStatus != LocalStatus.DELETED,
-                    tl => tl.OrderBy(t => t.Title));
-            
-            TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(taskLists);
+            TaskLists.AddRange(_mapper.Map<IEnumerable<TaskListItemViewModel>>(dbResponse.Result));
 
-            TaskListsAutoSuggestBoxItems = _mapper.Map<ObservableCollection<ItemModel>>(taskLists);
+            TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
 
             SelectedItem = TaskLists.FirstOrDefault();
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
         }
 
-        public void OnTaskListAutoSuggestBoxTextChangeAsync(string currentText)
+        public void OnTaskListAutoSuggestBoxTextChange(string currentText)
         {
             var filteredItems = string.IsNullOrEmpty(currentText) ?
-            _mapper.Map<ObservableCollection<ItemModel>>(TaskLists
+            _mapper.Map<IEnumerable<ItemModel>>(TaskLists
                 .OrderBy(t => t.Title)
                 .Take(10)) :
-            _mapper.Map<ObservableCollection<ItemModel>>(TaskLists
+            _mapper.Map<IEnumerable<ItemModel>>(TaskLists
                 .Where(t => t.Title.ToLowerInvariant().Contains(currentText.ToLowerInvariant()))
                 .OrderBy(t => t.Title)
                 .Take(10));
 
-            TaskListsAutoSuggestBoxItems = filteredItems;
+            TaskListsAutoSuggestBoxItems.Clear();
+            TaskListsAutoSuggestBoxItems.AddRange(filteredItems);
         }
 
-        public void OnTaskListAutoSuggestBoxQuerySubmittedAsync(ItemModel selectedItem)
+        public void OnTaskListAutoSuggestBoxQuerySubmitted(ItemModel selectedItem)
         {
             if (selectedItem == null)
                 return;
             SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
         }
 
-        public async Task OnNavigationViewSelectionChangeAsync(object selectedItem)
+        public async void OnNavigationViewSelectionChangeAsync(object selectedItem)
         {
             if (selectedItem == null)
             {
@@ -232,7 +236,7 @@ namespace MiraiNotes.UWP.ViewModels
             SelectedItem = taskList;
         }
 
-        public async Task LogoutAsync()
+        public async void LogoutAsync()
         {
             bool logout = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -245,16 +249,18 @@ namespace MiraiNotes.UWP.ViewModels
                 //delete all from the db
                 //delete user settings
                 //delete all view models
+                _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 await _dataService
                     .UserService
                     .ChangeCurrentUserStatus(false);
 
                 _userCredentialService.DeleteUserCredentials();
+                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 _navigationService.GoBack();
             }
         }
 
-        public async Task UpdateTaskListAsync(TaskListItemViewModel taskList)
+        public async void UpdateTaskListAsync(TaskListItemViewModel taskList)
         {
             int index = TaskLists.IndexOf(taskList);
             string newTitle = await _dialogService.ShowInputStringDialogAsync(
@@ -268,36 +274,46 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
-            var taskListToUpdate = (await _dataService
+            var dbResponse = await _dataService
                 .TaskListService
-                .GetAsync(t => t.GoogleTaskListID == taskList.TaskListID, null, string.Empty))
-                .FirstOrDefault();
-            taskListToUpdate.Title = newTitle;
-            taskListToUpdate.UpdatedAt = DateTime.Now;
-            taskListToUpdate.ToBeSynced = true;
-            taskListToUpdate.LocalStatus = LocalStatus.UPDATED;
+                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskListID == taskList.TaskListID);
+
+            if (!dbResponse.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error", 
+                    $"An unknown error occurred while trying to retrieve the task list from db. Error = {dbResponse.Message}");
+                return;
+            }
+
+            dbResponse.Result.Title = newTitle;
+            dbResponse.Result.UpdatedAt = DateTime.Now;
+            dbResponse.Result.ToBeSynced = true;
+            dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
 
             var response = await _dataService
                 .TaskListService
-                .UpdateAsync(taskListToUpdate);
-
-            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+                .UpdateAsync(dbResponse.Result);
 
             if (!response.Succeed)
             {
+                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
                     $"Coudln't update the task list {taskList.Title}. Error = {response.Message}");
                 return;
             }
-            TaskLists[index] = _mapper.Map<TaskListItemViewModel>(taskListToUpdate);
+
+            TaskLists[index] = _mapper.Map<TaskListItemViewModel>(dbResponse.Result);
+
+            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
             //If the updated task is the same as the selected one
             //we update SelectedItem
             if (SelectedItem == taskList)
                 SelectedItem = TaskLists[index];
         }
 
-        public async Task DeleteTaskList(TaskListItemViewModel taskList)
+        public async void DeleteTaskList(TaskListItemViewModel taskList)
         {
             bool deleteCurrentTaskList = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -308,47 +324,51 @@ namespace MiraiNotes.UWP.ViewModels
             if (!deleteCurrentTaskList)
                 return;
 
+            _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+
             //If we are deleting the tasklist that is selected
             //lets close the panel to avoid creating new tasks
             //in the CurrentTaskList
             if (CurrentTaskList == taskList)
                 OpenPane(false);
 
-            _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            var taskListToDelete = (await _dataService
+            var dbResponse = await _dataService
                 .TaskListService
-                .GetAsync(tl => tl.GoogleTaskListID == taskList.TaskListID, string.Empty));
+                .FirstOrDefaultAsNoTrackingAsync(tl => tl.GoogleTaskListID == taskList.TaskListID);
+            if (!dbResponse.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync(
+                    "Error",
+                    $"An unknown error occurred while trying to retrieve the task list from db. Error = {dbResponse.Message}");
+                return;
+            }
 
-            Result response;
+            EmptyResponse response;
             //if the task is created but wasnt synced, we remove it from the db
-            if (taskListToDelete.ToBeSynced)
+            if (dbResponse.Result.ToBeSynced)
             {
                 response = await _dataService
                     .TaskListService
-                    .RemoveAsync(taskListToDelete);
+                    .RemoveAsync(dbResponse.Result);
             }
             else
             {
-                taskListToDelete.LocalStatus = LocalStatus.DELETED;
-                taskListToDelete.ToBeSynced = true;
+                dbResponse.Result.LocalStatus = LocalStatus.DELETED;
+                dbResponse.Result.ToBeSynced = true;
 
                 response = await _dataService
                     .TaskListService
-                    .UpdateAsync(taskListToDelete);
+                    .UpdateAsync(dbResponse.Result);
             }
-            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             if (!response.Succeed)
             {
+                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
                     $"Coudln't delete the task list {taskList.Title}. Error = {response.Message}");
                 return;
             }
-
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"Sucessfully removed {taskList.Title} task list");
 
             //Here we select the previoues task list only if the 
             //selected item = the task list to be removed
@@ -358,11 +378,16 @@ namespace MiraiNotes.UWP.ViewModels
                 if (removedIndex != -1 && removedIndex > 0)
                     SelectedItem = TaskLists[removedIndex - 1];
                 else
-                    await OnNavigationViewSelectionChangeAsync(null);
+                    OnNavigationViewSelectionChangeAsync(null);
             }
             else if (TaskLists.Count == 1)
-                await OnNavigationViewSelectionChangeAsync(null);
+                OnNavigationViewSelectionChangeAsync(null);
             TaskLists.Remove(taskList);
+
+            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            await _dialogService.ShowMessageDialogAsync(
+                "Succeed",
+                $"Sucessfully removed {taskList.Title} task list");
         }
 
         private void OpenPane(bool isPaneOpen) => IsPaneOpen = isPaneOpen;

@@ -5,9 +5,9 @@ namespace MiraiNotes.UWP.Interfaces
 {
     public interface ISyncService
     {
-        Task<Result> SyncDownTaskListsAsync(bool isInBackground);
-        Task<Result> SyncDownTasksAsync(bool isInBackground);
-        Task<Result> SyncUpTaskListsAsync(bool isInBackground);
-        Task<Result> SyncUpTasksAsync(bool isInBackground);
+        Task<EmptyResponse> SyncDownTaskListsAsync(bool isInBackground);
+        Task<EmptyResponse> SyncDownTasksAsync(bool isInBackground);
+        Task<EmptyResponse> SyncUpTaskListsAsync(bool isInBackground);
+        Task<EmptyResponse> SyncUpTasksAsync(bool isInBackground);
     }
 }
