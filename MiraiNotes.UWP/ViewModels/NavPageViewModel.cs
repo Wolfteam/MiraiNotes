@@ -26,7 +26,6 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IUserCredentialService _userCredentialService;
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly INetworkService _networkService;
         private readonly IDispatcherHelper _dispatcher;
 
         private object _selectedItem;
@@ -105,7 +104,6 @@ namespace MiraiNotes.UWP.ViewModels
             IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            INetworkService networkService,
             IDispatcherHelper dispatcher)
         {
             _dialogService = dialogService;
@@ -114,7 +112,6 @@ namespace MiraiNotes.UWP.ViewModels
             _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dataService = dataService;
-            _networkService = networkService;
             _dispatcher = dispatcher;
 
             RegisterMessages();
@@ -146,17 +143,16 @@ namespace MiraiNotes.UWP.ViewModels
                 ((selectedItem) => OnNavigationViewSelectionChangeAsync(selectedItem));
 
             UpdateTaskListCommand = new RelayCommand<TaskListItemViewModel>
-                ((taskList) => UpdateTaskListAsync(taskList));
+                (async (taskList) => await UpdateTaskListAsync(taskList));
 
             DeleteTaskListCommand = new RelayCommand<TaskListItemViewModel>
-                ((taskList) => DeleteTaskList(taskList));
+                (async (taskList) => await DeleteTaskList(taskList));
 
-            LogoutCommand = new RelayCommand(() => LogoutAsync());
+            LogoutCommand = new RelayCommand
+                (async () => await LogoutAsync());
 
             OpenPaneCommand = new RelayCommand(() => OpenPane(true));
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
-
-            //TODO: TaskAutoSuggestBoxItems should be updated when a Task list is added/updated/modified
         }
 
         private async Task InitViewAsync()
@@ -174,7 +170,7 @@ namespace MiraiNotes.UWP.ViewModels
             if (!dbResponse.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
-                    "Error", 
+                    "Error",
                     $"An unknown error occurred while trying to retrieve all the task lists from the db. Error = {dbResponse.Message}");
                 return;
             }
@@ -236,7 +232,7 @@ namespace MiraiNotes.UWP.ViewModels
             SelectedItem = taskList;
         }
 
-        public async void LogoutAsync()
+        public async Task LogoutAsync()
         {
             bool logout = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -249,18 +245,20 @@ namespace MiraiNotes.UWP.ViewModels
                 //delete all from the db
                 //delete user settings
                 //delete all view models
+                OpenPane(false);
                 _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+
                 await _dataService
                     .UserService
                     .ChangeCurrentUserStatus(false);
 
                 _userCredentialService.DeleteUserCredentials();
-                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
                 _navigationService.GoBack();
+                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
             }
         }
 
-        public async void UpdateTaskListAsync(TaskListItemViewModel taskList)
+        public async Task UpdateTaskListAsync(TaskListItemViewModel taskList)
         {
             int index = TaskLists.IndexOf(taskList);
             string newTitle = await _dialogService.ShowInputStringDialogAsync(
@@ -281,7 +279,7 @@ namespace MiraiNotes.UWP.ViewModels
             if (!dbResponse.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
-                    "Error", 
+                    "Error",
                     $"An unknown error occurred while trying to retrieve the task list from db. Error = {dbResponse.Message}");
                 return;
             }
@@ -313,7 +311,7 @@ namespace MiraiNotes.UWP.ViewModels
                 SelectedItem = TaskLists[index];
         }
 
-        public async void DeleteTaskList(TaskListItemViewModel taskList)
+        public async Task DeleteTaskList(TaskListItemViewModel taskList)
         {
             bool deleteCurrentTaskList = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",

@@ -25,7 +25,7 @@ namespace MiraiNotes.UWP
         public App()
         {
             this.InitializeComponent();
-            
+
             //var jsonSettings = new JsonSerializerSettings
             //{
             //    Formatting = Formatting.Indented,
@@ -39,7 +39,7 @@ namespace MiraiNotes.UWP
             //JsonConvert.DefaultSettings = () => jsonSettings;
             this.Suspending += OnSuspending;
         }
-        
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -119,7 +119,7 @@ namespace MiraiNotes.UWP
             //TODO: CHANGE THE DEFAULT TIME THAT THE BGTask WILL GET EXECUTED
             BackgroundTaskHelper.Register(
                 nameof(SyncBackgroundTask),
-                new TimeTrigger(15,false),
+                new TimeTrigger(15, false),
                 false,
                 true,
                 new SystemCondition(SystemConditionType.FreeNetworkAvailable),

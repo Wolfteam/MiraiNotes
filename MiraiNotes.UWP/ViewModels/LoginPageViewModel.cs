@@ -111,6 +111,12 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async void SignInWithGoogleAsync()
         {
+            if (!_networkService.IsInternetAvailable())
+            {
+                await _dialogService.ShowMessageDialogAsync("Error", "Network is not available");
+                return;
+            }
+
             ShowLoading = true;
             ShowLoginButton = false;
             string googleUrl = _googleAuthService.GetAuthorizationUrl();

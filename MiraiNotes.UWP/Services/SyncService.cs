@@ -17,16 +17,18 @@ namespace MiraiNotes.UWP.Services
         //TODO: I think foreachs could be implemented with task.run or something like that
         private readonly IGoogleApiService _apiService;
         private readonly IMiraiNotesDataService _dataService;
+        private readonly INetworkService _networkService;
         private readonly IMapper _mapper;
 
         public SyncService(
             IGoogleApiService apiService,
             IMiraiNotesDataService dataService,
+            INetworkService networkService,
             IMapper mapper)
         {
-            //TODO: CHECK INTERNET CONNCTION IN THE API SERVICE
             _apiService = apiService;
             _dataService = dataService;
+            _networkService = networkService;
             _mapper = mapper;
         }
 
@@ -39,6 +41,12 @@ namespace MiraiNotes.UWP.Services
             };
 
             var syncDownResults = new List<EmptyResponse>();
+
+            if (!_networkService.IsInternetAvailable())
+            {
+                syncResult.Message = $"Network is not available";
+                return syncResult;
+            }
 
             var response = await _apiService
                 .TaskListService
@@ -152,6 +160,12 @@ namespace MiraiNotes.UWP.Services
             };
 
             var syncDownResults = new List<EmptyResponse>();
+
+            if (!_networkService.IsInternetAvailable())
+            {
+                syncResult.Message = $"Network is not available";
+                return syncResult;
+            }
 
             var dbResponse = await _dataService
                 .TaskListService
@@ -274,6 +288,12 @@ namespace MiraiNotes.UWP.Services
             };
             var syncUpResults = new List<EmptyResponse>();
 
+            if (!_networkService.IsInternetAvailable())
+            {
+                syncUpResult.Message = $"Network is not available";
+                return syncUpResult;
+            }
+
             var taskListToSyncDbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(
@@ -330,6 +350,8 @@ namespace MiraiNotes.UWP.Services
                 //TODO: WHAT SHOULD I DO WITH MOVE IN A SYNC?
             };
 
+            await Task.WhenAll(tasks);
+
             if (syncUpResults.Any(r => !r.Succeed))
             {
                 syncUpResult.Message = string.Join(
@@ -350,6 +372,12 @@ namespace MiraiNotes.UWP.Services
             };
 
             var syncUpResults = new List<EmptyResponse>();
+
+            if (!_networkService.IsInternetAvailable())
+            {
+                syncUpResult.Message = $"Network is not available";
+                return syncUpResult;
+            }
 
             var tasksToBeSyncedDbResponse = await _dataService
                 .TaskService

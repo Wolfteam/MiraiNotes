@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Extensions="using:WinRTXamlToolkit.Controls.Extensions"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
@@ -24,494 +25,503 @@
         </Style>
     </Page.Resources>
 
+    <Grid>
+        <Grid x:Name="MainSplitViewContent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ProgressRing
+                Grid.RowSpan="5"
+                Width="75"
+                Height="75"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsActive="True"
+                Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
+            <TextBlock
+                Grid.Row="0"
+                HorizontalAlignment="Center"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Style="{StaticResource TitleTextBlockStyle}"
+                Text="To be completed:"
+                Visibility="{Binding IsTaskListTitleVisible, Mode=OneWay}" />
 
-    <Grid x:Name="MainSplitViewContent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <ProgressRing
-            Grid.RowSpan="5"
-            Width="75"
-            Height="75"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            IsActive="True"
-            Visibility="{Binding ShowTaskListViewProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <TextBlock
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            FontSize="20"
-            FontWeight="SemiBold"
-            Style="{StaticResource TitleTextBlockStyle}"
-            Text="To be completed:"
-            Visibility="{Binding IsTaskListTitleVisible, Mode=OneWay}" />
-
-        <uc:TasksListView
-            x:Name="TaskListView"
-            Grid.Row="2"
-            Width="{Binding ElementName=MainGrid, Path=ActualWidth}"
-            Margin="0,12,0,0"
-            IsItemClickEnabled="True"
-            IsTextScaleFactorEnabled="True"
-            ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
-            ItemsSource="{Binding Tasks}"
-            SelectionMode="Extended"
-            Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}">
-            <interactivity:Interaction.Behaviors>
-                <core:EventTriggerBehavior EventName="SelectionChanged">
-                    <core:EventTriggerBehavior.Actions>
-                        <core:InvokeCommandAction Command="{Binding TaskListViewSelectedItemCommand}" CommandParameter="{Binding ElementName=TaskListView, Path=SelectedItem}" />
-                    </core:EventTriggerBehavior.Actions>
-                </core:EventTriggerBehavior>
-            </interactivity:Interaction.Behaviors>
-            <uc:TasksListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0" VerticalAlignment="Center">
-                                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                    <StackPanel.Resources>
-                                        <Storyboard x:Name="RotateButtonTo90Degrees">
-                                            <DoubleAnimation
-                                                EnableDependentAnimation="True"
-                                                Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
-                                                Storyboard.TargetProperty="Angle"
-                                                From="0"
-                                                To="90"
-                                                Duration="0:0:0.1" />
-                                        </Storyboard>
-                                        <Storyboard x:Name="RotateButtonTo0Degrees">
-                                            <DoubleAnimation
-                                                EnableDependentAnimation="True"
-                                                Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
-                                                Storyboard.TargetProperty="Angle"
-                                                From="90"
-                                                To="0"
-                                                Duration="0:0:0.1" />
-                                        </Storyboard>
-                                    </StackPanel.Resources>
-                                    <Button
-                                        Background="Transparent"
-                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowSubTasksCommand}"
-                                        CommandParameter="{Binding}"
-                                        ToolTipService.ToolTip="Show / hide sub tasks"
-                                        Visibility="{Binding HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <interactivity:Interaction.Behaviors>
-                                            <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="True">
-                                                <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo90Degrees}" />
-                                            </core:DataTriggerBehavior>
-                                            <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="False">
-                                                <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo0Degrees}" />
-                                            </core:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                        <FontIcon
-                                            FontFamily="Segoe MDL2 Assets"
-                                            Glyph="&#xE974;"
-                                            RenderTransformOrigin="0.5, 0.5">
-                                            <FontIcon.RenderTransform>
-                                                <RotateTransform x:Name="ShowSubTasks_ButtonRotateTransform" />
-                                            </FontIcon.RenderTransform>
-                                        </FontIcon>
-                                    </Button>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <StackPanel
-                                            Grid.Row="0"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Orientation="Horizontal">
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                FontSize="16"
-                                                Text="{Binding Title, Mode=OneWay}"
-                                                TextDecorations="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverter}}" />
-                                            <FontIcon
-                                                Margin="5,0,0,0"
-                                                FontFamily="Segoe MDL2 Assets"
-                                                Glyph="&#xE787;"
-                                                ToolTipService.ToolTip="Completition date is today or is already passed"
-                                                Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                        </StackPanel>
-
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Margin="20,0,0,0"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            FontSize="12"
-                                            Text="{Binding Notes, Mode=OneWay, Converter={StaticResource StringDelimiterConverter}, ConverterParameter=10}" />
-                                    </Grid>
-                                </StackPanel>
-                            </Grid>
-                            <CommandBar
-                                Grid.Column="1"
-                                Background="Transparent"
-                                DefaultLabelPosition="Collapsed">
-                                <CommandBar.PrimaryCommands>
-                                    <AppBarButton
-                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
-                                        CommandParameter="{Binding TaskID}"
-                                        Icon="Delete"
-                                        Label="Delete"
-                                        ToolTipService.ToolTip="Delete this task" />
-                                    <AppBarButton
-                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
-                                        CommandParameter="{Binding}"
-                                        Label="Mark as completed"
-                                        ToolTipService.ToolTip="Mark this task as completed"
-                                        Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsIncompletedCommand}"
-                                        CommandParameter="{Binding}"
-                                        Label="Mark as incompleted"
-                                        ToolTipService.ToolTip="Mark this sub task as incompleted"
-                                        Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        x:Name="MoveTask_AppBarButton"
-                                        AllowFocusOnInteraction="True"
-                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxClickedCommand}"
-                                        CommandParameter="{Binding}"
-                                        Label="Move"
-                                        Tag="{Binding}"
-                                        ToolTipService.ToolTip="Move this task to a different task list">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
-                                        </AppBarButton.Icon>
-                                        <AppBarButton.Flyout>
-                                            <Flyout
-                                                x:Name="MoveTask_Flyout"
-                                                LightDismissOverlayMode="Off"
-                                                Opened="TaskList_ComboBox_DropDownOpened"
-                                                Placement="Left">
-                                                <ComboBox
-                                                    x:Name="TaskList_ComboBox"
-                                                    DisplayMemberPath="Title"
-                                                    IsEnabled="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowMoveTaskFlyoutProgressBar, Converter={StaticResource InverseBooleanConverter}}"
-                                                    ItemsSource="{Binding ElementName=MainSplitViewContent, Path=DataContext.TaskLists}"
-                                                    PlaceholderText="Pick a task list"
-                                                    SelectedValuePath="TaskListID">
-                                                    <ComboBox.HeaderTemplate>
-                                                        <DataTemplate>
-                                                            <StackPanel Orientation="Vertical">
-                                                                <ProgressBar
-                                                                    Width="130"
-                                                                    IsIndeterminate="True"
-                                                                    ShowError="False"
-                                                                    ShowPaused="False"
-                                                                    Visibility="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowMoveTaskFlyoutProgressBar, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                                                <TextBlock>
-                                                                    <Run Text="Move" />
-                                                                    <Run Text="{Binding ElementName=MoveTask_AppBarButton, Path=Tag.Title}" />
-                                                                    <Run Text="to" />
-                                                                </TextBlock>
-                                                            </StackPanel>
-                                                        </DataTemplate>
-                                                    </ComboBox.HeaderTemplate>
-                                                    <interactivity:Interaction.Behaviors>
-                                                        <core:EventTriggerBehavior EventName="SelectionChanged">
-                                                            <core:EventTriggerBehavior.Actions>
-                                                                <core:InvokeCommandAction Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxSelectionChangedCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox, Path=SelectedItem}" />
-                                                                <core:CallMethodAction MethodName="Hide" TargetObject="{Binding ElementName=MoveTask_Flyout}" />
-                                                            </core:EventTriggerBehavior.Actions>
-                                                        </core:EventTriggerBehavior>
-                                                    </interactivity:Interaction.Behaviors>
-                                                </ComboBox>
-                                            </Flyout>
-                                        </AppBarButton.Flyout>
-                                    </AppBarButton>
-                                </CommandBar.PrimaryCommands>
-                            </CommandBar>
-                        </Grid>
-                        <uc:TasksListView
-                            Margin="20,0,0,0"
-                            ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
-                            ItemsSource="{Binding SubTasks, Mode=OneWay}"
-                            SelectionChanged="SubTasks_ListView_SelectionChanged"
-                            SelectionMode="Single"
-                            Visibility="{Binding ShowSubTasks, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <uc:TasksListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel
-                                            Grid.Column="0"
-                                            VerticalAlignment="Center"
-                                            Orientation="Horizontal">
-                                            <FontIcon
-                                                Margin="0,0,5,0"
-                                                FontFamily="Segoe MDL2 Assets"
-                                                Glyph="&#xE787;"
-                                                ToolTipService.ToolTip="Completition date is today or is already passed"
-                                                Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                FontSize="14"
-                                                FontStyle="Italic"
-                                                Text="{Binding Title}"
-                                                TextDecorations="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverterInverse}}" />
-                                        </StackPanel>
-
-                                        <CommandBar
-                                            Grid.Column="1"
+            <uc:TasksListView
+                x:Name="TaskListView"
+                Grid.Row="1"
+                Width="{Binding ElementName=MainGrid, Path=ActualWidth}"
+                Margin="0,12,0,0"
+                IsItemClickEnabled="True"
+                IsTextScaleFactorEnabled="True"
+                ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
+                ItemsSource="{Binding Tasks}"
+                SelectionMode="Extended"
+                Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}">
+                <interactivity:Interaction.Behaviors>
+                    <core:EventTriggerBehavior EventName="SelectionChanged">
+                        <core:EventTriggerBehavior.Actions>
+                            <core:InvokeCommandAction Command="{Binding TaskListViewSelectedItemCommand}" CommandParameter="{Binding ElementName=TaskListView, Path=SelectedItem}" />
+                        </core:EventTriggerBehavior.Actions>
+                    </core:EventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+                <uc:TasksListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0" VerticalAlignment="Center">
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                        <StackPanel.Resources>
+                                            <Storyboard x:Name="RotateButtonTo90Degrees">
+                                                <DoubleAnimation
+                                                    EnableDependentAnimation="True"
+                                                    Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
+                                                    Storyboard.TargetProperty="Angle"
+                                                    From="0"
+                                                    To="90"
+                                                    Duration="0:0:0.1" />
+                                            </Storyboard>
+                                            <Storyboard x:Name="RotateButtonTo0Degrees">
+                                                <DoubleAnimation
+                                                    EnableDependentAnimation="True"
+                                                    Storyboard.TargetName="ShowSubTasks_ButtonRotateTransform"
+                                                    Storyboard.TargetProperty="Angle"
+                                                    From="90"
+                                                    To="0"
+                                                    Duration="0:0:0.1" />
+                                            </Storyboard>
+                                        </StackPanel.Resources>
+                                        <Button
                                             Background="Transparent"
-                                            DefaultLabelPosition="Collapsed">
-                                            <CommandBar.PrimaryCommands>
-                                                <AppBarButton
-                                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    Label="Mark as completed"
-                                                    ToolTipService.ToolTip="Mark this sub task as completed"
-                                                    Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                    <AppBarButton.Icon>
-                                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
-                                                    </AppBarButton.Icon>
-                                                </AppBarButton>
-                                                <AppBarButton
-                                                    Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsIncompletedCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    Label="Mark as incompleted"
-                                                    ToolTipService.ToolTip="Mark this sub task as incompleted"
-                                                    Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                    <AppBarButton.Icon>
-                                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
-                                                    </AppBarButton.Icon>
-                                                </AppBarButton>
-                                            </CommandBar.PrimaryCommands>
-                                        </CommandBar>
-                                    </Grid>
-                                </DataTemplate>
-                            </uc:TasksListView.ItemTemplate>
-                        </uc:TasksListView>
-                    </StackPanel>
-                </DataTemplate>
-            </uc:TasksListView.ItemTemplate>
-        </uc:TasksListView>
-        <!--<TextBlock
+                                            Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowSubTasksCommand}"
+                                            CommandParameter="{Binding}"
+                                            ToolTipService.ToolTip="Show / hide sub tasks"
+                                            Visibility="{Binding HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <interactivity:Interaction.Behaviors>
+                                                <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="True">
+                                                    <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo90Degrees}" />
+                                                </core:DataTriggerBehavior>
+                                                <core:DataTriggerBehavior Binding="{Binding ShowSubTasks, Mode=OneWay}" Value="False">
+                                                    <media:ControlStoryboardAction Storyboard="{StaticResource RotateButtonTo0Degrees}" />
+                                                </core:DataTriggerBehavior>
+                                            </interactivity:Interaction.Behaviors>
+                                            <FontIcon
+                                                FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE974;"
+                                                RenderTransformOrigin="0.5, 0.5">
+                                                <FontIcon.RenderTransform>
+                                                    <RotateTransform x:Name="ShowSubTasks_ButtonRotateTransform" />
+                                                </FontIcon.RenderTransform>
+                                            </FontIcon>
+                                        </Button>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel
+                                                Grid.Row="0"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="16"
+                                                    Text="{Binding Title, Mode=OneWay}"
+                                                    TextDecorations="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverter}}" />
+                                                <FontIcon
+                                                    Margin="5,0,0,0"
+                                                    FontFamily="Segoe MDL2 Assets"
+                                                    Glyph="&#xE787;"
+                                                    ToolTipService.ToolTip="Completition date is today or is already passed"
+                                                    Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            </StackPanel>
+
+                                            <TextBlock
+                                                Grid.Row="1"
+                                                Margin="20,0,0,0"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                Text="{Binding Notes, Mode=OneWay, Converter={StaticResource StringDelimiterConverter}, ConverterParameter=10}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                                <CommandBar
+                                    Grid.Column="1"
+                                    Background="Transparent"
+                                    DefaultLabelPosition="Collapsed">
+                                    <CommandBar.PrimaryCommands>
+                                        <AppBarButton
+                                            Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
+                                            CommandParameter="{Binding TaskID}"
+                                            Icon="Delete"
+                                            Label="Delete"
+                                            ToolTipService.ToolTip="Delete this task" />
+                                        <AppBarButton
+                                            Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
+                                            CommandParameter="{Binding}"
+                                            Label="Mark as completed"
+                                            ToolTipService.ToolTip="Mark this task as completed"
+                                            Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <AppBarButton.Icon>
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                        <AppBarButton
+                                            Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsIncompletedCommand}"
+                                            CommandParameter="{Binding}"
+                                            Label="Mark as incompleted"
+                                            ToolTipService.ToolTip="Mark this sub task as incompleted"
+                                            Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <AppBarButton.Icon>
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                        <AppBarButton
+                                            x:Name="MoveTask_AppBarButton"
+                                            AllowFocusOnInteraction="True"
+                                            Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxClickedCommand}"
+                                            CommandParameter="{Binding}"
+                                            Label="Move"
+                                            Tag="{Binding}"
+                                            ToolTipService.ToolTip="Move this task to a different task list">
+                                            <AppBarButton.Icon>
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
+                                            </AppBarButton.Icon>
+                                            <AppBarButton.Flyout>
+                                                <Flyout
+                                                    x:Name="MoveTask_Flyout"
+                                                    LightDismissOverlayMode="Off"
+                                                    Opened="TaskList_ComboBox_DropDownOpened"
+                                                    Placement="Left">
+                                                    <ComboBox
+                                                        x:Name="TaskList_ComboBox"
+                                                        DisplayMemberPath="Title"
+                                                        IsEnabled="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowMoveTaskFlyoutProgressBar, Converter={StaticResource InverseBooleanConverter}}"
+                                                        ItemsSource="{Binding ElementName=MainSplitViewContent, Path=DataContext.TaskLists}"
+                                                        PlaceholderText="Pick a task list"
+                                                        SelectedValuePath="TaskListID">
+                                                        <ComboBox.HeaderTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Vertical">
+                                                                    <ProgressBar
+                                                                        Width="130"
+                                                                        IsIndeterminate="True"
+                                                                        ShowError="False"
+                                                                        ShowPaused="False"
+                                                                        Visibility="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowMoveTaskFlyoutProgressBar, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                                    <TextBlock>
+                                                                        <Run Text="Move" />
+                                                                        <Run Text="{Binding ElementName=MoveTask_AppBarButton, Path=Tag.Title}" />
+                                                                        <Run Text="to" />
+                                                                    </TextBlock>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ComboBox.HeaderTemplate>
+                                                        <interactivity:Interaction.Behaviors>
+                                                            <core:EventTriggerBehavior EventName="SelectionChanged">
+                                                                <core:EventTriggerBehavior.Actions>
+                                                                    <core:InvokeCommandAction Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MoveComboBoxSelectionChangedCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox, Path=SelectedItem}" />
+                                                                    <core:CallMethodAction MethodName="Hide" TargetObject="{Binding ElementName=MoveTask_Flyout}" />
+                                                                </core:EventTriggerBehavior.Actions>
+                                                            </core:EventTriggerBehavior>
+                                                        </interactivity:Interaction.Behaviors>
+                                                    </ComboBox>
+                                                </Flyout>
+                                            </AppBarButton.Flyout>
+                                        </AppBarButton>
+                                    </CommandBar.PrimaryCommands>
+                                </CommandBar>
+                            </Grid>
+                            <uc:TasksListView
+                                Margin="20,0,0,0"
+                                ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
+                                ItemsSource="{Binding SubTasks, Mode=OneWay}"
+                                SelectionChanged="SubTasks_ListView_SelectionChanged"
+                                SelectionMode="Single"
+                                Visibility="{Binding ShowSubTasks, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <uc:TasksListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel
+                                                Grid.Column="0"
+                                                VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                                <FontIcon
+                                                    Margin="0,0,5,0"
+                                                    FontFamily="Segoe MDL2 Assets"
+                                                    Glyph="&#xE787;"
+                                                    ToolTipService.ToolTip="Completition date is today or is already passed"
+                                                    Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="14"
+                                                    FontStyle="Italic"
+                                                    Text="{Binding Title}"
+                                                    TextDecorations="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverterInverse}}" />
+                                            </StackPanel>
+
+                                            <CommandBar
+                                                Grid.Column="1"
+                                                Background="Transparent"
+                                                DefaultLabelPosition="Collapsed">
+                                                <CommandBar.PrimaryCommands>
+                                                    <AppBarButton
+                                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsCompletedCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Label="Mark as completed"
+                                                        ToolTipService.ToolTip="Mark this sub task as completed"
+                                                        Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                        <AppBarButton.Icon>
+                                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                                        </AppBarButton.Icon>
+                                                    </AppBarButton>
+                                                    <AppBarButton
+                                                        Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.MarkAsIncompletedCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Label="Mark as incompleted"
+                                                        ToolTipService.ToolTip="Mark this sub task as incompleted"
+                                                        Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                        <AppBarButton.Icon>
+                                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
+                                                        </AppBarButton.Icon>
+                                                    </AppBarButton>
+                                                </CommandBar.PrimaryCommands>
+                                            </CommandBar>
+                                        </Grid>
+                                    </DataTemplate>
+                                </uc:TasksListView.ItemTemplate>
+                            </uc:TasksListView>
+                        </StackPanel>
+                    </DataTemplate>
+                </uc:TasksListView.ItemTemplate>
+            </uc:TasksListView>
+            <!--<TextBlock
             Grid.Row="2"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Text="There are no items...."
             TextAlignment="Center"
             Visibility="{Binding ShowNoContentText, Converter={StaticResource BoolToVisibilityConverter}}" />-->
-        <TextBlock
-            Grid.Row="3"
-            Margin="20,20,20,0"
-            HorizontalAlignment="Left"
-            Text="{Binding SelectedTasksText, Mode=OneWay}"
-            Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}" />
-        <AutoSuggestBox
-            x:Name="TaskAutoSuggestBox"
-            Grid.Row="4"
-            Margin="20"
-            DisplayMemberPath="Text"
-            Header="Type here to filter"
-            IsEnabled="{Binding IsAutoSuggestBoxEnabled, Mode=OneWay}"
-            ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
-            PlaceholderText="Search a task..."
-            QueryIcon="Find"
-            Text="{Binding TaskAutoSuggestBoxText, Mode=TwoWay}"
-            TextMemberPath="Text"
-            UpdateTextOnSelect="False">
-            <interactivity:Interaction.Behaviors>
-                <core:EventTriggerBehavior EventName="TextChanged">
-                    <core:EventTriggerBehavior.Actions>
-                        <core:InvokeCommandAction Command="{Binding TaskAutoSuggestBoxTextChangedCommand}" CommandParameter="{Binding ElementName=TaskAutoSuggestBox, Path=Text}" />
-                    </core:EventTriggerBehavior.Actions>
-                </core:EventTriggerBehavior>
-                <core:EventTriggerBehavior EventName="QuerySubmitted">
-                    <core:EventTriggerBehavior.Actions>
-                        <core:InvokeCommandAction Command="{Binding TaskAutoSuggestBoxQuerySubmittedCommand}" InputConverter="{StaticResource AutoSuggestQueryParameterConverter}" />
-                    </core:EventTriggerBehavior.Actions>
-                </core:EventTriggerBehavior>
-            </interactivity:Interaction.Behaviors>
-        </AutoSuggestBox>
-        <CommandBar
-            Grid.Row="5"
-            DefaultLabelPosition="Bottom"
-            IsEnabled="{Binding ShowTaskListViewProgressRing, Converter={StaticResource InverseBooleanConverter}}">
-            <CommandBar.PrimaryCommands>
-                <AppBarButton
-                    Icon="Add"
-                    Label="Add"
-                    ToolTipService.ToolTip="Add a new task list or task.">
-                    <AppBarButton.Flyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem
-                                Command="{Binding NewTaskListCommand}"
-                                IsEnabled="{Binding CanAddMoreTaskList, Mode=OneWay}"
-                                Text="New list" />
-                            <MenuFlyoutItem
-                                Command="{Binding NewTaskCommand}"
-                                IsEnabled="{Binding CanAddMoreTasks, Mode=OneWay}"
-                                Text="New task" />
-                        </MenuFlyout>
-                    </AppBarButton.Flyout>
-                </AppBarButton>
-                <AppBarButton
-                    Command="{Binding DeleteSelectedTasksCommand}"
-                    Icon="Delete"
-                    IsCompact="{Binding IsTaskListCommandBarCompact}"
-                    IsEnabled="{Binding CanDeleteTasks, Mode=OneWay}"
-                    Label="Delete"
-                    ToolTipService.ToolTip="Delete selected task(s)." />
-                <AppBarButton
-                    Command="{Binding RefreshTasksCommand}"
-                    Icon="Refresh"
-                    IsCompact="{Binding IsTaskListCommandBarCompact}"
-                    IsEnabled="{Binding CanRefreshTaskListView, Mode=OneWay}"
-                    Label="Refresh"
-                    ToolTipService.ToolTip="Refresh the tasks from the current task list. Requieres a network connection." />
-                <AppBarButton
-                    Icon="Sort"
-                    IsCompact="{Binding IsTaskListCommandBarCompact}"
-                    IsEnabled="{Binding CanSortTaskListView, Mode=OneWay}"
-                    Label="Sort"
-                    ToolTipService.ToolTip="Sort the task by name, creation date or your order">
-                    <AppBarButton.Flyout>
-                        <MenuFlyout>
-                            <MenuFlyoutSubItem Text="By name">
+            <TextBlock
+                Grid.Row="2"
+                Margin="20,20,20,0"
+                HorizontalAlignment="Left"
+                Text="{Binding SelectedTasksText, Mode=OneWay}"
+                Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}" />
+            <AutoSuggestBox
+                x:Name="TaskAutoSuggestBox"
+                Grid.Row="3"
+                Margin="20"
+                DisplayMemberPath="Text"
+                Header="Type here to filter"
+                IsEnabled="{Binding IsAutoSuggestBoxEnabled, Mode=OneWay}"
+                ItemsSource="{Binding TaskAutoSuggestBoxItems, Mode=OneWay}"
+                PlaceholderText="Search a task..."
+                QueryIcon="Find"
+                Text="{Binding TaskAutoSuggestBoxText, Mode=TwoWay}"
+                TextMemberPath="Text"
+                UpdateTextOnSelect="False">
+                <interactivity:Interaction.Behaviors>
+                    <core:EventTriggerBehavior EventName="TextChanged">
+                        <core:EventTriggerBehavior.Actions>
+                            <core:InvokeCommandAction Command="{Binding TaskAutoSuggestBoxTextChangedCommand}" CommandParameter="{Binding ElementName=TaskAutoSuggestBox, Path=Text}" />
+                        </core:EventTriggerBehavior.Actions>
+                    </core:EventTriggerBehavior>
+                    <core:EventTriggerBehavior EventName="QuerySubmitted">
+                        <core:EventTriggerBehavior.Actions>
+                            <core:InvokeCommandAction Command="{Binding TaskAutoSuggestBoxQuerySubmittedCommand}" InputConverter="{StaticResource AutoSuggestQueryParameterConverter}" />
+                        </core:EventTriggerBehavior.Actions>
+                    </core:EventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+            </AutoSuggestBox>
+            <CommandBar
+                Grid.Row="4"
+                DefaultLabelPosition="Bottom"
+                IsEnabled="{Binding ShowTaskListViewProgressRing, Converter={StaticResource InverseBooleanConverter}}">
+                <CommandBar.PrimaryCommands>
+                    <AppBarButton
+                        Icon="Add"
+                        Label="Add"
+                        ToolTipService.ToolTip="Add a new task list or task.">
+                        <AppBarButton.Flyout>
+                            <MenuFlyout>
                                 <MenuFlyoutItem
-                                    Command="{Binding SortTasksCommand}"
-                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_ASC}"
-                                    Text="Asc">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74A;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                    Command="{Binding NewTaskListCommand}"
+                                    IsEnabled="{Binding CanAddMoreTaskList, Mode=OneWay}"
+                                    Text="New list" />
                                 <MenuFlyoutItem
-                                    Command="{Binding SortTasksCommand}"
-                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_DESC}"
-                                    Text="Desc">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74B;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyoutSubItem>
+                                    Command="{Binding NewTaskCommand}"
+                                    IsEnabled="{Binding CanAddMoreTasks, Mode=OneWay}"
+                                    Text="New task" />
+                            </MenuFlyout>
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
+                    <AppBarButton
+                        Command="{Binding DeleteSelectedTasksCommand}"
+                        Icon="Delete"
+                        IsCompact="{Binding IsTaskListCommandBarCompact}"
+                        IsEnabled="{Binding CanDeleteTasks, Mode=OneWay}"
+                        Label="Delete"
+                        ToolTipService.ToolTip="Delete selected task(s)." />
+                    <AppBarButton
+                        Command="{Binding RefreshTasksCommand}"
+                        Icon="Refresh"
+                        IsCompact="{Binding IsTaskListCommandBarCompact}"
+                        IsEnabled="{Binding CanRefreshTaskListView, Mode=OneWay}"
+                        Label="Refresh"
+                        ToolTipService.ToolTip="Refresh the tasks from the current task list. Requieres a network connection." />
+                    <AppBarButton
+                        Icon="Sort"
+                        IsCompact="{Binding IsTaskListCommandBarCompact}"
+                        IsEnabled="{Binding CanSortTaskListView, Mode=OneWay}"
+                        Label="Sort"
+                        ToolTipService.ToolTip="Sort the task by name, creation date or your order">
+                        <AppBarButton.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutSubItem Text="By name">
+                                    <MenuFlyoutItem
+                                        Command="{Binding SortTasksCommand}"
+                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_ASC}"
+                                        Text="Asc">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74A;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem
+                                        Command="{Binding SortTasksCommand}"
+                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_DESC}"
+                                        Text="Desc">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74B;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyoutSubItem>
 
-                            <MenuFlyoutSubItem Text="By updated date">
-                                <MenuFlyoutItem
-                                    Command="{Binding SortTasksCommand}"
-                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_ASC}"
-                                    Text="Asc">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74A;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem
-                                    Command="{Binding SortTasksCommand}"
-                                    CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_DESC}"
-                                    Text="Desc">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74B;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyoutSubItem>
+                                <MenuFlyoutSubItem Text="By updated date">
+                                    <MenuFlyoutItem
+                                        Command="{Binding SortTasksCommand}"
+                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_ASC}"
+                                        Text="Asc">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74A;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem
+                                        Command="{Binding SortTasksCommand}"
+                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_DESC}"
+                                        Text="Desc">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74B;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyoutSubItem>
 
-                            <MenuFlyoutSubItem Text="By my order">
-                                <MenuFlyoutItem
-                                    Command="{Binding SortTasksCommand}"
-                                    CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_ASC}"
-                                    Text="Asc">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74A;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem
-                                    Command="{Binding SortTasksCommand}"
-                                    CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_DESC}"
-                                    Text="Desc">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74B;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyoutSubItem>
-                        </MenuFlyout>
-                    </AppBarButton.Flyout>
-                </AppBarButton>
-            </CommandBar.PrimaryCommands>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton
-                    Command="{Binding SelectAllTaskCommand}"
-                    Icon="SelectAll"
-                    IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
-                    Label="Select all" />
-                <AppBarButton
-                    Command="{Binding MarkAsCompletedSelectedTasksCommand}"
-                    IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
-                    Label="Mark selected tasks as completed">
-                    <AppBarButton.Icon>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton
-                    AllowFocusOnInteraction="True"
-                    IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
-                    Label="Move selected tasks"
-                    ToolTipService.ToolTip="Moves the selected tasks to a different task list">
-                    <AppBarButton.Flyout>
-                        <Flyout Opened="TaskList_ComboBox_DropDownOpened">
-                            <ComboBox
-                                x:Name="TaskList_ComboBox2"
-                                DisplayMemberPath="Title"
-                                IsEnabled="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                                ItemsSource="{Binding TaskLists, Mode=OneWay}"
-                                PlaceholderText="Pick a task list"
-                                SelectedValuePath="TaskListID">
-                                <ComboBox.HeaderTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Vertical">
-                                            <ProgressBar
-                                                Width="130"
-                                                IsIndeterminate="True"
-                                                ShowError="False"
-                                                ShowPaused="False"
-                                                Visibility="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                            <TextBlock Text="Move selected tasks to:" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ComboBox.HeaderTemplate>
-                                <interactivity:Interaction.Behaviors>
-                                    <core:EventTriggerBehavior EventName="SelectionChanged">
-                                        <core:EventTriggerBehavior.Actions>
-                                            <core:InvokeCommandAction Command="{Binding MoveSelectedTasksCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox2, Path=SelectedItem}" />
-                                        </core:EventTriggerBehavior.Actions>
-                                    </core:EventTriggerBehavior>
-                                </interactivity:Interaction.Behaviors>
-                            </ComboBox>
-                        </Flyout>
-                    </AppBarButton.Flyout>
-                    <AppBarButton.Icon>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarSeparator />
-                <AppBarButton Icon="ReShare" Label="Share" />
-                <AppBarButton Icon="Setting" Label="Settings" />
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
+                                <MenuFlyoutSubItem Text="By my order">
+                                    <MenuFlyoutItem
+                                        Command="{Binding SortTasksCommand}"
+                                        CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_ASC}"
+                                        Text="Asc">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74A;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem
+                                        Command="{Binding SortTasksCommand}"
+                                        CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_DESC}"
+                                        Text="Desc">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74B;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyoutSubItem>
+                            </MenuFlyout>
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
+                </CommandBar.PrimaryCommands>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton
+                        Command="{Binding SelectAllTaskCommand}"
+                        Icon="SelectAll"
+                        IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
+                        Label="Select all" />
+                    <AppBarButton
+                        Command="{Binding MarkAsCompletedSelectedTasksCommand}"
+                        IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
+                        Label="Mark selected tasks as completed">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton
+                        AllowFocusOnInteraction="True"
+                        IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
+                        Label="Move selected tasks"
+                        ToolTipService.ToolTip="Moves the selected tasks to a different task list">
+                        <AppBarButton.Flyout>
+                            <Flyout Opened="TaskList_ComboBox_DropDownOpened">
+                                <ComboBox
+                                    x:Name="TaskList_ComboBox2"
+                                    DisplayMemberPath="Title"
+                                    IsEnabled="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                                    ItemsSource="{Binding TaskLists, Mode=OneWay}"
+                                    PlaceholderText="Pick a task list"
+                                    SelectedValuePath="TaskListID">
+                                    <ComboBox.HeaderTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Vertical">
+                                                <ProgressBar
+                                                    Width="130"
+                                                    IsIndeterminate="True"
+                                                    ShowError="False"
+                                                    ShowPaused="False"
+                                                    Visibility="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                <TextBlock Text="Move selected tasks to:" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.HeaderTemplate>
+                                    <interactivity:Interaction.Behaviors>
+                                        <core:EventTriggerBehavior EventName="SelectionChanged">
+                                            <core:EventTriggerBehavior.Actions>
+                                                <core:InvokeCommandAction Command="{Binding MoveSelectedTasksCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox2, Path=SelectedItem}" />
+                                            </core:EventTriggerBehavior.Actions>
+                                        </core:EventTriggerBehavior>
+                                    </interactivity:Interaction.Behaviors>
+                                </ComboBox>
+                            </Flyout>
+                        </AppBarButton.Flyout>
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarSeparator />
+                    <AppBarButton Icon="ReShare" Label="Share" />
+                    <AppBarButton Icon="Setting" Label="Settings" />
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+        </Grid>
+        <controls:InAppNotification
+            x:Name="Task_InAppNotification"
+            AnimationDuration="00:00:00.1800000"
+            Content="This is a test message."
+            HorizontalOffset="12.88"
+            ShowDismissButton="True"
+            StackMode="QueueBehind"
+            VerticalOffset="200"
+            Visibility="Visible" />
     </Grid>
 </Page>
