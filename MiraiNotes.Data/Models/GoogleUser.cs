@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MiraiNotes.Data.Models
@@ -20,6 +21,12 @@ namespace MiraiNotes.Data.Models
         public string PictureUrl { get; set; }
 
         public bool IsActive { get; set; }
+
+        [Required]
+        public DateTimeOffset CreatedAt { get; set; }
+
+        [Required]
+        public DateTimeOffset UpdatedAt { get; set; }
 
         //If you need to add tasklist from the user entity
         //you need to changes this to a icollection

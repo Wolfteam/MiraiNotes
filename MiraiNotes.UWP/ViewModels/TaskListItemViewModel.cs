@@ -15,6 +15,6 @@ namespace MiraiNotes.UWP.ViewModels
             set { Set(ref _title, value); }
         }
 
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

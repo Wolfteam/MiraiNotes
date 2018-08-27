@@ -15,9 +15,9 @@ namespace MiraiNotes.Data.Models
         [Required]
         public string Title { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
 
         //[Required]
         //public string SelfLink { get; set; }
@@ -33,7 +33,7 @@ namespace MiraiNotes.Data.Models
 
         public DateTimeOffset? ToBeCompletedOn { get; set; }
 
-        public DateTime? CompletedOn { get; set; }
+        public DateTimeOffset? CompletedOn { get; set; }
 
         public bool IsDeleted { get; set; }
 

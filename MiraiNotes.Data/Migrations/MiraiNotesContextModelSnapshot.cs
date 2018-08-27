@@ -14,16 +14,16 @@ namespace MiraiNotes.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846");
+                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932");
 
             modelBuilder.Entity("MiraiNotes.Data.Models.GoogleTask", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime?>("CompletedOn");
+                    b.Property<DateTimeOffset?>("CompletedOn");
 
-                    b.Property<DateTime>("CreatedAt");
+                    b.Property<DateTimeOffset>("CreatedAt");
 
                     b.Property<string>("GoogleTaskID")
                         .IsRequired();
@@ -52,7 +52,7 @@ namespace MiraiNotes.Data.Migrations
 
                     b.Property<bool>("ToBeSynced");
 
-                    b.Property<DateTime>("UpdatedAt");
+                    b.Property<DateTimeOffset>("UpdatedAt");
 
                     b.HasKey("ID");
 
@@ -69,7 +69,7 @@ namespace MiraiNotes.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("CreatedAt");
+                    b.Property<DateTimeOffset>("CreatedAt");
 
                     b.Property<string>("GoogleTaskListID")
                         .IsRequired();
@@ -81,7 +81,7 @@ namespace MiraiNotes.Data.Migrations
 
                     b.Property<bool>("ToBeSynced");
 
-                    b.Property<DateTime>("UpdatedAt");
+                    b.Property<DateTimeOffset>("UpdatedAt");
 
                     b.Property<int>("UserID");
 
@@ -100,6 +100,8 @@ namespace MiraiNotes.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTimeOffset>("CreatedAt");
+
                     b.Property<string>("Email")
                         .IsRequired();
 
@@ -112,6 +114,8 @@ namespace MiraiNotes.Data.Migrations
                     b.Property<bool>("IsActive");
 
                     b.Property<string>("PictureUrl");
+
+                    b.Property<DateTimeOffset>("UpdatedAt");
 
                     b.HasKey("ID");
 

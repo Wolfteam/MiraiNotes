@@ -15,6 +15,6 @@ namespace MiraiNotes.UWP.Models.API
         public string SelfLink { get; set; }
 
         [JsonProperty(PropertyName = "updated")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 }

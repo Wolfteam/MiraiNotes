@@ -14,7 +14,7 @@ namespace MiraiNotes.UWP.ViewModels
         private string _status;
         private string _parentTask;
         private bool _hasSubTasks;
-        private DateTime? _completedOn;
+        private DateTimeOffset? _completedOn;
         private ObservableCollection<TaskItemViewModel> _subTasks = new ObservableCollection<TaskItemViewModel>();
         #endregion
 
@@ -34,9 +34,9 @@ namespace MiraiNotes.UWP.ViewModels
             set { Write(value); }
         }
 
-        public DateTime UpdatedAt
+        public DateTimeOffset UpdatedAt
         {
-            get { return Read<DateTime>(); }
+            get { return Read<DateTimeOffset>(); }
             set { Write(value); }
         }
 
@@ -98,7 +98,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public DateTime? CompletedOn
+        public DateTimeOffset? CompletedOn
         {
             get => _completedOn;
             set
