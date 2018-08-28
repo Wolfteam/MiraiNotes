@@ -379,12 +379,12 @@
                         Label="Delete"
                         ToolTipService.ToolTip="Delete selected task(s)." />
                     <AppBarButton
-                        Command="{Binding RefreshTasksCommand}"
-                        Icon="Refresh"
+                        Command="{Binding SyncCommand}"
+                        Icon="Sync"
                         IsCompact="{Binding IsTaskListCommandBarCompact}"
                         IsEnabled="{Binding CanRefreshTaskListView, Mode=OneWay}"
-                        Label="Refresh"
-                        ToolTipService.ToolTip="Refresh the tasks from the current task list. Requieres a network connection." />
+                        Label="Sync"
+                        ToolTipService.ToolTip="Forces a full sync of the app. Requieres a network connection." />
                     <AppBarButton
                         Icon="Sort"
                         IsCompact="{Binding IsTaskListCommandBarCompact}"

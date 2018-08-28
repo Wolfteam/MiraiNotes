@@ -299,7 +299,10 @@ namespace MiraiNotes.UWP.ViewModels
                     GoogleTaskStatus.NEEDS_ACTION.GetString() : CurrentTask.Status;
                 entity.Title = CurrentTask.Title;
                 entity.LocalStatus = CurrentTask.IsNew ?
-                    LocalStatus.CREATED : LocalStatus.UPDATED;
+                    LocalStatus.CREATED :
+                    entity.LocalStatus == LocalStatus.CREATED ?
+                        LocalStatus.CREATED : 
+                        LocalStatus.UPDATED;
                 entity.ToBeSynced = true;
                 entity.UpdatedAt = DateTime.Now;
                 entity.ToBeCompletedOn = CurrentTask.ToBeCompletedOn;
@@ -393,20 +396,30 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            dbResponse.Result.LocalStatus = LocalStatus.DELETED;
-            dbResponse.Result.ToBeSynced = true;
-            dbResponse.Result.UpdatedAt = DateTime.Now;
+            EmptyResponse deleteResponse;
+            if (dbResponse.Result.ToBeSynced)
+            {
+                deleteResponse = await _dataService
+                   .TaskService
+                   .RemoveAsync(dbResponse.Result);
+            }
+            else
+            {
+                dbResponse.Result.LocalStatus = LocalStatus.DELETED;
+                dbResponse.Result.UpdatedAt = DateTime.Now;
+                dbResponse.Result.ToBeSynced = true;
 
-            var updateResponse = await _dataService
-                .TaskService
-                .UpdateAsync(dbResponse.Result);
+                deleteResponse = await _dataService
+                    .TaskService
+                    .UpdateAsync(dbResponse.Result);
+            }
             ShowTaskProgressRing = false;
 
-            if (!updateResponse.Succeed)
+            if (!deleteResponse.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the selected task. Error = {updateResponse.Message}.");
+                    $"Coudln't delete the selected task. Error = {deleteResponse.Message}.");
                 return;
             }
             //If we are deleting a subtask
@@ -450,6 +463,11 @@ namespace MiraiNotes.UWP.ViewModels
             }
             taskToUpdateDbResponse.Result.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
                 DateTime.Now : (DateTime?)null;
+
+            taskToUpdateDbResponse.Result.LocalStatus = 
+                taskToUpdateDbResponse.Result.LocalStatus == LocalStatus.CREATED ?
+                    LocalStatus.CREATED :
+                    LocalStatus.UPDATED;
             taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
             taskToUpdateDbResponse.Result.Status = taskStatus.GetString();
             taskToUpdateDbResponse.Result.ToBeSynced = true;

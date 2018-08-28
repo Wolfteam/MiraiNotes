@@ -9,7 +9,6 @@ using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Models.API;
 using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.Generic;
@@ -29,7 +28,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IUserCredentialService _userCredentialService;
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IDispatcherHelper _dispatcher;
+        private readonly ISyncService _syncService;
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -190,7 +189,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand MarkAsCompletedSelectedTasksCommand { get; set; }
 
-        public ICommand RefreshTasksCommand { get; set; }
+        public ICommand SyncCommand { get; set; }
 
         public ICommand SortTasksCommand { get; set; }
 
@@ -215,7 +214,7 @@ namespace MiraiNotes.UWP.ViewModels
             IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            IDispatcherHelper dispatcher)
+            ISyncService syncService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -223,7 +222,7 @@ namespace MiraiNotes.UWP.ViewModels
             _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dataService = dataService;
-            _dispatcher = dispatcher;
+            _syncService = syncService;
 
             RegisterMessages();
             SetCommands();
@@ -287,8 +286,12 @@ namespace MiraiNotes.UWP.ViewModels
             MarkAsCompletedSelectedTasksCommand = new RelayCommand
                 (async () => await ChangeSelectedTasksStatusAsync(GoogleTaskStatus.COMPLETED));
 
-            RefreshTasksCommand = new RelayCommand
-                (async () => await GetAllTasksAsync(CurrentTaskList));
+            SyncCommand = new RelayCommand
+                (async () =>
+                {
+                    await Sync();
+                    await GetAllTasksAsync(CurrentTaskList);
+                });
 
             SortTasksCommand = new RelayCommand<TaskSortType>
                 ((sortBy) => SortTasks(sortBy));
@@ -333,6 +336,35 @@ namespace MiraiNotes.UWP.ViewModels
 
             SubTaskSelectedItemCommand = new RelayCommand<TaskItemViewModel>
                 ((subTask) => OnSubTaskSelected(subTask));
+        }
+
+        private async Task Sync()
+        {
+            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
+            ShowTaskListViewProgressRing = true;
+
+            var syncResults = new List<EmptyResponse>
+            {
+                await _syncService.SyncDownTaskListsAsync(false),
+                await _syncService.SyncDownTasksAsync(false),
+                await _syncService.SyncUpTaskListsAsync(false),
+                await _syncService.SyncUpTasksAsync(false)
+            };
+
+            string message = syncResults.Any(r => !r.Succeed) ?
+                string.Join(",\n", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
+                "A full sync was successfully performed.";
+
+            if (string.IsNullOrEmpty(message))
+                message = "An unknown error occurred while trying to perform the sync operation.";
+
+            ShowTaskListViewProgressRing = false;
+
+            if (syncResults.Any(r => !r.Succeed))
+                await _dialogService
+                    .ShowMessageDialogAsync("Error", $"A full sync completed with errors: {message}");
+            else
+                await _dialogService.ShowMessageDialogAsync("Completed", $"{message}");
         }
 
         public async Task GetAllTasksAsync(TaskListItemViewModel taskList)
@@ -629,7 +661,9 @@ namespace MiraiNotes.UWP.ViewModels
                 dbResponse.Result.CompletedOn = null;
             dbResponse.Result.Status = taskStatus.GetString();
             dbResponse.Result.UpdatedAt = DateTime.Now;
-            dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
+            dbResponse.Result.LocalStatus = dbResponse.Result.LocalStatus == LocalStatus.CREATED ?
+                LocalStatus.CREATED :
+                LocalStatus.UPDATED;
             dbResponse.Result.ToBeSynced = true;
 
             var response = await _dataService
@@ -717,7 +751,10 @@ namespace MiraiNotes.UWP.ViewModels
                     DateTime.Now : (DateTime?)null;
                 taskToUpdateDbResponse.Result.Status = taskStatus.GetString();
                 taskToUpdateDbResponse.Result.UpdatedAt = DateTime.Now;
-                taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
+                taskToUpdateDbResponse.Result.LocalStatus = 
+                    taskToUpdateDbResponse.Result.LocalStatus == LocalStatus.CREATED ?
+                        LocalStatus.CREATED :
+                        LocalStatus.UPDATED;
                 taskToUpdateDbResponse.Result.ToBeSynced = true;
 
                 var updateResponse = await _dataService
@@ -768,11 +805,15 @@ namespace MiraiNotes.UWP.ViewModels
                     tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
+                //TODO: I SHOULD MOVE ALL THIS CHANGE STATUS LOGIC TO THE DATA SERVICE
                 taskToUpdateResponse.Result.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
                     DateTime.Now : (DateTime?)null;
                 taskToUpdateResponse.Result.Status = taskStatus.GetString();
                 taskToUpdateResponse.Result.UpdatedAt = DateTime.Now;
-                taskToUpdateResponse.Result.LocalStatus = LocalStatus.UPDATED;
+                taskToUpdateResponse.Result.LocalStatus =
+                    taskToUpdateResponse.Result.LocalStatus == LocalStatus.CREATED ?
+                        LocalStatus.CREATED :
+                        LocalStatus.UPDATED;
                 taskToUpdateResponse.Result.ToBeSynced = true;
 
                 var updateResponse = await _dataService
@@ -910,8 +951,8 @@ namespace MiraiNotes.UWP.ViewModels
             if (dbResponse.Result.Any(t => t.ToBeSynced))
             {
                 deleteResponse.Add(await _dataService
-                        .TaskService
-                        .RemoveRangeAsync(dbResponse.Result.Where(t => t.ToBeSynced)));
+                    .TaskService
+                    .RemoveRangeAsync(dbResponse.Result.Where(t => t.ToBeSynced)));
             }
             if (dbResponse.Result.Any(t => !t.ToBeSynced))
             {
