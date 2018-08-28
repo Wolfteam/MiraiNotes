@@ -27,14 +27,13 @@ namespace MiraiNotes.UWP.BackgroundTasks
             };
 
             string message = syncResults.Any(r => !r.Succeed) ?
-                string.Join(",", syncResults.Where(r => !r.Succeed).Select(r => r.Message)) :
+                string.Join(",\n", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
                 "A full sync was successfully performed.";
 
             if (string.IsNullOrEmpty(message))
-            {
                 message = "An unknown error occurred while trying to perform the sync operation.";
-            }
 
+            //TODO: MAYBE ADD A SETTING TO SHOW OR NOT SHOW THE NOTIFICATION
             // Generate the toast notification content and pop the toast
             var content = GenerateToastContent(message);
             var toastNotification = new ToastNotification(content.GetXml());

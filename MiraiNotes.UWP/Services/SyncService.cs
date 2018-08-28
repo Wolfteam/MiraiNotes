@@ -2,6 +2,7 @@
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models.API;
 using System;
@@ -156,7 +157,7 @@ namespace MiraiNotes.UWP.Services
             var syncResult = new EmptyResponse
             {
                 Message = string.Empty,
-                Succeed = true
+                Succeed = false
             };
 
             var syncDownResults = new List<EmptyResponse>();
@@ -186,10 +187,14 @@ namespace MiraiNotes.UWP.Services
                 }
                 var downloadedTasks = response.Result.Items;
 
+                //if this task list doesnt contains task
+                if (downloadedTasks == null || downloadedTasks.Count() == 0)
+                    continue;
+
                 //I think i dont need to include the tasklist property
-                var currentTasksDbResponse = (await _dataService
+                var currentTasksDbResponse = await _dataService
                    .TaskService
-                   .GetAsync(t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID, null, string.Empty));
+                   .GetAsync(t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID, null, string.Empty);
 
                 if (!currentTasksDbResponse.Succeed)
                 {
@@ -360,6 +365,8 @@ namespace MiraiNotes.UWP.Services
                         .Where(r => !r.Succeed)
                         .Select(r => r.Message));
             }
+            else
+                syncUpResult.Succeed = true;
             return syncUpResult;
         }
 
@@ -368,7 +375,7 @@ namespace MiraiNotes.UWP.Services
             var syncUpResult = new EmptyResponse
             {
                 Message = string.Empty,
-                Succeed = true
+                Succeed = false
             };
 
             var syncUpResults = new List<EmptyResponse>();
@@ -401,7 +408,31 @@ namespace MiraiNotes.UWP.Services
                         return;
 
                     foreach (var task in tasksToCreate)
-                        syncUpResults.Add(await SaveUpTask(task));
+                    {
+                        string localID = task.GoogleTaskID;
+                        var result = await SaveUpTask(task);
+                        syncUpResults.Add(result);
+
+                        if (!result.Succeed)
+                            continue;
+
+                        //If this isn't a sub task
+                        if (string.IsNullOrEmpty(task.ParentTask))
+                        {
+                            tasksToCreate
+                                .Where(st => st.ParentTask == localID)
+                                .ForEach(st => st.ParentTask = task.GoogleTaskID);
+                        }
+                        //If this is a sub task and there are sts whose position depends in the current one
+                        //we need to update them
+                        else if (tasksToCreate.Any(st => st.Position == localID))
+                        {
+                            //In theory this should only affect 1 st
+                            tasksToCreate
+                                .Where(st => st.Position == localID)
+                                .ForEach(st => st.Position = task.GoogleTaskID);
+                        }
+                    }
                 }),
 
                 //Here we save the tasks that were deleted locally
@@ -434,6 +465,8 @@ namespace MiraiNotes.UWP.Services
                         .Where(r => !r.Succeed)
                         .Select(r => r.Message));
             }
+            else
+                syncUpResult.Succeed = true;
             return syncUpResult;
         }
 
@@ -568,7 +601,10 @@ namespace MiraiNotes.UWP.Services
                 task.ToBeSynced = false;
                 task.GoogleTaskID = response.Result.TaskID;
                 task.UpdatedAt = response.Result.UpdatedAt;
-                result = await _dataService.TaskService.UpdateAsync(task);
+                task.Position = response.Result.Position;
+                task.ParentTask = response.Result.ParentTask;
+
+                result = await _dataService.TaskService.UpdateAsync(task);          
             }
             else
                 result.Message = response.Errors?.ApiError?.Message ??
