@@ -290,7 +290,7 @@ namespace MiraiNotes.UWP.ViewModels
                 (async () =>
                 {
                     await Sync();
-                    await GetAllTasksAsync(CurrentTaskList);
+                    _messenger.Send(true, $"{MessageType.ON_FULL_SYNC}");
                 });
 
             SortTasksCommand = new RelayCommand<TaskSortType>

@@ -126,6 +126,10 @@ namespace MiraiNotes.UWP.ViewModels
                 $"{MessageType.TASK_LIST_ADDED}",
                 OnTaskListAdded);
             _messenger.Register<bool>(this, $"{MessageType.OPEN_PANE}", (open) => OpenPane(open));
+            _messenger.Register<bool>(
+                this, 
+                $"{MessageType.ON_FULL_SYNC}", 
+                async (_) => await InitViewAsync());
         }
 
         private void SetCommands()
@@ -158,9 +162,11 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task InitViewAsync()
         {
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            SelectedItem = 
+                CurrentTaskList = null;
             TaskLists.Clear();
             TaskListsAutoSuggestBoxItems.Clear();
-
+            
             var dbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(

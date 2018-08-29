@@ -98,12 +98,13 @@ namespace MiraiNotes.UWP.Services
                         syncDownResults.Add(r);
                 }),
 
-                //Here we delete any task that is not in remote
+                //Here we delete any task list that is not in remote
                 Task.Run(async() =>
                 {
                     var deletedTaskLists = dbResponse.Result
-                        .Where(ct => !downloadedTaskLists
-                            .Any(dt => dt.TaskListID == ct.GoogleTaskListID));
+                        .Where(ct => 
+                            !downloadedTaskLists.Any(dt => dt.TaskListID == ct.GoogleTaskListID) && 
+                            ct.LocalStatus != LocalStatus.CREATED);
 
                     if (deletedTaskLists.Count() == 0)
                         return;
@@ -237,8 +238,9 @@ namespace MiraiNotes.UWP.Services
                     Task.Run(async() =>
                     {
                         var deletedTasks = currentTasksDbResponse.Result
-                            .Where(ct => !downloadedTasks
-                                .Any(dt => dt.TaskID == ct.GoogleTaskID));
+                            .Where(ct => 
+                                !downloadedTasks.Any(dt => dt.TaskID == ct.GoogleTaskID) && 
+                                ct.LocalStatus != LocalStatus.CREATED);
 
                         if (deletedTasks.Count() == 0)
                             return;
