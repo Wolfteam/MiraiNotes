@@ -171,7 +171,9 @@ namespace MiraiNotes.UWP.Services
 
             var dbResponse = await _dataService
                 .TaskListService
-                .GetAllAsNoTrackingAsync();
+                .GetAsNoTrackingAsync(
+                    tl => tl.LocalStatus != LocalStatus.CREATED && 
+                    tl.LocalStatus != LocalStatus.DELETED);
 
             foreach (var taskList in dbResponse.Result)
             {
