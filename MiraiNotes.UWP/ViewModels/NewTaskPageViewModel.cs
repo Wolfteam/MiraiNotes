@@ -383,36 +383,10 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskProgressRing = true;
 
-            var dbResponse = await _dataService
+            var deleteResponse = await _dataService
                 .TaskService
-                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskID == CurrentTask.TaskID);
+                .RemoveTaskAsync(CurrentTask.TaskID);
 
-            if (!dbResponse.Succeed || dbResponse.Result == null)
-            {
-                ShowTaskProgressRing = false;
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"Couldn't find the task to delete in the db. Error = {dbResponse.Message}");
-                return;
-            }
-
-            EmptyResponse deleteResponse;
-            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
-            {
-                deleteResponse = await _dataService
-                   .TaskService
-                   .RemoveAsync(dbResponse.Result);
-            }
-            else
-            {
-                dbResponse.Result.LocalStatus = LocalStatus.DELETED;
-                dbResponse.Result.UpdatedAt = DateTime.Now;
-                dbResponse.Result.ToBeSynced = true;
-
-                deleteResponse = await _dataService
-                    .TaskService
-                    .UpdateAsync(dbResponse.Result);
-            }
             ShowTaskProgressRing = false;
 
             if (!deleteResponse.Succeed)
@@ -721,42 +695,17 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             ShowTaskProgressRing = true;
-            var dbResponse = await _dataService
+
+            var deleteResponse = await _dataService
                 .TaskService
-                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskID == subTask.TaskID);
-
-            if (!dbResponse.Succeed || dbResponse.Result == null)
-            {
-                ShowTaskProgressRing = false;
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"Coudln't find the {subTask.Title} in the db. Error = {dbResponse.Message}");
-                return;
-            }
-
-            EmptyResponse response;
-            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
-            {
-                response = await _dataService
-                    .TaskService
-                    .RemoveAsync(dbResponse.Result);
-            }
-            else
-            {
-                dbResponse.Result.LocalStatus = LocalStatus.DELETED;
-                dbResponse.Result.ToBeSynced = true;
-                dbResponse.Result.UpdatedAt = DateTime.Now;
-                response = await _dataService
-                   .TaskService
-                   .UpdateAsync(dbResponse.Result);
-            }
+                .RemoveTaskAsync(subTask.TaskID);
 
             ShowTaskProgressRing = false;
-            if (!response.Succeed)
+            if (!deleteResponse.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the selected sub task. Error = {response.Message}");
+                    $"Coudln't delete the selected sub task. Error = {deleteResponse.Message}");
                 return;
             }
             CurrentTask.SubTasks?.Remove(subTask);

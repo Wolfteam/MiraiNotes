@@ -849,37 +849,9 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskListViewProgressRing = true;
             _messenger.Send(true, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
 
-            var dbResponse = await _dataService
+            var deleteResponse = await _dataService
                 .TaskService
-                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskID == taskID);
-
-            if (!dbResponse.Succeed)
-            {
-                ShowTaskListViewProgressRing = false;
-                _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"An unknown error occurred while trying to retrieve task from db. Error = {dbResponse.Message}");
-                return;
-            }
-
-            EmptyResponse deleteResponse;
-            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
-            {
-                deleteResponse = await _dataService
-                   .TaskService
-                   .RemoveAsync(dbResponse.Result);
-            }
-            else
-            {
-                dbResponse.Result.LocalStatus = LocalStatus.DELETED;
-                dbResponse.Result.UpdatedAt = DateTime.Now;
-                dbResponse.Result.ToBeSynced = true;
-
-                deleteResponse = await _dataService
-                    .TaskService
-                    .UpdateAsync(dbResponse.Result);
-            }
+                .RemoveTaskAsync(taskID);
 
             ShowTaskListViewProgressRing = false;
             _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
@@ -888,7 +860,7 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't delete the selected task. Error code = {deleteResponse.Message}");
+                    $"Coudln't delete the selected task. Error = {deleteResponse.Message}");
             }
             else
             {
@@ -924,53 +896,18 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Send(true, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
             ShowTaskListViewProgressRing = true;
 
-            var dbResponse = await _dataService
+            var deleteResponse = await _dataService
                 .TaskService
-                .GetAsNoTrackingAsync(
-                    t => tasksToDelete.Any(td => t.GoogleTaskID == td.TaskID),
-                    null,
-                    string.Empty);
-
-            if (!dbResponse.Succeed)
-            {
-                ShowTaskListViewProgressRing = false;
-                _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"An unknown error occurred while trying to retrieve the tasks from db. Error = {dbResponse.Message}");
-                return;
-            }
-
-            var deleteResponse = new List<EmptyResponse>();
-
-            if (dbResponse.Result.Any(t => t.LocalStatus == LocalStatus.CREATED))
-            {
-                deleteResponse.Add(await _dataService
-                    .TaskService
-                    .RemoveRangeAsync(dbResponse.Result.Where(t => t.LocalStatus == LocalStatus.CREATED)));
-            }
-            if (dbResponse.Result.Any(t => t.LocalStatus != LocalStatus.CREATED))
-            {
-                dbResponse.Result.Where(t => t.LocalStatus != LocalStatus.CREATED).ForEach(t =>
-                {
-                    t.UpdatedAt = DateTime.Now;
-                    t.LocalStatus = LocalStatus.DELETED;
-                    t.ToBeSynced = true;
-                });
-                deleteResponse.Add(await _dataService
-                    .TaskService
-                    .UpdateRangeAsync(dbResponse.Result.Where(t => !t.ToBeSynced)));
-            }
+                .RemoveTaskAsync(tasksToDelete.Select(t => t.TaskID));
 
             ShowTaskListViewProgressRing = false;
             _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
 
-            if (deleteResponse.Any(r => !r.Succeed))
+            if (!deleteResponse.Succeed)
             {
-                string message = string.Join(",", deleteResponse.Where(r => !r.Succeed).Select(r => r.Message));
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"An error occurred, coudln't delete the selected tasks. Error = {message}");
+                    $"An error occurred, coudln't delete the selected tasks. Error = {deleteResponse.Message}");
                 return;
             }
 
