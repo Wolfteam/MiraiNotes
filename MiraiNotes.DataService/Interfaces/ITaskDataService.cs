@@ -28,8 +28,27 @@ namespace MiraiNotes.DataService.Interfaces
         /// </summary>
         /// <param name="selectedTaskListID">The selected task list where the task will be moved to</param>
         /// <param name="taskID">The id of the task to move</param>
-        /// <param name="position">The position</param>
+        /// <param name="parentTask">Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.</param>
+        /// <param name="previous">Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.</param>
         /// <returns><see cref="EmptyResponse"/></returns>
-        Task<Response<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string position);
+        Task<Response<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string previous);
+
+        /// <summary>
+        /// Removes a task and the associated subtasks (if they exist).
+        /// If the LocalStatus equals Created the task will be removed from db,
+        /// otherwise the new LocalStatus will be Removed
+        /// </summary>
+        /// <param name="taskID">The id of the task to delete</param>
+        /// <returns><see cref="EmptyResponse"/></returns>
+        Task<EmptyResponse> RemoveTaskAsync(string taskID);
+
+        /// <summary>
+        /// Removes multiples task and their associated subtasks (if they exist).
+        /// If the LocalStatus equals Created the task will be removed from db,
+        /// otherwise the new LocalStatus will be Removed
+        /// </summary>
+        /// <param name="taskID">The ids of the tasks to delete</param>
+        /// <returns><see cref="EmptyResponse"/></returns>
+        Task<EmptyResponse> RemoveTaskAsync(IEnumerable<string> taskIds);
     }
 }

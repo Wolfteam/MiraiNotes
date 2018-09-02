@@ -627,7 +627,7 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string position)
+        public async Task<Response<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string previous)
         {
             return await Task.Run(async () =>
             {
@@ -661,6 +661,18 @@ namespace MiraiNotes.DataService.Services
                             return response;
                         }
 
+                        //if this isnt a sub task
+                        if (string.IsNullOrEmpty(oldEntity.ParentTask))
+                        {
+                            previous = context.Tasks
+                                .Where(
+                                    t => t.TaskList == taskList && 
+                                    t.LocalStatus != LocalStatus.CREATED &&
+                                    string.IsNullOrEmpty(t.ParentTask))
+                                .OrderBy(t => t.Position)
+                                .LastOrDefault()?.GoogleTaskID;
+                        }
+
                         var entity = new GoogleTask
                         {
                             CompletedOn = oldEntity.CompletedOn,
@@ -671,7 +683,7 @@ namespace MiraiNotes.DataService.Services
                             LocalStatus = LocalStatus.CREATED,
                             Notes = oldEntity.Notes,
                             ParentTask = parentTask,
-                            Position = position,
+                            Position = previous,
                             Status = oldEntity.Status,
                             TaskList = taskList,
                             Title = oldEntity.Title,
@@ -693,6 +705,139 @@ namespace MiraiNotes.DataService.Services
 
                         response.Succeed = await context.SaveChangesAsync() > 0;
                         response.Result = entity;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<EmptyResponse> RemoveTaskAsync(string taskID)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new EmptyResponse
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var entity = await context
+                            .Tasks
+                            .FirstOrDefaultAsync(t => t.GoogleTaskID == taskID);
+
+                        if (entity == null)
+                        {
+                            response.Message = "Couldn't find the task to delete";
+                            return response;
+                        }
+
+                        var subTasks = context
+                            .Tasks
+                            .Where(t => t.ParentTask == entity.GoogleTaskID);
+
+                        if (entity.LocalStatus == LocalStatus.CREATED)
+                        {
+                            context.Remove(entity);
+                            if (subTasks.Count() > 0)
+                                context.RemoveRange(subTasks);
+                        }
+                        else
+                        {
+                            entity.LocalStatus = LocalStatus.DELETED;
+                            entity.UpdatedAt = DateTime.Now;
+                            entity.ToBeSynced = true;
+
+                            context.Update(entity);
+
+                            if (subTasks.Count() > 0)
+                            {
+                                await subTasks.ForEachAsync(st =>
+                                {
+                                    st.LocalStatus = LocalStatus.DELETED;
+                                    st.UpdatedAt = DateTime.Now;
+                                    st.ToBeSynced = true;
+                                });
+                                context.UpdateRange(subTasks);
+                            }
+                        }
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                    }
+                    catch (Exception e)
+                    {
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<EmptyResponse> RemoveTaskAsync(IEnumerable<string> taskIds)
+        {
+            return await Task.Run(async () =>
+            {
+                var response = new EmptyResponse
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var entities = context
+                            .Tasks
+                            .Where(t => taskIds.Any(a => a == t.GoogleTaskID));
+
+                        if (entities.Count() == 0)
+                        {
+                            response.Message = "Couldn't find the tasks to delete";
+                            return response;
+                        }
+
+                        if (entities.Any(t => t.LocalStatus == LocalStatus.CREATED))
+                        {
+                            var tasksToDelete = entities.Where(t => t.LocalStatus == LocalStatus.CREATED);
+                            var subTasks = context
+                                .Tasks
+                                .Where(st => tasksToDelete.Any(t => st.ParentTask == t.GoogleTaskID));
+                            context.RemoveRange(tasksToDelete);
+                            if (subTasks.Count() > 0)
+                                context.RemoveRange(subTasks);
+                        }
+
+                        if (entities.Any(t => t.LocalStatus != LocalStatus.CREATED))
+                        {
+                            var tasksToUpdate = entities.Where(t => t.LocalStatus != LocalStatus.CREATED);
+                            var subTasks = context
+                                .Tasks
+                                .Where(st => tasksToUpdate.Any(t => st.ParentTask == t.GoogleTaskID));
+
+                            await tasksToUpdate.ForEachAsync(t =>
+                            {
+                                t.UpdatedAt = DateTime.Now;
+                                t.LocalStatus = LocalStatus.DELETED;
+                                t.ToBeSynced = true;
+                            });
+
+                            await subTasks.ForEachAsync(t =>
+                            {
+                                t.UpdatedAt = DateTime.Now;
+                                t.LocalStatus = LocalStatus.DELETED;
+                                t.ToBeSynced = true;
+                            });
+
+                            context.UpdateRange(tasksToUpdate);
+                            if (subTasks.Count() > 0)
+                                context.UpdateRange(subTasks);
+                        }
+                        response.Succeed = await context.SaveChangesAsync() > 0;
                     }
                     catch (Exception e)
                     {
