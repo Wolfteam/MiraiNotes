@@ -26,6 +26,8 @@ namespace MiraiNotes.UWP.Pages
         public TasksPage()
         {
             this.InitializeComponent();
+            var vm = (TasksPageViewModel)DataContext;
+            vm.InAppNotificationRequest += ShowInAppNotification;
         }
 
         private void TaskList_ComboBox_DropDownOpened(object sender, object e)
@@ -39,6 +41,11 @@ namespace MiraiNotes.UWP.Pages
             var vm = (TasksPageViewModel)DataContext;
             var task = (sender as ListView).SelectedItem as TaskItemViewModel;
             vm.SubTaskSelectedItemCommand.Execute(task);
+        }
+
+        private void ShowInAppNotification(string message)
+        {
+            Task_InAppNotification.Show(message);
         }
     }
 }

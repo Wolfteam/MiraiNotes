@@ -6,6 +6,7 @@ using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -206,6 +207,10 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand SubTaskSelectedItemCommand { get; set; }
         #endregion
 
+        #region Events
+        public ShowInAppNotificationRequest InAppNotificationRequest { get; set; }
+        #endregion
+
         #region Constructors
         public TasksPageViewModel(
             ICustomDialogService dialogService,
@@ -253,6 +258,10 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.TASK_STATUS_CHANGED_FROM_PANE_FRAME}",
                 (tuple) => OnTaskStatusChanged(tuple.Item1, tuple.Item2));
+            _messenger.Register<string>(
+                this,
+                $"{MessageType.SHOW_IN_APP_NOTIFICATION}",
+                (message) => InAppNotificationRequest?.Invoke(message));
         }
 
         private void SetCommands()
@@ -341,7 +350,9 @@ namespace MiraiNotes.UWP.ViewModels
         private async Task Sync()
         {
             _messenger.Send(false, $"{MessageType.OPEN_PANE}");
-            ShowTaskListViewProgressRing = true;
+            _messenger.Send(
+                new Tuple<bool, string>(true, "Performing a full sync, please wait..."), 
+                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
 
             var syncResults = new List<EmptyResponse>
             {
@@ -355,16 +366,16 @@ namespace MiraiNotes.UWP.ViewModels
                 string.Join(",\n", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
                 "A full sync was successfully performed.";
 
-            if (string.IsNullOrEmpty(message))
+            if (syncResults.Any(r => !r.Succeed))
+                message = $"A full sync completed with errors: {message}";
+            else if (string.IsNullOrEmpty(message))
                 message = "An unknown error occurred while trying to perform the sync operation.";
 
-            ShowTaskListViewProgressRing = false;
+            InAppNotificationRequest?.Invoke(message);
 
-            if (syncResults.Any(r => !r.Succeed))
-                await _dialogService
-                    .ShowMessageDialogAsync("Error", $"A full sync completed with errors: {message}");
-            else
-                await _dialogService.ShowMessageDialogAsync("Completed", $"{message}");
+            _messenger.Send(
+                new Tuple<bool, string>(false, null),
+                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
         }
 
         public async Task GetAllTasksAsync(TaskListItemViewModel taskList)
@@ -615,17 +626,18 @@ namespace MiraiNotes.UWP.ViewModels
                 .AddAsync(entity);
 
             ShowTaskListViewProgressRing = false;
-            if (!response.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"Coudln't create the task list. Error = {response.Message}");
-                return;
-            }
-            await _dialogService.ShowMessageDialogAsync("Succeed", "Task list created.");
+
             _messenger.Send(
                 _mapper.Map<TaskListItemViewModel>(entity),
                 $"{MessageType.TASK_LIST_ADDED}");
+
+            string message = string.Empty;
+            if (!response.Succeed)
+                message = $"Coudln't create the task list. Error = {response.Message}";
+            else
+                message = "Task list succesfully created.";
+
+            InAppNotificationRequest?.Invoke(message);
         }
 
         public async Task ChangeTaskStatusAsync(TaskItemViewModel task, GoogleTaskStatus taskStatus, bool isSubTask)
@@ -690,9 +702,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskListViewProgressRing = false;
 
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"{task.Title} was marked as {statusMessage}.");
+            InAppNotificationRequest?.Invoke($"{task.Title} was marked as {statusMessage}.");
         }
 
         public async Task ChangeSelectedTasksStatusAsync(GoogleTaskStatus taskStatus)
@@ -960,9 +970,8 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Send(selectedTask.TaskID, $"{MessageType.TASK_DELETED_FROM_CONTENT_FRAME}");
 
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"Task sucessfully moved from: {_currentTaskList.Title} to: {selectedTaskList.Title}");
+            InAppNotificationRequest?
+                .Invoke($"Task sucessfully moved from: {_currentTaskList.Title} to: {selectedTaskList.Title}");
         }
 
         public async Task MoveSelectedTasksAsync(TaskListItemViewModel selectedTaskList)
@@ -1028,9 +1037,8 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"Moved {selectedTasks.Count()} task(s) to {selectedTaskList.Title}");
+            InAppNotificationRequest?
+                .Invoke($"Moved {selectedTasks.Count()} task(s) to {selectedTaskList.Title}");
         }
 
         public async Task MoveSubTasksAsync(string taskListID, IEnumerable<TaskItemViewModel> subTasks)

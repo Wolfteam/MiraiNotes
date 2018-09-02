@@ -301,7 +301,7 @@ namespace MiraiNotes.UWP.ViewModels
                 entity.LocalStatus = CurrentTask.IsNew ?
                     LocalStatus.CREATED :
                     entity.LocalStatus == LocalStatus.CREATED ?
-                        LocalStatus.CREATED : 
+                        LocalStatus.CREATED :
                         LocalStatus.UPDATED;
                 entity.ToBeSynced = true;
                 entity.UpdatedAt = DateTime.Now;
@@ -336,9 +336,9 @@ namespace MiraiNotes.UWP.ViewModels
                     moveToDifferentTaskList,
                     Enumerable.Empty<TaskItemViewModel>().ToList());
 
-                await _dialogService.ShowMessageDialogAsync(
-                    "Succeed",
-                    $"The task was sucessfully created into {SelectedTaskList.Title}");
+                _messenger.Send(
+                    $"The task was sucessfully created into {SelectedTaskList.Title}",
+                    $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
                 return;
             }
             else if (isNewTask)
@@ -466,9 +466,9 @@ namespace MiraiNotes.UWP.ViewModels
                 new Tuple<TaskItemViewModel, bool>(task, task.HasParentTask),
                 $"{MessageType.TASK_STATUS_CHANGED_FROM_PANE_FRAME}");
 
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"{task.Title} was marked as {statusMessage}.");
+            _messenger.Send(
+                $"{task.Title} was marked as {statusMessage}.",
+                $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
         }
 
         private void CleanPanel()
@@ -560,8 +560,8 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = true;
 
             var moveResponse = await _dataService
-                 .TaskService
-                 .MoveAsync(SelectedTaskList.TaskListID, CurrentTask.TaskID, CurrentTask.ParentTask, CurrentTask.Position);
+                .TaskService
+                .MoveAsync(SelectedTaskList.TaskListID, CurrentTask.TaskID, null, null);
 
             if (!moveResponse.Succeed)
             {
@@ -587,9 +587,10 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = false;
 
             await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"Task sucessfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}");
+
+            _messenger.Send(
+                $"Task sucessfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}",
+                $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
         }
 
         private async Task NewSubTaskAsync()

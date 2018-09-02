@@ -517,11 +517,10 @@
         <controls:InAppNotification
             x:Name="Task_InAppNotification"
             AnimationDuration="00:00:00.1800000"
-            Content="This is a test message."
             HorizontalOffset="12.88"
             ShowDismissButton="True"
             StackMode="QueueBehind"
             VerticalOffset="200"
-            Visibility="Visible" />
+            Visibility="Collapsed" />
     </Grid>
 </Page>

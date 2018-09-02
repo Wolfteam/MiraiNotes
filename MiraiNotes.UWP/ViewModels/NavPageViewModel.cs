@@ -37,6 +37,8 @@ namespace MiraiNotes.UWP.ViewModels
         private string _taskListAutoSuggestBoxText;
 
         private bool _isPaneOpen;
+        private bool _showMainProgressBar;
+        private string _mainProgressBarText;
         #endregion
 
         #region Properties
@@ -74,6 +76,18 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _isPaneOpen; }
             set { Set(ref _isPaneOpen, value); }
+        }
+
+        public bool ShowMainProgressBar
+        {
+            get { return _showMainProgressBar; }
+            set { Set(ref _showMainProgressBar, value); }
+        }
+
+        public string MainProgressBarText
+        {
+            get { return _mainProgressBarText; }
+            set { Set(ref _mainProgressBarText, value); }
         }
         #endregion
 
@@ -130,6 +144,10 @@ namespace MiraiNotes.UWP.ViewModels
                 this, 
                 $"{MessageType.ON_FULL_SYNC}", 
                 async (_) => await InitViewAsync());
+            _messenger.Register<Tuple<bool, string>>(
+                this, 
+                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}", 
+                (tuple) => ShowLoading(tuple.Item1, tuple.Item2));
         }
 
         private void SetCommands()
@@ -252,7 +270,7 @@ namespace MiraiNotes.UWP.ViewModels
                 //delete user settings
                 //delete all view models
                 OpenPane(false);
-                _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+                ShowLoading(true, "Logging out... Please wait..");
 
                 await _dataService
                     .UserService
@@ -260,7 +278,7 @@ namespace MiraiNotes.UWP.ViewModels
 
                 _userCredentialService.DeleteUserCredentials();
                 _navigationService.GoBack();
-                _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+                ShowLoading(false);
             }
         }
 
@@ -390,12 +408,19 @@ namespace MiraiNotes.UWP.ViewModels
             TaskLists.Remove(taskList);
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            await _dialogService.ShowMessageDialogAsync(
-                "Succeed",
-                $"Sucessfully removed {taskList.Title} task list");
+
+            _messenger.Send(
+                $"Sucessfully removed {taskList.Title} task list",
+                $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
         }
 
         private void OpenPane(bool isPaneOpen) => IsPaneOpen = isPaneOpen;
+
+        private void ShowLoading(bool show, string message = null)
+        {
+            ShowMainProgressBar = show;
+            MainProgressBarText = message;
+        }
         #endregion
     }
 }

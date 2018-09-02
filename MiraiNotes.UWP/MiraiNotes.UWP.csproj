@@ -107,6 +107,7 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\NavigationViewSelectionChangedEventArgsConverter.cs" />
     <Compile Include="Converters\TestConverter.cs" />
+    <Compile Include="Delegates\Delegates.cs" />
     <Compile Include="Design\DesignGoogleTaskListService.cs" />
     <Compile Include="Design\DesignGoogleTaskService.cs" />
     <Compile Include="Extensions\FocusExtension.cs" />
