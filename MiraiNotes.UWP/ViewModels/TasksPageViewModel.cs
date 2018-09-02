@@ -661,9 +661,8 @@ namespace MiraiNotes.UWP.ViewModels
                 dbResponse.Result.CompletedOn = null;
             dbResponse.Result.Status = taskStatus.GetString();
             dbResponse.Result.UpdatedAt = DateTime.Now;
-            dbResponse.Result.LocalStatus = dbResponse.Result.LocalStatus == LocalStatus.CREATED ?
-                LocalStatus.CREATED :
-                LocalStatus.UPDATED;
+            if (dbResponse.Result.LocalStatus != LocalStatus.CREATED)
+                dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
             dbResponse.Result.ToBeSynced = true;
 
             var response = await _dataService
@@ -751,10 +750,8 @@ namespace MiraiNotes.UWP.ViewModels
                     DateTime.Now : (DateTime?)null;
                 taskToUpdateDbResponse.Result.Status = taskStatus.GetString();
                 taskToUpdateDbResponse.Result.UpdatedAt = DateTime.Now;
-                taskToUpdateDbResponse.Result.LocalStatus = 
-                    taskToUpdateDbResponse.Result.LocalStatus == LocalStatus.CREATED ?
-                        LocalStatus.CREATED :
-                        LocalStatus.UPDATED;
+                if (taskToUpdateDbResponse.Result.LocalStatus != LocalStatus.CREATED)
+                    taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
                 taskToUpdateDbResponse.Result.ToBeSynced = true;
 
                 var updateResponse = await _dataService
@@ -810,10 +807,8 @@ namespace MiraiNotes.UWP.ViewModels
                     DateTime.Now : (DateTime?)null;
                 taskToUpdateResponse.Result.Status = taskStatus.GetString();
                 taskToUpdateResponse.Result.UpdatedAt = DateTime.Now;
-                taskToUpdateResponse.Result.LocalStatus =
-                    taskToUpdateResponse.Result.LocalStatus == LocalStatus.CREATED ?
-                        LocalStatus.CREATED :
-                        LocalStatus.UPDATED;
+                if (taskToUpdateResponse.Result.LocalStatus != LocalStatus.CREATED)
+                    taskToUpdateResponse.Result.LocalStatus = LocalStatus.UPDATED;
                 taskToUpdateResponse.Result.ToBeSynced = true;
 
                 var updateResponse = await _dataService
@@ -869,7 +864,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             EmptyResponse deleteResponse;
-            if (dbResponse.Result.ToBeSynced)
+            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
             {
                 deleteResponse = await _dataService
                    .TaskService
@@ -948,15 +943,15 @@ namespace MiraiNotes.UWP.ViewModels
 
             var deleteResponse = new List<EmptyResponse>();
 
-            if (dbResponse.Result.Any(t => t.ToBeSynced))
+            if (dbResponse.Result.Any(t => t.LocalStatus == LocalStatus.CREATED))
             {
                 deleteResponse.Add(await _dataService
                     .TaskService
-                    .RemoveRangeAsync(dbResponse.Result.Where(t => t.ToBeSynced)));
+                    .RemoveRangeAsync(dbResponse.Result.Where(t => t.LocalStatus == LocalStatus.CREATED)));
             }
-            if (dbResponse.Result.Any(t => !t.ToBeSynced))
+            if (dbResponse.Result.Any(t => t.LocalStatus != LocalStatus.CREATED))
             {
-                dbResponse.Result.Where(t => !t.ToBeSynced).ForEach(t =>
+                dbResponse.Result.Where(t => t.LocalStatus != LocalStatus.CREATED).ForEach(t =>
                 {
                     t.UpdatedAt = DateTime.Now;
                     t.LocalStatus = LocalStatus.DELETED;

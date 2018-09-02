@@ -397,7 +397,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             EmptyResponse deleteResponse;
-            if (dbResponse.Result.ToBeSynced)
+            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
             {
                 deleteResponse = await _dataService
                    .TaskService
@@ -464,11 +464,8 @@ namespace MiraiNotes.UWP.ViewModels
             taskToUpdateDbResponse.Result.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
                 DateTime.Now : (DateTime?)null;
 
-            taskToUpdateDbResponse.Result.LocalStatus = 
-                taskToUpdateDbResponse.Result.LocalStatus == LocalStatus.CREATED ?
-                    LocalStatus.CREATED :
-                    LocalStatus.UPDATED;
-            taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
+            if (taskToUpdateDbResponse.Result.LocalStatus != LocalStatus.CREATED)
+                taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
             taskToUpdateDbResponse.Result.Status = taskStatus.GetString();
             taskToUpdateDbResponse.Result.ToBeSynced = true;
             taskToUpdateDbResponse.Result.UpdatedAt = DateTime.Now;
@@ -738,7 +735,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             EmptyResponse response;
-            if (dbResponse.Result.ToBeSynced)
+            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
             {
                 response = await _dataService
                     .TaskService

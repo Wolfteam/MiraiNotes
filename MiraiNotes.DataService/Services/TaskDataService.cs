@@ -680,7 +680,7 @@ namespace MiraiNotes.DataService.Services
                             UpdatedAt = DateTime.Now
                         };
 
-                        if (oldEntity.ToBeSynced)
+                        if (oldEntity.LocalStatus == LocalStatus.CREATED)
                             context.Remove(oldEntity);
                         else
                         {

@@ -394,7 +394,7 @@ namespace MiraiNotes.UWP.Services
                 .TaskService
                 .GetAsNoTrackingAsync(
                     task => task.ToBeSynced,
-                    task => task.OrderBy(t => t.UpdatedAt),
+                    task => task.OrderBy(t => t.ParentTask).ThenBy(t => t.Position),
                     nameof(GoogleTask.TaskList));
 
             if (!tasksToBeSyncedDbResponse.Succeed)

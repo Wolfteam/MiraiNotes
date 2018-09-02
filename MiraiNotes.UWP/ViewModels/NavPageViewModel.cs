@@ -293,7 +293,8 @@ namespace MiraiNotes.UWP.ViewModels
             dbResponse.Result.Title = newTitle;
             dbResponse.Result.UpdatedAt = DateTime.Now;
             dbResponse.Result.ToBeSynced = true;
-            dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
+            if (dbResponse.Result.LocalStatus != LocalStatus.CREATED)
+                dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
 
             var response = await _dataService
                 .TaskListService
@@ -349,7 +350,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             EmptyResponse response;
             //if the task is created but wasnt synced, we remove it from the db
-            if (dbResponse.Result.ToBeSynced)
+            if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
             {
                 response = await _dataService
                     .TaskListService

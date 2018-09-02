@@ -11,6 +11,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
     public sealed class SyncBackgroundTask : IBackgroundTask
     {
         private readonly ISyncService _syncService;
+        private BackgroundTaskDeferral _deferral;
         public SyncBackgroundTask(ISyncService syncService)
         {
             _syncService = syncService;
@@ -18,6 +19,8 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
+            _deferral = taskInstance.GetDeferral();
+
             var syncResults = new List<EmptyResponse>
             {
                 await _syncService.SyncDownTaskListsAsync(true),
@@ -38,6 +41,8 @@ namespace MiraiNotes.UWP.BackgroundTasks
             var content = GenerateToastContent(message);
             var toastNotification = new ToastNotification(content.GetXml());
             ToastNotificationManager.CreateToastNotifier().Show(toastNotification);
+
+            _deferral.Complete();
         }
 
         public ToastContent GenerateToastContent(string results)
