@@ -12,6 +12,10 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Pages;
 using MiraiNotes.UWP.Services;
+using Serilog;
+using Serilog.Filters;
+using System.IO;
+using Windows.Storage;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -71,6 +75,9 @@ namespace MiraiNotes.UWP.ViewModels
             navigation.Configure(HOME_PAGE, typeof(MainPage));
             navigation.Configure(LOGIN_PAGE, typeof(LoginPage));
 
+            var logger = SetupLogging();
+            SimpleIoc.Default.Register(() => logger);
+
             var config = new MapperConfiguration(cfg =>
             {
                 // Add all profiles in current assembly
@@ -113,6 +120,57 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<NavPageViewModel>();
             SimpleIoc.Default.Register<TasksPageViewModel>();
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
+        }
+
+        private ILogger SetupLogging()
+        {
+            const string fileOutputTemplate = "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
+
+            var logger  = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource(typeof(NavPageViewModel).Namespace))
+                    .WriteTo.File(
+                        path: Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_app_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncService).Namespace}.{nameof(SyncService)}"))
+                    .WriteTo.File(
+                        path: Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_sync_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskListDataService).Namespace}.{nameof(TaskListDataService)}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_tasklist_data_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskDataService).Namespace}.{nameof(TaskDataService)}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_task_data_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(UserDataService).Namespace}.{nameof(UserDataService)}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_user_data_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .CreateLogger();
+            Log.Logger = logger;
+            return logger;
         }
     }
 }

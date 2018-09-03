@@ -3,6 +3,7 @@ using MiraiNotes.Data;
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,80 +14,101 @@ namespace MiraiNotes.DataService.Services
 {
     public class TaskListDataService : ITaskListDataService
     {
+        private readonly ILogger _logger;
+        public TaskListDataService(ILogger logger)
+        {
+            _logger = logger.ForContext<TaskListDataService>();
+        }
+
         public async Task<Response<GoogleTaskList>> AddAsync(GoogleTaskList entity)
         {
-            var response = new Response<GoogleTaskList>
+            return await Task.Run(async () =>
             {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
+                _logger.Information("AddAsync: Trying to add a new task list {@TaskList}", entity);
+                var response = new Response<GoogleTaskList>
                 {
-                    var currentUser = await context.Users
-                       .FirstOrDefaultAsync(u => u.IsActive);
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var currentUser = await context.Users
+                           .FirstOrDefaultAsync(u => u.IsActive);
 
-                    if (currentUser == null)
-                    {
-                        response.Message = "Couldn't find the current active user in the db";
+                        if (currentUser == null)
+                        {
+                            response.Message = "Couldn't find the current active user in the db";
+                            _logger.Warning("AddAsync: Couldn't find the current active user in the db");
+                        }
+                        else
+                        {
+                            entity.User = currentUser;
+                            await context.AddAsync(entity);
+                            response.Succeed = await context.SaveChangesAsync() > 0;
+                            response.Result = entity;
+                        }
+                        _logger.Information("AddAsync: Completed successfully");
                     }
-                    else
+                    catch (Exception e)
                     {
-                        entity.User = currentUser;
-                        await context.AddAsync(entity);
-                        response.Succeed = await context.SaveChangesAsync() > 0;
-                        response.Result = entity;
+                        _logger.Error(e, "AddAsync: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
                     }
                 }
-                catch (Exception e)
-                {
-                    response.Message = GetExceptionMessage(e);
-                }
-            }
-            return response;
+                return response;
+            }).ConfigureAwait(false);
         }
 
         public async Task<Response<IEnumerable<GoogleTaskList>>> AddRangeAsync(IEnumerable<GoogleTaskList> entities)
         {
-            var response = new Response<IEnumerable<GoogleTaskList>>
+            return await Task.Run(async () =>
             {
-                Message = string.Empty,
-                Succeed = false
-            };
-            using (var context = new MiraiNotesContext())
-            {
-                try
+                _logger.Information($"AddRangeAsync: Trying to add {entities.Count()} task lists");
+                var response = new Response<IEnumerable<GoogleTaskList>>
                 {
-                    var currentUser = await context.Users
-                        .FirstOrDefaultAsync(u => u.IsActive);
-
-                    if (currentUser == null)
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
                     {
-                        response.Message = "Couldn't find the current active user in the db";
+                        var currentUser = await context.Users
+                            .FirstOrDefaultAsync(u => u.IsActive);
+
+                        if (currentUser == null)
+                        {
+                            response.Message = "Couldn't find the current active user in the db";
+                            _logger.Warning("AddRangeAsync: Couldn't find the current active user in the db");
+                        }
+                        else
+                        {
+                            var e = entities.ToList();
+                            e.ForEach(tl => tl.User = currentUser);
+
+                            await context.AddRangeAsync(e);
+                            response.Succeed = await context.SaveChangesAsync() > 0;
+                            response.Result = entities;
+                        }
+                        _logger.Information("AddRangeAsync: Completed successfully");
                     }
-                    else
+                    catch (Exception e)
                     {
-                        var e = entities.ToList();
-                        e.ForEach(tl => tl.User = currentUser);
-
-                        await context.AddRangeAsync(e);
-                        response.Succeed = await context.SaveChangesAsync() > 0;
-                        response.Result = entities;
+                        _logger.Error(e, "AddRangeAsync: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
                     }
                 }
-                catch (Exception e)
-                {
-                    response.Message = GetExceptionMessage(e);
-                }
-            }
-            return response;
+                return response;
+            }).ConfigureAwait(false);
         }
 
         public async Task<Response<bool>> ExistsAsync(Expression<Func<GoogleTaskList, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("ExistsAsync: Trying to find the first task list that matches {@Predicate}", predicate);
                 var response = new Response<bool>
                 {
                     Succeed = false,
@@ -101,9 +123,11 @@ namespace MiraiNotes.DataService.Services
                             .Where(predicate)
                             .CountAsync() == 1;
                         response.Succeed = true;
+                        _logger.Information("ExistsAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "ExistsAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -115,6 +139,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("FirstOrDefaultAsync: Trying to find the first task list that matches {@Predicate}", predicate);
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -129,9 +154,11 @@ namespace MiraiNotes.DataService.Services
                             .TaskLists
                             .FirstOrDefaultAsync(predicate);
                         response.Succeed = true;
+                        _logger.Information("FirstOrDefaultAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "FirstOrDefaultAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -143,6 +170,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("FirstOrDefaultAsNoTrackingAsync: Trying to find the first task list that matches {@Predicate}", predicate);
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -158,9 +186,11 @@ namespace MiraiNotes.DataService.Services
                             .AsNoTracking()
                             .FirstOrDefaultAsync(predicate);
                         response.Succeed = true;
+                        _logger.Information("FirstOrDefaultAsNoTrackingAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "FirstOrDefaultAsNoTrackingAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -172,6 +202,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("GetAllAsNoTrackingAsync: Trying to get all the task list");
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -187,11 +218,12 @@ namespace MiraiNotes.DataService.Services
                             .AsNoTracking()
                             .ToListAsync();
                         response.Succeed = true;
+                        _logger.Information("GetAllAsNoTrackingAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "GetAllAsNoTrackingAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
-                        response.Result = Enumerable.Empty<GoogleTaskList>();
                     }
                 }
                 return response;
@@ -202,6 +234,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("GetAllAsync: Trying to get all the task lists");
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -216,10 +249,11 @@ namespace MiraiNotes.DataService.Services
                             .TaskLists
                             .ToListAsync();
                         response.Succeed = true;
+                        _logger.Information("GetAllAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
-                        response.Result = Enumerable.Empty<GoogleTaskList>();
+                        _logger.Error(e, "GetAllAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -231,6 +265,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("GetAsNoTrackingAsync: Getting all task lists");
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -266,10 +301,11 @@ namespace MiraiNotes.DataService.Services
                                 .ToListAsync();
                         }
                         response.Succeed = true;
+                        _logger.Information("GetAsNoTrackingAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
-                        response.Result = Enumerable.Empty<GoogleTaskList>();
+                        _logger.Error(e, "GetAsNoTrackingAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -281,6 +317,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("GetAsync: Getting all task lists that matches {@Predicate}", predicate);
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -295,10 +332,11 @@ namespace MiraiNotes.DataService.Services
                             .Where(predicate)
                             .ToListAsync();
                         response.Succeed = true;
+                        _logger.Information("GetAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
-                        response.Result = Enumerable.Empty<GoogleTaskList>();
+                        _logger.Error(e, "GetAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -310,6 +348,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("GetAsync: Getting all task lists with {@Filter}", filter);
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -333,9 +372,11 @@ namespace MiraiNotes.DataService.Services
 
                         response.Result = await query.FirstOrDefaultAsync();
                         response.Succeed = true;
+                        _logger.Information("GetAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "GetAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -347,6 +388,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("GetAsync: Getting all task lists with {@Filter}", filter);
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -377,10 +419,11 @@ namespace MiraiNotes.DataService.Services
                             response.Result = await query.ToListAsync();
                         }
                         response.Succeed = true;
+                        _logger.Information("GetAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
-                        response.Result = Enumerable.Empty<GoogleTaskList>();
+                        _logger.Error(e, "GetAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -392,6 +435,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information($"GetByIdAsync: Looking for task list with id = {id}");
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -405,9 +449,11 @@ namespace MiraiNotes.DataService.Services
                             .TaskLists
                             .FindAsync(id);
                         response.Succeed = true;
+                        _logger.Information("GetByIdAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "GetByIdAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -419,6 +465,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("RemoveAsync: Trying to delete {@TaskList}", entity);
                 var response = new EmptyResponse
                 {
                     Message = string.Empty,
@@ -430,9 +477,11 @@ namespace MiraiNotes.DataService.Services
                     {
                         context.Remove(entity);
                         response.Succeed = await context.SaveChangesAsync() > 0;
+                        _logger.Information("RemoveAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "RemoveAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -444,6 +493,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information($"RemoveAsync: Trying to delete task list with id {id}");
                 var response = new EmptyResponse
                 {
                     Message = string.Empty,
@@ -457,15 +507,18 @@ namespace MiraiNotes.DataService.Services
                         if (entity == null)
                         {
                             response.Message = "Entity couldn't be removed cause it wasnt found";
+                            _logger.Warning("RemoveAsync: Task list couldn't be removed cause it wasnt found");
                         }
                         else
                         {
                             context.Remove(entity);
                             response.Succeed = await context.SaveChangesAsync() > 0;
                         }
+                        _logger.Information("RemoveAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "RemoveAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -477,6 +530,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("RemoveAsync: Trying to delete task lists that matches {@Filter}", filter);
                 var response = new EmptyResponse
                 {
                     Message = string.Empty,
@@ -489,9 +543,11 @@ namespace MiraiNotes.DataService.Services
                         var entities = await GetAsync(filter);
                         context.RemoveRange(entities);
                         response.Succeed = await context.SaveChangesAsync() > 0;
+                        _logger.Information("RemoveAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "RemoveAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -503,6 +559,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information($"RemoveRangeAsync: Trying to delete {entities.Count()} task lists");
                 var response = new EmptyResponse
                 {
                     Message = string.Empty,
@@ -514,9 +571,11 @@ namespace MiraiNotes.DataService.Services
                     {
                         context.RemoveRange(entities);
                         response.Succeed = await context.SaveChangesAsync() > 0;
+                        _logger.Information("RemoveRangeAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "RemoveRangeAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -528,6 +587,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information("UpdateAsync: Trying to update {@TaskList}", entity);
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -540,9 +600,11 @@ namespace MiraiNotes.DataService.Services
                         context.Entry(entity).State = EntityState.Modified;
                         response.Succeed = await context.SaveChangesAsync() > 0;
                         response.Result = entity;
+                        _logger.Information("UpdateAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "UpdateAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -554,6 +616,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
+                _logger.Information($"UpdateRangeAsync: Trying to update {entities.Count()} task lists");
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -569,9 +632,11 @@ namespace MiraiNotes.DataService.Services
                         }
                         response.Succeed = await context.SaveChangesAsync() > 0;
                         response.Result = entities;
+                        _logger.Information("UpdateRangeAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "UpdateRangeAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
