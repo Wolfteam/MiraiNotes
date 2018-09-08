@@ -3,6 +3,7 @@ using Microsoft.Toolkit.Uwp.Helpers;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Pages;
+using Serilog;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -135,10 +136,12 @@ namespace MiraiNotes.UWP
             var deferral = args.TaskInstance.GetDeferral();
 
             var syncService = ServiceLocator.Current.GetInstance<ISyncService>();
+            var logger = ServiceLocator.Current.GetInstance<ILogger>();
+
             switch (args.TaskInstance.Task.Name)
             {
                 case nameof(SyncBackgroundTask):
-                    new SyncBackgroundTask(syncService).Run(args.TaskInstance);
+                    new SyncBackgroundTask(syncService, logger).Run(args.TaskInstance);
                     break;
             }
 

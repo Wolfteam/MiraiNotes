@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.DataService.Services;
+using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Design;
 using MiraiNotes.UWP.Handlers;
 using MiraiNotes.UWP.Helpers;
@@ -164,6 +165,14 @@ namespace MiraiNotes.UWP.ViewModels
                     .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(UserDataService).Namespace}.{nameof(UserDataService)}"))
                     .WriteTo.File(
                         Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_user_data_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncBackgroundTask).Namespace}.{nameof(SyncBackgroundTask)}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_background_tasks_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
