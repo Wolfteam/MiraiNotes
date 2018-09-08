@@ -213,7 +213,16 @@ namespace MiraiNotes.UWP.Services
 
                 //if this task list doesnt contains task
                 if (downloadedTasks == null || downloadedTasks.Count() == 0)
+                {
+                    _logger.Information($"SyncDownTasksAsync: Task list = {taskList.Title} does not contains tasks, trying to remove any local task associated to it");
+                    var deleteResponse = await _dataService
+                        .TaskService
+                        .RemoveAsync(
+                            t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID && 
+                            t.LocalStatus != LocalStatus.CREATED);
+                    syncDownResults.Add(deleteResponse);
                     continue;
+                }
 
                 _logger.Information($"SyncDownTasksAsync: Trying to get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
                 //I think i dont need to include the tasklist property
