@@ -108,7 +108,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("ExistsAsync: Trying to find the first task list that matches {@Predicate}", predicate);
+                _logger.Information($"ExistsAsync: Trying to find the first task list that matches {predicate.ToString()}");
                 var response = new Response<bool>
                 {
                     Succeed = false,
@@ -139,7 +139,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("FirstOrDefaultAsync: Trying to find the first task list that matches {@Predicate}", predicate);
+                _logger.Information($"FirstOrDefaultAsync: Trying to find the first task list that matches {predicate.ToString()}");
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -170,7 +170,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("FirstOrDefaultAsNoTrackingAsync: Trying to find the first task list that matches {@Predicate}", predicate);
+                _logger.Information($"FirstOrDefaultAsNoTrackingAsync: Trying to find the first task list that matches {predicate.ToString()}");
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -317,7 +317,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("GetAsync: Getting all task lists that matches {@Predicate}", predicate);
+                _logger.Information($"GetAsync: Getting all task lists that matches {predicate.ToString()}");
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -348,7 +348,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("GetAsync: Getting all task lists with {@Filter}", filter);
+                _logger.Information($"GetAsync: Getting all task lists with {filter.ToString()}");
                 var response = new Response<GoogleTaskList>
                 {
                     Message = string.Empty,
@@ -388,7 +388,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("GetAsync: Getting all task lists with {@Filter}", filter);
+                _logger.Information($"GetAsync: Getting all task lists with {filter?.ToString() ?? string.Empty}");
                 var response = new Response<IEnumerable<GoogleTaskList>>
                 {
                     Message = string.Empty,
@@ -526,11 +526,11 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleTaskList, bool>> filter = null)
+        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleTaskList, bool>> filter)
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("RemoveAsync: Trying to delete task lists that matches {@Filter}", filter);
+                _logger.Information($"RemoveAsync: Trying to delete task lists that matches {filter.ToString()}");
                 var response = new EmptyResponse
                 {
                     Message = string.Empty,
@@ -540,9 +540,17 @@ namespace MiraiNotes.DataService.Services
                 {
                     try
                     {
-                        var entities = await GetAsync(filter);
-                        context.RemoveRange(entities);
-                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        var entities = context
+                            .TaskLists
+                            .Where(filter);
+
+                        if (entities.Count() > 0)
+                        {
+                            context.RemoveRange(entities);
+                            response.Succeed = await context.SaveChangesAsync() > 0;
+                        }
+                        else
+                            response.Succeed = true;
                         _logger.Information("RemoveAsync: Completed successfully");
                     }
                     catch (Exception e)

@@ -131,7 +131,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("ExistsAsync: Trying to find the first user that matches {@Predicate}", predicate);
+                _logger.Information($"ExistsAsync: Trying to find the first user that matches {predicate.ToString()}");
                 var response = new Response<bool>
                 {
                     Message = string.Empty,
@@ -161,7 +161,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("FirstOrDefaultAsync: Trying to find the user that matches {@Predicate}", predicate);
+                _logger.Information($"FirstOrDefaultAsync: Trying to find the user that matches {predicate.ToString()}");
                 var response = new Response<GoogleUser>
                 {
                     Message = string.Empty,
@@ -191,7 +191,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("FirstOrDefaultAsNoTrackingAsync: Trying to find the first user that matches {@Predicate}", predicate);
+                _logger.Information($"FirstOrDefaultAsNoTrackingAsync: Trying to find the user that matches {predicate.ToString()}");
                 var response = new Response<GoogleUser>
                 {
                     Message = string.Empty,
@@ -334,7 +334,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("GetAsync: Getting all users that matches {@Predicate}", predicate);
+                _logger.Information($"GetAsync: Getting all users that matches {predicate.ToString()}");
                 var response = new Response<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
@@ -365,7 +365,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("GetAsync: Getting all users with {@Filter}", filter);
+                _logger.Information($"GetAsync: Getting all users with {filter.ToString()}");
                 var response = new Response<GoogleUser>
                 {
                     Message = string.Empty,
@@ -405,7 +405,7 @@ namespace MiraiNotes.DataService.Services
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("GetAsync: Getting all users with {@Filter}", filter);
+                _logger.Information($"GetAsync: Getting all users with {filter?.ToString() ?? string.Empty}");
                 var response = new Response<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
@@ -543,11 +543,11 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleUser, bool>> filter = null)
+        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleUser, bool>> filter)
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("RemoveAsync: Trying to delete user that matches {@Filter}", filter);
+                _logger.Information($"RemoveAsync: Trying to delete user that matches {filter.ToString()}");
                 var response = new EmptyResponse
                 {
                     Message = string.Empty,
@@ -557,10 +557,17 @@ namespace MiraiNotes.DataService.Services
                 {
                     try
                     {
-                        var entities = await GetAsync(filter);
-                        context.RemoveRange(entities);
-                        response.Succeed = await context.SaveChangesAsync() > 0;
-                        _logger.Information("RemoveAsync: Completed successfully");
+                        var entities = context
+                            .Users
+                            .Where(filter);
+
+                        if (entities.Count() > 0)
+                        {
+                            context.RemoveRange(entities);
+                            response.Succeed = await context.SaveChangesAsync() > 0;
+                        }
+                        else
+                            response.Succeed = true; _logger.Information("RemoveAsync: Completed successfully");
                     }
                     catch (Exception e)
                     {
