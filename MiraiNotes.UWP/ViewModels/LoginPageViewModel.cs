@@ -155,7 +155,15 @@ namespace MiraiNotes.UWP.ViewModels
                         //We save the token before doing any other network requst..
                         _userCredentialService.SaveUserCredentials(null, tokenResponse);
 
-                        await SignInAsync();
+                        bool isSignedIn = await SignInAsync();
+                        if (!isSignedIn)
+                        {
+                            await _dataService
+                                .UserService
+                                .ChangeCurrentUserStatus(false);
+
+                            _userCredentialService.DeleteUserCredentials();
+                        }
                         break;
                     case WebAuthenticationStatus.UserCancel:
                         break;
@@ -179,14 +187,15 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        private async Task SignInAsync()
+        private async Task<bool> SignInAsync()
         {
+            bool result = false;
             var user = await _googleUserService.GetUserInfoAsync();
             if (user == null)
             {
                 _userCredentialService.DeleteUserCredentials();
                 await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
-                return;
+                return result;
             }
 
             var response = await _dataService
@@ -213,7 +222,7 @@ namespace MiraiNotes.UWP.ViewModels
                 if (!userInDbResponse.Succeed)
                 {
                     await _dialogService.ShowMessageDialogAsync("Error", userInDbResponse.Message);
-                    return;
+                    return result;
                 }
 
                 userInDbResponse.Result.Fullname = user.FullName;
@@ -231,7 +240,7 @@ namespace MiraiNotes.UWP.ViewModels
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
                     $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
-                return;
+                return result;
             }
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
@@ -239,7 +248,7 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 await _dialogService
                     .ShowMessageDialogAsync("Error", syncResult.Message);
-                return;
+                return result;
             }
 
             syncResult = await _syncService.SyncDownTasksAsync(false);
@@ -248,10 +257,11 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 await _dialogService
                     .ShowMessageDialogAsync("Error", syncResult.Message);
-                return;
+                return result;
             }
 
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
+            return !result;
         }
         #endregion
     }
