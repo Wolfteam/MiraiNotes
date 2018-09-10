@@ -146,8 +146,10 @@
     <Compile Include="Models\API\GoogleUserModel.cs" />
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
+    <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\MessageType.cs" />
+    <Compile Include="Services\ApplicationSettingsService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\SmartObservableCollection.cs" />
