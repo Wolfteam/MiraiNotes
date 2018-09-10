@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
@@ -271,7 +272,7 @@ namespace MiraiNotes.UWP.ViewModels
                 //delete all view models
                 OpenPane(false);
                 ShowLoading(true, "Logging out... Please wait..");
-
+                BackgroundTasksManager.UnregisterBackgroundTasks();
                 await _dataService
                     .UserService
                     .ChangeCurrentUserStatus(false);

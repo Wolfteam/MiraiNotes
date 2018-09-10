@@ -1,7 +1,11 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Toolkit.Uwp.Notifications;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.ViewModels;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Background;
@@ -13,18 +17,35 @@ namespace MiraiNotes.UWP.BackgroundTasks
     {
         private readonly ISyncService _syncService;
         private readonly ILogger _logger;
+        private readonly IMessenger _messenger;
         private BackgroundTaskDeferral _deferral;
 
-        public SyncBackgroundTask(ISyncService syncService, ILogger logger)
+        public SyncBackgroundTask()
         {
-            _syncService = syncService;
-            _logger = logger.ForContext<SyncBackgroundTask>();
+            var vml = new ViewModelLocator();
+
+            _syncService = ViewModelLocator.SyncService;
+            _logger = ViewModelLocator.Logger.ForContext<SyncBackgroundTask>();
+            _messenger = ViewModelLocator.Messenger;
+
+            if (vml.IsAppAlreadyRunning())
+                _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is already running");
+            else
+                _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is not running");
         }
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
+            //TODO: THIS BG TASK SHOULD COULD RUN FOR MORE THAN 30 SEC...
+            taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
+
             _deferral = taskInstance.GetDeferral();
             _logger.Information($"Starting the {nameof(SyncBackgroundTask)}");
+
+            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
+            _messenger.Send(
+                new Tuple<bool, string>(true, "Performing a background full sync, please wait..."),
+                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
 
             var syncResults = new List<EmptyResponse>
             {
@@ -49,11 +70,14 @@ namespace MiraiNotes.UWP.BackgroundTasks
             var toastNotification = new ToastNotification(content.GetXml());
             ToastNotificationManager.CreateToastNotifier().Show(toastNotification);
 
+            _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+            _messenger.Send(true, $"{MessageType.ON_FULL_SYNC}");
+
             _logger.Information($"{nameof(SyncBackgroundTask)} completed successfully");
             _deferral.Complete();
         }
 
-        public ToastContent GenerateToastContent(string results)
+        private ToastContent GenerateToastContent(string results)
         {
             return new ToastContent()
             {
@@ -86,6 +110,11 @@ namespace MiraiNotes.UWP.BackgroundTasks
                     }
                 }
             };
+        }
+
+        private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        {
+            _logger.Warning($"{sender.Task.Name} cancel requested... Cancel reason = {reason.ToString()}");
         }
     }
 }

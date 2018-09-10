@@ -28,7 +28,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Properties
-        public NavigationService NavigationService
+        public static NavigationService NavigationService
         {
             get
             {
@@ -36,7 +36,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public LoginPageViewModel Login
+        public static LoginPageViewModel Login
         {
             get
             {
@@ -44,7 +44,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public NavPageViewModel Home
+        public static NavPageViewModel Home
         {
             get
             {
@@ -52,7 +52,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         } 
 
-        public TasksPageViewModel Tasks
+        public static TasksPageViewModel Tasks
         {
             get
             {
@@ -60,17 +60,32 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public NewTaskPageViewModel NewTask
+        public static NewTaskPageViewModel NewTask
         {
             get
             {
                 return ServiceLocator.Current.GetInstance<NewTaskPageViewModel>();
             }
         }
+
+        public static ISyncService SyncService 
+            => ServiceLocator.Current.GetInstance<ISyncService>();
+
+        public static ILogger Logger 
+            => ServiceLocator.Current.GetInstance<ILogger>();
+
+        public static IMessenger Messenger 
+            => ServiceLocator.Current.GetInstance<IMessenger>();
+
+        public static IUserCredentialService UserCredentialService 
+            => ServiceLocator.Current.GetInstance<IUserCredentialService>();
         #endregion
 
         public ViewModelLocator()
         {
+            if (IsAppAlreadyRunning())
+                return;
+
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
             var navigation = new NavigationService();
             navigation.Configure(HOME_PAGE, typeof(MainPage));
@@ -121,6 +136,17 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<NavPageViewModel>();
             SimpleIoc.Default.Register<TasksPageViewModel>();
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
+        }
+
+        /// <summary>
+        /// By using <see cref="ServiceLocator"/> we know if the LocationProviderSet
+        /// has been set, if it is, it means that the app is already running, otherwise
+        /// it is not
+        /// </summary>
+        /// <returns>True in case the app is already running</returns>
+        public bool IsAppAlreadyRunning()
+        {
+            return ServiceLocator.IsLocationProviderSet;
         }
 
         private ILogger SetupLogging()
