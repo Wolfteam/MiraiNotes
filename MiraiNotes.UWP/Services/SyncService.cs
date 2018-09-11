@@ -681,7 +681,7 @@ namespace MiraiNotes.UWP.Services
             {
                 result.Message = response.Errors?.ApiError?.Message ??
                     $"An unkwon error occurred while trying to create task {task.Title}";
-                _logger.Error("SyncUpTasksAsync: An error occurred while trying to save remotely {@Task}. {Error}", task, result.Message);
+                    _logger.Error("SyncUpTasksAsync: An error occurred while trying to save remotely {@Task}. {Error}", task, result.Message);
             }
 
             return result;

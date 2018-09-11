@@ -242,13 +242,14 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.NAVIGATIONVIEW_SELECTION_CHANGED}",
                 async (taskList) => await GetAllTasksAsync(taskList));
-
             _messenger.Register<bool>(
                 this,
                 $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}",
                 (show) => ShowTaskListViewProgressRing = show);
-
-            _messenger.Register<TaskItemViewModel>(this, $"{MessageType.TASK_SAVED}", OnTaskSaved);
+            _messenger.Register<string>(
+                this,
+                $"{MessageType.TASK_SAVED}",
+                async (taskID) => await OnTaskSavedAsync(taskID));
             _messenger.Register<string>(this, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}", OnTaskDeleted);
             _messenger.Register<KeyValuePair<string, string>>(
                 this,
@@ -351,7 +352,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             _messenger.Send(false, $"{MessageType.OPEN_PANE}");
             _messenger.Send(
-                new Tuple<bool, string>(true, "Performing a full sync, please wait..."), 
+                new Tuple<bool, string>(true, "Performing a full sync, please wait..."),
                 $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
 
             var syncResults = new List<EmptyResponse>
@@ -511,8 +512,43 @@ namespace MiraiNotes.UWP.ViewModels
             TaskAutoSuggestBoxText = string.Empty;
         }
 
-        public void OnTaskSaved(TaskItemViewModel task)
+        public async Task OnTaskSavedAsync(string taskID)
         {
+            ShowTaskListViewProgressRing = true;
+            var dbResponse = await _dataService
+                .TaskService
+                .FirstOrDefaultAsNoTrackingAsync(ta => ta.GoogleTaskID == taskID);
+
+            if (!dbResponse.Succeed || dbResponse.Result == null)
+            {
+                ShowTaskListViewProgressRing = false;
+                string msg = dbResponse.Result == null ?
+                    "Could not find the saved task in db" :
+                    $"An unknown error occurred. Error = {dbResponse.Message}";
+                await _dialogService.ShowMessageDialogAsync("Error", msg);
+                return;
+            }
+            var task = _mapper.Map<TaskItemViewModel>(dbResponse.Result);
+
+            if (!task.HasParentTask)
+            {
+                var stsResponse = await _dataService
+                    .TaskService
+                    .GetAsNoTrackingAsync(
+                        st => st.ParentTask == task.TaskID,
+                        st => st.OrderBy(s => s.Position));
+
+                if (!stsResponse.Succeed)
+                {
+                    ShowTaskListViewProgressRing = false;
+                    string msg = $"An unknown error occurred. Error = {dbResponse.Message}";
+                    await _dialogService.ShowMessageDialogAsync("Error", msg);
+                    return;
+                }
+                task.SubTasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(stsResponse.Result);
+            }
+            ShowTaskListViewProgressRing = false;
+
             if (task.HasParentTask)
             {
                 task.IsSelected = true;
@@ -528,9 +564,9 @@ namespace MiraiNotes.UWP.ViewModels
                     .FindIndex(st => st.TaskID == task.TaskID) ?? -1;
 
                 if (updatedSubTaskIndex != -1)
-                {
                     parentTask.SubTasks[updatedSubTaskIndex] = task;
-                }
+                else
+                    parentTask.SubTasks.Add(task);
             }
             else
             {

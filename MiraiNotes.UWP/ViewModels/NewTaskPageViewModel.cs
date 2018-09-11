@@ -366,7 +366,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             CurrentTask.SubTasks = new ObservableCollection<TaskItemViewModel>(sts);
 
-            _messenger.Send(CurrentTask, $"{MessageType.TASK_SAVED}");
+            _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
             UpdateTaskOperationTitle(isNewTask, CurrentTask.HasParentTask);
         }
 
