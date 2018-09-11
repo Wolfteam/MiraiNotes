@@ -112,7 +112,7 @@
     <Compile Include="Converters\VisibleWhenZeroConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\NavigationViewSelectionChangedEventArgsConverter.cs" />
-    <Compile Include="Converters\TestConverter.cs" />
+    <Compile Include="Converters\DatetimeOffsetToLocalDatetimeOffsetConverter.cs" />
     <Compile Include="Delegates\Delegates.cs" />
     <Compile Include="Design\DesignGoogleTaskListService.cs" />
     <Compile Include="Design\DesignGoogleTaskService.cs" />
