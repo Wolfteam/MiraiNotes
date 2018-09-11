@@ -691,31 +691,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskListViewProgressRing = true;
 
-            var dbResponse = await _dataService
-                .TaskService
-                .FirstOrDefaultAsNoTrackingAsync(tx => tx.GoogleTaskID == task.TaskID);
-
-            if (!dbResponse.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"An unknown error occurred while trying to retrieve task from db. Error = {dbResponse.Message}");
-                return;
-            }
-
-            if (taskStatus == GoogleTaskStatus.COMPLETED)
-                dbResponse.Result.CompletedOn = DateTime.Now;
-            else
-                dbResponse.Result.CompletedOn = null;
-            dbResponse.Result.Status = taskStatus.GetString();
-            dbResponse.Result.UpdatedAt = DateTime.Now;
-            if (dbResponse.Result.LocalStatus != LocalStatus.CREATED)
-                dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
-            dbResponse.Result.ToBeSynced = true;
-
             var response = await _dataService
                 .TaskService
-                .UpdateAsync(dbResponse.Result);
+                .ChangeTaskStatusAsync(task.TaskID, taskStatus);
 
             if (!response.Succeed)
             {
@@ -769,47 +747,20 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskListViewProgressRing = true;
 
             var tasksStatusNotChanged = new List<string>();
-            var dbResponse = await _dataService
-                .TaskService
-                .GetAsync(t => selectedTasks.Any(st => st.TaskID == t.GoogleTaskID));
-
-            if (!dbResponse.Succeed)
-            {
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"An unknown error occurred while trying to retrieve the selected tasks from db. Error = {dbResponse.Message}");
-                return;
-            }
-
+            //TODO: THIS COULD BE IMPROVED
             foreach (var task in selectedTasks)
             {
-                var taskToUpdateDbResponse = await _dataService
+                var response = await _dataService
                     .TaskService
-                    .FirstOrDefaultAsNoTrackingAsync(ta => ta.GoogleTaskID == task.TaskID);
+                    .ChangeTaskStatusAsync(task.TaskID, taskStatus);
 
-                if (!taskToUpdateDbResponse.Succeed)
+                if (!response.Succeed)
                 {
                     tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
-                taskToUpdateDbResponse.Result.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
-                    DateTime.Now : (DateTime?)null;
-                taskToUpdateDbResponse.Result.Status = taskStatus.GetString();
-                taskToUpdateDbResponse.Result.UpdatedAt = DateTime.Now;
-                if (taskToUpdateDbResponse.Result.LocalStatus != LocalStatus.CREATED)
-                    taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
-                taskToUpdateDbResponse.Result.ToBeSynced = true;
 
-                var updateResponse = await _dataService
-                    .TaskService
-                    .UpdateAsync(taskToUpdateDbResponse.Result);
-
-                if (!updateResponse.Succeed)
-                {
-                    tasksStatusNotChanged.Add(task.Title);
-                    continue;
-                }
-                var t = _mapper.Map<TaskItemViewModel>(updateResponse.Result);
+                var t = _mapper.Map<TaskItemViewModel>(response.Result);
                 OnTaskStatusChanged(t, false);
                 task.IsSelected = false;
 
@@ -839,35 +790,17 @@ namespace MiraiNotes.UWP.ViewModels
             var tasksStatusNotChanged = new List<string>();
             foreach (var task in tasks)
             {
-                var taskToUpdateResponse = await _dataService
+                var response = await _dataService
                     .TaskService
-                    .FirstOrDefaultAsNoTrackingAsync(ta => ta.GoogleTaskID == task.TaskID);
+                    .ChangeTaskStatusAsync(task.TaskID, taskStatus);
 
-                if (!taskToUpdateResponse.Succeed)
-                {
-                    tasksStatusNotChanged.Add(task.Title);
-                    continue;
-                }
-                //TODO: I SHOULD MOVE ALL THIS CHANGE STATUS LOGIC TO THE DATA SERVICE
-                taskToUpdateResponse.Result.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
-                    DateTime.Now : (DateTime?)null;
-                taskToUpdateResponse.Result.Status = taskStatus.GetString();
-                taskToUpdateResponse.Result.UpdatedAt = DateTime.Now;
-                if (taskToUpdateResponse.Result.LocalStatus != LocalStatus.CREATED)
-                    taskToUpdateResponse.Result.LocalStatus = LocalStatus.UPDATED;
-                taskToUpdateResponse.Result.ToBeSynced = true;
-
-                var updateResponse = await _dataService
-                    .TaskService
-                    .UpdateAsync(taskToUpdateResponse.Result);
-
-                if (!updateResponse.Succeed)
+                if (!response.Succeed)
                 {
                     tasksStatusNotChanged.Add(task.Title);
                     continue;
                 }
 
-                var t = _mapper.Map<TaskItemViewModel>(updateResponse.Result);
+                var t = _mapper.Map<TaskItemViewModel>(response.Result);
                 OnTaskStatusChanged(t, true);
 
                 _messenger.Send(

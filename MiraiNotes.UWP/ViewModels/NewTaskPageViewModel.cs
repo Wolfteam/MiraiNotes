@@ -423,44 +423,24 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskProgressRing = true;
 
-            var taskToUpdateDbResponse = await _dataService
+            var response = await _dataService
                 .TaskService
-                .FirstOrDefaultAsNoTrackingAsync(t => t.GoogleTaskID == task.TaskID);
-
-            if (!taskToUpdateDbResponse.Succeed || taskToUpdateDbResponse.Result == null)
-            {
-                ShowTaskProgressRing = false;
-                await _dialogService.ShowMessageDialogAsync(
-                    "Error",
-                    $"Couldn't find the task to change the status in the db. Error = {taskToUpdateDbResponse.Message}");
-                return;
-            }
-            taskToUpdateDbResponse.Result.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
-                DateTime.Now : (DateTime?)null;
-
-            if (taskToUpdateDbResponse.Result.LocalStatus != LocalStatus.CREATED)
-                taskToUpdateDbResponse.Result.LocalStatus = LocalStatus.UPDATED;
-            taskToUpdateDbResponse.Result.Status = taskStatus.GetString();
-            taskToUpdateDbResponse.Result.ToBeSynced = true;
-            taskToUpdateDbResponse.Result.UpdatedAt = DateTime.Now;
-
-            var updateResponse = await _dataService
-                .TaskService
-                .UpdateAsync(taskToUpdateDbResponse.Result);
+                .ChangeTaskStatusAsync(task.TaskID, taskStatus);
+            
             ShowTaskProgressRing = false;
 
-            if (!updateResponse.Succeed)
+            if (!response.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync(
                     $"Error",
                     $"An error occurred while trying to mark {task.Title} as {statusMessage}. " +
-                    $"Error = {updateResponse.Message}.");
+                    $"Error = {response.Message}.");
                 return;
             }
 
-            task.Status = taskToUpdateDbResponse.Result.Status;
-            task.CompletedOn = taskToUpdateDbResponse.Result.CompletedOn;
-            task.UpdatedAt = taskToUpdateDbResponse.Result.UpdatedAt;
+            task.Status = response.Result.Status;
+            task.CompletedOn = response.Result.CompletedOn;
+            task.UpdatedAt = response.Result.UpdatedAt;
 
             _messenger.Send(
                 new Tuple<TaskItemViewModel, bool>(task, task.HasParentTask),
