@@ -28,7 +28,7 @@ namespace MiraiNotes.UWP.ViewModels
         #endregion
 
         #region Properties
-        public static NavigationService NavigationService
+        public NavigationService NavigationService
         {
             get
             {
@@ -36,7 +36,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public static LoginPageViewModel Login
+        public LoginPageViewModel Login
         {
             get
             {
@@ -44,15 +44,15 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public static NavPageViewModel Home
+        public NavPageViewModel Home
         {
             get
             {
                 return ServiceLocator.Current.GetInstance<NavPageViewModel>();
             }
-        } 
+        }
 
-        public static TasksPageViewModel Tasks
+        public TasksPageViewModel Tasks
         {
             get
             {
@@ -60,7 +60,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public static NewTaskPageViewModel NewTask
+        public NewTaskPageViewModel NewTask
         {
             get
             {
@@ -68,16 +68,16 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public static ISyncService SyncService 
+        public ISyncService SyncService
             => ServiceLocator.Current.GetInstance<ISyncService>();
 
-        public static ILogger Logger 
+        public ILogger Logger
             => ServiceLocator.Current.GetInstance<ILogger>();
 
-        public static IMessenger Messenger 
+        public IMessenger Messenger
             => ServiceLocator.Current.GetInstance<IMessenger>();
 
-        public static IUserCredentialService UserCredentialService 
+        public IUserCredentialService UserCredentialService
             => ServiceLocator.Current.GetInstance<IUserCredentialService>();
         #endregion
 
@@ -99,7 +99,7 @@ namespace MiraiNotes.UWP.ViewModels
                 // Add all profiles in current assembly
                 cfg.AddProfiles(GetType().Assembly);
             });
-                
+
             if (ViewModelBase.IsInDesignModeStatic)
             {
                 SimpleIoc.Default.Register<IGoogleTaskListService, DesignGoogleTaskListService>();
@@ -131,7 +131,7 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<ITaskListDataService, TaskListDataService>();
             SimpleIoc.Default.Register<ITaskDataService, TaskDataService>();
             SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
-            
+
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();
             SimpleIoc.Default.Register<TasksPageViewModel>();
@@ -153,7 +153,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             const string fileOutputTemplate = "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
 
-            var logger  = new LoggerConfiguration()
+            var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource(typeof(NavPageViewModel).Namespace))
