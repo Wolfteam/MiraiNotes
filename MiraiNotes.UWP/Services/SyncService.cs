@@ -218,7 +218,7 @@ namespace MiraiNotes.UWP.Services
                     var deleteResponse = await _dataService
                         .TaskService
                         .RemoveAsync(
-                            t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID && 
+                            t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID &&
                             t.LocalStatus != LocalStatus.CREATED);
                     syncDownResults.Add(deleteResponse);
                     continue;
@@ -300,8 +300,16 @@ namespace MiraiNotes.UWP.Services
                             if (task.UpdatedAt < downloadedTask.UpdatedAt)
                             {
                                 _logger.Information("SyncDownTasksAsync: Trying to update the local {@Task} associated to tasklistID = {taskListID}", task, taskList.GoogleTaskListID);
+                                task.CompletedOn = downloadedTask.CompletedOn;
+                                task.GoogleTaskID = downloadedTask.TaskID;
+                                task.IsDeleted = downloadedTask.IsDeleted;
+                                task.IsHidden = downloadedTask.IsHidden;
+                                task.Notes = downloadedTask.Notes;
+                                task.ParentTask = downloadedTask.ParentTask;
+                                task.Position = downloadedTask.Position;
+                                task.Status = downloadedTask.Status;
                                 task.Title = downloadedTask.Title;
-                                task.GoogleTaskID= downloadedTask.TaskID;
+                                task.ToBeCompletedOn = downloadedTask.ToBeCompletedOn;
                                 task.UpdatedAt = downloadedTask.UpdatedAt;
 
                                 syncDownResults.Add( await _dataService
@@ -681,7 +689,7 @@ namespace MiraiNotes.UWP.Services
             {
                 result.Message = response.Errors?.ApiError?.Message ??
                     $"An unkwon error occurred while trying to create task {task.Title}";
-                    _logger.Error("SyncUpTasksAsync: An error occurred while trying to save remotely {@Task}. {Error}", task, result.Message);
+                _logger.Error("SyncUpTasksAsync: An error occurred while trying to save remotely {@Task}. {Error}", task, result.Message);
             }
 
             return result;
@@ -761,7 +769,10 @@ namespace MiraiNotes.UWP.Services
                 {
                     task.CompletedOn = response.Result.CompletedOn;
                     task.IsDeleted = response.Result.IsDeleted;
+                    task.IsHidden = response.Result.IsHidden;
                     task.Notes = response.Result.Notes;
+                    task.ParentTask = response.Result.ParentTask;
+                    task.Position = response.Result.Position;
                     task.Status = response.Result.Status;
                     task.Title = response.Result.Title;
                     task.ToBeCompletedOn = response.Result.ToBeCompletedOn;
