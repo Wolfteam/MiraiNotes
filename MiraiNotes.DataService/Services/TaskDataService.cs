@@ -2,6 +2,7 @@
 using MiraiNotes.Data;
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
+using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
 using Serilog;
 using System;
@@ -932,6 +933,55 @@ namespace MiraiNotes.DataService.Services
                     catch (Exception e)
                     {
                         _logger.Error(e, "RemoveTaskAsync: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<GoogleTask>> ChangeTaskStatusAsync(string taskID, GoogleTaskStatus taskStatus)
+        {
+            return await Task.Run(async () =>
+            {
+                _logger.Information($"ChangeTaskStatusAsync: Trying to change the status of taskID = {taskID} to {taskStatus}");
+                var response = new Response<GoogleTask>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var taskToUpdate = await context
+                            .Tasks
+                            .FirstOrDefaultAsync(t => t.GoogleTaskID == taskID);
+
+                        if (taskToUpdate == null)
+                        {
+                            response.Message = $"Could not find the task with taskID = {taskID} to change their status";
+                            _logger.Warning($"ChangeTaskStatusAsync: Could not find a task with taskID = {taskID}");
+                            return response;
+                        }
+
+                        taskToUpdate.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
+                            DateTime.Now : (DateTime?)null;
+                        taskToUpdate.Status = taskStatus.GetString();
+                        taskToUpdate.UpdatedAt = DateTime.Now;
+                        if (taskToUpdate.LocalStatus != LocalStatus.CREATED)
+                            taskToUpdate.LocalStatus = LocalStatus.UPDATED;
+                        taskToUpdate.ToBeSynced = true;
+
+                        context.Tasks.Update(taskToUpdate);
+
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Result = taskToUpdate;
+                        _logger.Information("ChangeTaskStatusAsync: Completed successfully");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "ChangeTaskStatusAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }

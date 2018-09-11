@@ -50,5 +50,13 @@ namespace MiraiNotes.DataService.Interfaces
         /// <param name="taskID">The ids of the tasks to delete</param>
         /// <returns><see cref="EmptyResponse"/></returns>
         Task<EmptyResponse> RemoveTaskAsync(IEnumerable<string> taskIds);
+
+        /// <summary>
+        /// Changes the task status to the one indicated by <paramref name="taskStatus"/>
+        /// </summary>
+        /// <param name="taskID">The ids of the tasks to delete</param>
+        /// <param name="taskStatus">The new task status</param>
+        /// <returns><see cref="Response{GoogleTask}"/></returns>
+        Task<Response<GoogleTask>> ChangeTaskStatusAsync(string taskID, GoogleTaskStatus taskStatus);
     }
 }
