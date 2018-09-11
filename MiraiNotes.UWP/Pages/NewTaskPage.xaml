@@ -19,6 +19,8 @@
             <Setter Property="Foreground" Value="Red" />
             <Setter Property="FontSize" Value="12" />
         </Style>
+
+        <converters:DatetimeOffsetToLocalDatetimeOffsetConverter x:Key="DatetimeOffsetToLocalDatetimeOffsetConverter" />
     </Page.Resources>
 
     <Grid>
@@ -261,7 +263,7 @@
                     <AppBarButton.Flyout>
                         <Flyout Placement="Left">
                             <CalendarDatePicker
-                                Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay}"
+                                Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay, Converter={StaticResource DatetimeOffsetToLocalDatetimeOffsetConverter}}"
                                 DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
                                 Header="This task will be completed on:"
                                 MinDate="{Binding MinDate, Mode=TwoWay}"
