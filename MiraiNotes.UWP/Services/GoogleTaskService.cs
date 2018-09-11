@@ -83,7 +83,7 @@ namespace MiraiNotes.UWP.Services
             int maxResults = 100,
             string pageToken = null)
         {
-            string url = $"{BASE_ADDRESS}/{taskListID}/tasks";
+            string url = $"{BASE_ADDRESS}/{taskListID}/tasks?showHidden=true";
             var result = new GoogleResponseModel<GoogleTaskApiResponseModel<GoogleTaskModel>>();
             var httpClient = _httpClientsFactory.GetHttpClient();
 
