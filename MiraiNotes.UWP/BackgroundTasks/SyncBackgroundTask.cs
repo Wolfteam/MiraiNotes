@@ -18,6 +18,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
         private readonly ISyncService _syncService;
         private readonly ILogger _logger;
         private readonly IMessenger _messenger;
+        private readonly bool _isAppRunning;
         private BackgroundTaskDeferral _deferral;
 
         public SyncBackgroundTask()
@@ -27,8 +28,9 @@ namespace MiraiNotes.UWP.BackgroundTasks
             _syncService = vml.SyncService;
             _logger = vml.Logger.ForContext<SyncBackgroundTask>();
             _messenger = vml.Messenger;
+            _isAppRunning = vml.IsAppAlreadyRunning();
 
-            if (vml.IsAppAlreadyRunning())
+            if (_isAppRunning)
                 _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is already running");
             else
                 _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is not running");
@@ -36,16 +38,23 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
-            //TODO: THIS BG TASK SHOULD COULD RUN FOR MORE THAN 30 SEC...
-            taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
+            //TODO: THIS BG TASK COULD RUN FOR MORE THAN 30 SEC...
+            bool startedManually = taskInstance == null;
+            if (!startedManually)
+                taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
 
-            _deferral = taskInstance.GetDeferral();
-            _logger.Information($"Starting the {nameof(SyncBackgroundTask)}");
+            _deferral = taskInstance?.GetDeferral();
+            _logger.Information($"Starting the {nameof(SyncBackgroundTask)} {(startedManually ? "manually" : "automatically" )}");
 
-            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
-            _messenger.Send(
-                new Tuple<bool, string>(true, "Performing a background full sync, please wait..."),
-                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+            if (_isAppRunning)
+            {
+                _messenger.Send(false, $"{MessageType.OPEN_PANE}");
+                _messenger.Send(
+                    new Tuple<bool, string>(
+                        true, 
+                        $"Performing a {(startedManually ? "manual" : "automatic" )} full sync, please wait..."),
+                    $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+            }
 
             var syncResults = new List<EmptyResponse>
             {
@@ -57,7 +66,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
             string message = syncResults.Any(r => !r.Succeed) ?
                 string.Join(",\n", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
-                "A full sync was successfully performed.";
+                $"A {(startedManually ? "manual" : "automatic" )} full sync was successfully performed.";
 
             if (string.IsNullOrEmpty(message))
                 message = "An unknown error occurred while trying to perform the sync operation.";
@@ -65,16 +74,22 @@ namespace MiraiNotes.UWP.BackgroundTasks
             _logger.Information($"{nameof(SyncBackgroundTask)} results = {message}");
 
             //TODO: MAYBE ADD A SETTING TO SHOW OR NOT SHOW THE NOTIFICATION
-            // Generate the toast notification content and pop the toast
-            var content = GenerateToastContent(message);
-            var toastNotification = new ToastNotification(content.GetXml());
-            ToastNotificationManager.CreateToastNotifier().Show(toastNotification);
 
-            _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-            _messenger.Send(true, $"{MessageType.ON_FULL_SYNC}");
+            if (!_isAppRunning)
+            {
+                var content = GenerateToastContent(message);
+                var toastNotification = new ToastNotification(content.GetXml());
+                ToastNotificationManager.CreateToastNotifier().Show(toastNotification);
+            }
+            else
+            {
+                _messenger.Send(message, $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
+                _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                _messenger.Send(true, $"{MessageType.ON_FULL_SYNC}");
+            }
 
             _logger.Information($"{nameof(SyncBackgroundTask)} completed successfully");
-            _deferral.Complete();
+            _deferral?.Complete();
         }
 
         private ToastContent GenerateToastContent(string results)
