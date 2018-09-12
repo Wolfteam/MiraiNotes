@@ -9,24 +9,42 @@ namespace MiraiNotes.UWP.Helpers
 {
     public class BackgroundTasksManager
     {
-        //TODO: NOT SURE IF I SHOULD REGISTER ALL MY BG TASKS AT THE SAME TIME
-        public static void RegisterBackgroundTasks()
+        /// <summary>
+        /// Registers a particular bg tasks specified by <paramref name="backgroundTask"/>
+        /// </summary>
+        /// <param name="backgroundTask">The background task to register</param>
+        /// <param name="restart">Indicates if the registration of the bg task is mandatory(True by default)</param>
+        public static void RegisterBackgroundTask(BackgroundTaskType backgroundTask, bool restart = true)
         {
-            if (BackgroundTaskHelper.IsBackgroundTaskRegistered(typeof(SyncBackgroundTask)))
+            int bgTaskInterval = 15;
+            string bgTaskName;
+            Type bgTaskType;
+
+            switch (backgroundTask)
             {
-                // Background task already registered.
-                return;
+                case BackgroundTaskType.ANY:
+                    throw new ArgumentException("Is not allowed to register all bg tasks at the same time");
+                case BackgroundTaskType.SYNC:
+                    bgTaskInterval = ApplicationSettingsService.SyncBackgroundTaskInterval;
+                    if (bgTaskInterval <= 0)
+                        return;
+                    bgTaskName = nameof(SyncBackgroundTask);
+                    bgTaskType = typeof(SyncBackgroundTask);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Provided bg task {backgroundTask} does not exists");
             }
 
-            //TODO: CHANGE THIS WHEN YOU IMPLEMENT APP SETTINGS 
-            int syncBackgroundTaskInterval = ApplicationSettingsService.SyncBackgroundTaskInterval;
-            if (syncBackgroundTaskInterval <= 0)
+            bool isBgTaskAlreadyRegistered = BackgroundTaskHelper.IsBackgroundTaskRegistered(bgTaskType);
+            if (isBgTaskAlreadyRegistered && !restart)
                 return;
 
-            //TODO: CHANGE THE DEFAULT TIME THAT THE BGTask WILL GET EXECUTED
+            if (isBgTaskAlreadyRegistered)
+                UnregisterBackgroundTask(backgroundTask);
+
             BackgroundTaskHelper.Register(
-                nameof(SyncBackgroundTask),
-                new TimeTrigger((uint)syncBackgroundTaskInterval, false),
+                bgTaskName,
+                new TimeTrigger((uint)bgTaskInterval, false),
                 false,
                 true,
                 new SystemCondition(SystemConditionType.FreeNetworkAvailable),
@@ -37,7 +55,7 @@ namespace MiraiNotes.UWP.Helpers
         /// Unregister a background task specified by <paramref name="backgroundTask"/>
         /// </summary>
         /// <param name="backgroundTask">The background task to unregister</param>
-        public static void UnregisterBackgroundTasks(BackgroundTaskType backgroundTask = BackgroundTaskType.ANY)
+        public static void UnregisterBackgroundTask(BackgroundTaskType backgroundTask = BackgroundTaskType.ANY)
         {
             switch (backgroundTask)
             {

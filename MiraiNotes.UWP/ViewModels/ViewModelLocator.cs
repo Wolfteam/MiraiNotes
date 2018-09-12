@@ -120,6 +120,8 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<AuthorizationHandler>();
             SimpleIoc.Default.Register<IHttpClientsFactory, HttpClientsFactory>();
 
+            SimpleIoc.Default.Register<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
+
             SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
             SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
             SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();

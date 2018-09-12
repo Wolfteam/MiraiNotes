@@ -272,7 +272,7 @@ namespace MiraiNotes.UWP.ViewModels
                 //delete all view models
                 OpenPane(false);
                 ShowLoading(true, "Logging out... Please wait..");
-                BackgroundTasksManager.UnregisterBackgroundTasks();
+                BackgroundTasksManager.UnregisterBackgroundTask();
                 await _dataService
                     .UserService
                     .ChangeCurrentUserStatus(false);

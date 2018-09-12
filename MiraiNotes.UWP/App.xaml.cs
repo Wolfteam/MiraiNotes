@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Helpers;
+using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;
 using System;
 using Windows.ApplicationModel;
@@ -62,7 +63,7 @@ namespace MiraiNotes.UWP
         private void OnLaunchedOrActivated(IActivatedEventArgs e)
         {
             // Initialize things like registering background tasks before the app is loaded
-            BackgroundTasksManager.RegisterBackgroundTasks();
+            BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.SYNC, false);
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

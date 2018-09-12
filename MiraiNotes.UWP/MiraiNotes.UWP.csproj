@@ -125,6 +125,7 @@
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
+    <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
     <Compile Include="Interfaces\IDispatcherHelper.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\MessageType.cs" />
     <Compile Include="Services\ApplicationSettingsService.cs" />
+    <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\SmartObservableCollection.cs" />
