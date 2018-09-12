@@ -11,7 +11,6 @@ using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -142,12 +141,12 @@ namespace MiraiNotes.UWP.ViewModels
                 OnTaskListAdded);
             _messenger.Register<bool>(this, $"{MessageType.OPEN_PANE}", (open) => OpenPane(open));
             _messenger.Register<bool>(
-                this, 
-                $"{MessageType.ON_FULL_SYNC}", 
-                async (_) => await InitViewAsync());
+                this,
+                $"{MessageType.ON_FULL_SYNC}",
+                async (_) => await InitViewAsync(true));
             _messenger.Register<Tuple<bool, string>>(
-                this, 
-                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}", 
+                this,
+                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}",
                 (tuple) => ShowLoading(tuple.Item1, tuple.Item2));
         }
 
@@ -178,14 +177,17 @@ namespace MiraiNotes.UWP.ViewModels
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
         }
 
-        private async Task InitViewAsync()
+        private async Task InitViewAsync(bool onFullSync = false)
         {
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            SelectedItem = 
+
+            string selectedTaskListID = CurrentTaskList?.TaskListID;
+
+            SelectedItem =
                 CurrentTaskList = null;
             TaskLists.Clear();
             TaskListsAutoSuggestBoxItems.Clear();
-            
+
             var dbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(
@@ -204,9 +206,12 @@ namespace MiraiNotes.UWP.ViewModels
 
             TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
 
-            SelectedItem = TaskLists.FirstOrDefault();
-
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+
+            if (onFullSync && TaskLists.Any(tl => tl.TaskListID == selectedTaskListID))
+                SelectedItem = TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID);
+            else
+                SelectedItem = TaskLists.FirstOrDefault();
         }
 
         public void OnTaskListAutoSuggestBoxTextChange(string currentText)

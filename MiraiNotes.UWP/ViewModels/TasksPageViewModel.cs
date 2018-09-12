@@ -4,7 +4,6 @@ using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Extensions;
@@ -30,6 +29,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
         private readonly ISyncService _syncService;
+        private readonly IBackgroundTaskManagerService _bgTaskManagerService;
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -219,7 +219,8 @@ namespace MiraiNotes.UWP.ViewModels
             IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            ISyncService syncService)
+            ISyncService syncService,
+            IBackgroundTaskManagerService bgTaskManagerService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -228,6 +229,7 @@ namespace MiraiNotes.UWP.ViewModels
             _mapper = mapper;
             _dataService = dataService;
             _syncService = syncService;
+            _bgTaskManagerService = bgTaskManagerService;
 
             RegisterMessages();
             SetCommands();
@@ -241,7 +243,13 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Register<TaskListItemViewModel>(
                 this,
                 $"{MessageType.NAVIGATIONVIEW_SELECTION_CHANGED}",
-                async (taskList) => await GetAllTasksAsync(taskList));
+                async (taskList) =>
+                {
+                    //The msg send by nav vm could take longer.. so lets way a litte bit
+                    //with that, the progress ring animation doesnt gets swallowed 
+                    await Task.Delay(500);
+                    await GetAllTasksAsync(taskList);
+                });
             _messenger.Register<bool>(
                 this,
                 $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}",
@@ -297,11 +305,7 @@ namespace MiraiNotes.UWP.ViewModels
                 (async () => await ChangeSelectedTasksStatusAsync(GoogleTaskStatus.COMPLETED));
 
             SyncCommand = new RelayCommand
-                (async () =>
-                {
-                    await Sync();
-                    _messenger.Send(true, $"{MessageType.ON_FULL_SYNC}");
-                });
+                (() => _bgTaskManagerService.StartBackgroundTask(BackgroundTaskType.SYNC));
 
             SortTasksCommand = new RelayCommand<TaskSortType>
                 ((sortBy) => SortTasks(sortBy));
@@ -346,37 +350,6 @@ namespace MiraiNotes.UWP.ViewModels
 
             SubTaskSelectedItemCommand = new RelayCommand<TaskItemViewModel>
                 ((subTask) => OnSubTaskSelected(subTask));
-        }
-
-        private async Task Sync()
-        {
-            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
-            _messenger.Send(
-                new Tuple<bool, string>(true, "Performing a full sync, please wait..."),
-                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-
-            var syncResults = new List<EmptyResponse>
-            {
-                await _syncService.SyncDownTaskListsAsync(false),
-                await _syncService.SyncDownTasksAsync(false),
-                await _syncService.SyncUpTaskListsAsync(false),
-                await _syncService.SyncUpTasksAsync(false)
-            };
-
-            string message = syncResults.Any(r => !r.Succeed) ?
-                string.Join(",\n", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
-                "A full sync was successfully performed.";
-
-            if (syncResults.Any(r => !r.Succeed))
-                message = $"A full sync completed with errors: {message}";
-            else if (string.IsNullOrEmpty(message))
-                message = "An unknown error occurred while trying to perform the sync operation.";
-
-            InAppNotificationRequest?.Invoke(message);
-
-            _messenger.Send(
-                new Tuple<bool, string>(false, null),
-                $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
         }
 
         public async Task GetAllTasksAsync(TaskListItemViewModel taskList)

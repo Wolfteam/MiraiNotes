@@ -146,7 +146,7 @@ namespace MiraiNotes.UWP.ViewModels
         /// it is not
         /// </summary>
         /// <returns>True in case the app is already running</returns>
-        public bool IsAppAlreadyRunning()
+        public static bool IsAppAlreadyRunning()
         {
             return ServiceLocator.IsLocationProviderSet;
         }

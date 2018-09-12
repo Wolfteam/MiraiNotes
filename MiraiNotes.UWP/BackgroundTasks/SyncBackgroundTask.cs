@@ -23,13 +23,13 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
         public SyncBackgroundTask()
         {
+            _isAppRunning = ViewModelLocator.IsAppAlreadyRunning();
             var vml = new ViewModelLocator();
 
             _syncService = vml.SyncService;
             _logger = vml.Logger.ForContext<SyncBackgroundTask>();
             _messenger = vml.Messenger;
-            _isAppRunning = vml.IsAppAlreadyRunning();
-
+            
             if (_isAppRunning)
                 _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is already running");
             else
