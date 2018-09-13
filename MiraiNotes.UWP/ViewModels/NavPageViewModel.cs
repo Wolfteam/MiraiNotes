@@ -207,6 +207,9 @@ namespace MiraiNotes.UWP.ViewModels
             TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            //The msg send by nav vm could take longer.. so lets way a litte bit
+            //with that, the progress ring animation doesnt gets swallowed 
+            await Task.Delay(500);
 
             if (onFullSync && TaskLists.Any(tl => tl.TaskListID == selectedTaskListID))
                 SelectedItem = TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID);

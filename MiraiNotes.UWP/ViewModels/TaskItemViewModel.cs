@@ -156,15 +156,15 @@ namespace MiraiNotes.UWP.ViewModels
             set { Write(value); }
         }
 
-        public bool IsCompletitionDateTodayOrAlreadyPassed
+        public bool IsCompletitionDateSet
         {
             get
             {
-                return ToBeCompletedOn?.Date <= DateTimeOffset.Now;
+                return ToBeCompletedOn.HasValue;
             }
         }
 
-        public string CompletitionDateTodayOrAlreadyPassedText
+        public string CompletitionDateText
         {
             get
             {
@@ -173,12 +173,19 @@ namespace MiraiNotes.UWP.ViewModels
                 else
                 {
                     var difference = DateTimeOffset.Now.DayOfYear - ToBeCompletedOn.Value.DayOfYear;
-                    if (difference == 0)
-                        return "Today";
-                    else if (difference == 1)
-                        return $"{difference} day ago";
+                    if (difference >= 0)
+                    {
+                        if (difference == 0)
+                            return "Today";
+                        else if (difference == 1)
+                            return $"{difference} day ago";
+                        else
+                            return $"{difference} days ago";
+                    }
+                    else if (difference == -1)
+                        return "Tomorrow";
                     else
-                        return $"{difference} days ago";
+                        return ToBeCompletedOn.Value.ToString("ddd, MMM d");
                 }
             }
         }

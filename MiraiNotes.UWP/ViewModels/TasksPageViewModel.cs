@@ -243,13 +243,7 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Register<TaskListItemViewModel>(
                 this,
                 $"{MessageType.NAVIGATIONVIEW_SELECTION_CHANGED}",
-                async (taskList) =>
-                {
-                    //The msg send by nav vm could take longer.. so lets way a litte bit
-                    //with that, the progress ring animation doesnt gets swallowed 
-                    await Task.Delay(500);
-                    await GetAllTasksAsync(taskList);
-                });
+                async (taskList) => await GetAllTasksAsync(taskList));
             _messenger.Register<bool>(
                 this,
                 $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}",
