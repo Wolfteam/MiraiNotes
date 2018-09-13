@@ -131,10 +131,11 @@ namespace MiraiNotes.UWP
                 // TODO: Handle other types of activation
                 throw new NotImplementedException("This type of of activation is not currently implemented");
             }
-
             //If the app is already initialized just return. Not sure if this is needed
             if (_initialized)
                 return;
+
+            ViewModels.ViewModelLocator.IsAppRunning = true;
 
             // Ensure the current window is active
             Window.Current.Activate();
@@ -170,9 +171,9 @@ namespace MiraiNotes.UWP
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             base.OnBackgroundActivated(args);
-
+            
             var deferral = args.TaskInstance.GetDeferral();
-
+            
             switch (args.TaskInstance.Task.Name)
             {
                 case nameof(SyncBackgroundTask):

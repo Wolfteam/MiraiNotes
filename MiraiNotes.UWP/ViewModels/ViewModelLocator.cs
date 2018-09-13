@@ -79,11 +79,13 @@ namespace MiraiNotes.UWP.ViewModels
 
         public IUserCredentialService UserCredentialService
             => ServiceLocator.Current.GetInstance<IUserCredentialService>();
+
+        public static bool IsAppRunning { get; set; }
         #endregion
 
         public ViewModelLocator()
         {
-            if (IsAppAlreadyRunning())
+            if (IsAppDependenciesRegistered())
                 return;
 
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
@@ -146,10 +148,9 @@ namespace MiraiNotes.UWP.ViewModels
         /// it is not
         /// </summary>
         /// <returns>True in case the app is already running</returns>
-        public static bool IsAppAlreadyRunning()
-        {
-            return ServiceLocator.IsLocationProviderSet;
-        }
+        public static bool IsAppDependenciesRegistered()
+            => ServiceLocator.IsLocationProviderSet;
+
 
         private ILogger SetupLogging()
         {

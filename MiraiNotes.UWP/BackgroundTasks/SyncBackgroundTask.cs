@@ -23,7 +23,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
         public SyncBackgroundTask()
         {
-            _isAppRunning = ViewModelLocator.IsAppAlreadyRunning();
+            _isAppRunning = ViewModelLocator.IsAppRunning;
             var vml = new ViewModelLocator();
 
             _syncService = vml.SyncService;
@@ -39,7 +39,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             //TODO: THIS BG TASK COULD RUN FOR MORE THAN 30 SEC...
-            bool startedManually = taskInstance == null;
+            bool startedManually = taskInstance is null;
             if (!startedManually)
                 taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
 
@@ -75,7 +75,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
             //TODO: MAYBE ADD A SETTING TO SHOW OR NOT SHOW THE NOTIFICATION
 
-            if (!_isAppRunning)
+            if (!_isAppRunning && !startedManually)
             {
                 var content = GenerateToastContent(message);
                 var toastNotification = new ToastNotification(content.GetXml());
