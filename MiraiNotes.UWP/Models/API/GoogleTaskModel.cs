@@ -14,7 +14,7 @@ namespace MiraiNotes.UWP.Models.API
         public string Title { get; set; }
 
         [JsonProperty(PropertyName = "updated")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
 
         [JsonProperty(PropertyName = "selfLink")]
         public string SelfLink { get; set; }
@@ -35,7 +35,7 @@ namespace MiraiNotes.UWP.Models.API
         public DateTimeOffset? ToBeCompletedOn { get; set; }
 
         [JsonProperty(PropertyName = "completed")]
-        public DateTime? CompletedOn { get; set; }
+        public DateTimeOffset? CompletedOn { get; set; }
 
         [JsonProperty(PropertyName = "deleted")]
         public bool IsDeleted { get; set; }

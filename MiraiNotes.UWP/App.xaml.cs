@@ -1,21 +1,12 @@
-﻿using MiraiNotes.UWP.Pages;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿using MiraiNotes.UWP.BackgroundTasks;
+using MiraiNotes.UWP.Helpers;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Pages;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace MiraiNotes.UWP
@@ -25,6 +16,7 @@ namespace MiraiNotes.UWP
     /// </summary>
     sealed partial class App : Application
     {
+        private bool _initialized;
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -32,7 +24,7 @@ namespace MiraiNotes.UWP
         public App()
         {
             this.InitializeComponent();
-            
+
             //var jsonSettings = new JsonSerializerSettings
             //{
             //    Formatting = Formatting.Indented,
@@ -46,7 +38,7 @@ namespace MiraiNotes.UWP
             //JsonConvert.DefaultSettings = () => jsonSettings;
             this.Suspending += OnSuspending;
         }
-        
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -54,6 +46,30 @@ namespace MiraiNotes.UWP
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            if (e.PrelaunchActivated)
+                return;
+            OnLaunchedOrActivated(e);
+        }
+
+        /// <summary>
+        /// Invoked when the application is activated by some means other than normal launching.
+        /// </summary>
+        /// <param name="e">Event data for the event.</param>
+        protected override void OnActivated(IActivatedEventArgs e)
+        {
+            OnLaunchedOrActivated(e);
+        }
+
+        private void OnLaunchedOrActivated(IActivatedEventArgs e)
+        {
+            // Initialize things like registering background tasks before the app is loaded
+            BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.SYNC, false);
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                this.DebugSettings.EnableFrameRateCounter = true;
+            }
+#endif
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -67,25 +83,64 @@ namespace MiraiNotes.UWP
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    //TODO: Load state from previously suspended application
+                    // TODO: Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
             }
 
-            if (e.PrelaunchActivated == false)
+            // Handle toast activation
+            if (e is ToastNotificationActivatedEventArgs toastActivationArgs)
             {
-                if (rootFrame.Content == null)
+                // If empty args, no specific action (just launch the app)
+                if (toastActivationArgs.Argument.Length == 0)
                 {
-                    // When the navigation stack isn't restored navigate to the first page,
-                    // configuring the new page by passing required information as a navigation
-                    // parameter
-                    rootFrame.Navigate(typeof(LoginPage), e.Arguments);
+                    if (rootFrame.Content == null)
+                        rootFrame.Navigate(typeof(LoginPage));
                 }
-                // Ensure the current window is active
-                Window.Current.Activate();
+                // Otherwise an action is provided
+                else
+                {
+
+                    // If we're loading the app for the first time, place the main page on the back stack
+                    // so that user can go back after they've been navigated to the specific page
+                    if (rootFrame.BackStack.Count == 0)
+                        rootFrame.BackStack.Add(new PageStackEntry(typeof(LoginPage), null, null));
+                }
             }
+            // Handle launch activation
+            else if (e is LaunchActivatedEventArgs launchActivationArgs)
+            {
+                // If launched with arguments (not a normal primary tile/applist launch)
+                if (launchActivationArgs.Arguments.Length > 0)
+                {
+                    // TODO: Handle arguments for cases like launching from secondary Tile, so we navigate to the correct page
+                    throw new NotImplementedException("Launched with arguments type of of activation is not currently implemented");
+                }
+                // Otherwise if launched normally
+                else
+                {
+                    // If we're currently not on a page, navigate to the login page
+                    if (rootFrame.Content == null)
+                        rootFrame.Navigate(typeof(LoginPage));
+                }
+            }
+            else
+            {
+                // TODO: Handle other types of activation
+                throw new NotImplementedException("This type of of activation is not currently implemented");
+            }
+            //If the app is already initialized just return. Not sure if this is needed
+            if (_initialized)
+                return;
+
+            ViewModels.ViewModelLocator.IsAppRunning = true;
+
+            // Ensure the current window is active
+            Window.Current.Activate();
+            GalaSoft.MvvmLight.Threading.DispatcherHelper.Initialize();
+            _initialized = true;
         }
 
         /// <summary>
@@ -109,6 +164,23 @@ namespace MiraiNotes.UWP
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
+            deferral.Complete();
+        }
+
+        // Event fired when a Background Task is activated (in Single Process Model)
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+            
+            var deferral = args.TaskInstance.GetDeferral();
+            
+            switch (args.TaskInstance.Task.Name)
+            {
+                case nameof(SyncBackgroundTask):
+                    new SyncBackgroundTask().Run(args.TaskInstance);
+                    break;
+            }
+
             deferral.Complete();
         }
     }

@@ -1,5 +1,5 @@
-﻿using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models.API;
 using System;
 using System.Collections.Generic;

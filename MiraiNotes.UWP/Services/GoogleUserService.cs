@@ -2,9 +2,6 @@
 using MiraiNotes.UWP.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.UWP.Services
@@ -20,7 +17,7 @@ namespace MiraiNotes.UWP.Services
             _httpClientsFactory = httpClientsFactory;
         }
 
-        public async Task<GoogleUserModel> GetUserInfoAsync(string token)
+        public async Task<GoogleUserModel> GetUserInfoAsync()
         {
             var httpClient = _httpClientsFactory.GetHttpClient();
             try

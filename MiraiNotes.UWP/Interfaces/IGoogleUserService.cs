@@ -5,6 +5,6 @@ namespace MiraiNotes.UWP.Interfaces
 {
     public interface IGoogleUserService
     {
-        Task<GoogleUserModel> GetUserInfoAsync(string token);
+        Task<GoogleUserModel> GetUserInfoAsync();
     }
 }

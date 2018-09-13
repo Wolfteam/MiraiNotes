@@ -2,11 +2,29 @@
     x:Class="MiraiNotes.UWP.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:MiraiNotes.UWP.Converters"
     xmlns:local="using:MiraiNotes.UWP"
     xmlns:locator="using:MiraiNotes.UWP.ViewModels">
     <Application.Resources>
         <ResourceDictionary>
-            <locator:ViewModelLocator x:Key="Locator"/>
+            <locator:ViewModelLocator x:Key="Locator" />
+
+            <!--  Converters  -->
+            <converters:AutoSuggestQueryParameterConverter x:Key="AutoSuggestQueryParameterConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:BooleanToVisibilityConverter
+                x:Key="BoolToVisibilityConverterInverse"
+                OnFalse="Visible"
+                OnTrue="Collapsed" />
+            <converters:BooleanToTextDecorationConverter x:Key="BoolToTextDecorationConverter" />
+            <converters:BooleanToTextDecorationConverter
+                x:Key="BoolToTextDecorationConverterInverse"
+                OnFalse="None"
+                OnTrue="Strikethrough" />
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:NavigationViewSelectionChangedEventArgsConverter x:Key="NavigationViewSelectionChangedEventArgsConverter" />
+            <converters:StringDelimiterConverter x:Key="StringDelimiterConverter" />
+            <!--<converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />-->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

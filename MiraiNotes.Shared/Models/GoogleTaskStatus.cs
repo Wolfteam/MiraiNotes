@@ -1,4 +1,4 @@
-﻿namespace MiraiNotes.UWP.Models
+﻿namespace MiraiNotes.Shared.Models
 {
     public enum GoogleTaskStatus
     {

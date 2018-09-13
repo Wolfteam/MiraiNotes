@@ -13,12 +13,10 @@ namespace MiraiNotes.UWP.Services
         public const string BASE_ADDRESS = "https://www.googleapis.com/tasks/v1/users/@me/lists";
 
         private readonly IHttpClientsFactory _httpClientsFactory;
-        private readonly IUserCredentialService _userCredentialService;
 
-        public GoogleTaskListService(IHttpClientsFactory httpClientsFactory, IUserCredentialService userCredentialService)
+        public GoogleTaskListService(IHttpClientsFactory httpClientsFactory)
         {
             _httpClientsFactory = httpClientsFactory;
-            _userCredentialService = userCredentialService;
         }
 
         public async Task<GoogleEmptyResponseModel> DeleteAsync(string taskListID)

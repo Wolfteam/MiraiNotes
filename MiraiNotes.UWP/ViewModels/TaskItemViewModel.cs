@@ -1,4 +1,6 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Shared.Helpers;
+using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.ObjectModel;
 using Template10.Validation;
@@ -12,7 +14,8 @@ namespace MiraiNotes.UWP.ViewModels
         private string _status;
         private string _parentTask;
         private bool _hasSubTasks;
-        private DateTime? _completedOn;
+        private DateTimeOffset? _completedOn;
+        private ObservableCollection<TaskItemViewModel> _subTasks = new ObservableCollection<TaskItemViewModel>();
         #endregion
 
         public string TaskID
@@ -31,9 +34,9 @@ namespace MiraiNotes.UWP.ViewModels
             set { Write(value); }
         }
 
-        public DateTime UpdatedAt
+        public DateTimeOffset UpdatedAt
         {
-            get { return Read<DateTime>(); }
+            get { return Read<DateTimeOffset>(); }
             set { Write(value); }
         }
 
@@ -68,6 +71,8 @@ namespace MiraiNotes.UWP.ViewModels
                 RaisePropertyChanged(nameof(CanBeMarkedAsCompleted));
                 RaisePropertyChanged(nameof(CanBeMarkedAsIncompleted));
                 RaisePropertyChanged(nameof(IsCompleted));
+                //This is until uwp team fixes the text decoration not getting updated
+                RaisePropertyChanged(nameof(Title));
             }
         }
 
@@ -79,9 +84,7 @@ namespace MiraiNotes.UWP.ViewModels
                 //until you save it to google tasks
                 if (string.IsNullOrEmpty(Status))
                     return GoogleTaskStatus.NEEDS_ACTION;
-                string status = Status.ToUpper();
-                Enum.TryParse(status, out GoogleTaskStatus googleTaskStatus);
-                return googleTaskStatus;
+                return GoogleTaskStatusHelper.GetGoogleStatus(Status);
             }
         }
 
@@ -95,7 +98,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public DateTime? CompletedOn
+        public DateTimeOffset? CompletedOn
         {
             get => _completedOn;
             set
@@ -153,15 +156,15 @@ namespace MiraiNotes.UWP.ViewModels
             set { Write(value); }
         }
 
-        public bool IsCompletitionDateTodayOrAlreadyPassed
+        public bool IsCompletitionDateSet
         {
             get
             {
-                return ToBeCompletedOn?.Date <= DateTimeOffset.Now;
+                return ToBeCompletedOn.HasValue;
             }
         }
 
-        public string CompletitionDateTodayOrAlreadyPassedText
+        public string CompletitionDateText
         {
             get
             {
@@ -170,12 +173,19 @@ namespace MiraiNotes.UWP.ViewModels
                 else
                 {
                     var difference = DateTimeOffset.Now.DayOfYear - ToBeCompletedOn.Value.DayOfYear;
-                    if (difference == 0)
-                        return "Today";
-                    else if (difference == 1)
-                        return $"{difference} day ago";
+                    if (difference >= 0)
+                    {
+                        if (difference == 0)
+                            return "Today";
+                        else if (difference == 1)
+                            return $"{difference} day ago";
+                        else
+                            return $"{difference} days ago";
+                    }
+                    else if (difference == -1)
+                        return "Tomorrow";
                     else
-                        return $"{difference} days ago";
+                        return ToBeCompletedOn.Value.ToString("ddd, MMM d");
                 }
             }
         }
@@ -198,16 +208,15 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get
             {
-                var items = Read<ObservableCollection<TaskItemViewModel>>();
-                if (items?.Count > 0)
+                if (_subTasks?.Count > 0)
                     HasSubTasks = true;
                 else
                     HasSubTasks = false;
-                return items;
+                return _subTasks;
             }
             set
             {
-                Write(value);
+                _subTasks = value;
                 RaisePropertyChanged(nameof(SubTasks));
             }
         }

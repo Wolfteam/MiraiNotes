@@ -1,6 +1,7 @@
-﻿using MiraiNotes.UWP.Helpers;
+﻿using MiraiNotes.Shared.Helpers;
+using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Models.API;
 using Newtonsoft.Json;
 using System;
@@ -15,12 +16,10 @@ namespace MiraiNotes.UWP.Services
         public const string BASE_ADDRESS = "https://www.googleapis.com/tasks/v1/lists";
         //https://www.googleapis.com/tasks/v1/lists/MDAwNDE5MDcxMTUwMzkwODQyNjA6OTQ0ODQyMjIyOjA/tasks?maxResults=2
         private readonly IHttpClientsFactory _httpClientsFactory;
-        private readonly IUserCredentialService _userCredentialService;
 
-        public GoogleTaskService(IHttpClientsFactory httpClientsFactory, IUserCredentialService userCredentialService)
+        public GoogleTaskService(IHttpClientsFactory httpClientsFactory)
         {
             _httpClientsFactory = httpClientsFactory;
-            _userCredentialService = userCredentialService;
         }
 
         public async Task<GoogleEmptyResponseModel> ClearAsync(string taskListID)
@@ -84,7 +83,7 @@ namespace MiraiNotes.UWP.Services
             int maxResults = 100,
             string pageToken = null)
         {
-            string url = $"{BASE_ADDRESS}/{taskListID}/tasks";
+            string url = $"{BASE_ADDRESS}/{taskListID}/tasks?showHidden=true";
             var result = new GoogleResponseModel<GoogleTaskApiResponseModel<GoogleTaskModel>>();
             var httpClient = _httpClientsFactory.GetHttpClient();
 

@@ -14,5 +14,7 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _title; }
             set { Set(ref _title, value); }
         }
+
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

@@ -18,7 +18,14 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <PackageCertificateKeyFile>MiraiNotes.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>AD9303CF24DCC256629FB20EC16F85BA597B384E</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>A7A53CBDEF3DDC2F1C94BEB5597F065440F994A3</PackageCertificateThumbprint>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86</AppxBundlePlatforms>
+    <AppInstallerUri>\\MiraiNotes</AppInstallerUri>
+    <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
+    <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -96,29 +103,37 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BackgroundTasks\SyncBackgroundTask.cs" />
     <Compile Include="Controls\TasksListView.cs" />
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\StringDelimiterConverter.cs" />
     <Compile Include="Converters\VisibleWhenZeroConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\NavigationViewSelectionChangedEventArgsConverter.cs" />
-    <Compile Include="Converters\TestConverter.cs" />
+    <Compile Include="Converters\DatetimeOffsetToLocalDatetimeOffsetConverter.cs" />
+    <Compile Include="Delegates\Delegates.cs" />
     <Compile Include="Design\DesignGoogleTaskListService.cs" />
     <Compile Include="Design\DesignGoogleTaskService.cs" />
     <Compile Include="Extensions\FocusExtension.cs" />
     <Compile Include="Extensions\ObservableCollectionExtension.cs" />
     <Compile Include="Handlers\AuthorizationHandler.cs" />
+    <Compile Include="Helpers\BackgroundTasksManager.cs" />
+    <Compile Include="Helpers\DispatcherHelperEx.cs" />
     <Compile Include="Helpers\HttpClientExtensions.cs" />
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
-    <Compile Include="Helpers\GoogleTaskStatusHelper.cs" />
+    <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
+    <Compile Include="Interfaces\IDispatcherHelper.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
     <Compile Include="Interfaces\IGoogleTaskService.cs" />
     <Compile Include="Interfaces\IGoogleUserService.cs" />
     <Compile Include="Interfaces\IHttpClientsFactory.cs" />
+    <Compile Include="Interfaces\INetworkService.cs" />
+    <Compile Include="Interfaces\ISyncService.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -129,12 +144,18 @@
     <Compile Include="Models\API\GoogleTaskModel.cs" />
     <Compile Include="Models\API\GoogleTaskApiResponseModel.cs" />
     <Compile Include="Models\API\GoogleTaskListModel.cs" />
-    <Compile Include="Models\GoogleTaskStatus.cs" />
     <Compile Include="Models\API\GoogleUserModel.cs" />
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
+    <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\MessageType.cs" />
+    <Compile Include="Services\ApplicationSettingsService.cs" />
+    <Compile Include="Services\BackgroundTaskManagerService.cs" />
+    <Compile Include="Services\NetworkService.cs" />
+    <Compile Include="Services\SyncService.cs" />
+    <Compile Include="Utils\SmartObservableCollection.cs" />
+    <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\TaskListItemViewModel.cs" />
     <Compile Include="ViewModels\TaskItemViewModel.cs" />
     <Compile Include="Models\TaskSortType.cs" />
@@ -275,6 +296,18 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.1.7</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp">
+      <Version>4.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Connectivity">
+      <Version>4.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
+      <Version>4.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
+      <Version>4.0.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
       <Version>2.0.0</Version>
     </PackageReference>
@@ -283,6 +316,12 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog">
+      <Version>2.7.1</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.File">
+      <Version>4.0.0</Version>
     </PackageReference>
     <PackageReference Include="Template10-Validation">
       <Version>1.0.2</Version>
@@ -293,6 +332,23 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MiraiNotes.UWP_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiraiNotes.DataService\MiraiNotes.DataService.csproj">
+      <Project>{d46856f5-8558-4735-b2c8-195021ee2960}</Project>
+      <Name>MiraiNotes.DataService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MiraiNotes.Data\MiraiNotes.Data.csproj">
+      <Project>{5ebd0bc2-8279-41ed-9c43-7b531220b95f}</Project>
+      <Name>MiraiNotes.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MiraiNotes.Shared\MiraiNotes.Shared.csproj">
+      <Project>{13c950f5-4dbb-4992-8a4f-407a61626963}</Project>
+      <Name>MiraiNotes.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

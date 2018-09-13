@@ -1,7 +1,8 @@
-﻿using System;
-using System.Linq;
-using MiraiNotes.UWP.Interfaces;
+﻿using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Windows.Security.Credentials;
 
 namespace MiraiNotes.UWP.Services
@@ -15,10 +16,15 @@ namespace MiraiNotes.UWP.Services
         public void DeleteUserCredentials()
         {
             var vault = new PasswordVault();
+            var credentialList = new List<PasswordCredential>();
             var credentials = vault.RetrieveAll();
-            foreach (var credential in credentials)
+            foreach (PasswordCredential credential in credentials)
             {
-                vault.Remove(credential);
+                credentialList.Add(vault.Retrieve(credential.Resource, credential.UserName));
+            }
+            foreach (PasswordCredential entry in credentialList)
+            {
+                vault.Remove(entry);
             }
         }
 
@@ -63,6 +69,7 @@ namespace MiraiNotes.UWP.Services
             catch (Exception)
             {
                 // When there is no matching resource an error occurs, which we ignore.
+                System.Diagnostics.Debug.WriteLine("User is not logged in");
             }
             return isUserLogged;
         }
