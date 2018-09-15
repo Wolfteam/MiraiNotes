@@ -68,6 +68,12 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
+        public SettingsPageViewModel Settings
+            => ServiceLocator.Current.GetInstance<SettingsPageViewModel>();
+
+        public IApplicationSettingsService ApplicationSettingsService
+            => ServiceLocator.Current.GetInstance<IApplicationSettingsService>();
+
         public ISyncService SyncService
             => ServiceLocator.Current.GetInstance<ISyncService>();
 
@@ -122,6 +128,9 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<AuthorizationHandler>();
             SimpleIoc.Default.Register<IHttpClientsFactory, HttpClientsFactory>();
 
+            SimpleIoc.Default.Register<IApplicationSettingsServiceBase, ApplicationSettingsServiceBase>();
+            SimpleIoc.Default.Register<IApplicationSettingsService, ApplicationSettingsService>();
+
             SimpleIoc.Default.Register<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
 
             SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
@@ -140,6 +149,7 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<NavPageViewModel>();
             SimpleIoc.Default.Register<TasksPageViewModel>();
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
+            SimpleIoc.Default.Register<SettingsPageViewModel>();
         }
 
         /// <summary>

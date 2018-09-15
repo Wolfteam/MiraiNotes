@@ -108,6 +108,7 @@
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\SettingsPageTypeToSegoeMDL2IconConverter.cs" />
     <Compile Include="Converters\StringDelimiterConverter.cs" />
     <Compile Include="Converters\VisibleWhenZeroConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
@@ -125,6 +126,8 @@
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
+    <Compile Include="Interfaces\IApplicationSettingsService.cs" />
+    <Compile Include="Interfaces\IApplicationSettingsServiceBase.cs" />
     <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
     <Compile Include="Interfaces\IDispatcherHelper.cs" />
@@ -150,12 +153,35 @@
     <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\MessageType.cs" />
+    <Compile Include="Models\SettingsPageType.cs" />
+    <Compile Include="Models\SettingsPageItem.cs" />
+    <Compile Include="Models\SyncBgTaskIntervals.cs" />
+    <Compile Include="Pages\Settings\SettingsAboutPage.xaml.cs">
+      <DependentUpon>SettingsAboutPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\SettingsGeneralPage.xaml.cs">
+      <DependentUpon>SettingsGeneralPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\SettingsMainPage.xaml.cs">
+      <DependentUpon>SettingsMainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\SettingsNotificationsPage.xaml.cs">
+      <DependentUpon>SettingsNotificationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\SettingsSynchronizationPage.xaml.cs">
+      <DependentUpon>SettingsSynchronizationPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\ApplicationSettingsService.cs" />
+    <Compile Include="Services\ApplicationSettingsServiceBase.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\SmartObservableCollection.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
+    <Compile Include="ViewModels\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\TaskListItemViewModel.cs" />
     <Compile Include="ViewModels\TaskItemViewModel.cs" />
     <Compile Include="Models\TaskSortType.cs" />
@@ -281,6 +307,30 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\NewTaskPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\SettingsAboutPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\SettingsGeneralPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\SettingsMainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\SettingsNotificationsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\SettingsSynchronizationPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
