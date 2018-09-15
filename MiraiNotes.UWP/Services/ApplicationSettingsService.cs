@@ -1,19 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Storage;
+﻿using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 
 namespace MiraiNotes.UWP.Services
 {
-    public class ApplicationSettingsService
+    public class ApplicationSettingsService : IApplicationSettingsService
     {
-        //TODO: I SHOULD ADD A ENUM FOR THE VALUES
-        public static int SyncBackgroundTaskInterval
+        private readonly IApplicationSettingsServiceBase _settings;
+
+        public ApplicationSettingsService(IApplicationSettingsServiceBase settings)
         {
-            get => (int)(ApplicationData.Current.LocalSettings.Values[nameof(SyncBackgroundTaskInterval)] ?? 0);
-            set => ApplicationData.Current.LocalSettings.Values[nameof(SyncBackgroundTaskInterval)] = value;
+            _settings = settings;
+        }
+
+        public SyncBgTaskIntervals SyncBackgroundTaskInterval
+        {
+            get => (SyncBgTaskIntervals)(_settings[nameof(SyncBackgroundTaskInterval)] ?? SyncBgTaskIntervals.NEVER);
+            set => _settings[nameof(SyncBackgroundTaskInterval)] = value;
+        }
+
+        public bool SyncBackgroundTaskAfterStart
+        {
+            get => (bool)(_settings[nameof(SyncBackgroundTaskAfterStart)] ?? false);
+            set => _settings[nameof(SyncBackgroundTaskAfterStart)] = value;
+        }
+
+
+        public bool ShowToastNotificationAfterFullSync
+        {
+            get => (bool)(_settings[nameof(ShowToastNotificationAfterFullSync)] ?? false);
+            set => _settings[nameof(ShowToastNotificationAfterFullSync)] = value;
+        }
+
+        //public static bool ShowToastNotificationForTasks
+        //{
+        //    get => (bool)(_settings[nameof(ShowToastNotificationAfterFullSync)] ?? false);
+        //    set => _settings[nameof(ShowToastNotificationAfterFullSync)] = value;
+        //}
+
+        //public static TaskSortType DefaultTaskListSortOrder
+        //{
+        //    get => (TaskSortType)(_settings[nameof(DefaultTaskListSortOrder)] ?? TaskSortType.BY_NAME_ASC);
+        //    set => _settings[nameof(DefaultTaskListSortOrder)] = value;
+        //}
+
+        public TaskSortType DefaultTaskSortOrder
+        {
+            get => (TaskSortType)(_settings[nameof(DefaultTaskSortOrder)] ?? TaskSortType.BY_NAME_ASC);
+            set => _settings[nameof(DefaultTaskSortOrder)] = value;
+        }
+
+        public bool AskForPasswordWhenAppStarts
+        {
+            get => (bool)(_settings[nameof(AskForPasswordWhenAppStarts)] ?? false);
+            set => _settings[nameof(AskForPasswordWhenAppStarts)] = value;
         }
     }
 }
