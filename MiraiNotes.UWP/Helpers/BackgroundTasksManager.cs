@@ -1,7 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Helpers;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Services;
 using System;
 using Windows.ApplicationModel.Background;
 
@@ -14,9 +13,8 @@ namespace MiraiNotes.UWP.Helpers
         /// </summary>
         /// <param name="backgroundTask">The background task to register</param>
         /// <param name="restart">Indicates if the registration of the bg task is mandatory(True by default)</param>
-        public static void RegisterBackgroundTask(BackgroundTaskType backgroundTask, bool restart = true)
+        public static void RegisterBackgroundTask(BackgroundTaskType backgroundTask, int bgTaskInterval = 0, bool restart = true)
         {
-            int bgTaskInterval = 15;
             string bgTaskName;
             Type bgTaskType;
 
@@ -25,9 +23,6 @@ namespace MiraiNotes.UWP.Helpers
                 case BackgroundTaskType.ANY:
                     throw new ArgumentException("Is not allowed to register all bg tasks at the same time");
                 case BackgroundTaskType.SYNC:
-                    bgTaskInterval = ApplicationSettingsService.SyncBackgroundTaskInterval;
-                    if (bgTaskInterval <= 0)
-                        return;
                     bgTaskName = nameof(SyncBackgroundTask);
                     bgTaskType = typeof(SyncBackgroundTask);
                     break;
@@ -41,6 +36,9 @@ namespace MiraiNotes.UWP.Helpers
 
             if (isBgTaskAlreadyRegistered)
                 UnregisterBackgroundTask(backgroundTask);
+
+            if (bgTaskInterval <= 0)
+                return;
 
             BackgroundTaskHelper.Register(
                 bgTaskName,

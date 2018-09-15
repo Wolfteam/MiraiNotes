@@ -63,7 +63,7 @@ namespace MiraiNotes.UWP
         private void OnLaunchedOrActivated(IActivatedEventArgs e)
         {
             // Initialize things like registering background tasks before the app is loaded
-            BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.SYNC, false);
+            //BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.SYNC, false);
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

@@ -15,6 +15,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
 {
     public sealed class SyncBackgroundTask : IBackgroundTask
     {
+        private readonly IApplicationSettingsService _appSettings;
         private readonly ISyncService _syncService;
         private readonly ILogger _logger;
         private readonly IMessenger _messenger;
@@ -26,6 +27,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
             _isAppRunning = ViewModelLocator.IsAppRunning;
             var vml = new ViewModelLocator();
 
+            _appSettings = vml.ApplicationSettingsService;
             _syncService = vml.SyncService;
             _logger = vml.Logger.ForContext<SyncBackgroundTask>();
             _messenger = vml.Messenger;
@@ -75,7 +77,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
             //TODO: MAYBE ADD A SETTING TO SHOW OR NOT SHOW THE NOTIFICATION
 
-            if (!_isAppRunning && !startedManually)
+            if (!_isAppRunning && !startedManually && _appSettings.ShowToastNotificationAfterFullSync)
             {
                 var content = GenerateToastContent(message);
                 var toastNotification = new ToastNotification(content.GetXml());
