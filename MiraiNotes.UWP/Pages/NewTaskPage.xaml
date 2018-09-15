@@ -77,13 +77,13 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Orientation="Horizontal"
-                    Visibility="{Binding CurrentTask.IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    Visibility="{Binding CurrentTask.IsCompletitionDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE787;" />
                     <TextBlock
                         Grid.Row="0"
                         Margin="5,0"
                         FontSize="24"
-                        Text="{Binding CurrentTask.CompletitionDateTodayOrAlreadyPassedText, Mode=OneWay}" />
+                        Text="{Binding CurrentTask.CompletitionDateText, Mode=OneWay}" />
                 </StackPanel>
             </Grid>
 

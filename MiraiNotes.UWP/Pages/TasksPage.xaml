@@ -143,7 +143,7 @@
                                                     FontFamily="Segoe MDL2 Assets"
                                                     Glyph="&#xE787;"
                                                     ToolTipService.ToolTip="Completition date is today or is already passed"
-                                                    Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                    Visibility="{Binding IsCompletitionDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                             </StackPanel>
 
                                             <TextBlock
@@ -266,7 +266,7 @@
                                                     FontFamily="Segoe MDL2 Assets"
                                                     Glyph="&#xE787;"
                                                     ToolTipService.ToolTip="Completition date is today or is already passed"
-                                                    Visibility="{Binding IsCompletitionDateTodayOrAlreadyPassed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                    Visibility="{Binding IsCompletitionDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                 <TextBlock
                                                     VerticalAlignment="Center"
                                                     FontSize="14"
