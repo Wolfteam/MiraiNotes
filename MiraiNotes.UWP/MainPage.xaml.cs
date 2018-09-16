@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.UWP.Pages;
+using MiraiNotes.UWP.Pages.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,6 +32,7 @@ namespace MiraiNotes.UWP
             this.InitializeComponent();
             ContentFrame.Navigate(typeof(TasksPage));
             PaneFrame.Navigate(typeof(NewTaskPage));
+            SettingsPageFrame.Navigate(typeof(SettingsPage));
             MainSplitView.RegisterPropertyChangedCallback(SplitView.IsPaneOpenProperty, IsPaneOpenPropertyChanged);
             MainSplitView.SizeChanged += (sender, e) => UpdatePaneWidth();
         }

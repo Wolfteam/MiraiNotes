@@ -19,187 +19,211 @@
     mc:Ignorable="d">
 
     <Grid>
-        <NavigationView
-            x:Name="NavigationView"
-            AlwaysShowHeader="True"
-            Background="{ThemeResource SystemControlBaseLowAcrylicWindowBrush}"
-            CompactModeThresholdWidth="1280"
-            ExpandedModeThresholdWidth="1280"
-            IsBackButtonVisible="Collapsed"
-            IsBackEnabled="False"
-            IsSettingsVisible="True"
-            IsTabStop="True"
-            MenuItemsSource="{Binding TaskLists, Mode=OneWay}"
-            PaneTitle="Mirai Notes"
-            SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
-            <interactivity:Interaction.Behaviors>
-                <core:EventTriggerBehavior EventName="SelectionChanged">
-                    <core:EventTriggerBehavior.Actions>
-                        <core:InvokeCommandAction Command="{Binding NavigationViewSelectionChanged}" InputConverter="{StaticResource NavigationViewSelectionChangedEventArgsConverter}" />
-                    </core:EventTriggerBehavior.Actions>
-                </core:EventTriggerBehavior>
-
-                <core:EventTriggerBehavior EventName="Loaded">
-                    <core:EventTriggerBehavior.Actions>
-                        <core:InvokeCommandAction Command="{Binding PageLoadedCommand}" />
-                    </core:EventTriggerBehavior.Actions>
-                </core:EventTriggerBehavior>
-            </interactivity:Interaction.Behaviors>
-
-            <NavigationView.HeaderTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="10*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            Grid.Column="0"
-                            HorizontalAlignment="Center"
-                            FontSize="30"
-                            FontWeight="Bold"
-                            Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}" />
-                        <Button
-                            Grid.Column="1"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Background="Transparent"
-                            Command="{Binding ClosePaneCommand}"
-                            IsTabStop="False"
-                            IsTapEnabled="False"
-                            Visibility="{Binding IsPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <SymbolIcon Symbol="Cancel" />
-                        </Button>
-                    </Grid>
-                </DataTemplate>
-            </NavigationView.HeaderTemplate>
-            <NavigationView.AutoSuggestBox>
-                <AutoSuggestBox
-                    x:Name="TaskListsAutoSuggestBox"
-                    DisplayMemberPath="Text"
-                    ItemsSource="{Binding TaskListsAutoSuggestBoxItems, Mode=OneWay}"
-                    PlaceholderText="Search a task list..."
-                    QueryIcon="Find"
-                    Text="{Binding TaskListkAutoSuggestBoxText, Mode=TwoWay}"
-                    TextMemberPath="Text"
-                    UpdateTextOnSelect="False">
+        <SplitView
+            x:Name="MainContentSplitView"
+            DisplayMode="Overlay"
+            IsPaneOpen="{Binding IsSettingsPaneOpen, Mode=TwoWay}"
+            OpenPaneLength="400"
+            PanePlacement="Right">
+            <SplitView.Pane>
+                <Frame x:Name="SettingsPageFrame" />
+            </SplitView.Pane>
+            <SplitView.Content>
+                <NavigationView
+                    x:Name="NavigationView"
+                    AlwaysShowHeader="True"
+                    Background="{ThemeResource SystemControlBaseLowAcrylicWindowBrush}"
+                    CompactModeThresholdWidth="1280"
+                    ExpandedModeThresholdWidth="1280"
+                    IsBackButtonVisible="Collapsed"
+                    IsBackEnabled="False"
+                    IsSettingsVisible="True"
+                    IsTabStop="True"
+                    MenuItemsSource="{Binding TaskLists, Mode=OneWay}"
+                    PaneTitle="Mirai Notes"
+                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                     <interactivity:Interaction.Behaviors>
-                        <core:EventTriggerBehavior EventName="TextChanged">
+                        <core:EventTriggerBehavior EventName="SelectionChanged">
                             <core:EventTriggerBehavior.Actions>
-                                <core:InvokeCommandAction Command="{Binding TaskListAutoSuggestBoxTextChangedCommand}" CommandParameter="{Binding ElementName=TaskListsAutoSuggestBox, Path=Text}" />
+                                <core:InvokeCommandAction Command="{Binding NavigationViewSelectionChanged}" InputConverter="{StaticResource NavigationViewSelectionChangedEventArgsConverter}" />
                             </core:EventTriggerBehavior.Actions>
                         </core:EventTriggerBehavior>
-                        <core:EventTriggerBehavior EventName="QuerySubmitted">
+
+                        <core:EventTriggerBehavior EventName="Loaded">
                             <core:EventTriggerBehavior.Actions>
-                                <core:InvokeCommandAction Command="{Binding TaskListAutoSuggestBoxQuerySubmittedCommand}" InputConverter="{StaticResource AutoSuggestQueryParameterConverter}" />
+                                <core:InvokeCommandAction Command="{Binding PageLoadedCommand}" />
                             </core:EventTriggerBehavior.Actions>
                         </core:EventTriggerBehavior>
                     </interactivity:Interaction.Behaviors>
-                </AutoSuggestBox>
-            </NavigationView.AutoSuggestBox>
-            <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="viewModels:TaskListItemViewModel">
-                    <Grid
-                        Width="320"
-                        Height="40"
-                        Margin="-16,0,0,0"
-                        VerticalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
 
-                        <StackPanel
-                            Grid.Column="0"
-                            HorizontalAlignment="Left"
-                            Orientation="Horizontal"
-                            ToolTipService.ToolTip="{Binding Title, Mode=OneWay}">
-                            <Viewbox Margin="16,12" HorizontalAlignment="Left">
-                                <SymbolIcon Symbol="List" />
-                            </Viewbox>
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Text="{Binding Title, Mode=OneWay}"
-                                TextWrapping="Wrap" />
-                        </StackPanel>
+                    <NavigationView.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="30"
+                                    FontWeight="Bold"
+                                    Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}" />
+                                <Button
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    Command="{Binding ClosePaneCommand}"
+                                    IsTabStop="False"
+                                    IsTapEnabled="False"
+                                    Visibility="{Binding IsPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <SymbolIcon Symbol="Cancel" />
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </NavigationView.HeaderTemplate>
+                    <NavigationView.AutoSuggestBox>
+                        <AutoSuggestBox
+                            x:Name="TaskListsAutoSuggestBox"
+                            DisplayMemberPath="Text"
+                            ItemsSource="{Binding TaskListsAutoSuggestBoxItems, Mode=OneWay}"
+                            PlaceholderText="Search a task list..."
+                            QueryIcon="Find"
+                            Text="{Binding TaskListkAutoSuggestBoxText, Mode=TwoWay}"
+                            TextMemberPath="Text"
+                            UpdateTextOnSelect="False">
+                            <interactivity:Interaction.Behaviors>
+                                <core:EventTriggerBehavior EventName="TextChanged">
+                                    <core:EventTriggerBehavior.Actions>
+                                        <core:InvokeCommandAction Command="{Binding TaskListAutoSuggestBoxTextChangedCommand}" CommandParameter="{Binding ElementName=TaskListsAutoSuggestBox, Path=Text}" />
+                                    </core:EventTriggerBehavior.Actions>
+                                </core:EventTriggerBehavior>
+                                <core:EventTriggerBehavior EventName="QuerySubmitted">
+                                    <core:EventTriggerBehavior.Actions>
+                                        <core:InvokeCommandAction Command="{Binding TaskListAutoSuggestBoxQuerySubmittedCommand}" InputConverter="{StaticResource AutoSuggestQueryParameterConverter}" />
+                                    </core:EventTriggerBehavior.Actions>
+                                </core:EventTriggerBehavior>
+                            </interactivity:Interaction.Behaviors>
+                        </AutoSuggestBox>
+                    </NavigationView.AutoSuggestBox>
+                    <NavigationView.MenuItemTemplate>
+                        <DataTemplate x:DataType="viewModels:TaskListItemViewModel">
+                            <Grid
+                                Width="320"
+                                Height="40"
+                                Margin="-16,0,0,0"
+                                VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                        <StackPanel
-                            Grid.Column="1"
-                            HorizontalAlignment="Right"
-                            Orientation="Horizontal">
+                                <StackPanel
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Left"
+                                    Orientation="Horizontal"
+                                    ToolTipService.ToolTip="{Binding Title, Mode=OneWay}">
+                                    <Viewbox Margin="16,12" HorizontalAlignment="Left">
+                                        <SymbolIcon Symbol="List" />
+                                    </Viewbox>
+                                    <TextBlock
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Title, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <StackPanel
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal">
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        HorizontalContentAlignment="Right"
+                                        Background="Transparent"
+                                        Command="{Binding ElementName=NavigationView, Path=DataContext.UpdateTaskListCommand}"
+                                        CommandParameter="{Binding}"
+                                        ToolTipService.ToolTip="Update task list's title">
+                                        <SymbolIcon Symbol="Edit" />
+                                    </Button>
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        HorizontalContentAlignment="Right"
+                                        Background="Transparent"
+                                        Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskListCommand}"
+                                        CommandParameter="{Binding}"
+                                        ToolTipService.ToolTip="Delete this task list">
+                                        <SymbolIcon Symbol="Delete" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </NavigationView.MenuItemTemplate>
+                    <NavigationView.Content>
+                        <SplitView
+                            x:Name="MainSplitView"
+                            DisplayMode="Inline"
+                            IsPaneOpen="{Binding IsPaneOpen, Mode=OneWay}"
+                            PaneBackground="{StaticResource SystemControlPageBackgroundListLowBrush}"
+                            PanePlacement="Right">
+                            <SplitView.Pane>
+                                <Frame x:Name="PaneFrame" />
+                            </SplitView.Pane>
+                            <SplitView.Content>
+                                <Frame x:Name="ContentFrame" />
+                            </SplitView.Content>
+                        </SplitView>
+                    </NavigationView.Content>
+                    <NavigationView.PaneFooter>
+                        <StackPanel>
                             <Button
-                                HorizontalAlignment="Right"
-                                HorizontalContentAlignment="Right"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
                                 Background="Transparent"
-                                Command="{Binding ElementName=NavigationView, Path=DataContext.UpdateTaskListCommand}"
-                                CommandParameter="{Binding}"
-                                ToolTipService.ToolTip="Update task list's title">
-                                <SymbolIcon Symbol="Edit" />
-                            </Button>
-                            <Button
-                                HorizontalAlignment="Right"
-                                HorizontalContentAlignment="Right"
-                                Background="Transparent"
-                                Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskListCommand}"
-                                CommandParameter="{Binding}"
-                                ToolTipService.ToolTip="Delete this task list">
-                                <SymbolIcon Symbol="Delete" />
+                                Command="{Binding LogoutCommand}"
+                                ToolTipService.ToolTip="Sign out">
+                                <Grid Height="40" Margin="-9,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <SymbolIcon
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Symbol="People" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Text="Sign out" />
+                                </Grid>
                             </Button>
                         </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </NavigationView.MenuItemTemplate>
-            <NavigationView.Content>
-                <SplitView
-                    x:Name="MainSplitView"
-                    DisplayMode="Inline"
-                    IsPaneOpen="{Binding IsPaneOpen, Mode=OneWay}"
-                    PaneBackground="{StaticResource SystemControlPageBackgroundListLowBrush}"
-                    PanePlacement="Right">
-                    <SplitView.Pane>
-                        <Frame x:Name="PaneFrame" />
-                    </SplitView.Pane>
-                    <SplitView.Content>
-                        <Frame x:Name="ContentFrame" />
-                    </SplitView.Content>
-                </SplitView>
-            </NavigationView.Content>
-            <NavigationView.PaneFooter>
-                <StackPanel>
-                    <Button
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        Background="Transparent"
-                        Command="{Binding LogoutCommand}"
-                        CommandParameter="24"
-                        ToolTipService.ToolTip="Sign out">
-                        <Grid Height="40" Margin="-9,0,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="48" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <SymbolIcon
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Symbol="People" />
-                            <TextBlock
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Text="Sign out" />
-                        </Grid>
-                    </Button>
-                </StackPanel>
-            </NavigationView.PaneFooter>
-        </NavigationView>
+                    </NavigationView.PaneFooter>
+                </NavigationView>
+            </SplitView.Content>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup>
+                    <VisualState>
+                        <VisualState.StateTriggers>
+                            <AdaptiveTrigger MinWindowWidth="400" />
+                        </VisualState.StateTriggers>
+                        <VisualState.Setters>
+                            <Setter Target="MainContentSplitView.DisplayMode" Value="Overlay" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </SplitView>
+
         <controls:Loading
             HorizontalContentAlignment="Stretch"
             VerticalContentAlignment="Center"
