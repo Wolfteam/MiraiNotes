@@ -6,9 +6,37 @@
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding Settings, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
-    <Grid>
-        <TextBlock Text="Estas en la notification" />
-    </Grid>
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <ContinuumNavigationTransitionInfo />
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+
+    <StackPanel
+        Margin="10,0,10,10"
+        HorizontalAlignment="Stretch"
+        Orientation="Vertical">
+        <StackPanel Margin="5">
+            <ToggleSwitch
+                Header="Show notification after full sync"
+                IsOn="{Binding ShowToastNotificationAfterFullSync, Mode=TwoWay}"
+                OffContent="Hidden"
+                OnContent="Showing" />
+        </StackPanel>
+        <StackPanel Margin="5">
+            <ToggleSwitch
+                Header="Show a reminder notification for completed task"
+                IsOn="{Binding ShowToastNotificationForCompletedTasks, Mode=TwoWay}"
+                OffContent="Hidden"
+                OnContent="Showing" />
+        </StackPanel>
+    </StackPanel>
 </Page>

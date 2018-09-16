@@ -8,7 +8,52 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
 
-    <Grid>
-        <TextBlock Text="Estas en la about" />
-    </Grid>
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <ContinuumNavigationTransitionInfo />
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <StackPanel
+        Margin="10,0,10,10"
+        HorizontalAlignment="Stretch"
+        Orientation="Vertical">
+        <StackPanel Margin="5" HorizontalAlignment="Center">
+            <Image MaxWidth="100" Source="/Assets/logo.png" />
+            <TextBlock HorizontalAlignment="Center" Text="Mirai Notes" />
+            <TextBlock HorizontalAlignment="Center" Text="Version 1.0.0.0" />
+        </StackPanel>
+
+        <StackPanel Margin="5,10,5,5" HorizontalAlignment="Center">
+            <TextBlock Text="This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later." TextWrapping="Wrap" />
+            <MenuFlyoutSeparator Margin="0,5" />
+            <TextBlock
+                FontSize="18"
+                FontWeight="SemiBold"
+                Text="Donations" />
+            <TextBlock Text="I hope you are enjoying using this app, if you would like to buy me a coffee, you can mail me to the following address:" TextWrapping="Wrap" />
+            <Button
+                x:Name="MailMe_Button"
+                HorizontalAlignment="Center"
+                Click="MailMe_Button_Click">
+                Mail me
+            </Button>
+            <MenuFlyoutSeparator Margin="0,5" />
+
+            <TextBlock
+                FontSize="18"
+                FontWeight="SemiBold"
+                Text="Support" />
+            <TextBlock Text="I made this app in my free time and it is also open source." TextWrapping="Wrap" />
+            <TextBlock Text="If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:" TextWrapping="Wrap" />
+            <HyperlinkButton
+                HorizontalAlignment="Center"
+                Content="Mirai Notes Github Page"
+                NavigateUri="https://github.com/Wolfteam/MiraiNotes/issues" />
+        </StackPanel>
+    </StackPanel>
 </Page>

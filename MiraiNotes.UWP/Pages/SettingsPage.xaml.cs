@@ -15,23 +15,24 @@ namespace MiraiNotes.UWP.Pages
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        public SettingsPageViewModel SettingsViewModel => DataContext as SettingsPageViewModel;
+        public SettingsPageViewModel ViewModel => DataContext as SettingsPageViewModel;
 
         public SettingsPage()
         {
             this.InitializeComponent();
-            SettingsViewModel.NavigationRequest += OnNavigationRequest;
-            SettingsPageFrame.Navigate(typeof(SettingsMainPage));
+            ViewModel.NavigationRequest += OnNavigationRequest;
+            OnNavigationRequest(SettingsPageType.HOME);
         }
 
         private void OnNavigationRequest(SettingsPageType settingsPageType)
         {
             Type page;
-            SettingsViewModel.IsBackButtonVisible = true;
+            ViewModel.IsBackButtonVisible = true;
             switch (settingsPageType)
             {
                 case SettingsPageType.HOME:
-                    SettingsViewModel.IsBackButtonVisible = false;
+                    ViewModel.CurrentPageText = "Settings";
+                    ViewModel.IsBackButtonVisible = false;
                     if (SettingsPageFrame.CanGoBack)
                     {
                         SettingsPageFrame.GoBack();
@@ -41,28 +42,27 @@ namespace MiraiNotes.UWP.Pages
                         page = typeof(SettingsMainPage);
                     break;
                 case SettingsPageType.GENERAL:
+                    ViewModel.CurrentPageText = "General";
                     page = typeof(SettingsGeneralPage);
                     break;
                 case SettingsPageType.ACCOUNT:
                     throw new NotImplementedException("Account settings page is not implemented");
                 case SettingsPageType.SYNCHRONIZATION:
+                    ViewModel.CurrentPageText = "Syncrhonization";
                     page = typeof(SettingsSynchronizationPage);
                     break;
                 case SettingsPageType.NOTIFICATIONS:
+                    ViewModel.CurrentPageText = "Notifications";
                     page = typeof(SettingsNotificationsPage);
                     break;
                 case SettingsPageType.ABOUT:
+                    ViewModel.CurrentPageText = "About";
                     page = typeof(SettingsAboutPage);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(settingsPageType), settingsPageType, "Cannot navigate to the current selected settings page");
             }
             SettingsPageFrame.Navigate(page);
-        }
-
-        private void SettingsPageFrame_Navigated(object sender, NavigationEventArgs e)
-        {
-            (SettingsPageFrame.Content as FrameworkElement).DataContext = SettingsViewModel;
         }
     }
 }

@@ -6,9 +6,89 @@
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding Settings, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
-    <Grid>
-        <TextBlock Text="Estas en la general" />
-    </Grid>
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <ContinuumNavigationTransitionInfo />
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <StackPanel
+        Margin="10,0,10,10"
+        HorizontalAlignment="Stretch"
+        Orientation="Vertical">
+        <TextBlock
+            FontSize="18"
+            FontWeight="SemiBold"
+            Text="App Theme" />
+        <StackPanel Margin="5">
+            <ComboBox
+                Width="200"
+                Header="Default app theme"
+                PlaceholderText="Pick a theme">
+                <x:String>
+                    Light
+                </x:String>
+                <x:String>
+                    Black
+                </x:String>
+            </ComboBox>
+        </StackPanel>
+
+        <!--<MenuFlyoutSeparator Margin="0,5" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Default task list sort order" />
+                <ComboBox
+                    Width="200"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding TasksSortTypes, Mode=OneWay}"
+                    PlaceholderText="Pick a sorting order"
+                    SelectedItem="{Binding DefaultTaskSortOrder, Mode=TwoWay}"
+                    SelectedValuePath="ItemID" />
+            </StackPanel>-->
+        <MenuFlyoutSeparator Margin="0,5" />
+        <TextBlock
+            FontSize="18"
+            FontWeight="SemiBold"
+            Text="Task lists and Tasks" />
+        <StackPanel Margin="5">
+            <ComboBox
+                Width="200"
+                DisplayMemberPath="Text"
+                Header="Default task sort order"
+                ItemsSource="{Binding TasksSortTypes}"
+                PlaceholderText="Pick a sorting order"
+                SelectedItem="{Binding CurrentTaskSortOrder, Mode=TwoWay}"
+                SelectedValuePath="ItemID" />
+        </StackPanel>
+
+        <StackPanel Margin="5">
+            <ToggleSwitch
+                Header="Show completed tasks"
+                IsOn="{Binding ShowCompletedTasks, Mode=TwoWay}"
+                OffContent="Hidden"
+                OnContent="Showing" />
+        </StackPanel>
+
+
+        <MenuFlyoutSeparator Margin="0,5" />
+
+        <TextBlock
+            FontSize="18"
+            FontWeight="SemiBold"
+            Text="Others" />
+        <StackPanel Margin="5">
+            <ToggleSwitch
+                Header="Ask for a password when the app starts"
+                IsOn="{Binding AskForPasswordWhenAppStarts, Mode=TwoWay}"
+                OffContent="No"
+                OnContent="Yes" />
+        </StackPanel>
+    </StackPanel>
 </Page>

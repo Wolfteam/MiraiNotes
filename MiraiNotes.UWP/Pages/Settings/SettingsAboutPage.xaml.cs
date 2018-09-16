@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Email;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -25,6 +27,22 @@ namespace MiraiNotes.UWP.Pages.Settings
         public SettingsAboutPage()
         {
             this.InitializeComponent();
+        }
+
+        private void MailMe_Button_Click(object sender, RoutedEventArgs e)
+        {
+            ShowComposeNewEmailAsync();
+        }
+
+        private async void ShowComposeNewEmailAsync()
+        {
+            var emailMessage = new EmailMessage();
+            emailMessage.To.Add(new EmailRecipient("xxx@xx.com"));
+            emailMessage.Subject = "Mirai Notes - Donations";
+            string messageBody = "Hello, i would like to buy you a coffee :D";
+            emailMessage.Body = messageBody;
+
+            await EmailManager.ShowComposeNewEmailAsync(emailMessage);
         }
     }
 }

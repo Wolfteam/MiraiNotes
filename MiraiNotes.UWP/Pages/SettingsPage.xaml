@@ -12,7 +12,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel
             Grid.Row="0"
@@ -29,8 +29,13 @@
             <TextBlock
                 Margin="10,0,0,0"
                 FontSize="20"
-                Text="Settings" />
+                FontWeight="SemiBold"
+                Text="{Binding CurrentPageText, Mode=OneWay}" />
         </StackPanel>
-        <Frame x:Name="SettingsPageFrame" Grid.Row="1" />
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Frame x:Name="SettingsPageFrame" Grid.Row="1" />
+        </ScrollViewer>
+
     </Grid>
 </Page>
