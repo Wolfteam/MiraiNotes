@@ -17,9 +17,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace MiraiNotes.UWP.Pages.Dialogs
 {
-    public sealed partial class PasswordContentDialog : ContentDialog
+    public sealed partial class SettingsPasswordContentDialog : ContentDialog
     {
-        public PasswordContentDialog()
+        public SettingsPasswordContentDialog()
         {
             this.InitializeComponent();
         }

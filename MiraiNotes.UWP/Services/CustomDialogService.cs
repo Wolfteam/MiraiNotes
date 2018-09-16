@@ -1,4 +1,6 @@
 ﻿using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Pages.Dialogs;
 using System;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -141,6 +143,38 @@ namespace MiraiNotes.UWP.Services
             else
             {
                 return string.Empty;
+            }
+        }
+
+        public async Task<bool> ShowCustomDialog(CustomDialogType dialogType)
+        {
+            ContentDialog dialog;
+            ContentDialogResult result;
+            switch (dialogType)
+            {
+                case CustomDialogType.PASSWORD_DIALOG:
+                    dialog = new SettingsPasswordContentDialog();
+
+                    //diaglog.Closing += (sender, args) =>
+                    //{
+                    //    // This mean user does click on Primary or Secondary button
+                    //    if (args.Result == ContentDialogResult.None)
+                    //    {
+                    //        args.Cancel = true;
+                    //    }
+                    //};
+                    result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.None)
+                        return false;
+                    return result == ContentDialogResult.Primary;
+                case CustomDialogType.LOGIN_PASSWORD_DIALOG:
+                    dialog = new LoginPasswordContentDialog();
+                    result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.None)
+                        return false;
+                    return result == ContentDialogResult.Primary;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(dialogType), dialogType, "The provided dialog type doesnt exists");
             }
         }
     }

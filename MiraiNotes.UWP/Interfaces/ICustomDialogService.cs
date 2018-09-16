@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiraiNotes.UWP.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.UWP.Interfaces
@@ -108,5 +109,12 @@ namespace MiraiNotes.UWP.Interfaces
         /// <param name="cancelButtonText">The 'Cancel' button text.</param>
         /// <returns>Task&lt;System.String&gt;.</returns>
         Task<string> ShowInputTextDialogAsync(string title, string defaultText, string okButtonText, string cancelButtonText);
+
+        /// <summary>
+        /// Opens a specific modal confirmation dialog
+        /// </summary>
+        /// <param name="dialogType">The custom content dialog to show</param>
+        /// <returns>Returns true in case the dialog is closed correctly by the primary button</returns>
+        Task<bool> ShowCustomDialog(CustomDialogType dialogType);
     }
 }
