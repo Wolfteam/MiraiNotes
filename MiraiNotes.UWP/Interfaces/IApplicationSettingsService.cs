@@ -6,12 +6,16 @@ namespace MiraiNotes.UWP.Interfaces
     {
         SyncBgTaskIntervals SyncBackgroundTaskInterval { get; set; }
 
-        bool SyncBackgroundTaskAfterStart { get; set; }
+        bool RunSyncBackgroundTaskAfterStart { get; set; }
 
         bool ShowToastNotificationAfterFullSync { get; set; }
+
+        bool ShowToastNotificationForCompletedTasks { get; set; }
 
         TaskSortType DefaultTaskSortOrder { get; set; }
 
         bool AskForPasswordWhenAppStarts { get; set; }
+
+        bool ShowCompletedTasks { get; set; }
     }
 }
