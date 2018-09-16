@@ -15,6 +15,7 @@ namespace MiraiNotes.UWP.ViewModels
         #region Members
         private readonly IApplicationSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
+        private readonly IDispatcherHelper _dispatcher;
 
         private bool _isBackButtonVisible;
         private string _currentPageText;
@@ -129,9 +130,15 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 if (value)
                 {
-                    //_dialogService.ShowInputStringDialogAsync("")
+                    _dispatcher.CheckBeginInvokeOnUi(async () =>
+                    {
+                        bool isPasswordSaved = await _dialogService.ShowCustomDialog(CustomDialogType.PASSWORD_DIALOG);
+                        _appSettings.AskForPasswordWhenAppStarts = isPasswordSaved;
+                        RaisePropertyChanged(nameof(AskForPasswordWhenAppStarts));
+                    });
                 }
-                _appSettings.AskForPasswordWhenAppStarts = value;
+                else
+                    _appSettings.AskForPasswordWhenAppStarts = value;
             }
         }
 
@@ -199,9 +206,14 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand NavigationRequestCommand { get; set; }
         #endregion
 
-        public SettingsPageViewModel(IApplicationSettingsService appSettings, ICustomDialogService dialogService)
+        public SettingsPageViewModel(
+            IApplicationSettingsService appSettings,
+            ICustomDialogService dialogService,
+            IDispatcherHelper dispatcher)
         {
             _appSettings = appSettings;
+            _dialogService = dialogService;
+            _dispatcher = dispatcher;
 
             NavigationRequestCommand = new RelayCommand<SettingsPageType>
                 ((page) => NavigationRequest?.Invoke(page));

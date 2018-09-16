@@ -5,6 +5,7 @@ using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
         private readonly ISyncService _syncService;
+        private readonly IApplicationSettingsService _appSettings;
 
         private bool _showLoading;
         private bool _showLoginButton;
@@ -59,7 +61,8 @@ namespace MiraiNotes.UWP.ViewModels
             IGoogleUserService googleUserService,
             IMiraiNotesDataService dataService,
             INetworkService networkService,
-            ISyncService syncService)
+            ISyncService syncService,
+            IApplicationSettingsService appSettings)
         {
             _dialogService = dialogService;
             _navigationService = navigationService;
@@ -69,6 +72,7 @@ namespace MiraiNotes.UWP.ViewModels
             _dataService = dataService;
             _networkService = networkService;
             _syncService = syncService;
+            _appSettings = appSettings;
 
             SetCommands();
         }
@@ -92,7 +96,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .UserService
                 .GetCurrentActiveUserAsync();
 
-            if (!currentUserResponse.Succeed)
+            if (!currentUserResponse.Succeed || currentUserResponse.Result is null)
             {
                 ShowLoading = false;
                 ShowLoginButton = true;
@@ -103,7 +107,15 @@ namespace MiraiNotes.UWP.ViewModels
             }
             ShowLoading = false;
 
-            if (isUserLoggedIn && currentUserResponse.Result != null)
+            if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
+            {
+                var result = await _dialogService.ShowCustomDialog(CustomDialogType.LOGIN_PASSWORD_DIALOG);
+                if (result)
+                    _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
+                else
+                    ShowLoginButton = true;
+            }
+            else if (isUserLoggedIn)
                 _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
             else
                 ShowLoginButton = true;
@@ -153,6 +165,7 @@ namespace MiraiNotes.UWP.ViewModels
                             return;
                         }
                         //We save the token before doing any other network requst..
+                        _userCredentialService.DeleteUserCredentials();
                         _userCredentialService.SaveUserCredentials(null, tokenResponse);
 
                         bool isSignedIn = await SignInAsync();

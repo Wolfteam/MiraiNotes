@@ -39,6 +39,7 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _isPaneOpen;
         private bool _showMainProgressBar;
         private string _mainProgressBarText;
+        public bool _isSettingsPaneOpen;
         #endregion
 
         #region Properties
@@ -88,6 +89,12 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _mainProgressBarText; }
             set { Set(ref _mainProgressBarText, value); }
+        }
+
+        public bool IsSettingsPaneOpen
+        {
+            get { return _isSettingsPaneOpen; }
+            set { Set(ref _isSettingsPaneOpen, value); }
         }
         #endregion
 
@@ -239,9 +246,9 @@ namespace MiraiNotes.UWP.ViewModels
             SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
         }
 
-        public async void OnNavigationViewSelectionChangeAsync(object selectedItem)
+        public void OnNavigationViewSelectionChangeAsync(object selectedItem)
         {
-            if (selectedItem == null)
+            if (selectedItem is null)
             {
                 CurrentTaskList = null;
                 SelectedItem = null;
@@ -254,7 +261,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
             else
             {
-                await _dialogService.ShowMessageDialogAsync($"Seleccionaste a navigation item", "Hola");
+                IsSettingsPaneOpen = true;
             }
             TaskListkAutoSuggestBoxText = string.Empty;
         }

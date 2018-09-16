@@ -151,11 +151,19 @@
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
     <Compile Include="Models\BackgroundTaskType.cs" />
+    <Compile Include="Models\CustomDialogType.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\MessageType.cs" />
+    <Compile Include="Models\PasswordVaultResourceType.cs" />
     <Compile Include="Models\SettingsPageType.cs" />
     <Compile Include="Models\SettingsPageItem.cs" />
     <Compile Include="Models\SyncBgTaskIntervals.cs" />
+    <Compile Include="Pages\Dialogs\LoginPasswordContentDialog.xaml.cs">
+      <DependentUpon>LoginPasswordContentDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Dialogs\SettingsPasswordContentDialog.xaml.cs">
+      <DependentUpon>SettingsPasswordContentDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Settings\SettingsAboutPage.xaml.cs">
       <DependentUpon>SettingsAboutPage.xaml</DependentUpon>
     </Compile>
@@ -180,6 +188,8 @@
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\SmartObservableCollection.cs" />
+    <Compile Include="ViewModels\Dialogs\LoginPasswordDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\SettingsPasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\TaskListItemViewModel.cs" />
@@ -301,6 +311,14 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\Dialogs\LoginPasswordContentDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Dialogs\SettingsPasswordContentDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\LoginPage.xaml">
       <SubType>Designer</SubType>

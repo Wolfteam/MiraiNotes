@@ -13,6 +13,7 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Pages;
 using MiraiNotes.UWP.Services;
+using MiraiNotes.UWP.ViewModels.Dialogs;
 using Serilog;
 using Serilog.Filters;
 using System.IO;
@@ -70,6 +71,12 @@ namespace MiraiNotes.UWP.ViewModels
 
         public SettingsPageViewModel Settings
             => ServiceLocator.Current.GetInstance<SettingsPageViewModel>();
+
+        public SettingsPasswordDialogViewModel SettingsPasswordDialog
+            => ServiceLocator.Current.GetInstance<SettingsPasswordDialogViewModel>();
+
+        public LoginPasswordDialogViewModel LoginPasswordDialog
+            => ServiceLocator.Current.GetInstance<LoginPasswordDialogViewModel>();
 
         public IApplicationSettingsService ApplicationSettingsService
             => ServiceLocator.Current.GetInstance<IApplicationSettingsService>();
@@ -150,6 +157,9 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<TasksPageViewModel>();
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
             SimpleIoc.Default.Register<SettingsPageViewModel>();
+
+            SimpleIoc.Default.Register<SettingsPasswordDialogViewModel>();
+            SimpleIoc.Default.Register<LoginPasswordDialogViewModel>();
         }
 
         /// <summary>
