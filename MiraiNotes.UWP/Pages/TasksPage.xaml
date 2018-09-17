@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Extensions="using:WinRTXamlToolkit.Controls.Extensions"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converters="using:MiraiNotes.UWP.Converters"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
@@ -23,6 +24,13 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+
+        <converters:TaskSortTypeToVisibilityConverter x:Key="TaskSortTypeToVisibilityConverter" />
+
+        <localModels:TaskSortType x:Key="TaskSortByNameAsc">BY_NAME_ASC</localModels:TaskSortType>
+        <localModels:TaskSortType x:Key="TaskSortByNameDesc">BY_NAME_DESC</localModels:TaskSortType>
+        <localModels:TaskSortType x:Key="TaskSortByUpdatedDateAsc">BY_UPDATED_DATE_ASC</localModels:TaskSortType>
+        <localModels:TaskSortType x:Key="TaskSortByUpdatedDateDesc">BY_UPDATED_DATE_DESC</localModels:TaskSortType>
     </Page.Resources>
 
     <Grid>
@@ -399,7 +407,7 @@
                                         CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_ASC}"
                                         Text="Asc">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE74A;" />
+                                            <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByNameAsc}}" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem
@@ -407,7 +415,7 @@
                                         CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_DESC}"
                                         Text="Desc">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE74B;" />
+                                            <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByNameDesc}}" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                 </MenuFlyoutSubItem>
@@ -418,7 +426,7 @@
                                         CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_ASC}"
                                         Text="Asc">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE74A;" />
+                                            <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByUpdatedDateAsc}}" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem
@@ -426,12 +434,12 @@
                                         CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_DESC}"
                                         Text="Desc">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE74B;" />
+                                            <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByUpdatedDateDesc}}" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                 </MenuFlyoutSubItem>
 
-                                <MenuFlyoutSubItem Text="By my order">
+                                <!--<MenuFlyoutSubItem Text="By my order">
                                     <MenuFlyoutItem
                                         Command="{Binding SortTasksCommand}"
                                         CommandParameter="{x:Bind localModels:TaskSortType.CUSTOM_ASC}"
@@ -448,7 +456,7 @@
                                             <FontIcon Glyph="&#xE74B;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                </MenuFlyoutSubItem>
+                                </MenuFlyoutSubItem>-->
                             </MenuFlyout>
                         </AppBarButton.Flyout>
                     </AppBarButton>

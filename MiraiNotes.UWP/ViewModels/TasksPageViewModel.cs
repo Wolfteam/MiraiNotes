@@ -30,6 +30,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMiraiNotesDataService _dataService;
         private readonly ISyncService _syncService;
         private readonly IBackgroundTaskManagerService _bgTaskManagerService;
+        private readonly IApplicationSettingsService _appSettings;
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -53,6 +54,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         private ObservableCollection<TaskListItemViewModel> _taskLists = new ObservableCollection<TaskListItemViewModel>();
         private bool _showMoveTaskFlyoutProgressBar;
+
+        private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
         #endregion
 
         #region Properties
@@ -151,6 +154,11 @@ namespace MiraiNotes.UWP.ViewModels
             set { SetValue(ref _taskAutoSuggestBoxText, value); }
         }
 
+        public TaskSortType CurrentTasksSortOrder
+        {
+            get { return _currentTasksSortOrder; }
+            set { SetValue(ref _currentTasksSortOrder, value); }
+        }
 
         public ObservableCollection<TaskListItemViewModel> TaskLists
         {
@@ -220,7 +228,8 @@ namespace MiraiNotes.UWP.ViewModels
             IMapper mapper,
             IMiraiNotesDataService dataService,
             ISyncService syncService,
-            IBackgroundTaskManagerService bgTaskManagerService)
+            IBackgroundTaskManagerService bgTaskManagerService,
+            IApplicationSettingsService appSettings)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -230,6 +239,7 @@ namespace MiraiNotes.UWP.ViewModels
             _dataService = dataService;
             _syncService = syncService;
             _bgTaskManagerService = bgTaskManagerService;
+            _appSettings = appSettings;
 
             RegisterMessages();
             SetCommands();
@@ -265,6 +275,10 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.SHOW_IN_APP_NOTIFICATION}",
                 (message) => InAppNotificationRequest?.Invoke(message));
+            _messenger.Register<TaskSortType>(
+                this, 
+                $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}", 
+                SortTasks);
         }
 
         private void SetCommands()
@@ -390,6 +404,8 @@ namespace MiraiNotes.UWP.ViewModels
                 Tasks.AddRange(mainTasks);
                 TaskAutoSuggestBoxItems
                     .AddRange(_mapper.Map<IEnumerable<ItemModel>>(mainTasks.OrderBy(t => t.Title)));
+
+                SortTasks(_appSettings.DefaultTaskSortOrder);
             }
             CurrentTaskList = taskList;
             ShowTaskListViewProgressRing = false;
@@ -995,6 +1011,7 @@ namespace MiraiNotes.UWP.ViewModels
             //TODO: WHEN YOU SORT, THE SELECTED ITEM GETS LOST
             if (Tasks == null)
                 return;
+
             _isSelectionInProgress = true;
             switch (sortType)
             {
@@ -1019,6 +1036,7 @@ namespace MiraiNotes.UWP.ViewModels
                 default:
                     throw new ArgumentOutOfRangeException("The TaskSortType doesnt have a default sort type");
             }
+            CurrentTasksSortOrder = sortType;
             _isSelectionInProgress = false;
         }
 

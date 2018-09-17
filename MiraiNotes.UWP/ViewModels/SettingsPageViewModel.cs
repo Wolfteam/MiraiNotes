@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -16,6 +17,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IApplicationSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
         private readonly IDispatcherHelper _dispatcher;
+        private readonly IMessenger _messenger;
 
         private bool _isBackButtonVisible;
         private string _currentPageText;
@@ -153,6 +155,7 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 var selectedSortType = (TaskSortType)Enum.Parse(typeof(TaskSortType), value.ItemID);
                 _appSettings.DefaultTaskSortOrder = selectedSortType;
+                _messenger.Send(selectedSortType, $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}");
             }
         }
 
@@ -209,11 +212,13 @@ namespace MiraiNotes.UWP.ViewModels
         public SettingsPageViewModel(
             IApplicationSettingsService appSettings,
             ICustomDialogService dialogService,
-            IDispatcherHelper dispatcher)
+            IDispatcherHelper dispatcher,
+            IMessenger messenger)
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
             _dispatcher = dispatcher;
+            _messenger = messenger;
 
             NavigationRequestCommand = new RelayCommand<SettingsPageType>
                 ((page) => NavigationRequest?.Invoke(page));

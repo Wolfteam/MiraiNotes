@@ -110,6 +110,7 @@
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\SettingsPageTypeToSegoeMDL2IconConverter.cs" />
     <Compile Include="Converters\StringDelimiterConverter.cs" />
+    <Compile Include="Converters\TaskSortTypeToVisibilityConverter.cs" />
     <Compile Include="Converters\VisibleWhenZeroConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\NavigationViewSelectionChangedEventArgsConverter.cs" />
