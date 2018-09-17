@@ -37,7 +37,7 @@
                     ExpandedModeThresholdWidth="1280"
                     IsBackButtonVisible="Collapsed"
                     IsBackEnabled="False"
-                    IsSettingsVisible="True"
+                    IsSettingsVisible="False"
                     IsTabStop="True"
                     MenuItemsSource="{Binding TaskLists, Mode=OneWay}"
                     PaneTitle="Mirai Notes"
@@ -204,6 +204,29 @@
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
                                         Text="Sign out" />
+                                </Grid>
+                            </Button>
+                            <Button
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                Background="Transparent"
+                                Command="{Binding OpenSettingsCommand}"
+                                ToolTipService.ToolTip="Settings">
+                                <Grid Height="40" Margin="-9,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <SymbolIcon
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Symbol="Setting" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Text="Settings" />
                                 </Grid>
                             </Button>
                         </StackPanel>
