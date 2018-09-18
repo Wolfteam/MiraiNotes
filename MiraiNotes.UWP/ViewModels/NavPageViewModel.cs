@@ -29,6 +29,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDispatcherHelper _dispatcher;
         private readonly IApplicationSettingsService _appSettings;
+        private readonly IBackgroundTaskManagerService _backgroundTaskManager;
 
         private object _selectedItem;
         private SmartObservableCollection<TaskListItemViewModel> _taskLists = new SmartObservableCollection<TaskListItemViewModel>();
@@ -131,7 +132,8 @@ namespace MiraiNotes.UWP.ViewModels
             IMapper mapper,
             IMiraiNotesDataService dataService,
             IDispatcherHelper dispatcher,
-            IApplicationSettingsService appSettings)
+            IApplicationSettingsService appSettings,
+            IBackgroundTaskManagerService backgroundTaskManager)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -141,6 +143,7 @@ namespace MiraiNotes.UWP.ViewModels
             _dataService = dataService;
             _dispatcher = dispatcher;
             _appSettings = appSettings;
+            _backgroundTaskManager = backgroundTaskManager;
 
             RegisterMessages();
             SetCommands();
@@ -203,6 +206,12 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task InitViewAsync(bool onFullSync = false)
         {
+            if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
+            {
+                _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC);
+                return;
+            }
+
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
             string selectedTaskListID = CurrentTaskList?.TaskListID;
