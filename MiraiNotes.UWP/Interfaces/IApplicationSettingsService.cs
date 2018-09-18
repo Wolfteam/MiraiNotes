@@ -17,5 +17,7 @@ namespace MiraiNotes.UWP.Interfaces
         bool AskForPasswordWhenAppStarts { get; set; }
 
         bool ShowCompletedTasks { get; set; }
+
+        TaskListSortType DefaultTaskListSortOrder { get; set; }
     }
 }

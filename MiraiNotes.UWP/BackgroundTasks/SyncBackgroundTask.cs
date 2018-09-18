@@ -75,8 +75,6 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
             _logger.Information($"{nameof(SyncBackgroundTask)} results = {message}");
 
-            //TODO: MAYBE ADD A SETTING TO SHOW OR NOT SHOW THE NOTIFICATION
-
             if (!_isAppRunning && !startedManually && _appSettings.ShowToastNotificationAfterFullSync)
             {
                 var content = GenerateToastContent(message);

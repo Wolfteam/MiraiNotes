@@ -19,11 +19,12 @@ namespace MiraiNotes.UWP.Services
         //    set => _settings[nameof(AppTheme)] = (int)value;
         //}
 
-        //public static TaskSortType DefaultTaskListSortOrder
-        //{
-        //    get => (TaskSortType)(_settings[nameof(DefaultTaskListSortOrder)] ?? TaskSortType.BY_NAME_ASC);
-        //    set => _settings[nameof(DefaultTaskListSortOrder)] = value;
-        //}
+        public TaskListSortType DefaultTaskListSortOrder
+        {
+            get => (TaskListSortType)(_settings[nameof(DefaultTaskListSortOrder)] ?? TaskListSortType.BY_NAME_ASC);
+            set => _settings[nameof(DefaultTaskListSortOrder)] = (int)value;
+        }
+
         public TaskSortType DefaultTaskSortOrder
         {
             get => (TaskSortType)(_settings[nameof(DefaultTaskSortOrder)] ?? TaskSortType.BY_NAME_ASC);

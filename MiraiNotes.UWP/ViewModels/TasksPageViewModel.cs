@@ -566,8 +566,6 @@ namespace MiraiNotes.UWP.ViewModels
                 {
                     Tasks.Add(task);
                 }
-                //TODO: I should show a different list for completed tasks
-                //if (task.TaskStatus == GoogleTaskStatus.NEEDS_ACTION)
             }
         }
 

@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignWidth="400"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Settings, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -41,22 +42,23 @@
             </ComboBox>
         </StackPanel>
 
-        <!--<MenuFlyoutSeparator Margin="0,5" />
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Default task list sort order" />
-                <ComboBox
-                    Width="200"
-                    DisplayMemberPath="Text"
-                    ItemsSource="{Binding TasksSortTypes, Mode=OneWay}"
-                    PlaceholderText="Pick a sorting order"
-                    SelectedItem="{Binding DefaultTaskSortOrder, Mode=TwoWay}"
-                    SelectedValuePath="ItemID" />
-            </StackPanel>-->
         <MenuFlyoutSeparator Margin="0,5" />
+
         <TextBlock
             FontSize="18"
             FontWeight="SemiBold"
             Text="Task lists and Tasks" />
+
+        <StackPanel Margin="5" Orientation="Horizontal">
+            <ComboBox
+                Width="200"
+                DisplayMemberPath="Text"
+                Header="Default task list sort order"
+                ItemsSource="{Binding TaskListSortTypes, Mode=OneWay}"
+                PlaceholderText="Pick a sorting order"
+                SelectedItem="{Binding CurrentTaskListSortOrder, Mode=TwoWay}"
+                SelectedValuePath="ItemID" />
+        </StackPanel>
         <StackPanel Margin="5">
             <ComboBox
                 Width="200"
@@ -68,13 +70,13 @@
                 SelectedValuePath="ItemID" />
         </StackPanel>
 
-        <StackPanel Margin="5">
+        <!--<StackPanel Margin="5">
             <ToggleSwitch
                 Header="Show completed tasks"
                 IsOn="{Binding ShowCompletedTasks, Mode=TwoWay}"
                 OffContent="Hidden"
                 OnContent="Showing" />
-        </StackPanel>
+        </StackPanel>-->
 
 
         <MenuFlyoutSeparator Margin="0,5" />

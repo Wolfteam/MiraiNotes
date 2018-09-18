@@ -159,6 +159,7 @@
     <Compile Include="Models\SettingsPageType.cs" />
     <Compile Include="Models\SettingsPageItem.cs" />
     <Compile Include="Models\SyncBgTaskIntervals.cs" />
+    <Compile Include="Models\TaskListSortType.cs" />
     <Compile Include="Pages\Dialogs\LoginPasswordContentDialog.xaml.cs">
       <DependentUpon>LoginPasswordContentDialog.xaml</DependentUpon>
     </Compile>

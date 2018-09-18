@@ -18,6 +18,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly ICustomDialogService _dialogService;
         private readonly IDispatcherHelper _dispatcher;
         private readonly IMessenger _messenger;
+        private readonly IBackgroundTaskManagerService _backgroundTaskManagerService;
 
         private bool _isBackButtonVisible;
         private string _currentPageText;
@@ -69,6 +70,30 @@ namespace MiraiNotes.UWP.ViewModels
             set => Set(ref _isBackButtonVisible, value);
         }
 
+        public List<ItemModel> TaskListSortTypes { get; } = new List<ItemModel>
+        {
+            new ItemModel
+            {
+                ItemID = TaskListSortType.BY_NAME_ASC.ToString(),
+                Text = "By name asc"
+            },
+            new ItemModel
+            {
+                ItemID = TaskListSortType.BY_NAME_DESC.ToString(),
+                Text = "By name desc"
+            },
+            new ItemModel
+            {
+                ItemID = TaskListSortType.BY_UPDATED_DATE_ASC.ToString(),
+                Text = "By updated date asc"
+            },
+            new ItemModel
+            {
+                ItemID = TaskListSortType.BY_UPDATED_DATE_DESC.ToString(),
+                Text = "By updated date desc"
+            }
+        };
+
         public List<ItemModel> TasksSortTypes { get; } = new List<ItemModel>
         {
             new ItemModel
@@ -90,7 +115,7 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 ItemID = TaskSortType.BY_UPDATED_DATE_DESC.ToString(),
                 Text = "By updated date desc"
-            },
+            }
         };
 
         public List<ItemModel> SyncBgTaskIntervalTypes { get; } = new List<ItemModel>
@@ -144,6 +169,21 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
+        public ItemModel CurrentTaskListSortOrder
+        {
+            get
+            {
+                var currentSelectedSortType = _appSettings.DefaultTaskListSortOrder;
+                return TaskListSortTypes.FirstOrDefault(i => i.ItemID == currentSelectedSortType.ToString());
+            }
+            set
+            {
+                var selectedSortType = (TaskListSortType)Enum.Parse(typeof(TaskListSortType), value.ItemID);
+                _appSettings.DefaultTaskListSortOrder = selectedSortType;
+                _messenger.Send(selectedSortType, $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}");
+            }
+        }
+
         public ItemModel CurrentTaskSortOrder
         {
             get
@@ -185,6 +225,7 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemID);
                 _appSettings.SyncBackgroundTaskInterval = selectedInterval;
+                _backgroundTaskManagerService.RegisterBackgroundTasks(BackgroundTaskType.SYNC, true);
             }
         }
         #endregion
@@ -213,12 +254,14 @@ namespace MiraiNotes.UWP.ViewModels
             IApplicationSettingsService appSettings,
             ICustomDialogService dialogService,
             IDispatcherHelper dispatcher,
-            IMessenger messenger)
+            IMessenger messenger,
+            IBackgroundTaskManagerService backgroundTaskManagerService)
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
             _dispatcher = dispatcher;
             _messenger = messenger;
+            _backgroundTaskManagerService = backgroundTaskManagerService;
 
             NavigationRequestCommand = new RelayCommand<SettingsPageType>
                 ((page) => NavigationRequest?.Invoke(page));
