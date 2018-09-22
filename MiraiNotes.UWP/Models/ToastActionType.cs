@@ -1,9 +1,8 @@
 ﻿namespace MiraiNotes.UWP.Models
 {
-    public enum BackgroundTaskType
+    public enum ToastNotificationActionType
     {
-        ANY = 0,
-        SYNC = 1,
+        OPEN_TASK,
         MARK_AS_COMPLETED
     }
 }

@@ -103,6 +103,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BackgroundTasks\MarkAsCompletedBackgroundTask.cs" />
     <Compile Include="BackgroundTasks\SyncBackgroundTask.cs" />
     <Compile Include="Controls\TasksListView.cs" />
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
@@ -127,10 +128,12 @@
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
+    <Compile Include="Helpers\CustomToastNotificationManager.cs" />
     <Compile Include="Interfaces\IApplicationSettingsService.cs" />
     <Compile Include="Interfaces\IApplicationSettingsServiceBase.cs" />
     <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
+    <Compile Include="Interfaces\ICustomToastNotificationManager.cs" />
     <Compile Include="Interfaces\IDispatcherHelper.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
     <Compile Include="Interfaces\IGoogleTaskService.cs" />
@@ -160,6 +163,7 @@
     <Compile Include="Models\SettingsPageItem.cs" />
     <Compile Include="Models\SyncBgTaskIntervals.cs" />
     <Compile Include="Models\TaskListSortType.cs" />
+    <Compile Include="Models\ToastActionType.cs" />
     <Compile Include="Pages\Dialogs\LoginPasswordContentDialog.xaml.cs">
       <DependentUpon>LoginPasswordContentDialog.xaml</DependentUpon>
     </Compile>
