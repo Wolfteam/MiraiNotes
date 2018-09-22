@@ -766,6 +766,8 @@ namespace MiraiNotes.DataService.Services
                             Notes = oldEntity.Notes,
                             ParentTask = parentTask,
                             Position = previous,
+                            RemindOn = oldEntity.RemindOn,
+                            RemindOnGUID = oldEntity.RemindOnGUID,
                             Status = oldEntity.Status,
                             TaskList = taskList,
                             Title = oldEntity.Title,
@@ -982,6 +984,62 @@ namespace MiraiNotes.DataService.Services
                     catch (Exception e)
                     {
                         _logger.Error(e, "ChangeTaskStatusAsync: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<Response<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType)
+        {
+            return await Task.Run(async () =>
+            {
+                string dateToRemoveType = dateType == TaskNotificationDateType.REMINDER_DATE ?
+                    "reminder" : "completition";
+                _logger.Information($"RemoveDate: Trying to remove the {dateToRemoveType} date of taskID = {taskID}");
+                var response = new Response<GoogleTask>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var taskToUpdate = await context
+                            .Tasks
+                            .FirstOrDefaultAsync(t => t.GoogleTaskID == taskID);
+
+                        if (taskToUpdate == null)
+                        {
+                            response.Message = $"Could not find the task with taskID = {taskID} to remove its {dateToRemoveType} date";
+                            _logger.Warning($"RemoveDate: Could not find a task with taskID = {taskID}");
+                            return response;
+                        }
+
+                        switch (dateType)
+                        {
+                            case TaskNotificationDateType.TO_BE_COMPLETED_DATE:
+                                taskToUpdate.ToBeCompletedOn = null;
+                                break;
+                            case TaskNotificationDateType.REMINDER_DATE:
+                                taskToUpdate.RemindOn = null;
+                                taskToUpdate.RemindOnGUID = null;
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(dateType), dateType, "Provided google task date type does not exists");
+                        }
+
+                        context.Tasks.Update(taskToUpdate);
+
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Result = taskToUpdate;
+                        _logger.Information("RemoveDate: Completed successfully");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "RemoveDate: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }

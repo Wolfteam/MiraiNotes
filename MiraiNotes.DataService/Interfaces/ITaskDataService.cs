@@ -58,5 +58,13 @@ namespace MiraiNotes.DataService.Interfaces
         /// <param name="taskStatus">The new task status</param>
         /// <returns><see cref="Response{GoogleTask}"/></returns>
         Task<Response<GoogleTask>> ChangeTaskStatusAsync(string taskID, GoogleTaskStatus taskStatus);
+
+        /// <summary>
+        /// Removes the a type of date of the specified task
+        /// </summary>
+        /// <param name="taskID">The task id</param>
+        /// <param name="dateType">The type of date to remove</param>
+        /// <returns><see cref="Response{GoogleTask}"/></returns>
+        Task<Response<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType);
     }
 }
