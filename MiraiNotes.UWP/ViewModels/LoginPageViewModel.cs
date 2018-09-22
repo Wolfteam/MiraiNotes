@@ -96,7 +96,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .UserService
                 .GetCurrentActiveUserAsync();
 
-            if (!currentUserResponse.Succeed || currentUserResponse.Result is null)
+            if (!currentUserResponse.Succeed || isUserLoggedIn && currentUserResponse.Result is null)
             {
                 ShowLoading = false;
                 ShowLoginButton = true;
