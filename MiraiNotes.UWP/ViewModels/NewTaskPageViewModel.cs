@@ -7,7 +7,6 @@ using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
@@ -30,6 +29,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDispatcherHelper _dispatcherHelper;
+        private readonly ICustomToastNotificationManager _toastManager;
 
 
         private string _taskOperationTitle;
@@ -102,6 +102,8 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand MarkSubTaskAsCompletedCommand { get; set; }
 
         public ICommand MarkSubTaskAsIncompletedCommand { get; set; }
+
+        public ICommand RemoveTaskNotificationDateCommand { get; set; }
         #endregion
 
         #region Constructor
@@ -112,7 +114,8 @@ namespace MiraiNotes.UWP.ViewModels
             IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            IDispatcherHelper dispatcherHelper)
+            IDispatcherHelper dispatcherHelper,
+            ICustomToastNotificationManager toastManager)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -121,6 +124,7 @@ namespace MiraiNotes.UWP.ViewModels
             _mapper = mapper;
             _dataService = dataService;
             _dispatcherHelper = dispatcherHelper;
+            _toastManager = toastManager;
 
             RegisterMessages();
             SetCommands();
@@ -207,10 +211,15 @@ namespace MiraiNotes.UWP.ViewModels
 
             MarkSubTaskAsIncompletedCommand = new RelayCommand<TaskItemViewModel>
                 (async (subTask) => await ChangeTaskStatusAsync(subTask, GoogleTaskStatus.NEEDS_ACTION));
+
+            RemoveTaskNotificationDateCommand = new RelayCommand<TaskNotificationDateType>
+                (async (dateType) => await RemoveTaskNotificationDateAsync(dateType));
         }
 
         public async Task InitView(string taskID)
         {
+            MinDate = DateTimeOffset.Now;
+
             ShowTaskProgressRing = true;
             if (string.IsNullOrEmpty(taskID))
                 CurrentTask = new TaskItemViewModel();
@@ -253,13 +262,35 @@ namespace MiraiNotes.UWP.ViewModels
                     $"The selected task list and the current task list cant be null");
                 return;
             }
-            //If the task selected in the combo is not the same as the one in the 
+
+            if (CurrentTask.RemindOn.HasValue)
+            {
+                var minutesDiff = (CurrentTask.RemindOn.Value - DateTimeOffset.Now).Minutes;
+                if (minutesDiff < 5)
+                {
+                    _messenger.Send(
+                        $"The remind date is not valid.",
+                        $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
+                    return;
+                }
+            }
+
+            //If the task list selected in the combo is not the same as the one in the 
             //navigation view, its because we are trying to save/update a 
             //task into a different task list
             bool moveToDifferentTaskList = SelectedTaskList.TaskListID != _currentTaskList.TaskListID;
+
+            //If we are updating a task but also moving it into a different tasklist
             if (moveToDifferentTaskList && !isNewTask)
             {
-                await MoveCurrentTaskAsync();
+                bool move = await _dialogService.ShowConfirmationDialogAsync(
+                    "Confirm",
+                    "Since you are moving an existing task to a different task list, any change made here will be lost. Do you want to continue ?",
+                    "Yes",
+                    "No");
+
+                if (move)
+                    await MoveCurrentTaskAsync();
                 return;
             }
 
@@ -306,6 +337,15 @@ namespace MiraiNotes.UWP.ViewModels
                 entity.ToBeSynced = true;
                 entity.UpdatedAt = DateTime.Now;
                 entity.ToBeCompletedOn = CurrentTask.ToBeCompletedOn;
+                entity.RemindOn = CurrentTask.RemindOn;
+            }
+
+            //If the current task has a reminder date and the entity doesn't have
+            //a reminder guid, we set it up. I do this to avoid replacing the guid
+            if (CurrentTask.RemindOn.HasValue && string.IsNullOrEmpty(entity.RemindOnGUID))
+            {
+                //TODO: I SHOULD FIND A WORKAROUND FOR THE RemindOnGUID
+                entity.RemindOnGUID = Guid.NewGuid().ToString("N").Substring(0, 12);
             }
 
             Response<GoogleTask> response;
@@ -365,6 +405,23 @@ namespace MiraiNotes.UWP.ViewModels
             var sts = await SaveSubTasksAsync(subTasksToSave, isNewTask, moveToDifferentTaskList, currentSts);
 
             CurrentTask.SubTasks = new ObservableCollection<TaskItemViewModel>(sts);
+
+            if (CurrentTask.RemindOn.HasValue)
+            {
+                string notes = CurrentTask.Notes.Length > 15 ?
+                    $"{CurrentTask.Notes.Substring(0, 15)}...." :
+                    $"{CurrentTask.Notes}....";
+
+                _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
+                _toastManager.ScheduleTaskReminderToastNotification(
+                    response.Result.RemindOnGUID,
+                    _currentTaskList.TaskListID,
+                    CurrentTask.TaskID,
+                    _currentTaskList.Title,
+                    CurrentTask.Title,
+                    notes,
+                    CurrentTask.RemindOn.Value);
+            }
 
             _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
             UpdateTaskOperationTitle(isNewTask, CurrentTask.HasParentTask);
@@ -426,7 +483,7 @@ namespace MiraiNotes.UWP.ViewModels
             var response = await _dataService
                 .TaskService
                 .ChangeTaskStatusAsync(task.TaskID, taskStatus);
-            
+
             ShowTaskProgressRing = false;
 
             if (!response.Succeed)
@@ -693,6 +750,55 @@ namespace MiraiNotes.UWP.ViewModels
             _messenger.Send(
                 new KeyValuePair<string, string>(CurrentTask.TaskID, subTask.TaskID),
                 $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
+        }
+
+        private async Task RemoveTaskNotificationDateAsync(TaskNotificationDateType dateType)
+        {
+            string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE ?
+                "completition" : "reminder";
+            bool isConfirmed = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirm",
+                $"Are you sure you want to remove this task's {message} date ?",
+                "Yes",
+                "No");
+
+            if (!isConfirmed)
+                return;
+
+            ShowTaskProgressRing = true;
+            if (!CurrentTask.IsNew)
+            {
+                var response = await _dataService
+                    .TaskService
+                    .RemoveNotificationDate(CurrentTask.TaskID, dateType);
+
+                if (!response.Succeed)
+                {
+                    await _dialogService.ShowMessageDialogAsync(
+                        "Error",
+                        $"Could not remove the {message} date of {CurrentTask.Title}");
+                }
+
+                if (dateType == TaskNotificationDateType.REMINDER_DATE)
+                    _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
+
+                CurrentTask = _mapper.Map<TaskItemViewModel>(response.Result);
+            }
+            else
+            {
+                switch (dateType)
+                {
+                    case TaskNotificationDateType.TO_BE_COMPLETED_DATE:
+                        CurrentTask.ToBeCompletedOn = null;
+                        break;
+                    case TaskNotificationDateType.REMINDER_DATE:
+                        CurrentTask.RemindOn = null;
+                        break;
+                }
+            }
+
+            _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
+            ShowTaskProgressRing = false;
         }
 
         private List<TaskItemViewModel> GetSubTasksToSave(bool isCurrentTaskNew, bool moveToDifferentTaskList)

@@ -3,6 +3,7 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;
 using System;
+using System.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -63,7 +64,7 @@ namespace MiraiNotes.UWP
         private void OnLaunchedOrActivated(IActivatedEventArgs e)
         {
             // Initialize things like registering background tasks before the app is loaded
-            //BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.SYNC, false);
+            BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.MARK_AS_COMPLETED, restart: false);
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -102,11 +103,26 @@ namespace MiraiNotes.UWP
                 // Otherwise an action is provided
                 else
                 {
-
                     // If we're loading the app for the first time, place the main page on the back stack
                     // so that user can go back after they've been navigated to the specific page
                     if (rootFrame.BackStack.Count == 0)
                         rootFrame.BackStack.Add(new PageStackEntry(typeof(LoginPage), null, null));
+
+                    var queryParams = toastActivationArgs.Argument
+                        .Split('&')
+                        .ToDictionary(c => c.Split('=')[0], c => Uri.UnescapeDataString(c.Split('=')[1]));
+
+                    var actionType = (ToastNotificationActionType)Enum.Parse(typeof(ToastNotificationActionType), queryParams["action"]);
+
+                    switch (actionType)
+                    {
+                        case ToastNotificationActionType.OPEN_TASK:
+                            //TODO: FINISH THIS
+                            break;
+                        case ToastNotificationActionType.MARK_AS_COMPLETED:
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(actionType), actionType, "The provided toast action type is not valid");
+                    }
                 }
             }
             // Handle launch activation
@@ -171,13 +187,16 @@ namespace MiraiNotes.UWP
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             base.OnBackgroundActivated(args);
-            
+
             var deferral = args.TaskInstance.GetDeferral();
-            
+
             switch (args.TaskInstance.Task.Name)
             {
                 case nameof(SyncBackgroundTask):
                     new SyncBackgroundTask().Run(args.TaskInstance);
+                    break;
+                case nameof(MarkAsCompletedBackgroundTask):
+                    new MarkAsCompletedBackgroundTask().Run(args.TaskInstance);
                     break;
             }
 

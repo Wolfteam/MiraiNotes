@@ -10,6 +10,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages"
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sharedModels="using:MiraiNotes.Shared.Models"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding NewTask, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -48,42 +49,102 @@
                 IsActive="True"
                 Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid Grid.Row="0" Margin="0,0,0,5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <StackPanel
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid
+                    Grid.Row="0"
                     Grid.Column="0"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal">
+                    VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
                     <FontIcon
+                        Grid.Column="0"
                         FontFamily="Segoe MDL2 Assets"
                         Glyph="&#xE710;"
                         Visibility="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <FontIcon
+                        Grid.Column="0"
                         FontFamily="Segoe MDL2 Assets"
                         Glyph="&#xE70F;"
                         Visibility="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
                     <TextBlock
-                        Grid.Row="0"
+                        Grid.Column="1"
                         Margin="5,0"
                         FontSize="24"
-                        Text="{Binding TaskOperationTitle, Mode=OneWay}" />
-                </StackPanel>
-                <StackPanel
+                        Text="{Binding TaskOperationTitle, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid
+                    Grid.Row="0"
                     Grid.Column="1"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
-                    Orientation="Horizontal"
                     Visibility="{Binding CurrentTask.IsCompletitionDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ToolTipService.ToolTip>
+                        <TextBlock>
+                            <Run Text="This task is marked to be completed on" />
+                            <Run Text="{Binding CurrentTask.CompletitionDateText}" />
+                        </TextBlock>
+                    </ToolTipService.ToolTip>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE787;" />
                     <TextBlock
-                        Grid.Row="0"
+                        Grid.Column="1"
                         Margin="5,0"
-                        FontSize="24"
-                        Text="{Binding CurrentTask.CompletitionDateText, Mode=OneWay}" />
+                        FontSize="20"
+                        Text="{Binding CurrentTask.CompletitionDateText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Grid.Column="2"
+                        Height="25"
+                        Background="Transparent"
+                        Command="{Binding RemoveTaskNotificationDateCommand}"
+                        CommandParameter="{x:Bind sharedModels:TaskNotificationDateType.TO_BE_COMPLETED_DATE}">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
+                    </Button>
+                </Grid>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Visibility="{Binding CurrentTask.IsReminderDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ToolTipService.ToolTip>
+                        <TextBlock>
+                            <Run Text="A reminder has been set to" />
+                            <Run Text="{Binding CurrentTask.RemindOnDateText}" />
+                        </TextBlock>
+                    </ToolTipService.ToolTip>
+
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC92;" />
+
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        FontSize="20"
+                        Text="{Binding CurrentTask.RemindOnDateText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Height="25"
+                        Background="Transparent"
+                        Command="{Binding RemoveTaskNotificationDateCommand}"
+                        CommandParameter="{x:Bind sharedModels:TaskNotificationDateType.REMINDER_DATE}">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
+                    </Button>
                 </StackPanel>
             </Grid>
 
@@ -266,16 +327,41 @@
                                 Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay, Converter={StaticResource DatetimeOffsetToLocalDatetimeOffsetConverter}}"
                                 DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
                                 Header="This task will be completed on:"
-                                MinDate="{Binding MinDate, Mode=TwoWay}"
+                                MinDate="{Binding MinDate, Mode=OneWay}"
                                 PlaceholderText="To be completed on" />
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
                 <AppBarSeparator />
                 <AppBarButton
+                    IsEnabled="True"
+                    Label="Add a reminder for this task"
+                    ToolTipService.ToolTip="When created, it shows a toast notification that acts as a reminder for this task">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC92;" />
+                    </AppBarButton.Icon>
+                    <AppBarButton.Flyout>
+                        <Flyout Placement="Left">
+                            <StackPanel Orientation="Vertical">
+                                <CalendarDatePicker
+                                    Margin="0,0,0,5"
+                                    Date="{Binding CurrentTask.RemindOn, Mode=TwoWay}"
+                                    DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
+                                    Header="Remind me on this date:"
+                                    MinDate="{Binding MinDate, Mode=OneWay}"
+                                    PlaceholderText="Remind on" />
+                                <TimePicker
+                                    Header="At this hour:"
+                                    IsEnabled="{Binding CurrentTask.HasAReminderDate, Mode=OneWay}"
+                                    Time="{Binding CurrentTask.RemindOnTime, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton
                     AllowFocusOnInteraction="True"
                     Icon="List"
-                    Label="Save to"
+                    Label="Save this task to"
                     ToolTipService.ToolTip="Select the task list where this task will be saved">
                     <AppBarButton.Flyout>
                         <Flyout Placement="Left">
