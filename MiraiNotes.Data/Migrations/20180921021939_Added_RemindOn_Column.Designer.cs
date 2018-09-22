@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiraiNotes.Data;
 
 namespace MiraiNotes.Data.Migrations
 {
     [DbContext(typeof(MiraiNotesContext))]
-    partial class MiraiNotesContextModelSnapshot : ModelSnapshot
+    [Migration("20180921021939_Added_RemindOn_Column")]
+    partial class Added_RemindOn_Column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,8 +43,6 @@ namespace MiraiNotes.Data.Migrations
                     b.Property<string>("Position");
 
                     b.Property<DateTimeOffset?>("RemindOn");
-
-                    b.Property<string>("RemindOnGUID");
 
                     b.Property<string>("Status")
                         .IsRequired();
