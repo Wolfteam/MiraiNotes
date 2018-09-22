@@ -141,7 +141,7 @@ namespace MiraiNotes.UWP.Helpers
             {
                 //maybe this could be the date that this task was set to be reminded
                 //DisplayTimestamp = DateTimeOffset.Now,
-                Launch = $"action={(int)ToastNotificationActionType.OPEN_TASK}&taskListId={taskListID}&taskID={taskID}",
+                Launch = $"action={(int)ToastNotificationActionType.OPEN_TASK}&taskListID={taskListID}&taskID={taskID}",
                 Scenario = ToastScenario.Reminder,
                 Visual = new ToastVisual()
                 {

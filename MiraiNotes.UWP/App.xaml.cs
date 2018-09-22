@@ -2,6 +2,7 @@
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;
+using MiraiNotes.UWP.ViewModels;
 using System;
 using System.Linq;
 using Windows.ApplicationModel;
@@ -94,19 +95,12 @@ namespace MiraiNotes.UWP
             // Handle toast activation
             if (e is ToastNotificationActivatedEventArgs toastActivationArgs)
             {
-                // If empty args, no specific action (just launch the app)
-                if (toastActivationArgs.Argument.Length == 0)
-                {
-                    if (rootFrame.Content == null)
-                        rootFrame.Navigate(typeof(LoginPage));
-                }
-                // Otherwise an action is provided
-                else
+                if (toastActivationArgs.Argument.Length != 0)
                 {
                     // If we're loading the app for the first time, place the main page on the back stack
                     // so that user can go back after they've been navigated to the specific page
-                    if (rootFrame.BackStack.Count == 0)
-                        rootFrame.BackStack.Add(new PageStackEntry(typeof(LoginPage), null, null));
+                    //if (rootFrame.BackStack.Count == 0)
+                    //rootFrame.BackStack.Add(new PageStackEntry(typeof(LoginPage), null, null));
 
                     var queryParams = toastActivationArgs.Argument
                         .Split('&')
@@ -117,12 +111,21 @@ namespace MiraiNotes.UWP
                     switch (actionType)
                     {
                         case ToastNotificationActionType.OPEN_TASK:
-                            //TODO: FINISH THIS
+                            BaseViewModel.InitDetails = new Tuple<string, string>(queryParams["taskListID"], queryParams["taskID"]);
                             break;
                         case ToastNotificationActionType.MARK_AS_COMPLETED:
                         default:
                             throw new ArgumentOutOfRangeException(nameof(actionType), actionType, "The provided toast action type is not valid");
                     }
+                }
+                if (rootFrame.Content == null)
+                    rootFrame.Navigate(typeof(LoginPage));
+
+                //kinda hack but works..
+                if (ViewModelLocator.IsAppRunning)
+                {
+                    var vml = new ViewModelLocator();
+                    vml.Home.PageLoadedCommand.Execute(null);
                 }
             }
             // Handle launch activation

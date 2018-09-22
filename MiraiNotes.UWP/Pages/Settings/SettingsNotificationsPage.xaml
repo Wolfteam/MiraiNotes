@@ -32,12 +32,12 @@
                 OffContent="Hidden"
                 OnContent="Showing" />
         </StackPanel>
-        <StackPanel Margin="5">
+        <!--<StackPanel Margin="5">
             <ToggleSwitch
                 Header="Show a reminder notification for completed task"
                 IsOn="{Binding ShowToastNotificationForCompletedTasks, Mode=TwoWay}"
                 OffContent="Hidden"
                 OnContent="Showing" />
-        </StackPanel>
+        </StackPanel>-->
     </StackPanel>
 </Page>

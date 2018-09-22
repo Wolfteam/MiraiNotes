@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
@@ -18,7 +17,7 @@ using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
-    public class NavPageViewModel : ViewModelBase
+    public class NavPageViewModel : BaseViewModel
     {
         #region Members
         private readonly ICustomDialogService _dialogService;
@@ -166,8 +165,8 @@ namespace MiraiNotes.UWP.ViewModels
                 $"{MessageType.SHOW_MAIN_PROGRESS_BAR}",
                 (tuple) => ShowLoading(tuple.Item1, tuple.Item2));
             _messenger.Register<TaskListSortType>(
-                this, 
-                $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}", 
+                this,
+                $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}",
                 SortTaskLists);
         }
 
@@ -206,15 +205,25 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task InitViewAsync(bool onFullSync = false)
         {
+            string selectedTaskListID = string.Empty;
+
             if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
             {
                 _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC);
                 return;
             }
+            //If we have something in the init details, lets select that task list
+            else if (!onFullSync &&
+                InitDetails is null == false &&
+                !string.IsNullOrEmpty(InitDetails.Item1) &&
+                !string.IsNullOrEmpty(InitDetails.Item2))
+            {
+                selectedTaskListID = InitDetails.Item1;
+            }
+            else
+                selectedTaskListID = CurrentTaskList?.TaskListID;
 
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-
-            string selectedTaskListID = CurrentTaskList?.TaskListID;
 
             SelectedItem =
                 CurrentTaskList = null;
@@ -246,7 +255,7 @@ namespace MiraiNotes.UWP.ViewModels
             //with that, the progress ring animation doesnt gets swallowed 
             await Task.Delay(500);
 
-            if (onFullSync && TaskLists.Any(tl => tl.TaskListID == selectedTaskListID))
+            if (TaskLists.Any(tl => tl.TaskListID == selectedTaskListID))
                 SelectedItem = TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID);
             else
                 SelectedItem = TaskLists.FirstOrDefault();

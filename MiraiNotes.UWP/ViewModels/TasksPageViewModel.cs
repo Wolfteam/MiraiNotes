@@ -74,61 +74,61 @@ namespace MiraiNotes.UWP.ViewModels
         public TaskListItemViewModel CurrentTaskList
         {
             get { return _currentTaskList; }
-            set { SetValue(ref _currentTaskList, value); }
+            set { Set(ref _currentTaskList, value); }
         }
 
         public bool IsTaskListTitleVisible
         {
             get { return _isTaskListTitleVisible; }
-            set { SetValue(ref _isTaskListTitleVisible, value); }
+            set { Set(ref _isTaskListTitleVisible, value); }
         }
 
         public bool IsTaskListViewVisible
         {
             get { return _isTaskListViewVisible; }
-            set { SetValue(ref _isTaskListViewVisible, value); }
+            set { Set(ref _isTaskListViewVisible, value); }
         }
 
         public bool IsAutoSuggestBoxEnabled
         {
             get { return _isAutoSuggestBoxEnabled; }
-            set { SetValue(ref _isAutoSuggestBoxEnabled, value); }
+            set { Set(ref _isAutoSuggestBoxEnabled, value); }
         }
 
         public bool CanAddMoreTaskList
         {
             get { return _canAddMoreTaskList; }
-            set { SetValue(ref _canAddMoreTaskList, value); }
+            set { Set(ref _canAddMoreTaskList, value); }
         }
 
         public bool CanAddMoreTasks
         {
             get { return _canAddMoreTasks; }
-            set { SetValue(ref _canAddMoreTasks, value); }
+            set { Set(ref _canAddMoreTasks, value); }
         }
 
         public bool CanDeleteTasks
         {
             get { return _canDeleteTasks; }
-            set { SetValue(ref _canDeleteTasks, value); }
+            set { Set(ref _canDeleteTasks, value); }
         }
 
         public bool CanRefreshTaskListView
         {
             get { return _canRefreshTaskListView; }
-            set { SetValue(ref _canRefreshTaskListView, value); }
+            set { Set(ref _canRefreshTaskListView, value); }
         }
 
         public bool CanSortTaskListView
         {
             get { return _canSortTaskListView; }
-            set { SetValue(ref _canSortTaskListView, value); }
+            set { Set(ref _canSortTaskListView, value); }
         }
 
         public bool IsTaskListCommandBarCompact
         {
             get { return _isTaskListCommandBarCompact; }
-            set { SetValue(ref _isTaskListCommandBarCompact, value); }
+            set { Set(ref _isTaskListCommandBarCompact, value); }
         }
 
         public bool ShowTaskListViewProgressRing
@@ -138,32 +138,32 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 HideControls(!value);
                 DisableControls(!value);
-                SetValue(ref _showTaskListViewProgressRing, value);
+                Set(ref _showTaskListViewProgressRing, value);
             }
         }
 
         public string SelectedTasksText
         {
             get { return _selectedTasksText; }
-            set { SetValue(ref _selectedTasksText, value); }
+            set { Set(ref _selectedTasksText, value); }
         }
 
         public string TaskAutoSuggestBoxText
         {
             get { return _taskAutoSuggestBoxText; }
-            set { SetValue(ref _taskAutoSuggestBoxText, value); }
+            set { Set(ref _taskAutoSuggestBoxText, value); }
         }
 
         public TaskSortType CurrentTasksSortOrder
         {
             get { return _currentTasksSortOrder; }
-            set { SetValue(ref _currentTasksSortOrder, value); }
+            set { Set(ref _currentTasksSortOrder, value); }
         }
 
         public ObservableCollection<TaskListItemViewModel> TaskLists
         {
             get { return _taskLists; }
-            set { SetValue(ref _taskLists, value); }
+            set { Set(ref _taskLists, value); }
         }
 
         public TaskItemViewModel SelectedTaskToMove { get; set; }
@@ -171,7 +171,7 @@ namespace MiraiNotes.UWP.ViewModels
         public bool ShowMoveTaskFlyoutProgressBar
         {
             get { return _showMoveTaskFlyoutProgressBar; }
-            set { SetValue(ref _showMoveTaskFlyoutProgressBar, value); }
+            set { Set(ref _showMoveTaskFlyoutProgressBar, value); }
         }
         #endregion
 
@@ -276,8 +276,8 @@ namespace MiraiNotes.UWP.ViewModels
                 $"{MessageType.SHOW_IN_APP_NOTIFICATION}",
                 (message) => InAppNotificationRequest?.Invoke(message));
             _messenger.Register<TaskSortType>(
-                this, 
-                $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}", 
+                this,
+                $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}",
                 SortTasks);
         }
 
@@ -408,6 +408,18 @@ namespace MiraiNotes.UWP.ViewModels
                 SortTasks(_appSettings.DefaultTaskSortOrder);
             }
             CurrentTaskList = taskList;
+
+            //If we have something in the init details, lets select that task
+            if (InitDetails is null == false &&
+                !string.IsNullOrEmpty(InitDetails.Item1) &&
+                !string.IsNullOrEmpty(InitDetails.Item2))
+            {
+                var selectedTask = Tasks.FirstOrDefault(t => t.TaskID == InitDetails.Item2);
+                if (selectedTask is null == false)
+                    selectedTask.IsSelected = true;
+                InitDetails = null;
+            }
+
             ShowTaskListViewProgressRing = false;
         }
 

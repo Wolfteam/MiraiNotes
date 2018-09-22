@@ -265,11 +265,11 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (CurrentTask.RemindOn.HasValue)
             {
-                var minutesDiff = (CurrentTask.RemindOn.Value - DateTimeOffset.Now).Minutes;
-                if (minutesDiff < 5)
+                var minutesDiff = (CurrentTask.RemindOn.Value - DateTimeOffset.Now).Seconds;
+                if (minutesDiff < 120)
                 {
                     _messenger.Send(
-                        $"The remind date is not valid.",
+                        $"The date of the reminder must be at least 2 mins above the current time.",
                         $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
                     return;
                 }
