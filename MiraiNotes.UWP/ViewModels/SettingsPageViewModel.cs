@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -275,6 +276,12 @@ namespace MiraiNotes.UWP.ViewModels
         }
         #endregion
 
+        #region Abouts Properties
+        public string AppVersion
+        {
+            get => MiscellaneousUtils.GetAppVersion();
+        }
+        #endregion
 
         #region Commands
         public ICommand NavigationRequestCommand { get; set; }
