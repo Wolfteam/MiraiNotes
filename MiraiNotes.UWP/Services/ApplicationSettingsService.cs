@@ -13,11 +13,11 @@ namespace MiraiNotes.UWP.Services
         }
 
         #region General
-        //public int AppTheme
-        //{
-        //    get => (TaskSortType)(_settings[nameof(AppTheme)] ?? TaskSortType.BY_NAME_ASC);
-        //    set => _settings[nameof(AppTheme)] = (int)value;
-        //}
+        public AppThemeType AppTheme
+        {
+            get => (AppThemeType)(_settings[nameof(AppTheme)] ?? AppThemeType.DARK);
+            set => _settings[nameof(AppTheme)] = (int)value;
+        }
 
         public TaskListSortType DefaultTaskListSortOrder
         {

@@ -26,6 +26,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Events
         public event SettingsNavigationRequest NavigationRequest;
+        public ChangeCurrentThemeRequest ChangeCurrentThemeRequest;
         #endregion
 
 
@@ -146,10 +147,39 @@ namespace MiraiNotes.UWP.ViewModels
                 Text = "Each 24 hours"
             }
         };
+
+        public List<ItemModel> AppThemes { get; } = new List<ItemModel>
+        {
+            new ItemModel
+            {
+                ItemID = AppThemeType.DARK.ToString(),
+                Text = "Dark"
+            },
+            new ItemModel
+            {
+                ItemID = AppThemeType.LIGHT.ToString(),
+                Text = "Light"
+            }
+        };
         #endregion
 
 
         #region General Settings Properties
+        public ItemModel CurrentAppTheme
+        {
+            get
+            {
+                var currentSelectedTheme = _appSettings.AppTheme;
+                return AppThemes.FirstOrDefault(i => i.ItemID == currentSelectedTheme.ToString());
+            }
+            set
+            {
+                var selectedTheme = (AppThemeType)Enum.Parse(typeof(AppThemeType), value.ItemID);
+                _appSettings.AppTheme = selectedTheme;
+                ChangeCurrentThemeRequest?.Invoke(selectedTheme);
+            }
+        }
+
         public bool AskForPasswordWhenAppStarts
         {
             get => _appSettings.AskForPasswordWhenAppStarts;

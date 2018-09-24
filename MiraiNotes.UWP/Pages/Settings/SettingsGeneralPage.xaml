@@ -24,6 +24,7 @@
         Margin="10,0,10,10"
         HorizontalAlignment="Stretch"
         Orientation="Vertical">
+
         <TextBlock
             FontSize="18"
             FontWeight="SemiBold"
@@ -31,18 +32,34 @@
         <StackPanel Margin="5">
             <ComboBox
                 Width="200"
+                DisplayMemberPath="Text"
                 Header="Default app theme"
-                PlaceholderText="Pick a theme">
-                <x:String>
-                    Light
-                </x:String>
-                <x:String>
-                    Black
-                </x:String>
-            </ComboBox>
+                ItemsSource="{Binding AppThemes, Mode=OneWay}"
+                PlaceholderText="Pick a theme"
+                SelectedItem="{Binding CurrentAppTheme, Mode=TwoWay}"
+                SelectedValuePath="ItemID" />
+            <Grid Margin="5">
+                <GridView
+                    x:Name="gridView"
+                    Height="120"
+                    Header="Accent color"
+                    ItemsSource="{x:Bind Colors}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    SelectionChanged="gridView_SelectionChanged">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="30" Height="30">
+                                <Grid.Background>
+                                    <SolidColorBrush Color="{Binding Color}" />
+                                </Grid.Background>
+                            </Grid>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </Grid>
         </StackPanel>
 
-        <MenuFlyoutSeparator Margin="0,5" />
+        <MenuFlyoutSeparator Margin="0,5" Background="{ThemeResource SystemAccentColor}" />
 
         <TextBlock
             FontSize="18"
@@ -79,7 +96,7 @@
         </StackPanel>-->
 
 
-        <MenuFlyoutSeparator Margin="0,5" />
+        <MenuFlyoutSeparator Margin="0,5" Background="{ThemeResource SystemAccentColor}" />
 
         <TextBlock
             FontSize="18"

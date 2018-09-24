@@ -4,6 +4,8 @@ namespace MiraiNotes.UWP.Interfaces
 {
     public interface IApplicationSettingsService
     {
+        AppThemeType AppTheme { get; set; }
+
         SyncBgTaskIntervals SyncBackgroundTaskInterval { get; set; }
 
         bool RunSyncBackgroundTaskAfterStart { get; set; }
