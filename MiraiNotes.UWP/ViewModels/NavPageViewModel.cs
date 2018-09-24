@@ -29,6 +29,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IDispatcherHelper _dispatcher;
         private readonly IApplicationSettingsService _appSettings;
         private readonly IBackgroundTaskManagerService _backgroundTaskManager;
+        private readonly IGoogleUserService _googleUserService;
 
         private object _selectedItem;
         private SmartObservableCollection<TaskListItemViewModel> _taskLists = new SmartObservableCollection<TaskListItemViewModel>();
@@ -43,6 +44,8 @@ namespace MiraiNotes.UWP.ViewModels
         private string _mainProgressBarText;
         public bool _isSettingsPaneOpen;
         private bool _isSelectionInProgress;
+        private string _currentUserName;
+        private string _userInitials;
         #endregion
 
         #region Properties
@@ -99,6 +102,23 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _isSettingsPaneOpen; }
             set { Set(ref _isSettingsPaneOpen, value); }
         }
+
+        public string CurrentUserName
+        {
+            get { return _currentUserName; }
+            set { Set(ref _currentUserName, value); }
+        }
+
+        public string CurrentUserInitials
+        {
+            get { return _userInitials; }
+            set { Set(ref _userInitials, value); }
+        }
+
+        public string CurrentUserProfileImagePath
+        {
+            get => _googleUserService.GetCurrentUserProfileImagePath();
+        }
         #endregion
 
         #region Commands
@@ -132,7 +152,8 @@ namespace MiraiNotes.UWP.ViewModels
             IMiraiNotesDataService dataService,
             IDispatcherHelper dispatcher,
             IApplicationSettingsService appSettings,
-            IBackgroundTaskManagerService backgroundTaskManager)
+            IBackgroundTaskManagerService backgroundTaskManager,
+            IGoogleUserService googleUserService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -143,6 +164,7 @@ namespace MiraiNotes.UWP.ViewModels
             _dispatcher = dispatcher;
             _appSettings = appSettings;
             _backgroundTaskManager = backgroundTaskManager;
+            _googleUserService = googleUserService;
 
             RegisterMessages();
             SetCommands();
@@ -172,8 +194,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         private void SetCommands()
         {
-            PageLoadedCommand = new RelayCommand
-                (async () => await InitViewAsync());
+            PageLoadedCommand = new RelayCommand(async () =>
+            {
+                await LoadProfileInfo();
+                await InitViewAsync();
+            });
 
             TaskListAutoSuggestBoxTextChangedCommand = new RelayCommand<string>
                 ((text) => OnTaskListAutoSuggestBoxTextChange(text));
@@ -201,6 +226,24 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 IsSettingsPaneOpen = true;
             });
+        }
+
+        private async Task LoadProfileInfo()
+        {
+            _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
+            var currentUser = await _dataService.UserService.GetCurrentActiveUserAsync();
+            if (currentUser.Succeed)
+            {
+                CurrentUserName = currentUser.Result.Fullname;
+                string userInitials = string.Empty;
+                currentUser.Result.Fullname?.Split(" ").ForEach(part =>
+                {
+                    if (!string.IsNullOrEmpty(part))
+                        userInitials += part.Substring(0, 1);
+                });
+                CurrentUserInitials = userInitials;
+            }
+            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
         }
 
         private async Task InitViewAsync(bool onFullSync = false)
@@ -324,6 +367,8 @@ namespace MiraiNotes.UWP.ViewModels
                 OpenPane(false);
                 ShowLoading(true, "Logging out... Please wait..");
                 BackgroundTasksManager.UnregisterBackgroundTask();
+                _appSettings.ResetAppSettings();
+
                 await _dataService
                     .UserService
                     .ChangeCurrentUserStatus(false);

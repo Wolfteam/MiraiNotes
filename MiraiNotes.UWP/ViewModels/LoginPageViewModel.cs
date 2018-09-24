@@ -273,6 +273,10 @@ namespace MiraiNotes.UWP.ViewModels
                 return result;
             }
 
+            await _googleUserService.RemoveProfileImage();
+
+            await _googleUserService.DownloadProfileImage(user.ImageUrl);
+
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
             return !result;
         }

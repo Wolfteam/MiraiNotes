@@ -69,9 +69,13 @@ namespace MiraiNotes.UWP.Helpers
             {
                 case BackgroundTaskType.ANY:
                     BackgroundTaskHelper.Unregister(nameof(SyncBackgroundTask));
+                    BackgroundTaskHelper.Unregister(nameof(MarkAsCompletedBackgroundTask));
                     break;
                 case BackgroundTaskType.SYNC:
                     BackgroundTaskHelper.Unregister(nameof(SyncBackgroundTask));
+                    break;
+                case BackgroundTaskType.MARK_AS_COMPLETED:
+                    BackgroundTaskHelper.Unregister(nameof(MarkAsCompletedBackgroundTask));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"The provided BackgroundTaskType doesnt exists {backgroundTask}");

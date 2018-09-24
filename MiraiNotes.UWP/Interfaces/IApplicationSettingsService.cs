@@ -21,5 +21,7 @@ namespace MiraiNotes.UWP.Interfaces
         bool ShowCompletedTasks { get; set; }
 
         TaskListSortType DefaultTaskListSortOrder { get; set; }
+
+        void ResetAppSettings();
     }
 }

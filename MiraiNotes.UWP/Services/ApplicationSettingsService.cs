@@ -73,5 +73,17 @@ namespace MiraiNotes.UWP.Services
             set => _settings[nameof(ShowToastNotificationForCompletedTasks)] = value;
         }
         #endregion
+
+        public void ResetAppSettings()
+        {
+            AskForPasswordWhenAppStarts =
+                RunSyncBackgroundTaskAfterStart =
+                    ShowCompletedTasks =
+                        ShowToastNotificationAfterFullSync =
+                            ShowToastNotificationForCompletedTasks = false;
+            SyncBackgroundTaskInterval = SyncBgTaskIntervals.NEVER;
+            DefaultTaskListSortOrder = TaskListSortType.BY_NAME_ASC;
+            DefaultTaskSortOrder = TaskSortType.BY_NAME_ASC;
+        }
     }
 }
