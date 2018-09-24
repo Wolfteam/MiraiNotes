@@ -194,6 +194,7 @@
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
+    <Compile Include="Utils\MiscellaneousUtils.cs" />
     <Compile Include="Utils\SmartObservableCollection.cs" />
     <Compile Include="ViewModels\Dialogs\LoginPasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsPasswordDialogViewModel.cs" />
