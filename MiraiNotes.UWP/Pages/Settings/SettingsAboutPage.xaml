@@ -31,7 +31,7 @@
 
         <StackPanel Margin="5,10,5,5" HorizontalAlignment="Center">
             <TextBlock Text="This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later." TextWrapping="Wrap" />
-            <MenuFlyoutSeparator Margin="0,5" />
+            <MenuFlyoutSeparator Margin="0,5" Background="{ThemeResource SystemAccentColor}" />
             <TextBlock
                 FontSize="18"
                 FontWeight="SemiBold"
@@ -43,7 +43,7 @@
                 Click="MailMe_Button_Click">
                 Mail me
             </Button>
-            <MenuFlyoutSeparator Margin="0,5" />
+            <MenuFlyoutSeparator Margin="0,5" Background="{ThemeResource SystemAccentColor}" />
 
             <TextBlock
                 FontSize="18"

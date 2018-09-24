@@ -13,7 +13,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Xaml.Interactions.Media"
     xmlns:uc="using:MiraiNotes.UWP.Controls"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Tasks, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -522,9 +521,7 @@
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarSeparator />
-                    <AppBarButton Icon="ReShare" Label="Share" />
-                    <AppBarButton Icon="Setting" Label="Settings" />
+                    <AppBarSeparator Background="{ThemeResource SystemAccentColor}" />
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>

@@ -11,7 +11,6 @@
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sharedModels="using:MiraiNotes.Shared.Models"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding NewTask, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -106,6 +105,7 @@
                         Grid.Column="1"
                         Margin="5,0"
                         FontSize="20"
+                        Foreground="{ThemeResource SystemAccentColor}"
                         Text="{Binding CurrentTask.CompletitionDateText, Mode=OneWay}"
                         TextWrapping="Wrap" />
                     <Button
@@ -136,6 +136,7 @@
                     <TextBlock
                         Margin="5,0,0,0"
                         FontSize="20"
+                        Foreground="{ThemeResource SystemAccentColor}"
                         Text="{Binding CurrentTask.RemindOnDateText, Mode=OneWay}"
                         TextWrapping="Wrap" />
                     <Button
@@ -153,9 +154,11 @@
                     x:Name="TaskTitle_TextBox"
                     extensions:FieldValidationExtensions.DefaultErrorMessage="The task title is required"
                     extensions:FieldValidationExtensions.Format="MinLength, NonEmpty"
+                    extensions:FieldValidationExtensions.InvalidBrush="{x:Null}"
                     extensions:FieldValidationExtensions.MinLength="2"
                     extensions:FieldValidationExtensions.MinLengthErrorMessage="The task title must have at least 2 charaters"
                     extensions:FieldValidationExtensions.NonEmptyErrorMessage="The task title cannot be empty"
+                    extensions:FieldValidationExtensions.ValidBrush="{x:Null}"
                     FontWeight="SemiBold"
                     Header="Title:"
                     IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
@@ -181,9 +184,11 @@
                         Grid.Row="0"
                         extensions:FieldValidationExtensions.DefaultErrorMessage="The task body is required"
                         extensions:FieldValidationExtensions.Format="MinLength, NonEmpty"
+                        extensions:FieldValidationExtensions.InvalidBrush="{x:Null}"
                         extensions:FieldValidationExtensions.MinLength="2"
                         extensions:FieldValidationExtensions.MinLengthErrorMessage="The task body must have at least 2 charaters"
                         extensions:FieldValidationExtensions.NonEmptyErrorMessage="The task body cannot be empty"
+                        extensions:FieldValidationExtensions.ValidBrush="{x:Null}"
                         AcceptsReturn="True"
                         FontWeight="SemiBold"
                         Header="Notes:"
@@ -306,7 +311,7 @@
                     IsEnabled="{Binding CurrentTask.HasParentTask, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                     Label="Add a sub task"
                     ToolTipService.ToolTip="Add a sub task to this task list" />
-                <AppBarSeparator />
+                <AppBarSeparator Foreground="{ThemeResource SystemAccentColor}" />
                 <AppBarButton
                     Command="{Binding MarkAsCompletedCommand}"
                     IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"
@@ -332,7 +337,7 @@
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarSeparator />
+                <AppBarSeparator Foreground="{ThemeResource SystemAccentColor}" />
                 <AppBarButton
                     IsEnabled="True"
                     Label="Add a reminder for this task"
