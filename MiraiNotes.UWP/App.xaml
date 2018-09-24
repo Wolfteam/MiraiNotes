@@ -7,7 +7,12 @@
     xmlns:locator="using:MiraiNotes.UWP.ViewModels">
     <Application.Resources>
         <ResourceDictionary>
-            <locator:ViewModelLocator x:Key="Locator" />
+            <!--  Themes  -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light" Source="/XamlResources/LightThemeDictionary.xaml" />
+                <ResourceDictionary x:Key="Dark" Source="/XamlResources/DarkThemeDictionary.xaml" />
+            </ResourceDictionary.ThemeDictionaries>
+
 
             <!--  Converters  -->
             <converters:AutoSuggestQueryParameterConverter x:Key="AutoSuggestQueryParameterConverter" />
@@ -25,6 +30,9 @@
             <converters:NavigationViewSelectionChangedEventArgsConverter x:Key="NavigationViewSelectionChangedEventArgsConverter" />
             <converters:StringDelimiterConverter x:Key="StringDelimiterConverter" />
             <!--<converters:VisibleWhenZeroConverter x:Key="VisibleWhenZeroConverter" />-->
+
+            <!--  View model locator  -->
+            <locator:ViewModelLocator x:Key="Locator" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

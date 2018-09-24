@@ -154,6 +154,7 @@
     <Compile Include="Models\API\GoogleUserModel.cs" />
     <Compile Include="Models\API\GoogleResponseModel.cs" />
     <Compile Include="Models\API\TokenResponse.cs" />
+    <Compile Include="Models\AppThemeType.cs" />
     <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\CustomDialogType.cs" />
     <Compile Include="Models\ItemModel.cs" />
@@ -359,6 +360,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\TasksPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XamlResources\DarkThemeDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="XamlResources\LightThemeDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
