@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
+    xmlns:localUtils="using:MiraiNotes.UWP.Utils"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignWidth="400"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -29,7 +30,7 @@
             <TextBlock HorizontalAlignment="Center" Text="Mirai Notes" />
             <TextBlock HorizontalAlignment="Center">
                 <Run Text="Version " />
-                <Run Text="{Binding AppVersion, Mode=OneWay}" />
+                <Run Text="{x:Bind localUtils:MiscellaneousUtils.GetAppVersion(), Mode=OneWay}" />
             </TextBlock>
         </StackPanel>
 
@@ -40,7 +41,7 @@
                 FontSize="18"
                 FontWeight="SemiBold"
                 Text="Donations" />
-            <TextBlock Text="I hope you are enjoying using this app, if you would like to buy me a coffee, you can mail me to the following address:" TextWrapping="Wrap" />
+            <TextBlock Text="I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email" TextWrapping="Wrap" />
             <Button
                 x:Name="MailMe_Button"
                 HorizontalAlignment="Center"

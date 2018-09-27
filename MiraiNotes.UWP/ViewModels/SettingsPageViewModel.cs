@@ -4,7 +4,6 @@ using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +28,6 @@ namespace MiraiNotes.UWP.ViewModels
         public event SettingsNavigationRequest NavigationRequest;
         public ChangeCurrentThemeRequest ChangeCurrentThemeRequest;
         #endregion
-
 
         #region Properties
         public string CurrentPageText
@@ -164,7 +162,6 @@ namespace MiraiNotes.UWP.ViewModels
         };
         #endregion
 
-
         #region General Settings Properties
         public ItemModel CurrentAppTheme
         {
@@ -237,7 +234,6 @@ namespace MiraiNotes.UWP.ViewModels
         }
         #endregion
 
-
         #region Synchronization Settings Properties
         public bool RunSyncBackgroundTaskAfterStart
         {
@@ -261,7 +257,6 @@ namespace MiraiNotes.UWP.ViewModels
         }
         #endregion
 
-
         #region Notification Settings Properties
         public bool ShowToastNotificationAfterFullSync
         {
@@ -273,13 +268,6 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get => _appSettings.ShowToastNotificationForCompletedTasks;
             set => _appSettings.ShowToastNotificationForCompletedTasks = value;
-        }
-        #endregion
-
-        #region Abouts Properties
-        public string AppVersion
-        {
-            get => MiscellaneousUtils.GetAppVersion();
         }
         #endregion
 
