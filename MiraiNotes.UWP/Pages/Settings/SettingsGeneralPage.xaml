@@ -86,20 +86,12 @@
             Text="Accent Color" />
         <StackPanel Margin="5">
             <GridView
-                x:Name="AccentColors_GridView"
                 Height="120"
                 ItemTemplateSelector="{StaticResource AccentColorTemplateSelector}"
                 ItemsSource="{Binding AccentColors, Mode=OneWay}"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 SelectedIndex="{Binding SelectedAccentColorIndex, Mode=TwoWay}"
                 SelectionMode="Single">
-                <interactivity:Interaction.Behaviors>
-                    <core:EventTriggerBehavior EventName="SelectionChanged">
-                        <core:EventTriggerBehavior.Actions>
-                            <core:InvokeCommandAction Command="{Binding AccentColorSelectionChangedCommand}" CommandParameter="{Binding ElementName=AccentColors_GridView, Path=SelectedItem}" />
-                        </core:EventTriggerBehavior.Actions>
-                    </core:EventTriggerBehavior>
-                </interactivity:Interaction.Behaviors>
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <toolkit:WrapPanel

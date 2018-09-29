@@ -204,7 +204,16 @@ namespace MiraiNotes.UWP.ViewModels
                 _currentAccentColorIndex = AccentColors.IndexOf(AccentColors.FirstOrDefault(a => a.HexAccentColor == _appSettings.AppHexAccentColor));
                 return _currentAccentColorIndex;
             }
-            set => Set(ref _currentAccentColorIndex, value);
+            set
+            {
+                var selectedColor = AccentColors[value];
+                if (_appSettings.AppHexAccentColor == selectedColor.HexAccentColor)
+                    return;
+                _appSettings.AppHexAccentColor = selectedColor.HexAccentColor;
+                MiscellaneousUtils.ChangeCurrentTheme(_appSettings.AppTheme, _appSettings.AppHexAccentColor);
+                AccentColorChanged = true;
+                Set(ref _currentAccentColorIndex, value);
+            }
         }
 
         public bool AccentColorChanged
@@ -308,8 +317,6 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Commands
         public ICommand NavigationRequestCommand { get; set; }
-
-        public ICommand AccentColorSelectionChangedCommand { get; set; }
         #endregion
 
         public SettingsPageViewModel(
@@ -327,15 +334,6 @@ namespace MiraiNotes.UWP.ViewModels
 
             NavigationRequestCommand = new RelayCommand<SettingsPageType>
                 ((page) => NavigationRequest?.Invoke(page));
-
-            AccentColorSelectionChangedCommand = new RelayCommand<AccentColorModel>((selectedColor) =>
-            {
-                if (_appSettings.AppHexAccentColor == selectedColor.HexAccentColor)
-                    return;
-                _appSettings.AppHexAccentColor = selectedColor.HexAccentColor;
-                MiscellaneousUtils.ChangeCurrentTheme(_appSettings.AppTheme, _appSettings.AppHexAccentColor);
-                AccentColorChanged = true;
-            });
         }
     }
 }
