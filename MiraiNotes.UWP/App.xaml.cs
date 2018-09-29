@@ -2,17 +2,14 @@
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;
+using MiraiNotes.UWP.Utils;
 using MiraiNotes.UWP.ViewModels;
 using System;
-using System.Drawing;
 using System.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Storage;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace MiraiNotes.UWP
@@ -170,45 +167,9 @@ namespace MiraiNotes.UWP
         private void AfterLaunchedOrActivated()
         {
             var vml = new ViewModelLocator();
-            ChangeCurrentTheme(vml.ApplicationSettingsService.AppTheme);
-            if (vml.Settings.ChangeCurrentThemeRequest is null)
-                vml.Settings.ChangeCurrentThemeRequest = ChangeCurrentTheme;
-        }
-
-        private void ChangeCurrentTheme(AppThemeType appTheme)
-        {
-            //Windows.UI.Color accentColor;
-            //var currentAccentColor = ApplicationData.Current.LocalSettings.Values["AccentColor"];
-            //if (currentAccentColor is null == false)
-            //{
-            //    accentColor = GetSolidColorBrush(ApplicationData.Current.LocalSettings.Values["AccentColor"].ToString());
-            //}
-            //else
-            //{
-            //    accentColor = (Windows.UI.Color) Application.Current.Resources["SystemAccentColor"];
-            //}
-
-            //Application.Current.Resources["SystemAccentColor"] = accentColor;
-            //var tb = ApplicationView.GetForCurrentView().TitleBar;
-            //tb.BackgroundColor =
-            //    tb.ButtonBackgroundColor =
-            //        tb.InactiveBackgroundColor =
-            //            tb.ButtonInactiveBackgroundColor = accentColor;
-            // Set theme for window root.
-            if (Window.Current.Content is FrameworkElement frameworkElement)
-            {
-                frameworkElement.RequestedTheme = (ElementTheme)appTheme;
-            }
-        }
-
-        public Windows.UI.Color GetSolidColorBrush(string hex)
-        {
-            hex = hex.Replace("#", string.Empty);
-            byte a = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
-            byte r = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
-            byte g = (byte)(Convert.ToUInt32(hex.Substring(4, 2), 16));
-            byte b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
-            return Windows.UI.Color.FromArgb(a, r, g, b);
+            MiscellaneousUtils.ChangeCurrentTheme(
+                vml.ApplicationSettingsService.AppTheme, 
+                vml.ApplicationSettingsService.AppHexAccentColor);
         }
 
         /// <summary>
