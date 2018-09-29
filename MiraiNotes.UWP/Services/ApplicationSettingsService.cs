@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 
 namespace MiraiNotes.UWP.Services
 {
@@ -17,6 +18,12 @@ namespace MiraiNotes.UWP.Services
         {
             get => (AppThemeType)(_settings[nameof(AppTheme)] ?? AppThemeType.DARK);
             set => _settings[nameof(AppTheme)] = (int)value;
+        }
+
+        public string AppHexAccentColor
+        {
+            get => (string)(_settings[nameof(AppHexAccentColor)] ?? MiscellaneousUtils.GetSystemAccentColor().ToString());
+            set => _settings[nameof(AppHexAccentColor)] = value;
         }
 
         public TaskListSortType DefaultTaskListSortOrder

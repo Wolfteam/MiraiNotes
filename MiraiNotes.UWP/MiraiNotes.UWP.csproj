@@ -105,10 +105,12 @@
     </Compile>
     <Compile Include="BackgroundTasks\MarkAsCompletedBackgroundTask.cs" />
     <Compile Include="BackgroundTasks\SyncBackgroundTask.cs" />
+    <Compile Include="Controls\DataTemplates\AccentColorTemplateSelector.cs" />
     <Compile Include="Controls\TasksListView.cs" />
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\HexToColorConverter.cs" />
     <Compile Include="Converters\SettingsPageTypeToSegoeMDL2IconConverter.cs" />
     <Compile Include="Converters\StringDelimiterConverter.cs" />
     <Compile Include="Converters\TaskSortTypeToVisibilityConverter.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\AccentColorModel.cs" />
     <Compile Include="Models\API\GoogleApiErrorModel.cs" />
     <Compile Include="Models\API\GoogleBaseModel.cs" />
     <Compile Include="Models\API\GoogleEmptyResponseModel.cs" />

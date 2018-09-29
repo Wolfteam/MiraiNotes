@@ -6,6 +6,8 @@ namespace MiraiNotes.UWP.Interfaces
     {
         AppThemeType AppTheme { get; set; }
 
+        string AppHexAccentColor { get; set; }
+
         SyncBgTaskIntervals SyncBackgroundTaskInterval { get; set; }
 
         bool RunSyncBackgroundTaskAfterStart { get; set; }
