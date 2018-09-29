@@ -1,32 +1,14 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using GalaSoft.MvvmLight;
+using System;
 
 namespace MiraiNotes.UWP.ViewModels
 {
-    public class BaseViewModel : INotifyPropertyChanged
+    public class BaseViewModel : ViewModelBase
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #region Properties
-
-        #endregion
-
-        #region Methods
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected void SetValue<T>(ref T backingField, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(backingField, value))
-            {
-                return;
-            }
-            backingField = value;
-            OnPropertyChanged(propertyName);
-        }
-        #endregion
+        /// <summary>
+        /// Used to open a specific task inside a task list.
+        /// Stores the taskListID and taskID provided from a launched or navigated args
+        /// </summary>
+        public static Tuple<string, string> InitDetails { get; set; }
     }
 }

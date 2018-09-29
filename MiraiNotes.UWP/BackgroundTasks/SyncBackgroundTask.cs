@@ -1,5 +1,4 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
-using Microsoft.Toolkit.Uwp.Notifications;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -9,15 +8,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Background;
-using Windows.UI.Notifications;
 
 namespace MiraiNotes.UWP.BackgroundTasks
 {
     public sealed class SyncBackgroundTask : IBackgroundTask
     {
+        private readonly IApplicationSettingsService _appSettings;
         private readonly ISyncService _syncService;
         private readonly ILogger _logger;
         private readonly IMessenger _messenger;
+        private readonly ICustomToastNotificationManager _toastNotificationManager;
         private readonly bool _isAppRunning;
         private BackgroundTaskDeferral _deferral;
 
@@ -26,14 +26,16 @@ namespace MiraiNotes.UWP.BackgroundTasks
             _isAppRunning = ViewModelLocator.IsAppRunning;
             var vml = new ViewModelLocator();
 
+            _appSettings = vml.ApplicationSettingsService;
             _syncService = vml.SyncService;
             _logger = vml.Logger.ForContext<SyncBackgroundTask>();
             _messenger = vml.Messenger;
-            
+            _toastNotificationManager = vml.ToastNotificationManager;
+
             if (_isAppRunning)
-                _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is already running");
+                _logger.Information($"{nameof(SyncBackgroundTask)}: is being started when the app is already running");
             else
-                _logger.Information($"{nameof(SyncBackgroundTask)} is being started when the app is not running");
+                _logger.Information($"{nameof(SyncBackgroundTask)}: is being started when the app is not running");
         }
 
         public async void Run(IBackgroundTaskInstance taskInstance)
@@ -44,7 +46,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
                 taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
 
             _deferral = taskInstance?.GetDeferral();
-            _logger.Information($"Starting the {nameof(SyncBackgroundTask)} {(startedManually ? "manually" : "automatically" )}");
+            _logger.Information($"{nameof(SyncBackgroundTask)}: Started {(startedManually ? "manually" : "automatically" )}");
 
             if (_isAppRunning)
             {
@@ -71,16 +73,10 @@ namespace MiraiNotes.UWP.BackgroundTasks
             if (string.IsNullOrEmpty(message))
                 message = "An unknown error occurred while trying to perform the sync operation.";
 
-            _logger.Information($"{nameof(SyncBackgroundTask)} results = {message}");
+            _logger.Information($"{nameof(SyncBackgroundTask)}: results = {message}");
 
-            //TODO: MAYBE ADD A SETTING TO SHOW OR NOT SHOW THE NOTIFICATION
-
-            if (!_isAppRunning && !startedManually)
-            {
-                var content = GenerateToastContent(message);
-                var toastNotification = new ToastNotification(content.GetXml());
-                ToastNotificationManager.CreateToastNotifier().Show(toastNotification);
-            }
+            if (!_isAppRunning && !startedManually && _appSettings.ShowToastNotificationAfterFullSync)
+                _toastNotificationManager.ShowSimpleToastNotification("Sync Results" ,message);
             else
             {
                 _messenger.Send(message, $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
@@ -88,47 +84,13 @@ namespace MiraiNotes.UWP.BackgroundTasks
                 _messenger.Send(true, $"{MessageType.ON_FULL_SYNC}");
             }
 
-            _logger.Information($"{nameof(SyncBackgroundTask)} completed successfully");
+            _logger.Information($"{nameof(SyncBackgroundTask)}: completed successfully");
             _deferral?.Complete();
-        }
-
-        private ToastContent GenerateToastContent(string results)
-        {
-            return new ToastContent()
-            {
-                //Launch = "action=viewEvent&eventId=1983",
-                Scenario = ToastScenario.Default,
-
-                Visual = new ToastVisual()
-                {
-                    BindingGeneric = new ToastBindingGeneric()
-                    {
-                        Children =
-                        {
-                            new AdaptiveText()
-                            {
-                                Text = "Sync results"
-                            },
-                            new AdaptiveText()
-                            {
-                                Text = results
-                            }
-                        }
-                    }
-                },
-
-                Actions = new ToastActionsCustom()
-                {
-                    Buttons =
-                    {
-                        new ToastButtonDismiss()
-                    }
-                }
-            };
         }
 
         private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
+            //TODO: I SHOULD CANCEL THE BG TASKS HERE
             _logger.Warning($"{sender.Task.Name} cancel requested... Cancel reason = {reason.ToString()}");
         }
     }

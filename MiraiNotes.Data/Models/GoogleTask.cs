@@ -43,6 +43,11 @@ namespace MiraiNotes.Data.Models
 
         public bool ToBeSynced { get; set; }
 
+        public DateTimeOffset? RemindOn { get; set; }
+
+        public string RemindOnGUID { get; set; }
+
+
         [Required]
         public virtual GoogleTaskList TaskList { get; set; }
     }

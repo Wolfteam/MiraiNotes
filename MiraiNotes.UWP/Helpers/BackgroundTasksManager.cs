@@ -1,8 +1,8 @@
 ﻿using Microsoft.Toolkit.Uwp.Helpers;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Services;
 using System;
+using System.Collections.Generic;
 using Windows.ApplicationModel.Background;
 
 namespace MiraiNotes.UWP.Helpers
@@ -14,22 +14,28 @@ namespace MiraiNotes.UWP.Helpers
         /// </summary>
         /// <param name="backgroundTask">The background task to register</param>
         /// <param name="restart">Indicates if the registration of the bg task is mandatory(True by default)</param>
-        public static void RegisterBackgroundTask(BackgroundTaskType backgroundTask, bool restart = true)
+        public static void RegisterBackgroundTask(BackgroundTaskType backgroundTask, int bgTaskInterval = 0, bool restart = true)
         {
-            int bgTaskInterval = 15;
             string bgTaskName;
             Type bgTaskType;
+            IBackgroundTrigger trigger;
+            var conditions = new List<IBackgroundCondition>();
 
             switch (backgroundTask)
             {
                 case BackgroundTaskType.ANY:
                     throw new ArgumentException("Is not allowed to register all bg tasks at the same time");
                 case BackgroundTaskType.SYNC:
-                    bgTaskInterval = ApplicationSettingsService.SyncBackgroundTaskInterval;
-                    if (bgTaskInterval <= 0)
-                        return;
                     bgTaskName = nameof(SyncBackgroundTask);
                     bgTaskType = typeof(SyncBackgroundTask);
+                    trigger = new TimeTrigger((uint)bgTaskInterval, false);
+                    conditions.Add(new SystemCondition(SystemConditionType.FreeNetworkAvailable));
+                    conditions.Add(new SystemCondition(SystemConditionType.InternetAvailable));
+                    break;
+                case BackgroundTaskType.MARK_AS_COMPLETED:
+                    bgTaskName = nameof(MarkAsCompletedBackgroundTask);
+                    bgTaskType = typeof(MarkAsCompletedBackgroundTask);
+                    trigger = new ToastNotificationActionTrigger();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"Provided bg task {backgroundTask} does not exists");
@@ -42,13 +48,15 @@ namespace MiraiNotes.UWP.Helpers
             if (isBgTaskAlreadyRegistered)
                 UnregisterBackgroundTask(backgroundTask);
 
+            if (bgTaskInterval <= 0 && backgroundTask != BackgroundTaskType.MARK_AS_COMPLETED)
+                return;
+
             BackgroundTaskHelper.Register(
                 bgTaskName,
-                new TimeTrigger((uint)bgTaskInterval, false),
+                trigger,
                 false,
                 true,
-                new SystemCondition(SystemConditionType.FreeNetworkAvailable),
-                new SystemCondition(SystemConditionType.InternetAvailable));
+                conditions.ToArray());
         }
 
         /// <summary>
@@ -61,9 +69,13 @@ namespace MiraiNotes.UWP.Helpers
             {
                 case BackgroundTaskType.ANY:
                     BackgroundTaskHelper.Unregister(nameof(SyncBackgroundTask));
+                    BackgroundTaskHelper.Unregister(nameof(MarkAsCompletedBackgroundTask));
                     break;
                 case BackgroundTaskType.SYNC:
                     BackgroundTaskHelper.Unregister(nameof(SyncBackgroundTask));
+                    break;
+                case BackgroundTaskType.MARK_AS_COMPLETED:
+                    BackgroundTaskHelper.Unregister(nameof(MarkAsCompletedBackgroundTask));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"The provided BackgroundTaskType doesnt exists {backgroundTask}");

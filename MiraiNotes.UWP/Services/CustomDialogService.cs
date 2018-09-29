@@ -1,8 +1,11 @@
 ﻿using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Pages.Dialogs;
 using System;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace MiraiNotes.UWP.Services
 {
@@ -24,9 +27,11 @@ namespace MiraiNotes.UWP.Services
             {
                 Title = title,
                 Content = message,
-                CloseButtonText = buttonText
+                CloseButtonText = buttonText,
+                BorderBrush = GetBorderBrush(),
+                Background = GetBackgroundBrush(),
             };
-
+            
             await dialog.ShowAsync();
         }
 
@@ -46,6 +51,8 @@ namespace MiraiNotes.UWP.Services
             {
                 Title = title,
                 Content = message,
+                BorderBrush = GetBorderBrush(),
+                Background = GetBackgroundBrush(),
                 //IsPrimaryButtonEnabled = true,
                 PrimaryButtonText = yesButtonText,
                 //IsSecondaryButtonEnabled = true,
@@ -81,11 +88,12 @@ namespace MiraiNotes.UWP.Services
                 Text = defaultText,
                 SelectionStart = defaultText.Length,
                 BorderThickness = new Thickness(1),
-                //BorderBrush = new SolidColorBrush((Color)Application.Current.Resources["CustomDialogBorderColor"])
             };
             var dialog = new ContentDialog
             {
                 Content = inputTextBox,
+                BorderBrush = GetBorderBrush(),
+                Background = GetBackgroundBrush(),
                 Title = title,
                 IsSecondaryButtonEnabled = true,
                 PrimaryButtonText = okButtonText,
@@ -123,13 +131,14 @@ namespace MiraiNotes.UWP.Services
                 SelectionStart = defaultText.Length,
                 Opacity = 1,
                 BorderThickness = new Thickness(1),
-                //BorderBrush = new SolidColorBrush((Color)Application.Current.Resources["CustomDialogBorderColor"])
             };
             var dialog = new ContentDialog
             {
                 Content = inputTextBox,
                 Title = title,
                 IsSecondaryButtonEnabled = true,
+                BorderBrush = GetBorderBrush(),
+                Background = GetBackgroundBrush(),
                 PrimaryButtonText = okButtonText,
                 SecondaryButtonText = cancelButtonText
             };
@@ -143,5 +152,42 @@ namespace MiraiNotes.UWP.Services
                 return string.Empty;
             }
         }
+
+        public async Task<bool> ShowCustomDialog(CustomDialogType dialogType)
+        {
+            ContentDialog dialog;
+            ContentDialogResult result;
+            switch (dialogType)
+            {
+                case CustomDialogType.PASSWORD_DIALOG:
+                    dialog = new SettingsPasswordContentDialog();
+                    //diaglog.Closing += (sender, args) =>
+                    //{
+                    //    // This mean user does click on Primary or Secondary button
+                    //    if (args.Result == ContentDialogResult.None)
+                    //    {
+                    //        args.Cancel = true;
+                    //    }
+                    //};
+                    result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.None)
+                        return false;
+                    return result == ContentDialogResult.Primary;
+                case CustomDialogType.LOGIN_PASSWORD_DIALOG:
+                    dialog = new LoginPasswordContentDialog();
+                    result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.None)
+                        return false;
+                    return result == ContentDialogResult.Primary;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(dialogType), dialogType, "The provided dialog type doesnt exists");
+            }
+        }
+
+        private AcrylicBrush GetBackgroundBrush()
+            => Application.Current.Resources["ContentDialogBackground"] as AcrylicBrush;
+
+        private SolidColorBrush GetBorderBrush()
+            => Application.Current.Resources["SystemControlBackgroundAccentBrush"] as SolidColorBrush;
     }
 }

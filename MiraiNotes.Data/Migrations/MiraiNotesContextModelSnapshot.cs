@@ -40,6 +40,10 @@ namespace MiraiNotes.Data.Migrations
 
                     b.Property<string>("Position");
 
+                    b.Property<DateTimeOffset?>("RemindOn");
+
+                    b.Property<string>("RemindOnGUID");
+
                     b.Property<string>("Status")
                         .IsRequired();
 

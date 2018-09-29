@@ -2,7 +2,10 @@
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;
+using MiraiNotes.UWP.Utils;
+using MiraiNotes.UWP.ViewModels;
 using System;
+using System.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -24,7 +27,6 @@ namespace MiraiNotes.UWP
         public App()
         {
             this.InitializeComponent();
-
             //var jsonSettings = new JsonSerializerSettings
             //{
             //    Formatting = Formatting.Indented,
@@ -49,6 +51,7 @@ namespace MiraiNotes.UWP
             if (e.PrelaunchActivated)
                 return;
             OnLaunchedOrActivated(e);
+            AfterLaunchedOrActivated();
         }
 
         /// <summary>
@@ -58,12 +61,13 @@ namespace MiraiNotes.UWP
         protected override void OnActivated(IActivatedEventArgs e)
         {
             OnLaunchedOrActivated(e);
+            AfterLaunchedOrActivated();
         }
 
         private void OnLaunchedOrActivated(IActivatedEventArgs e)
         {
             // Initialize things like registering background tasks before the app is loaded
-            BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.SYNC, false);
+            BackgroundTasksManager.RegisterBackgroundTask(BackgroundTaskType.MARK_AS_COMPLETED, restart: false);
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -93,20 +97,37 @@ namespace MiraiNotes.UWP
             // Handle toast activation
             if (e is ToastNotificationActivatedEventArgs toastActivationArgs)
             {
-                // If empty args, no specific action (just launch the app)
-                if (toastActivationArgs.Argument.Length == 0)
+                if (toastActivationArgs.Argument.Length != 0)
                 {
-                    if (rootFrame.Content == null)
-                        rootFrame.Navigate(typeof(LoginPage));
-                }
-                // Otherwise an action is provided
-                else
-                {
-
                     // If we're loading the app for the first time, place the main page on the back stack
                     // so that user can go back after they've been navigated to the specific page
-                    if (rootFrame.BackStack.Count == 0)
-                        rootFrame.BackStack.Add(new PageStackEntry(typeof(LoginPage), null, null));
+                    //if (rootFrame.BackStack.Count == 0)
+                    //rootFrame.BackStack.Add(new PageStackEntry(typeof(LoginPage), null, null));
+
+                    var queryParams = toastActivationArgs.Argument
+                        .Split('&')
+                        .ToDictionary(c => c.Split('=')[0], c => Uri.UnescapeDataString(c.Split('=')[1]));
+
+                    var actionType = (ToastNotificationActionType)Enum.Parse(typeof(ToastNotificationActionType), queryParams["action"]);
+
+                    switch (actionType)
+                    {
+                        case ToastNotificationActionType.OPEN_TASK:
+                            BaseViewModel.InitDetails = new Tuple<string, string>(queryParams["taskListID"], queryParams["taskID"]);
+                            break;
+                        case ToastNotificationActionType.MARK_AS_COMPLETED:
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(actionType), actionType, "The provided toast action type is not valid");
+                    }
+                }
+                if (rootFrame.Content == null)
+                    rootFrame.Navigate(typeof(LoginPage));
+
+                //kinda hack but works..
+                if (ViewModelLocator.IsAppRunning)
+                {
+                    var vml = new ViewModelLocator();
+                    vml.Home.PageLoadedCommand.Execute(null);
                 }
             }
             // Handle launch activation
@@ -135,12 +156,20 @@ namespace MiraiNotes.UWP
             if (_initialized)
                 return;
 
-            ViewModels.ViewModelLocator.IsAppRunning = true;
+            ViewModelLocator.IsAppRunning = true;
 
             // Ensure the current window is active
             Window.Current.Activate();
             GalaSoft.MvvmLight.Threading.DispatcherHelper.Initialize();
             _initialized = true;
+        }
+
+        private void AfterLaunchedOrActivated()
+        {
+            var vml = new ViewModelLocator();
+            MiscellaneousUtils.ChangeCurrentTheme(
+                vml.ApplicationSettingsService.AppTheme, 
+                vml.ApplicationSettingsService.AppHexAccentColor);
         }
 
         /// <summary>
@@ -171,13 +200,16 @@ namespace MiraiNotes.UWP
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             base.OnBackgroundActivated(args);
-            
+
             var deferral = args.TaskInstance.GetDeferral();
-            
+
             switch (args.TaskInstance.Task.Name)
             {
                 case nameof(SyncBackgroundTask):
                     new SyncBackgroundTask().Run(args.TaskInstance);
+                    break;
+                case nameof(MarkAsCompletedBackgroundTask):
+                    new MarkAsCompletedBackgroundTask().Run(args.TaskInstance);
                     break;
             }
 

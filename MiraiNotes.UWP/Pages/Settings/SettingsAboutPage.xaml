@@ -1,0 +1,65 @@
+﻿<Page
+    x:Class="MiraiNotes.UWP.Pages.Settings.SettingsAboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
+    xmlns:localUtils="using:MiraiNotes.UWP.Utils"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignWidth="400"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding Settings, Source={StaticResource Locator}}"
+    mc:Ignorable="d">
+
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <ContinuumNavigationTransitionInfo />
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <StackPanel
+        Margin="10,0,10,10"
+        HorizontalAlignment="Stretch"
+        Orientation="Vertical">
+        <StackPanel Margin="5" HorizontalAlignment="Center">
+            <Image MaxWidth="100" Source="/Assets/logo.png" />
+            <TextBlock HorizontalAlignment="Center" Text="Mirai Notes" />
+            <TextBlock HorizontalAlignment="Center">
+                <Run Text="Version " />
+                <Run Text="{x:Bind localUtils:MiscellaneousUtils.GetAppVersion(), Mode=OneWay}" />
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel Margin="5,10,5,5" HorizontalAlignment="Center">
+            <TextBlock Text="This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later." TextWrapping="Wrap" />
+            <MenuFlyoutSeparator Margin="0,5" Background="{ThemeResource SystemAccentColor}" />
+            <TextBlock
+                FontSize="18"
+                FontWeight="SemiBold"
+                Text="Donations" />
+            <TextBlock Text="I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email" TextWrapping="Wrap" />
+            <Button
+                x:Name="MailMe_Button"
+                HorizontalAlignment="Center"
+                Click="MailMe_Button_Click">
+                Mail me
+            </Button>
+            <MenuFlyoutSeparator Margin="0,5" Background="{ThemeResource SystemAccentColor}" />
+
+            <TextBlock
+                FontSize="18"
+                FontWeight="SemiBold"
+                Text="Support" />
+            <TextBlock Text="I made this app in my free time and it is also open source." TextWrapping="Wrap" />
+            <TextBlock Text="If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:" TextWrapping="Wrap" />
+            <HyperlinkButton
+                HorizontalAlignment="Center"
+                Content="Mirai Notes Github Page"
+                NavigateUri="https://github.com/Wolfteam/MiraiNotes/issues" />
+        </StackPanel>
+    </StackPanel>
+</Page>

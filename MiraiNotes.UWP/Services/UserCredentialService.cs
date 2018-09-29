@@ -28,7 +28,7 @@ namespace MiraiNotes.UWP.Services
             }
         }
 
-        public PasswordCredential GetUserCredentials(string resource)
+        private PasswordCredential GetUserCredential(string resource)
         {
             PasswordCredential credential = null;
             try
@@ -47,8 +47,8 @@ namespace MiraiNotes.UWP.Services
 
         public TokenResponse GetUserToken()
         {
-            var accessToken = GetUserCredentials(TOKEN_RESOURCE);
-            var refreshToken = GetUserCredentials(REFRESH_TOKEN_RESOURCE);
+            var accessToken = GetUserCredential(TOKEN_RESOURCE);
+            var refreshToken = GetUserCredential(REFRESH_TOKEN_RESOURCE);
             return new TokenResponse
             {
                 AccessToken = accessToken?.Password,
@@ -89,6 +89,58 @@ namespace MiraiNotes.UWP.Services
             SaveUserCredentials(LOGGED_USER_RESOURCE, username, "default");
             SaveUserCredentials(REFRESH_TOKEN_RESOURCE, username, token.RefreshToken);
             SaveUserCredentials(TOKEN_RESOURCE, username, token.AccessToken);
+        }
+
+        public void SaveUserCredentials(PasswordVaultResourceType resource, string username, string password)
+        {
+            SaveUserCredentials($"{resource}", username, password);
+        }
+
+        public string GetUserCredentials(PasswordVaultResourceType resource, string username)
+        {
+            PasswordCredential credential = null;
+            try
+            {
+                var vault = new PasswordVault();
+                // Try to get an existing credential from the vault.
+                var credentials = vault.FindAllByResource($"{resource}");
+                foreach (var item in credentials)
+                {
+                    if (item.UserName == username)
+                    {
+                        credential = item;
+                        credential.RetrievePassword();
+                    }
+                }          
+            }
+            catch (Exception)
+            {
+            }
+            return credential?.Password;
+        }
+
+        public void DeleteUserCredentials(PasswordVaultResourceType resource, string username)
+        {
+            var vault = new PasswordVault();
+            var credentialList = new List<PasswordCredential>();
+
+            try
+            {
+                var credentials = vault.FindAllByResource($"{resource}");
+                foreach (PasswordCredential credential in credentials)
+                {
+                    if (credential.UserName == username)
+                        credentialList.Add(vault.Retrieve(credential.Resource, credential.UserName));
+                }
+                foreach (PasswordCredential entry in credentialList)
+                {
+                    vault.Remove(entry);
+                }
+            }
+            catch (Exception)
+            {
+                //Credential not found
+            }
         }
     }
 }

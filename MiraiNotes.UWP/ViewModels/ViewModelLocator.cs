@@ -13,6 +13,7 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Pages;
 using MiraiNotes.UWP.Services;
+using MiraiNotes.UWP.ViewModels.Dialogs;
 using Serilog;
 using Serilog.Filters;
 using System.IO;
@@ -29,44 +30,31 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Properties
         public NavigationService NavigationService
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<NavigationService>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<NavigationService>();
 
         public LoginPageViewModel Login
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<LoginPageViewModel>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<LoginPageViewModel>();
 
         public NavPageViewModel Home
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<NavPageViewModel>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<NavPageViewModel>();
 
         public TasksPageViewModel Tasks
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<TasksPageViewModel>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<TasksPageViewModel>();
 
         public NewTaskPageViewModel NewTask
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<NewTaskPageViewModel>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<NewTaskPageViewModel>();
+
+        public SettingsPageViewModel Settings
+            => ServiceLocator.Current.GetInstance<SettingsPageViewModel>();
+
+        public SettingsPasswordDialogViewModel SettingsPasswordDialog
+            => ServiceLocator.Current.GetInstance<SettingsPasswordDialogViewModel>();
+
+        public LoginPasswordDialogViewModel LoginPasswordDialog
+            => ServiceLocator.Current.GetInstance<LoginPasswordDialogViewModel>();
+
+        public IApplicationSettingsService ApplicationSettingsService
+            => ServiceLocator.Current.GetInstance<IApplicationSettingsService>();
 
         public ISyncService SyncService
             => ServiceLocator.Current.GetInstance<ISyncService>();
@@ -74,11 +62,20 @@ namespace MiraiNotes.UWP.ViewModels
         public ILogger Logger
             => ServiceLocator.Current.GetInstance<ILogger>();
 
+        public IMapper Mapper
+            => ServiceLocator.Current.GetInstance<IMapper>();
+
         public IMessenger Messenger
             => ServiceLocator.Current.GetInstance<IMessenger>();
 
+        public IMiraiNotesDataService DataService
+            => ServiceLocator.Current.GetInstance<IMiraiNotesDataService>();
+
         public IUserCredentialService UserCredentialService
             => ServiceLocator.Current.GetInstance<IUserCredentialService>();
+
+        public ICustomToastNotificationManager ToastNotificationManager
+            => ServiceLocator.Current.GetInstance<ICustomToastNotificationManager>();
 
         public static bool IsAppRunning { get; set; }
         #endregion
@@ -122,6 +119,9 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<AuthorizationHandler>();
             SimpleIoc.Default.Register<IHttpClientsFactory, HttpClientsFactory>();
 
+            SimpleIoc.Default.Register<IApplicationSettingsServiceBase, ApplicationSettingsServiceBase>();
+            SimpleIoc.Default.Register<IApplicationSettingsService, ApplicationSettingsService>();
+
             SimpleIoc.Default.Register<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
 
             SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
@@ -136,10 +136,16 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<ITaskDataService, TaskDataService>();
             SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
 
+            SimpleIoc.Default.Register<ICustomToastNotificationManager, CustomToastNotificationManager>();
+
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();
             SimpleIoc.Default.Register<TasksPageViewModel>();
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
+            SimpleIoc.Default.Register<SettingsPageViewModel>();
+
+            SimpleIoc.Default.Register<SettingsPasswordDialogViewModel>();
+            SimpleIoc.Default.Register<LoginPasswordDialogViewModel>();
         }
 
         /// <summary>
@@ -200,6 +206,14 @@ namespace MiraiNotes.UWP.ViewModels
                         shared: true))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncBackgroundTask).Namespace}.{nameof(SyncBackgroundTask)}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_background_tasks_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MarkAsCompletedBackgroundTask).Namespace}.{nameof(MarkAsCompletedBackgroundTask)}"))
                     .WriteTo.File(
                         Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_background_tasks_.log"),
                         rollingInterval: RollingInterval.Day,

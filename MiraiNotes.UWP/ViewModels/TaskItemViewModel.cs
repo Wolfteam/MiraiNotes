@@ -1,6 +1,5 @@
 ﻿using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.ObjectModel;
 using Template10.Validation;
@@ -16,6 +15,7 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _hasSubTasks;
         private DateTimeOffset? _completedOn;
         private ObservableCollection<TaskItemViewModel> _subTasks = new ObservableCollection<TaskItemViewModel>();
+        private DateTimeOffset? _remindOn;
         #endregion
 
         public string TaskID
@@ -106,6 +106,7 @@ namespace MiraiNotes.UWP.ViewModels
                 _completedOn = value;
                 RaisePropertyChanged(nameof(CompletedOn));
                 RaisePropertyChanged(nameof(IsCompleted));
+                RaisePropertyChanged(nameof(CompletitionDateText));
             }
         }
 
@@ -230,6 +231,56 @@ namespace MiraiNotes.UWP.ViewModels
         public bool HasParentTask
         {
             get => !string.IsNullOrEmpty(ParentTask);
+        }
+
+        public DateTimeOffset? RemindOn
+        {
+            get => _remindOn;
+            set
+            {
+                _remindOn = value;
+                RaisePropertyChanged(nameof(HasAReminderDate));
+                RaisePropertyChanged(nameof(RemindOnDateText));
+                RaisePropertyChanged(nameof(RemindOnTime));
+            }
+        }
+
+        public TimeSpan? RemindOnTime
+        {
+            get => RemindOn?.TimeOfDay;
+            set
+            {
+                if (_remindOn.HasValue)
+                {
+                    long timeDiff = DateTimeOffset.Now.TimeOfDay.Ticks - value.Value.Ticks;
+                    if (timeDiff > 0)
+                        value = DateTimeOffset.Now.TimeOfDay;
+
+                    RemindOn = RemindOn.Value.Date + value;
+                    RaisePropertyChanged(nameof(RemindOn));
+                    RaisePropertyChanged(nameof(HasAReminderDate));
+                    RaisePropertyChanged(nameof(RemindOnDateText));
+                }
+            }
+        }
+
+        public bool IsReminderDateSet
+            => RemindOn != null;
+
+        public bool HasAReminderDate
+            => RemindOn != null;
+
+        public string RemindOnDateText
+        {
+            get
+            {
+                if (!RemindOn.HasValue)
+                    return string.Empty;
+                else
+                {
+                    return RemindOn.Value.ToString("ddd, MMM d HH:mm");
+                }
+            }
         }
     }
 }
