@@ -72,7 +72,8 @@
                                     HorizontalAlignment="Center"
                                     FontSize="30"
                                     FontWeight="Bold"
-                                    Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}" />
+                                    Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}"
+                                    TextTrimming="CharacterEllipsis" />
                                 <Button
                                     Grid.Column="1"
                                     HorizontalAlignment="Right"
@@ -221,18 +222,6 @@
                     </NavigationView.PaneFooter>
                 </NavigationView>
             </SplitView.Content>
-            <VisualStateManager.VisualStateGroups>
-                <VisualStateGroup>
-                    <VisualState>
-                        <VisualState.StateTriggers>
-                            <AdaptiveTrigger MinWindowWidth="400" />
-                        </VisualState.StateTriggers>
-                        <VisualState.Setters>
-                            <Setter Target="MainContentSplitView.DisplayMode" Value="Overlay" />
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateManager.VisualStateGroups>
         </SplitView>
 
         <controls:Loading

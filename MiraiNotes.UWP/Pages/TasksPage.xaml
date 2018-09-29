@@ -527,6 +527,7 @@
         <controls:InAppNotification
             x:Name="Task_InAppNotification"
             AnimationDuration="00:00:00.1800000"
+            Background="{ThemeResource ColorDetailsBackground}"
             HorizontalOffset="12.88"
             ShowDismissButton="True"
             StackMode="QueueBehind"
