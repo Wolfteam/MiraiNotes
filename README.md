@@ -1,4 +1,7 @@
 <h1 align="center">Mirai Notes</h1>
+<p align="center">
+  <img height="120px" src="images/logo.png">
+</p>
 
 A simple UWP notes app that provides synchronization with Google Task and can be also used offline.
 
