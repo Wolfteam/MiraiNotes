@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,12 @@ namespace MiraiNotes.UWP.ViewModels
 
         private bool _isBackButtonVisible;
         private string _currentPageText;
+        private bool _accentColorChanged;
+        private int _currentAccentColorIndex;
         #endregion
 
         #region Events
         public event SettingsNavigationRequest NavigationRequest;
-        public ChangeCurrentThemeRequest ChangeCurrentThemeRequest;
         #endregion
 
         #region Properties
@@ -160,6 +162,23 @@ namespace MiraiNotes.UWP.ViewModels
                 Text = "Light"
             }
         };
+
+        public List<AccentColorModel> AccentColors { get; } = new List<string>
+        {
+            "#0077dd", "#008888", "#ee0088",
+            "#cc4400", "#ee1122","#008899",
+            "#118833","#881199", "#cc33bb",
+            "#777777", "#ffb900", "#ff8c00",
+            "#0063b1", "#6b69d6", "#68768a"
+        }.Select(s => new AccentColorModel
+        {
+            HexAccentColor = s,
+            IsSystemAccentColor = false
+        }).Append(new AccentColorModel
+        {
+            HexAccentColor = MiscellaneousUtils.GetSystemAccentColor().ToString(),
+            IsSystemAccentColor = true
+        }).ToList();
         #endregion
 
         #region General Settings Properties
@@ -174,8 +193,24 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 var selectedTheme = (AppThemeType)Enum.Parse(typeof(AppThemeType), value.ItemID);
                 _appSettings.AppTheme = selectedTheme;
-                ChangeCurrentThemeRequest?.Invoke(selectedTheme);
+                MiscellaneousUtils.ChangeCurrentTheme(selectedTheme, _appSettings.AppHexAccentColor);
             }
+        }
+
+        public int SelectedAccentColorIndex
+        {
+            get
+            {
+                _currentAccentColorIndex = AccentColors.IndexOf(AccentColors.FirstOrDefault(a => a.HexAccentColor == _appSettings.AppHexAccentColor));
+                return _currentAccentColorIndex;
+            }
+            set => Set(ref _currentAccentColorIndex, value);
+        }
+
+        public bool AccentColorChanged
+        {
+            get => _accentColorChanged;
+            set => Set(ref _accentColorChanged, value);
         }
 
         public bool AskForPasswordWhenAppStarts
@@ -273,6 +308,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Commands
         public ICommand NavigationRequestCommand { get; set; }
+
+        public ICommand AccentColorSelectionChangedCommand { get; set; }
         #endregion
 
         public SettingsPageViewModel(
@@ -290,6 +327,15 @@ namespace MiraiNotes.UWP.ViewModels
 
             NavigationRequestCommand = new RelayCommand<SettingsPageType>
                 ((page) => NavigationRequest?.Invoke(page));
+
+            AccentColorSelectionChangedCommand = new RelayCommand<AccentColorModel>((selectedColor) =>
+            {
+                if (_appSettings.AppHexAccentColor == selectedColor.HexAccentColor)
+                    return;
+                _appSettings.AppHexAccentColor = selectedColor.HexAccentColor;
+                MiscellaneousUtils.ChangeCurrentTheme(_appSettings.AppTheme, _appSettings.AppHexAccentColor);
+                AccentColorChanged = true;
+            });
         }
     }
 }

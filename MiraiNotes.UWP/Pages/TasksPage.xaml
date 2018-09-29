@@ -521,7 +521,6 @@
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarSeparator Background="{ThemeResource SystemAccentColor}" />
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
