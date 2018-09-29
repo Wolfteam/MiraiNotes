@@ -1,0 +1,386 @@
+﻿<Page
+    x:Class="MiraiNotes.UWP.Pages.NewTaskPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:MiraiNotes.UWP.Converters"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="using:WinRTXamlToolkit.Controls.Extensions"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:MiraiNotes.UWP.Pages"
+    xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sharedModels="using:MiraiNotes.Shared.Models"
+    DataContext="{Binding NewTask, Source={StaticResource Locator}}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="ValidationErrorLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Red" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <converters:DatetimeOffsetToLocalDatetimeOffsetConverter x:Key="DatetimeOffsetToLocalDatetimeOffsetConverter" />
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid
+            x:Name="MainSplitViewPane"
+            Margin="20,10,20,20"
+            HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ProgressRing
+                Grid.RowSpan="4"
+                Width="75"
+                Height="75"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsActive="True"
+                Visibility="{Binding ShowTaskProgressRing, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+            <Grid Grid.Row="0" Margin="0,0,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon
+                        Grid.Column="0"
+                        FontFamily="Segoe MDL2 Assets"
+                        Glyph="&#xE710;"
+                        Visibility="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <FontIcon
+                        Grid.Column="0"
+                        FontFamily="Segoe MDL2 Assets"
+                        Glyph="&#xE70F;"
+                        Visibility="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0"
+                        FontSize="24"
+                        Text="{Binding TaskOperationTitle, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding CurrentTask.IsCompletitionDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ToolTipService.ToolTip>
+                        <TextBlock>
+                            <Run Text="This task is marked to be completed on" />
+                            <Run Text="{Binding CurrentTask.CompletitionDateText}" />
+                        </TextBlock>
+                    </ToolTipService.ToolTip>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE787;" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0"
+                        FontSize="20"
+                        Foreground="{ThemeResource SystemAccentColor}"
+                        Text="{Binding CurrentTask.CompletitionDateText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Grid.Column="2"
+                        Height="25"
+                        Background="Transparent"
+                        Command="{Binding RemoveTaskNotificationDateCommand}"
+                        CommandParameter="{x:Bind sharedModels:TaskNotificationDateType.TO_BE_COMPLETED_DATE}">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
+                    </Button>
+                </Grid>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Visibility="{Binding CurrentTask.IsReminderDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ToolTipService.ToolTip>
+                        <TextBlock>
+                            <Run Text="A reminder has been set to" />
+                            <Run Text="{Binding CurrentTask.RemindOnDateText}" />
+                        </TextBlock>
+                    </ToolTipService.ToolTip>
+
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC92;" />
+
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        FontSize="20"
+                        Foreground="{ThemeResource SystemAccentColor}"
+                        Text="{Binding CurrentTask.RemindOnDateText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Height="25"
+                        Background="Transparent"
+                        Command="{Binding RemoveTaskNotificationDateCommand}"
+                        CommandParameter="{x:Bind sharedModels:TaskNotificationDateType.REMINDER_DATE}">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                <TextBox
+                    x:Name="TaskTitle_TextBox"
+                    extensions:FieldValidationExtensions.DefaultErrorMessage="The task title is required"
+                    extensions:FieldValidationExtensions.Format="MinLength, NonEmpty"
+                    extensions:FieldValidationExtensions.InvalidBrush="{x:Null}"
+                    extensions:FieldValidationExtensions.MinLength="2"
+                    extensions:FieldValidationExtensions.MinLengthErrorMessage="The task title must have at least 2 charaters"
+                    extensions:FieldValidationExtensions.NonEmptyErrorMessage="The task title cannot be empty"
+                    extensions:FieldValidationExtensions.ValidBrush="{x:Null}"
+                    FontWeight="SemiBold"
+                    Header="Title:"
+                    IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
+                    IsSpellCheckEnabled="False"
+                    MaxLength="50"
+                    PlaceholderText="Enter your task title here"
+                    Text="{Binding CurrentTask.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextWrapping="NoWrap" />
+                <TextBlock
+                    Style="{StaticResource ValidationErrorLabelStyle}"
+                    Text="{Binding (extensions:FieldValidationExtensions.ValidationMessage), ElementName=TaskTitle_TextBox}"
+                    Visibility="{Binding (extensions:FieldValidationExtensions.ValidationMessageVisibility), ElementName=TaskTitle_TextBox}" />
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBox
+                        x:Name="TaskBody_TextBox"
+                        Grid.Row="0"
+                        extensions:FieldValidationExtensions.DefaultErrorMessage="The task body is required"
+                        extensions:FieldValidationExtensions.Format="MinLength, NonEmpty"
+                        extensions:FieldValidationExtensions.InvalidBrush="{x:Null}"
+                        extensions:FieldValidationExtensions.MinLength="2"
+                        extensions:FieldValidationExtensions.MinLengthErrorMessage="The task body must have at least 2 charaters"
+                        extensions:FieldValidationExtensions.NonEmptyErrorMessage="The task body cannot be empty"
+                        extensions:FieldValidationExtensions.ValidBrush="{x:Null}"
+                        AcceptsReturn="True"
+                        FontWeight="SemiBold"
+                        Header="Notes:"
+                        IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
+                        IsSpellCheckEnabled="False"
+                        PlaceholderText="Enter your task text here"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        Text="{Binding CurrentTask.Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        TextWrapping="Wrap" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Height="20"
+                        Style="{StaticResource ValidationErrorLabelStyle}"
+                        Text="{Binding (extensions:FieldValidationExtensions.ValidationMessage), ElementName=TaskBody_TextBox}"
+                        Visibility="{Binding (extensions:FieldValidationExtensions.ValidationMessageVisibility), ElementName=TaskBody_TextBox}" />
+                </Grid>
+            </Grid>
+
+            <ListView
+                Grid.Row="3"
+                Header="Sub Tasks:"
+                IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}"
+                ItemsSource="{Binding CurrentTask.SubTasks, Mode=OneWay}"
+                SelectionMode="None"
+                Visibility="{Binding CurrentTask.HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontStyle="Italic"
+                                Text="{Binding Title}"
+                                TextDecorations="{Binding IsCompleted, Mode=OneWay, Converter={StaticResource BoolToTextDecorationConverterInverse}}" />
+                            <CommandBar
+                                Grid.Column="1"
+                                Background="Transparent"
+                                DefaultLabelPosition="Collapsed">
+                                <CommandBar.PrimaryCommands>
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.DeleteSubTaskCommand}"
+                                        CommandParameter="{Binding}"
+                                        Icon="Delete"
+                                        Label="Delete"
+                                        ToolTipService.ToolTip="Delete this sub task" />
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.MarkSubTaskAsCompletedCommand}"
+                                        CommandParameter="{Binding}"
+                                        Label="Mark as completed"
+                                        ToolTipService.ToolTip="Mark this sub task as completed"
+                                        Visibility="{Binding CanBeMarkedAsCompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Command="{Binding ElementName=MainSplitViewPane, Path=DataContext.MarkSubTaskAsIncompletedCommand}"
+                                        CommandParameter="{Binding}"
+                                        Label="Mark as incompleted"
+                                        ToolTipService.ToolTip="Mark this sub task as incompleted"
+                                        Visibility="{Binding CanBeMarkedAsIncompleted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC61;" />
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                </CommandBar.PrimaryCommands>
+                            </CommandBar>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock
+                Grid.Row="3"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="Task does not contains sub tasks"
+                TextAlignment="Center"
+                Visibility="{Binding CurrentTask.HasSubTasks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverse}}" />
+        </Grid>
+
+        <CommandBar
+            Grid.Row="1"
+            DefaultLabelPosition="Bottom"
+            IsEnabled="{Binding ShowTaskProgressRing, Converter={StaticResource InverseBooleanConverter}}">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton
+                    Command="{Binding SaveChangesCommand}"
+                    Icon="Save"
+                    IsEnabled="{Binding CurrentTask.IsValid, Mode=OneWay}"
+                    Label="Save"
+                    ToolTipService.ToolTip="Save your task changes" />
+                <AppBarButton
+                    Command="{Binding ClosePaneCommand}"
+                    Icon="Cancel"
+                    Label="Cancel"
+                    ToolTipService.ToolTip="Discard your task changes" />
+                <AppBarButton
+                    Command="{Binding DeleteTaskCommand}"
+                    Icon="Delete"
+                    IsEnabled="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    Label="Delete"
+                    ToolTipService.ToolTip="Delete this task." />
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton
+                    Command="{Binding NewSubTaskCommand}"
+                    Icon="Add"
+                    IsEnabled="{Binding CurrentTask.HasParentTask, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    Label="Add a sub task"
+                    ToolTipService.ToolTip="Add a sub task to this task list" />
+                <AppBarSeparator Foreground="{ThemeResource SystemAccentColor}" />
+                <AppBarButton
+                    Command="{Binding MarkAsCompletedCommand}"
+                    IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"
+                    Label="Mark as completed"
+                    ToolTipService.ToolTip="Mark this task as completed.">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE930;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton
+                    Icon="Calendar"
+                    IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"
+                    Label="To be completed on"
+                    ToolTipService.ToolTip="Choose the date this task should be completed">
+                    <AppBarButton.Flyout>
+                        <Flyout Placement="Left">
+                            <CalendarDatePicker
+                                Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay, Converter={StaticResource DatetimeOffsetToLocalDatetimeOffsetConverter}}"
+                                DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
+                                Header="This task will be completed on:"
+                                MinDate="{Binding MinDate, Mode=OneWay}"
+                                PlaceholderText="To be completed on" />
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarSeparator Foreground="{ThemeResource SystemAccentColor}" />
+                <AppBarButton
+                    IsEnabled="True"
+                    Label="Add a reminder for this task"
+                    ToolTipService.ToolTip="When created, it shows a toast notification that acts as a reminder for this task">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC92;" />
+                    </AppBarButton.Icon>
+                    <AppBarButton.Flyout>
+                        <Flyout Placement="Left">
+                            <StackPanel Orientation="Vertical">
+                                <CalendarDatePicker
+                                    Margin="0,0,0,5"
+                                    Date="{Binding CurrentTask.RemindOn, Mode=TwoWay}"
+                                    DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
+                                    Header="Remind me on this date:"
+                                    MinDate="{Binding MinDate, Mode=OneWay}"
+                                    PlaceholderText="Remind on" />
+                                <TimePicker
+                                    Header="At this hour:"
+                                    IsEnabled="{Binding CurrentTask.HasAReminderDate, Mode=OneWay}"
+                                    Time="{Binding CurrentTask.RemindOnTime, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton
+                    AllowFocusOnInteraction="True"
+                    Icon="List"
+                    Label="Save this task to"
+                    ToolTipService.ToolTip="Select the task list where this task will be saved">
+                    <AppBarButton.Flyout>
+                        <Flyout Placement="Left">
+                            <ComboBox
+                                DisplayMemberPath="Title"
+                                Header="Task List:"
+                                ItemsSource="{Binding TaskLists, Mode=OneWay}"
+                                PlaceholderText="Pick a task list"
+                                SelectedItem="{Binding SelectedTaskList, Mode=TwoWay}"
+                                SelectedValuePath="TaskListID" />
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Grid>
+</Page>

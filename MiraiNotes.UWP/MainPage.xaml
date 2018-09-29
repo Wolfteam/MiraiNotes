@@ -1,0 +1,247 @@
+﻿<Page
+    x:Class="MiraiNotes.UWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Extensions="using:WinRTXamlToolkit.Controls.Extensions"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converters="using:MiraiNotes.UWP.Converters"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:MiraiNotes.UWP"
+    xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
+    xmlns:localModels="using:MiraiNotes.UWP.Models"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="using:MiraiNotes.UWP.ViewModels"
+    x:Name="MainContentPage"
+    DataContext="{Binding Home, Source={StaticResource Locator}}"
+    mc:Ignorable="d">
+
+    <Grid>
+        <SplitView
+            x:Name="MainContentSplitView"
+            DisplayMode="Overlay"
+            IsPaneOpen="{Binding IsSettingsPaneOpen, Mode=TwoWay}"
+            OpenPaneLength="400"
+            PaneBackground="{ThemeResource PageBackground}"
+            PanePlacement="Right">
+            <SplitView.Pane>
+                <Frame x:Name="SettingsPageFrame" />
+            </SplitView.Pane>
+            <SplitView.Content>
+                <NavigationView
+                    x:Name="NavigationView"
+                    AlwaysShowHeader="True"
+                    Background="{ThemeResource PageBackground}"
+                    IsBackButtonVisible="Collapsed"
+                    IsBackEnabled="False"
+                    IsSettingsVisible="False"
+                    IsTabStop="True"
+                    MenuItemsSource="{Binding TaskLists, Mode=OneWay}"
+                    PaneTitle="Mirai Notes"
+                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                    <interactivity:Interaction.Behaviors>
+                        <core:EventTriggerBehavior EventName="SelectionChanged">
+                            <core:EventTriggerBehavior.Actions>
+                                <core:InvokeCommandAction Command="{Binding NavigationViewSelectionChanged}" InputConverter="{StaticResource NavigationViewSelectionChangedEventArgsConverter}" />
+                            </core:EventTriggerBehavior.Actions>
+                        </core:EventTriggerBehavior>
+
+                        <core:EventTriggerBehavior EventName="Loaded">
+                            <core:EventTriggerBehavior.Actions>
+                                <core:InvokeCommandAction Command="{Binding PageLoadedCommand}" />
+                            </core:EventTriggerBehavior.Actions>
+                        </core:EventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
+
+                    <NavigationView.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid Background="{ThemeResource PageBackground}">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="30"
+                                    FontWeight="Bold"
+                                    Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <Button
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    Command="{Binding ClosePaneCommand}"
+                                    IsTabStop="False"
+                                    IsTapEnabled="False"
+                                    Visibility="{Binding IsPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <SymbolIcon Symbol="Cancel" />
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </NavigationView.HeaderTemplate>
+                    <NavigationView.AutoSuggestBox>
+                        <AutoSuggestBox
+                            x:Name="TaskListsAutoSuggestBox"
+                            DisplayMemberPath="Text"
+                            ItemsSource="{Binding TaskListsAutoSuggestBoxItems, Mode=OneWay}"
+                            PlaceholderText="Search a task list..."
+                            QueryIcon="Find"
+                            Text="{Binding TaskListkAutoSuggestBoxText, Mode=TwoWay}"
+                            TextMemberPath="Text"
+                            UpdateTextOnSelect="False">
+                            <interactivity:Interaction.Behaviors>
+                                <core:EventTriggerBehavior EventName="TextChanged">
+                                    <core:EventTriggerBehavior.Actions>
+                                        <core:InvokeCommandAction Command="{Binding TaskListAutoSuggestBoxTextChangedCommand}" CommandParameter="{Binding ElementName=TaskListsAutoSuggestBox, Path=Text}" />
+                                    </core:EventTriggerBehavior.Actions>
+                                </core:EventTriggerBehavior>
+                                <core:EventTriggerBehavior EventName="QuerySubmitted">
+                                    <core:EventTriggerBehavior.Actions>
+                                        <core:InvokeCommandAction Command="{Binding TaskListAutoSuggestBoxQuerySubmittedCommand}" InputConverter="{StaticResource AutoSuggestQueryParameterConverter}" />
+                                    </core:EventTriggerBehavior.Actions>
+                                </core:EventTriggerBehavior>
+                            </interactivity:Interaction.Behaviors>
+                        </AutoSuggestBox>
+                    </NavigationView.AutoSuggestBox>
+                    <NavigationView.MenuItemTemplate>
+                        <DataTemplate x:DataType="viewModels:TaskListItemViewModel">
+                            <Grid
+                                Width="320"
+                                Height="40"
+                                Margin="-16,0,0,0"
+                                VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Left"
+                                    Orientation="Horizontal"
+                                    ToolTipService.ToolTip="{Binding Title, Mode=OneWay}">
+                                    <Viewbox Margin="16,12" HorizontalAlignment="Left">
+                                        <SymbolIcon Symbol="List" />
+                                    </Viewbox>
+                                    <TextBlock
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Title, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <StackPanel
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal">
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        HorizontalContentAlignment="Right"
+                                        Background="Transparent"
+                                        Command="{Binding ElementName=NavigationView, Path=DataContext.UpdateTaskListCommand}"
+                                        CommandParameter="{Binding}"
+                                        ToolTipService.ToolTip="Update task list's title">
+                                        <SymbolIcon Symbol="Edit" />
+                                    </Button>
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        HorizontalContentAlignment="Right"
+                                        Background="Transparent"
+                                        Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskListCommand}"
+                                        CommandParameter="{Binding}"
+                                        ToolTipService.ToolTip="Delete this task list">
+                                        <SymbolIcon Symbol="Delete" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </NavigationView.MenuItemTemplate>
+                    <NavigationView.Content>
+                        <SplitView
+                            x:Name="MainSplitView"
+                            DisplayMode="Inline"
+                            IsPaneOpen="{Binding IsPaneOpen, Mode=OneWay}"
+                            PaneBackground="{ThemeResource BrushDetailsBackground}"
+                            PanePlacement="Right">
+                            <SplitView.Pane>
+                                <Frame x:Name="PaneFrame" />
+                            </SplitView.Pane>
+                            <SplitView.Content>
+                                <Frame x:Name="ContentFrame" />
+                            </SplitView.Content>
+                        </SplitView>
+                    </NavigationView.Content>
+                    <NavigationView.PaneFooter>
+                        <StackPanel>
+                            <StackPanel.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                </Style>
+                                <Style BasedOn="{StaticResource ButtonRevealStyle}" TargetType="Button">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <MenuFlyoutSeparator Background="{ThemeResource SystemAccentColor}" />
+                            <Button Command="{Binding LogoutCommand}">
+                                <Grid Height="40" Margin="-9,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <PersonPicture
+                                        Height="35"
+                                        DisplayName="{Binding CurrentUserName, Mode=OneWay}"
+                                        Initials="{Binding CurrentUserInitials, Mode=OneWay}"
+                                        ProfilePicture="{Binding CurrentUserProfileImagePath, Mode=OneWay}"
+                                        ToolTipService.ToolTip="{Binding CurrentUserName}" />
+                                    <TextBlock Grid.Column="1" Text="Sign out" />
+                                </Grid>
+                            </Button>
+                            <Button Command="{Binding OpenSettingsCommand}" ToolTipService.ToolTip="Settings">
+                                <Grid Height="40" Margin="-9,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <SymbolIcon Grid.Column="0" Symbol="Setting" />
+                                    <TextBlock Grid.Column="1" Text="Settings" />
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                    </NavigationView.PaneFooter>
+                </NavigationView>
+            </SplitView.Content>
+        </SplitView>
+
+        <controls:Loading
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Center"
+            IsLoading="{Binding ShowMainProgressBar, Mode=OneWay}">
+            <controls:Loading.Background>
+                <SolidColorBrush Opacity="0.8" Color="Black" />
+            </controls:Loading.Background>
+            <StackPanel Orientation="Vertical">
+                <ProgressBar
+                    Width="Auto"
+                    Foreground="White"
+                    IsIndeterminate="True" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Foreground="White"
+                    Text="{Binding MainProgressBarText, Mode=OneWay}" />
+            </StackPanel>
+        </controls:Loading>
+    </Grid>
+</Page>
