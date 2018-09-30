@@ -87,10 +87,10 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 return;
             }
 
-            _credentialService.DeleteUserCredentials(
+            _credentialService.DeleteUserCredential(
                 PasswordVaultResourceType.SETTINGS_PASSWORD_RESOURCE, 
                 response.Result.Email);
-            _credentialService.SaveUserCredentials(
+            _credentialService.SaveUserCredential(
                 PasswordVaultResourceType.SETTINGS_PASSWORD_RESOURCE,
                 response.Result.Email,
                 Password);
