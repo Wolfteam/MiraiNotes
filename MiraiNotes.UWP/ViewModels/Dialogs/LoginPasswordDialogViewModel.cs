@@ -47,7 +47,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         public async Task<bool> PasswordMatches()
         {
             var response = await _dataService.UserService.GetCurrentActiveUserAsync();
-            string currentPassowrd = _credentialService.GetUserCredentials(
+            string currentPassowrd = _credentialService.GetUserCredential(
                 PasswordVaultResourceType.SETTINGS_PASSWORD_RESOURCE,
                 response.Result.Email);
 

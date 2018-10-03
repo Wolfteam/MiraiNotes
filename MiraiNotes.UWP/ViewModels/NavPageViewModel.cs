@@ -373,7 +373,11 @@ namespace MiraiNotes.UWP.ViewModels
                     .UserService
                     .ChangeCurrentUserStatus(false);
 
-                _userCredentialService.DeleteUserCredentials();
+                string currentLoggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+                if (string.IsNullOrEmpty(currentLoggedUsername))
+                    currentLoggedUsername = _userCredentialService.DefaultUsername;
+
+                _userCredentialService.DeleteUserCredential(PasswordVaultResourceType.ALL, currentLoggedUsername);
                 _navigationService.GoBack();
                 ShowLoading(false);
             }

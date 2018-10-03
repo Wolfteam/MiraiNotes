@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiraiNotes.Data", "MiraiNot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiraiNotes.DataService", "MiraiNotes.DataService\MiraiNotes.DataService.csproj", "{D46856F5-8558-4735-B2C8-195021EE2960}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiraiNotes.Shared", "MiraiNotes.Shared\MiraiNotes.Shared.csproj", "{13C950F5-4DBB-4992-8A4F-407A61626963}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiraiNotes.Shared", "MiraiNotes.Shared\MiraiNotes.Shared.csproj", "{13C950F5-4DBB-4992-8A4F-407A61626963}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{15746AB2-E9D0-4580-9636-5736A619301E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{15746AB2-E9D0-4580-9636-5736A619301E}.Debug|Any CPU.Build.0 = Debug|x86
+		{15746AB2-E9D0-4580-9636-5736A619301E}.Debug|Any CPU.Deploy.0 = Debug|x86
 		{15746AB2-E9D0-4580-9636-5736A619301E}.Debug|ARM.ActiveCfg = Debug|ARM
 		{15746AB2-E9D0-4580-9636-5736A619301E}.Debug|ARM.Build.0 = Debug|ARM
 		{15746AB2-E9D0-4580-9636-5736A619301E}.Debug|ARM.Deploy.0 = Debug|ARM

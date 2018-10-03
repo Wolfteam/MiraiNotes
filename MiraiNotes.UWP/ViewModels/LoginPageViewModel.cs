@@ -91,10 +91,13 @@ namespace MiraiNotes.UWP.ViewModels
         public async Task InitViewAsync()
         {
             ShowLoading = true;
-            bool isUserLoggedIn = _userCredentialService.IsUserLoggedIn();
             var currentUserResponse = await _dataService
                 .UserService
                 .GetCurrentActiveUserAsync();
+            string loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+
+            bool isUserLoggedIn = loggedUsername != _userCredentialService.DefaultUsername &&
+                !string.IsNullOrEmpty(loggedUsername);
 
             if (!currentUserResponse.Succeed || isUserLoggedIn && currentUserResponse.Result is null)
             {
@@ -131,8 +134,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowLoading = true;
             ShowLoginButton = false;
-            string googleUrl = _googleAuthService.GetAuthorizationUrl();
-            Uri requestUri = new Uri(googleUrl);
+            Uri requestUri = new Uri(_googleAuthService.GetAuthorizationUrl());
             Uri callbackUri = new Uri(_googleAuthService.ApprovalUrl);
             try
             {
@@ -165,8 +167,24 @@ namespace MiraiNotes.UWP.ViewModels
                             return;
                         }
                         //We save the token before doing any other network requst..
-                        _userCredentialService.DeleteUserCredentials();
-                        _userCredentialService.SaveUserCredentials(null, tokenResponse);
+                        _userCredentialService.DeleteUserCredential(
+                            PasswordVaultResourceType.ALL, 
+                            _userCredentialService.DefaultUsername);
+
+                        _userCredentialService.SaveUserCredential(
+                            PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                            _userCredentialService.DefaultUsername,
+                            _userCredentialService.DefaultUsername);
+
+                        _userCredentialService.SaveUserCredential(
+                            PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                            _userCredentialService.DefaultUsername, 
+                            tokenResponse.RefreshToken);
+
+                        _userCredentialService.SaveUserCredential(
+                            PasswordVaultResourceType.TOKEN_RESOURCE,
+                            _userCredentialService.DefaultUsername,
+                            tokenResponse.AccessToken);
 
                         bool isSignedIn = await SignInAsync();
                         if (!isSignedIn)
@@ -175,7 +193,9 @@ namespace MiraiNotes.UWP.ViewModels
                                 .UserService
                                 .ChangeCurrentUserStatus(false);
 
-                            _userCredentialService.DeleteUserCredentials();
+                            _userCredentialService.DeleteUserCredential(
+                                PasswordVaultResourceType.ALL, 
+                                _userCredentialService.DefaultUsername);
                         }
                         break;
                     case WebAuthenticationStatus.UserCancel:
@@ -190,7 +210,9 @@ namespace MiraiNotes.UWP.ViewModels
             }
             catch (Exception ex)
             {
-                _userCredentialService.DeleteUserCredentials();
+                _userCredentialService.DeleteUserCredential(
+                    PasswordVaultResourceType.ALL,
+                    _userCredentialService.DefaultUsername);
                 await _dialogService.ShowErrorMessageDialogAsync(ex, "An unknown error occurred");
             }
             finally
@@ -206,7 +228,6 @@ namespace MiraiNotes.UWP.ViewModels
             var user = await _googleUserService.GetUserInfoAsync();
             if (user == null)
             {
-                _userCredentialService.DeleteUserCredentials();
                 await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
                 return result;
             }
@@ -255,6 +276,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
                 return result;
             }
+
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
             if (!syncResult.Succeed)
@@ -272,6 +294,22 @@ namespace MiraiNotes.UWP.ViewModels
                     .ShowMessageDialogAsync("Error", syncResult.Message);
                 return result;
             }
+
+            _userCredentialService.UpdateUserCredential(
+                PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                _userCredentialService.DefaultUsername,
+                false,
+                userSaved.Result.Email);
+            _userCredentialService.UpdateUserCredential(
+                PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                _userCredentialService.DefaultUsername,
+                true,
+                userSaved.Result.Email);
+            _userCredentialService.UpdateUserCredential(
+                PasswordVaultResourceType.TOKEN_RESOURCE,
+                _userCredentialService.DefaultUsername,
+                true,
+                userSaved.Result.Email);
 
             await _googleUserService.RemoveProfileImage();
 

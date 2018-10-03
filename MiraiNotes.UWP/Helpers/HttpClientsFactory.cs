@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using MiraiNotes.UWP.Handlers;
 using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
@@ -26,10 +27,19 @@ namespace MiraiNotes.UWP.Helpers
 
         public HttpClient GetHttpClient()
         {
-            var token = _userCredentialService.GetUserToken();
-            if (token == null)
+            string currentLoggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+
+            if (string.IsNullOrEmpty(currentLoggedUsername))
                 return _httpClient;
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+            string token = _userCredentialService.GetUserCredential(
+                PasswordVaultResourceType.TOKEN_RESOURCE, 
+                currentLoggedUsername);
+
+            if (string.IsNullOrEmpty(token))
+                return _httpClient;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             return _httpClient;
         }
     }

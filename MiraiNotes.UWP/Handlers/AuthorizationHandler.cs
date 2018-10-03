@@ -1,6 +1,5 @@
-﻿using GalaSoft.MvvmLight.Views;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Services;
+﻿using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -39,11 +38,32 @@ namespace MiraiNotes.UWP.Handlers
                 //that means its time to use our refresh token
                 try
                 {
-                    var token = _userCredentialService.GetUserToken();
-                    token = await _googleAuthService.GetNewTokenAsync(token.RefreshToken);
-                    if (token == null)
+                    string currentLoggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+                    if (string.IsNullOrEmpty(currentLoggedUsername))
                     {
-                        await _dialogService.ShowMessageDialogAsync("Error", "Could't get a new token. Did you remove access to our app :C?");
+                        await _dialogService.ShowMessageDialogAsync(
+                            "Error", 
+                            "Could't retrieve the current logged username");
+                        return response;
+                    }
+
+                    string refreshToken = _userCredentialService.GetUserCredential(
+                        PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                        currentLoggedUsername);
+                    if (string.IsNullOrEmpty(refreshToken))
+                    {
+                        await _dialogService.ShowMessageDialogAsync(
+                            "Error",
+                            "Could't retrieve the refresh token");
+                        return response;
+                    }
+
+                    var token = await _googleAuthService.GetNewTokenAsync(refreshToken);
+                    if (token is null)
+                    {
+                        await _dialogService.ShowMessageDialogAsync(
+                            "Error", 
+                            "Could't get a new token. Did you remove access to our app :C?");
                         return response;
                     }
 
@@ -53,7 +73,16 @@ namespace MiraiNotes.UWP.Handlers
                     clonedRequest = await CloneRequest(request);
 
                     // Save the user to the app settings
-                    _userCredentialService.SaveUserCredentials(null, token);
+                    _userCredentialService.UpdateUserCredential(
+                        PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE, 
+                        currentLoggedUsername,
+                        false,
+                        token.RefreshToken);
+                    _userCredentialService.UpdateUserCredential(
+                        PasswordVaultResourceType.TOKEN_RESOURCE,
+                        currentLoggedUsername,
+                        false,
+                        token.AccessToken);
                     // Set the authentication header
                     //clonedRequest.Headers.Remove("Bearer");
                     //clonedRequest.Headers.Add("Bearer", newToken.AccessToken);

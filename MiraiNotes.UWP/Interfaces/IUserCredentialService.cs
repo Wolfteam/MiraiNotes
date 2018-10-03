@@ -1,24 +1,54 @@
 ﻿using MiraiNotes.UWP.Models;
-using Windows.Security.Credentials;
 
 namespace MiraiNotes.UWP.Interfaces
 {
     public interface IUserCredentialService
     {
-        void SaveUserCredentials(PasswordVaultResourceType resource, string username, string password);
+        /// <summary>
+        /// Its the default owner value for a resource.
+        /// With this one, you can get the current logged username
+        /// </summary>
+        string DefaultUsername { get; }
 
-        void SaveUserCredentials(string resource, string username, string password);
+        /// <summary>
+        /// Gets the current logged username
+        /// </summary>
+        /// <returns>The logged username</returns>
+        string GetCurrentLoggedUsername();
 
-        void SaveUserCredentials(string email, TokenResponse token);
+        /// <summary>
+        /// Gets the secret associated to a resource and a username
+        /// </summary>
+        /// <param name="resource">The resource</param>
+        /// <param name="username">The current owner of the resource</param>
+        /// <returns>The secret</returns>
+        string GetUserCredential(PasswordVaultResourceType resource, string username);
 
-        bool IsUserLoggedIn();
+        /// <summary>
+        /// Removes the secret associated to a resource and a username
+        /// </summary>
+        /// <param name="resource">The resource</param>
+        /// <param name="username">The current owner of the resource</param>
+        void DeleteUserCredential(PasswordVaultResourceType resource, string username);
 
-        string GetUserCredentials(PasswordVaultResourceType resource, string username);
+        /// <summary>
+        /// Saves a secret in the specified <paramref name="resource"/> and for the specified <paramref name="username"/>
+        /// </summary>
+        /// <param name="resource">The resource</param>
+        /// <param name="username">The current owner of the resource</param>
+        /// <param name="secret">The secret</param>
+        void SaveUserCredential(PasswordVaultResourceType resource, string username, string secret);
 
-        TokenResponse GetUserToken();
-
-        void DeleteUserCredentials();
-
-        void DeleteUserCredentials(PasswordVaultResourceType resource, string username);
+        /// <summary>
+        /// Updates the owner of a resource or the secret associated to the <paramref name="resource"/>
+        /// and the <paramref name="username"/>
+        /// </summary>
+        /// <param name="resource">The resource</param>
+        /// <param name="username">The current owner of the resource</param>
+        /// <param name="updateUsername">If true <paramref name="newValue"/> will be used to update the owner of the resource, 
+        /// otherwise it will update the secret
+        /// </param>
+        /// <param name="newValue">The new owner or the new secret to update</param>
+        void UpdateUserCredential(PasswordVaultResourceType resource, string username, bool updateUsername, string newValue);
     }
 }

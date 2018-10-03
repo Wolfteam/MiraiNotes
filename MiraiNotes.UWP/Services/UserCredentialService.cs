@@ -9,95 +9,26 @@ namespace MiraiNotes.UWP.Services
 {
     public class UserCredentialService : IUserCredentialService
     {
-        private const string LOGGED_USER_RESOURCE = "LOGGED_USER_RESOURCE";
-        private const string TOKEN_RESOURCE = "TOKEN_RESOURCE";
-        private const string REFRESH_TOKEN_RESOURCE = "REFRESH_TOKEN_RESOURCE";
+        #region Properties
+        public string DefaultUsername => "DEFAULT_USERNAME";
+        #endregion
 
-        public void DeleteUserCredentials()
-        {
-            var vault = new PasswordVault();
-            var credentialList = new List<PasswordCredential>();
-            var credentials = vault.RetrieveAll();
-            foreach (PasswordCredential credential in credentials)
-            {
-                credentialList.Add(vault.Retrieve(credential.Resource, credential.UserName));
-            }
-            foreach (PasswordCredential entry in credentialList)
-            {
-                vault.Remove(entry);
-            }
-        }
+        #region Methods
+        public string GetCurrentLoggedUsername()
+            => GetUserCredential(PasswordVaultResourceType.LOGGED_USER_RESOURCE, DefaultUsername);
 
-        private PasswordCredential GetUserCredential(string resource)
+        public void SaveUserCredential(PasswordVaultResourceType resource, string username, string password)
         {
-            PasswordCredential credential = null;
-            try
-            {
-                var vault = new PasswordVault();
-                // Try to get an existing credential from the vault.
-                credential = vault.FindAllByResource(resource).FirstOrDefault();
-                credential.RetrievePassword();
-            }
-            catch (Exception)
-            {
-                // When there is no matching resource an error occurs, which we ignore.
-            }
-            return credential;
-        }
-
-        public TokenResponse GetUserToken()
-        {
-            var accessToken = GetUserCredential(TOKEN_RESOURCE);
-            var refreshToken = GetUserCredential(REFRESH_TOKEN_RESOURCE);
-            return new TokenResponse
-            {
-                AccessToken = accessToken?.Password,
-                RefreshToken = refreshToken?.Password,
-            };
-        }
-
-        public bool IsUserLoggedIn()
-        {
-            bool isUserLogged = false;
-            try
-            {
-                var vault = new PasswordVault();
-                // Try to get an existing credential from the vault.
-                var credential = vault.FindAllByResource(LOGGED_USER_RESOURCE).FirstOrDefault();
-                isUserLogged = credential != null;
-            }
-            catch (Exception)
-            {
-                // When there is no matching resource an error occurs, which we ignore.
-                System.Diagnostics.Debug.WriteLine("User is not logged in");
-            }
-            return isUserLogged;
-        }
-
-        public void SaveUserCredentials(string resource, string username, string password)
-        {
-            PasswordVault vault = new PasswordVault();
-            PasswordCredential credential = new PasswordCredential(resource, username, password);
-            vault.Add(credential);
-        }
-
-        public void SaveUserCredentials(string username, TokenResponse token)
-        {
-            DeleteUserCredentials();
-            if (string.IsNullOrEmpty(username))
-                username = LOGGED_USER_RESOURCE;
-            SaveUserCredentials(LOGGED_USER_RESOURCE, username, "default");
-            SaveUserCredentials(REFRESH_TOKEN_RESOURCE, username, token.RefreshToken);
-            SaveUserCredentials(TOKEN_RESOURCE, username, token.AccessToken);
-        }
-
-        public void SaveUserCredentials(PasswordVaultResourceType resource, string username, string password)
-        {
+            if (resource == PasswordVaultResourceType.ALL)
+                throw new ArgumentOutOfRangeException(nameof(resource), resource, $"Cant save a resource of type {resource}");
             SaveUserCredentials($"{resource}", username, password);
         }
 
-        public string GetUserCredentials(PasswordVaultResourceType resource, string username)
+        public string GetUserCredential(PasswordVaultResourceType resource, string username)
         {
+            if (resource == PasswordVaultResourceType.ALL)
+                throw new ArgumentOutOfRangeException(nameof(resource), resource, $"Cant retrieve a resource of type {resource}");
+
             PasswordCredential credential = null;
             try
             {
@@ -111,7 +42,7 @@ namespace MiraiNotes.UWP.Services
                         credential = item;
                         credential.RetrievePassword();
                     }
-                }          
+                }
             }
             catch (Exception)
             {
@@ -119,8 +50,16 @@ namespace MiraiNotes.UWP.Services
             return credential?.Password;
         }
 
-        public void DeleteUserCredentials(PasswordVaultResourceType resource, string username)
+        public void DeleteUserCredential(PasswordVaultResourceType resource, string username)
         {
+            if (resource == PasswordVaultResourceType.ALL)
+            {
+                if (DefaultUsername != username)
+                    DeleteUserCredentials(DefaultUsername);
+                DeleteUserCredentials(username);
+                return;
+            }
+
             var vault = new PasswordVault();
             var credentialList = new List<PasswordCredential>();
 
@@ -142,5 +81,48 @@ namespace MiraiNotes.UWP.Services
                 //Credential not found
             }
         }
+
+        public void UpdateUserCredential(PasswordVaultResourceType resource, string username, bool updateUsername, string newValue)
+        {
+            if (resource == PasswordVaultResourceType.ALL)
+                throw new ArgumentOutOfRangeException(nameof(resource), resource, $"Cant update a resource of type {resource}");
+
+            //If i need to update the username of the secret
+            if (updateUsername)
+            {
+                string currentSecret = GetUserCredential(resource, username);
+                DeleteUserCredential(resource, username);
+                SaveUserCredential(resource, newValue, currentSecret);
+            }
+            else
+            {
+                DeleteUserCredential(resource, username);
+                SaveUserCredential(resource, username, newValue);
+            }
+        }
+
+        private void DeleteUserCredentials(string username)
+        {
+            var vault = new PasswordVault();
+            var credentialList = new List<PasswordCredential>();
+            var credentials = vault.RetrieveAll();
+            foreach (PasswordCredential credential in credentials)
+            {
+                if (credential.UserName == username)
+                    credentialList.Add(vault.Retrieve(credential.Resource, credential.UserName));
+            }
+            foreach (PasswordCredential entry in credentialList)
+            {
+                vault.Remove(entry);
+            }
+        }
+
+        private void SaveUserCredentials(string resource, string username, string password)
+        {
+            PasswordVault vault = new PasswordVault();
+            PasswordCredential credential = new PasswordCredential(resource, username, password);
+            vault.Add(credential);
+        }
+        #endregion
     }
 }
