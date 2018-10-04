@@ -15,7 +15,6 @@ namespace MiraiNotes.UWP.Services
 {
     public class SyncService : ISyncService
     {
-        //TODO: IMPLEMENT PAGINATION
         //TODO: I think foreachs could be implemented with task.run or something like that
         private readonly IGoogleApiService _apiService;
         private readonly IMiraiNotesDataService _dataService;
@@ -55,106 +54,115 @@ namespace MiraiNotes.UWP.Services
                 return syncResult;
             }
 
-            var response = await _apiService
-                .TaskListService
-                .GetAllAsync();
-
-            if (!response.Succeed)
+            string nextPageToken = null;
+            bool hasMorePages = true;
+            while (hasMorePages)
             {
-                //TODO: I SHOULD DO SOMETHING HERE...
-                syncResult.Message = response.Errors?.ApiError?.Message ?? response.Errors.ErrorDescription;
-                _logger.Error($"SyncDownTaskListsAsync: Couldn't get all the task lists from api. Error = {syncResult.Message}");
-                return syncResult;
-            }
+                var response = await _apiService
+                    .TaskListService
+                    .GetAllAsync(pageToken: nextPageToken);
 
-            var downloadedTaskLists = response.Result
-                .Items
-                .ToList();
+                nextPageToken = response.Result?.NextPageToken;
+                if (string.IsNullOrEmpty(nextPageToken))
+                    hasMorePages = false;
 
-            var dbResponse = await _dataService
-                .TaskListService
-                .GetAllAsNoTrackingAsync();
-
-            if (!dbResponse.Succeed)
-            {
-                _logger.Error($"SyncDownTaskListsAsync: Couldn't get all the task lists from db. Error = {dbResponse.Message}");
-                return dbResponse;
-            }
-
-            var tasks = new List<Task>
-            {
-                //Here we save any new remote task list
-                Task.Run(async () =>
+                if (!response.Succeed)
                 {
-                    var taskListsToSave = downloadedTaskLists
-                        .Where(dt => !dbResponse.Result
-                            .Any(ct => ct.GoogleTaskListID == dt.TaskListID))
-                        .Select(t => new GoogleTaskList
-                        {
-                            GoogleTaskListID = t.TaskListID,
-                            CreatedAt = DateTime.Now,
-                            Title = t.Title,
-                            UpdatedAt = t.UpdatedAt
-                        });
-                    if (taskListsToSave.Count() == 0)
-                        return;
-                    _logger.Information($"SyncDownTaskListsAsync: Trying to save into db {taskListsToSave.Count()} new remote task lists");
+                    //TODO: I SHOULD DO SOMETHING HERE...
+                    syncResult.Message = response.Errors?.ApiError?.Message ?? response.Errors.ErrorDescription;
+                    _logger.Error($"SyncDownTaskListsAsync: Couldn't get all the task lists from api. Error = {syncResult.Message}");
+                    return syncResult;
+                }
 
-                    var r = await _dataService
-                        .TaskListService
-                        .AddRangeAsync(taskListsToSave);
-                    if (r.Succeed)
-                        syncDownResults.Add(r);
-                }),
+                var downloadedTaskLists = response.Result
+                    .Items
+                    .ToList();
 
-                //Here we delete any task list that is not in remote
-                Task.Run(async() =>
+                var dbResponse = await _dataService
+                    .TaskListService
+                    .GetAllAsNoTrackingAsync();
+
+                if (!dbResponse.Succeed)
                 {
-                    var deletedTaskLists = dbResponse.Result
-                        .Where(ct =>
-                            !downloadedTaskLists.Any(dt => dt.TaskListID == ct.GoogleTaskListID) &&
-                            ct.LocalStatus != LocalStatus.CREATED);
+                    _logger.Error($"SyncDownTaskListsAsync: Couldn't get all the task lists from db. Error = {dbResponse.Message}");
+                    return dbResponse;
+                }
 
-                    if (deletedTaskLists.Count() == 0)
-                        return;
-                    _logger.Information($"SyncDownTaskListsAsync: Trying to delete from db {deletedTaskLists.Count()} task lists");
-
-                    var r = await _dataService
-                        .TaskListService
-                        .RemoveRangeAsync(deletedTaskLists);
-
-                    if (r.Succeed)
-                        syncDownResults.Add(r);
-                }),
-
-                //Here we update the local tasklists
-                Task.Run(async () =>
+                var tasks = new List<Task>
                 {
-                    foreach (var taskList in dbResponse.Result)
+                    //Here we save any new remote task list
+                    Task.Run(async () =>
                     {
-                        var t = downloadedTaskLists
-                            .FirstOrDefault(dt => dt.TaskListID == taskList.GoogleTaskListID);
-
-                        if (t == null)
+                        var taskListsToSave = downloadedTaskLists
+                            .Where(dt => !dbResponse.Result
+                                .Any(ct => ct.GoogleTaskListID == dt.TaskListID))
+                            .Select(t => new GoogleTaskList
+                            {
+                                GoogleTaskListID = t.TaskListID,
+                                CreatedAt = DateTime.Now,
+                                Title = t.Title,
+                                UpdatedAt = t.UpdatedAt
+                            });
+                        if (taskListsToSave.Count() == 0)
                             return;
+                        _logger.Information($"SyncDownTaskListsAsync: Trying to save into db {taskListsToSave.Count()} new remote task lists");
 
-                        if (taskList.UpdatedAt < t.UpdatedAt)
+                        var r = await _dataService
+                            .TaskListService
+                            .AddRangeAsync(taskListsToSave);
+                        if (r.Succeed)
+                            syncDownResults.Add(r);
+                    }),
+
+                    //Here we delete any task list that is not in remote
+                    Task.Run(async() =>
+                    {
+                        var deletedTaskLists = dbResponse.Result
+                            .Where(ct =>
+                                !downloadedTaskLists.Any(dt => dt.TaskListID == ct.GoogleTaskListID) &&
+                                ct.LocalStatus != LocalStatus.CREATED);
+
+                        if (deletedTaskLists.Count() == 0)
+                            return;
+                        _logger.Information($"SyncDownTaskListsAsync: Trying to delete from db {deletedTaskLists.Count()} task lists");
+
+                        var r = await _dataService
+                            .TaskListService
+                            .RemoveRangeAsync(deletedTaskLists);
+
+                        if (r.Succeed)
+                            syncDownResults.Add(r);
+                    }),
+
+                    //Here we update the local tasklists
+                    Task.Run(async () =>
+                    {
+                        foreach (var taskList in dbResponse.Result)
                         {
-                            _logger.Information("SyncDownTaskListsAsync: Trying to update the local {@TaskList}", taskList);
-                            taskList.Title = t.Title;
-                            taskList.UpdatedAt = t.UpdatedAt;
-                            var r = await _dataService
-                                .TaskListService
-                                .UpdateAsync(taskList);
+                            var t = downloadedTaskLists
+                                .FirstOrDefault(dt => dt.TaskListID == taskList.GoogleTaskListID);
 
-                            if (r.Succeed)
-                                syncDownResults.Add(r);
+                            if (t == null)
+                                return;
+
+                            if (taskList.UpdatedAt < t.UpdatedAt)
+                            {
+                                _logger.Information("SyncDownTaskListsAsync: Trying to update the local {@TaskList}", taskList);
+                                taskList.Title = t.Title;
+                                taskList.UpdatedAt = t.UpdatedAt;
+                                var r = await _dataService
+                                    .TaskListService
+                                    .UpdateAsync(taskList);
+
+                                if (r.Succeed)
+                                    syncDownResults.Add(r);
+                            }
                         }
-                    }
-                })
-            };
+                    })
+                };
 
-            await Task.WhenAll(tasks);
+                await Task.WhenAll(tasks);
+            }
 
             if (syncDownResults.Any(r => !r.Succeed))
                 syncResult.Message = string.Join(",\n", syncDownResults.Select(r => r.Message));
@@ -197,130 +205,139 @@ namespace MiraiNotes.UWP.Services
             foreach (var taskList in dbResponse.Result)
             {
                 _logger.Information("SyncDownTasksAsync: Trying to get all the tasks associated to {@TaskList} from api", taskList);
-                var response = await _apiService
-                    .TaskService
-                    .GetAllAsync(taskList.GoogleTaskListID);
-
-                if (!response.Succeed)
+                string nextPageToken = null;
+                bool hasMorePages = true;
+                while (hasMorePages)
                 {
-                    //TODO: I SHOULD DO SOMETHING HERE TOO...
-                    syncResult.Message = response.Errors?.ApiError?.Message ?? response.Errors.ErrorDescription;
-                    syncResult.Succeed = false;
-                    _logger.Error("SyncDownTasksAsync: Couldn't get all the tasks associated to {@TaskList} from api. Error = {Error}", taskList, syncResult.Message);
-                    return syncResult;
-                }
-                var downloadedTasks = response.Result.Items;
-
-                //if this task list doesnt contains task
-                if (downloadedTasks == null || downloadedTasks.Count() == 0)
-                {
-                    _logger.Information($"SyncDownTasksAsync: Task list = {taskList.Title} does not contains tasks, trying to remove any local task associated to it");
-                    var deleteResponse = await _dataService
+                    var response = await _apiService
                         .TaskService
-                        .RemoveAsync(
-                            t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID &&
-                            t.LocalStatus != LocalStatus.CREATED);
-                    syncDownResults.Add(deleteResponse);
-                    continue;
-                }
+                        .GetAllAsync(taskList.GoogleTaskListID, pageToken: nextPageToken);
 
-                _logger.Information($"SyncDownTasksAsync: Trying to get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
-                //I think i dont need to include the tasklist property
-                var currentTasksDbResponse = await _dataService
-                   .TaskService
-                   .GetAsync(t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID, null, string.Empty);
+                    nextPageToken = response.Result?.NextPageToken;
+                    if (string.IsNullOrEmpty(nextPageToken))
+                        hasMorePages = false;
 
-                if (!currentTasksDbResponse.Succeed)
-                {
-                    _logger.Error($"SyncDownTasksAsync: Couldn't get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
-                    return currentTasksDbResponse;
-                }
-
-                var tasks = new List<Task>
-                {
-                    //Here we save any new remote task
-                    Task.Run(async() =>
+                    if (!response.Succeed)
                     {
-                        var tasksToSave = downloadedTasks
-                            .Where(dt => !currentTasksDbResponse.Result
-                                .Any(ct => ct.GoogleTaskID == dt.TaskID))
-                            .Select(t => new GoogleTask
-                            {
-                                GoogleTaskID = t.TaskID,
-                                CreatedAt = DateTime.Now,
-                                Title = t.Title,
-                                UpdatedAt = t.UpdatedAt,
-                                CompletedOn = t.CompletedOn,
-                                IsDeleted = t.IsDeleted,
-                                IsHidden = t.IsHidden,
-                                Notes = t.Notes,
-                                ParentTask = t.ParentTask,
-                                Position = t.Position,
-                                Status = t.Status,
-                                ToBeCompletedOn = t.ToBeCompletedOn
-                            });
+                        //TODO: I SHOULD DO SOMETHING HERE TOO...
+                        syncResult.Message = response.Errors?.ApiError?.Message ?? response.Errors.ErrorDescription;
+                        syncResult.Succeed = false;
+                        _logger.Error("SyncDownTasksAsync: Couldn't get all the tasks associated to {@TaskList} from api. Error = {Error}", taskList, syncResult.Message);
+                        return syncResult;
+                    }
+                    var downloadedTasks = response.Result.Items;
 
-                        if (tasksToSave.Count() == 0)
-                            return;
-                        _logger.Information($"SyncDownTasksAsync: Trying to save into db {tasksToSave.Count()} new remote task associated to tasklistID = {taskList.GoogleTaskListID}");
-
-                        syncDownResults.Add(await _dataService
+                    //if this task list doesnt contains task
+                    if (downloadedTasks == null || downloadedTasks.Count() == 0)
+                    {
+                        _logger.Information($"SyncDownTasksAsync: Task list = {taskList.Title} does not contains tasks, trying to remove any local task associated to it");
+                        var deleteResponse = await _dataService
                             .TaskService
-                            .AddRangeAsync(taskList.GoogleTaskListID ,tasksToSave));
-                    }),
+                            .RemoveAsync(
+                                t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID &&
+                                t.LocalStatus != LocalStatus.CREATED);
+                        syncDownResults.Add(deleteResponse);
+                        continue;
+                    }
 
-                    //Here we delete any task that is not in remote
-                    Task.Run(async() =>
+                    _logger.Information($"SyncDownTasksAsync: Trying to get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
+                    //I think i dont need to include the tasklist property
+                    var currentTasksDbResponse = await _dataService
+                       .TaskService
+                       .GetAsync(t => t.TaskList.GoogleTaskListID == taskList.GoogleTaskListID, null, string.Empty);
+
+                    if (!currentTasksDbResponse.Succeed)
                     {
-                        var deletedTasks = currentTasksDbResponse.Result
-                            .Where(ct =>
-                                !downloadedTasks.Any(dt => dt.TaskID == ct.GoogleTaskID) &&
-                                ct.LocalStatus != LocalStatus.CREATED);
+                        _logger.Error($"SyncDownTasksAsync: Couldn't get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
+                        return currentTasksDbResponse;
+                    }
 
-                        if (deletedTasks.Count() == 0)
-                            return;
-                        _logger.Information($"SyncDownTasksAsync: Trying to delete from db {deletedTasks.Count()} tasks associated to tasklistID = {taskList.GoogleTaskListID}");
-
-                        syncDownResults.Add(await _dataService
-                            .TaskService
-                            .RemoveRangeAsync(deletedTasks));
-                    }),
-
-                    //Here we update the local tasks
-                    Task.Run(async() =>
+                    var tasks = new List<Task>
                     {
-                        foreach (var task in currentTasksDbResponse.Result)
+                        //Here we save any new remote task
+                        Task.Run(async() =>
                         {
-                            var downloadedTask = downloadedTasks
-                                .FirstOrDefault(dt => dt.TaskID == task.GoogleTaskID);
+                            var tasksToSave = downloadedTasks
+                                .Where(dt => !currentTasksDbResponse.Result
+                                    .Any(ct => ct.GoogleTaskID == dt.TaskID))
+                                .Select(t => new GoogleTask
+                                {
+                                    GoogleTaskID = t.TaskID,
+                                    CreatedAt = DateTime.Now,
+                                    Title = t.Title,
+                                    UpdatedAt = t.UpdatedAt,
+                                    CompletedOn = t.CompletedOn,
+                                    IsDeleted = t.IsDeleted,
+                                    IsHidden = t.IsHidden,
+                                    Notes = t.Notes,
+                                    ParentTask = t.ParentTask,
+                                    Position = t.Position,
+                                    Status = t.Status,
+                                    ToBeCompletedOn = t.ToBeCompletedOn
+                                });
 
-                            if (downloadedTask == null)
+                            if (tasksToSave.Count() == 0)
                                 return;
+                            _logger.Information($"SyncDownTasksAsync: Trying to save into db {tasksToSave.Count()} new remote task associated to tasklistID = {taskList.GoogleTaskListID}");
 
-                            if (task.UpdatedAt < downloadedTask.UpdatedAt)
+                            syncDownResults.Add(await _dataService
+                                .TaskService
+                                .AddRangeAsync(taskList.GoogleTaskListID ,tasksToSave));
+                        }),
+
+                        //Here we delete any task that is not in remote
+                        Task.Run(async() =>
+                        {
+                            var deletedTasks = currentTasksDbResponse.Result
+                                .Where(ct =>
+                                    !downloadedTasks.Any(dt => dt.TaskID == ct.GoogleTaskID) &&
+                                    ct.LocalStatus != LocalStatus.CREATED);
+
+                            if (deletedTasks.Count() == 0)
+                                return;
+                            _logger.Information($"SyncDownTasksAsync: Trying to delete from db {deletedTasks.Count()} tasks associated to tasklistID = {taskList.GoogleTaskListID}");
+
+                            syncDownResults.Add(await _dataService
+                                .TaskService
+                                .RemoveRangeAsync(deletedTasks));
+                        }),
+
+                        //Here we update the local tasks
+                        Task.Run(async() =>
+                        {
+                            foreach (var task in currentTasksDbResponse.Result)
                             {
-                                _logger.Information("SyncDownTasksAsync: Trying to update the local {@Task} associated to tasklistID = {taskListID}", task, taskList.GoogleTaskListID);
-                                task.CompletedOn = downloadedTask.CompletedOn;
-                                task.GoogleTaskID = downloadedTask.TaskID;
-                                task.IsDeleted = downloadedTask.IsDeleted;
-                                task.IsHidden = downloadedTask.IsHidden;
-                                task.Notes = downloadedTask.Notes;
-                                task.ParentTask = downloadedTask.ParentTask;
-                                task.Position = downloadedTask.Position;
-                                task.Status = downloadedTask.Status;
-                                task.Title = downloadedTask.Title;
-                                task.ToBeCompletedOn = downloadedTask.ToBeCompletedOn;
-                                task.UpdatedAt = downloadedTask.UpdatedAt;
+                                var downloadedTask = downloadedTasks
+                                    .FirstOrDefault(dt => dt.TaskID == task.GoogleTaskID);
 
-                                syncDownResults.Add( await _dataService
-                                    .TaskService
-                                    .UpdateAsync(task));
+                                if (downloadedTask == null)
+                                    return;
+
+                                if (task.UpdatedAt < downloadedTask.UpdatedAt)
+                                {
+                                    _logger.Information("SyncDownTasksAsync: Trying to update the local {@Task} associated to tasklistID = {taskListID}", task, taskList.GoogleTaskListID);
+                                    task.CompletedOn = downloadedTask.CompletedOn;
+                                    task.GoogleTaskID = downloadedTask.TaskID;
+                                    task.IsDeleted = downloadedTask.IsDeleted;
+                                    task.IsHidden = downloadedTask.IsHidden;
+                                    task.Notes = downloadedTask.Notes;
+                                    task.ParentTask = downloadedTask.ParentTask;
+                                    task.Position = downloadedTask.Position;
+                                    task.Status = downloadedTask.Status;
+                                    task.Title = downloadedTask.Title;
+                                    task.ToBeCompletedOn = downloadedTask.ToBeCompletedOn;
+                                    task.UpdatedAt = downloadedTask.UpdatedAt;
+
+                                    syncDownResults.Add( await _dataService
+                                        .TaskService
+                                        .UpdateAsync(task));
+                                }
                             }
-                        }
-                    })
-                };
+                        })
+                    };
 
-                await Task.WhenAll(tasks);
+                    await Task.WhenAll(tasks);
+                }
             }
 
             if (syncDownResults.Any(r => !r.Succeed))
@@ -404,8 +421,6 @@ namespace MiraiNotes.UWP.Services
                     foreach (var taskList in updatedTaskLists)
                         syncUpResults.Add(await UpdateUpTaskList(taskList));
                 })
-
-                //TODO: WHAT SHOULD I DO WITH MOVE IN A SYNC?
             };
 
             await Task.WhenAll(tasks);

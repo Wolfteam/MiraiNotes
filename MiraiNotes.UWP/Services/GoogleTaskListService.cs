@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models.API;
+using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models.API;
-using Newtonsoft.Json;
 
 namespace MiraiNotes.UWP.Services
 {
@@ -53,8 +53,9 @@ namespace MiraiNotes.UWP.Services
             var result = new GoogleResponseModel<GoogleTaskApiResponseModel<GoogleTaskListModel>>();
             var httpClient = _httpClientsFactory.GetHttpClient();
             try
-            {
-                var response = await httpClient.GetAsync(BASE_ADDRESS);
+            {          
+                string url = $"{BASE_ADDRESS}?maxResults={maxResults}{(string.IsNullOrEmpty(pageToken) ? "" : $"&pageToken={pageToken}")}";
+                var response = await httpClient.GetAsync(url);
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

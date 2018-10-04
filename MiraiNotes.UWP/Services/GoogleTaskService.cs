@@ -83,12 +83,12 @@ namespace MiraiNotes.UWP.Services
             int maxResults = 100,
             string pageToken = null)
         {
-            string url = $"{BASE_ADDRESS}/{taskListID}/tasks?showHidden=true";
             var result = new GoogleResponseModel<GoogleTaskApiResponseModel<GoogleTaskModel>>();
             var httpClient = _httpClientsFactory.GetHttpClient();
 
             try
             {
+                string url = $"{BASE_ADDRESS}/{taskListID}/tasks?showHidden=true&maxResults={maxResults}{(string.IsNullOrEmpty(pageToken) ? "" : $"&pageToken={pageToken}")}";
                 var response = await httpClient.GetAsync(url);
                 string responseBody = await response.Content.ReadAsStringAsync();
 
