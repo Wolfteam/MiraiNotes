@@ -95,10 +95,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <ToolTipService.ToolTip>
-                        <TextBlock>
-                            <Run Text="This task is marked to be completed on" />
-                            <Run Text="{Binding CurrentTask.CompletitionDateText}" />
-                        </TextBlock>
+                        <TextBlock Text="{Binding CurrentTask.FullCompletitionDateText}" TextWrapping="Wrap" />
                     </ToolTipService.ToolTip>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE787;" />
                     <TextBlock

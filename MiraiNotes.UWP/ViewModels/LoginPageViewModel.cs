@@ -204,7 +204,7 @@ namespace MiraiNotes.UWP.ViewModels
                         await _dialogService.ShowMessageDialogAsync("Error", result.ResponseErrorDetail.ToString());
                         break;
                     default:
-                        await _dialogService.ShowMessageDialogAsync("Error", result.ResponseData.ToString());
+                        await _dialogService.ShowMessageDialogAsync("Error", result.ResponseData);
                         break;
                 }
             }

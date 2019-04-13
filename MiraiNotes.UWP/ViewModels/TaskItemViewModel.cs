@@ -9,6 +9,7 @@ namespace MiraiNotes.UWP.ViewModels
     public class TaskItemViewModel : ValidatableModelBase
     {
         #region Members
+
         private string _taskID;
         private string _status;
         private string _parentTask;
@@ -16,11 +17,13 @@ namespace MiraiNotes.UWP.ViewModels
         private DateTimeOffset? _completedOn;
         private ObservableCollection<TaskItemViewModel> _subTasks = new ObservableCollection<TaskItemViewModel>();
         private DateTimeOffset? _remindOn;
+
         #endregion
 
         public string TaskID
         {
-            get => _taskID; set
+            get => _taskID;
+            set
             {
                 _taskID = value;
                 RaisePropertyChanged(nameof(TaskID));
@@ -107,6 +110,7 @@ namespace MiraiNotes.UWP.ViewModels
                 RaisePropertyChanged(nameof(CompletedOn));
                 RaisePropertyChanged(nameof(IsCompleted));
                 RaisePropertyChanged(nameof(CompletitionDateText));
+                RaisePropertyChanged(nameof(FullCompletitionDateText));
             }
         }
 
@@ -123,9 +127,7 @@ namespace MiraiNotes.UWP.ViewModels
         }
 
         public bool IsNew
-        {
-            get { return string.IsNullOrEmpty(TaskID); }
-        }
+            => string.IsNullOrEmpty(TaskID);
 
         public bool IsCompleted => CompletedOn != null && TaskStatus == GoogleTaskStatus.COMPLETED;
 
@@ -158,12 +160,7 @@ namespace MiraiNotes.UWP.ViewModels
         }
 
         public bool IsCompletitionDateSet
-        {
-            get
-            {
-                return ToBeCompletedOn.HasValue;
-            }
-        }
+            => ToBeCompletedOn.HasValue;
 
         public string CompletitionDateText
         {
@@ -171,23 +168,41 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 if (!ToBeCompletedOn.HasValue)
                     return string.Empty;
-                else
+                var difference = DateTimeOffset.Now.Subtract(ToBeCompletedOn.Value).Days;
+                if (difference >= 0)
                 {
-                    var difference = DateTimeOffset.Now.DayOfYear - ToBeCompletedOn.Value.DayOfYear;
-                    if (difference >= 0)
-                    {
-                        if (difference == 0)
-                            return "Today";
-                        else if (difference == 1)
-                            return $"{difference} day ago";
-                        else
-                            return $"{difference} days ago";
-                    }
-                    else if (difference == -1)
-                        return "Tomorrow";
+                    if (difference == 0)
+                        return "Today";
+                    else if (difference == 1)
+                        return $"{difference} day ago";
                     else
-                        return ToBeCompletedOn.Value.ToString("ddd, MMM d");
+                        return $"{difference} days ago";
                 }
+                else if (difference == -1)
+                    return "Tomorrow";
+                else
+                    return $"{ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
+            }
+        }
+
+        public string FullCompletitionDateText
+        {
+            get
+            {
+                if (!ToBeCompletedOn.HasValue)
+                    return string.Empty;
+                var difference = DateTimeOffset.Now.Subtract(ToBeCompletedOn.Value).Days;
+                if (difference >= 0)
+                {
+                    if (difference == 0)
+                        return "This task is marked to be completed Today";
+                    else
+                        return $"This task was marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
+                }
+                else if (difference == -1)
+                    return "This task is marked to be completed Tomorrow";
+                else
+                    return $"This task is marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
             }
         }
 
@@ -270,17 +285,9 @@ namespace MiraiNotes.UWP.ViewModels
         public bool HasAReminderDate
             => RemindOn != null;
 
-        public string RemindOnDateText
-        {
-            get
-            {
-                if (!RemindOn.HasValue)
-                    return string.Empty;
-                else
-                {
-                    return RemindOn.Value.ToString("ddd, MMM d HH:mm");
-                }
-            }
-        }
+        public string RemindOnDateText =>
+            !RemindOn.HasValue
+            ? string.Empty
+            : RemindOn.Value.ToString("ddd, MMM d HH:mm");
     }
 }

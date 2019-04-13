@@ -22,6 +22,7 @@ namespace MiraiNotes.UWP.ViewModels
     public class NewTaskPageViewModel : ViewModelBase
     {
         #region Members
+
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
@@ -38,11 +39,16 @@ namespace MiraiNotes.UWP.ViewModels
         private DateTimeOffset _minDate = DateTime.Now;
         private bool _showTaskProgressRing;
         private bool _isCurrentTaskTitleFocused;
-        private ObservableCollection<TaskListItemViewModel> _taskLists = new ObservableCollection<TaskListItemViewModel>();
+
+        private ObservableCollection<TaskListItemViewModel> _taskLists =
+            new ObservableCollection<TaskListItemViewModel>();
+
         private TaskListItemViewModel _selectedTaskList;
+
         #endregion
 
         #region Properties
+
         public string TaskOperationTitle
         {
             get { return _taskOperationTitle; }
@@ -84,9 +90,11 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _selectedTaskList; }
             set { Set(ref _selectedTaskList, value); }
         }
+
         #endregion
 
         #region Commands
+
         public ICommand SaveChangesCommand { get; set; }
 
         public ICommand DeleteTaskCommand { get; set; }
@@ -104,9 +112,11 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand MarkSubTaskAsIncompletedCommand { get; set; }
 
         public ICommand RemoveTaskNotificationDateCommand { get; set; }
+
         #endregion
 
         #region Constructor
+
         public NewTaskPageViewModel(
             ICustomDialogService dialogService,
             IMessenger messenger,
@@ -129,9 +139,11 @@ namespace MiraiNotes.UWP.ViewModels
             RegisterMessages();
             SetCommands();
         }
+
         #endregion
 
         #region Methods
+
         private void RegisterMessages()
         {
             _messenger.Register<TaskListItemViewModel>(
@@ -156,6 +168,7 @@ namespace MiraiNotes.UWP.ViewModels
                         {
                             u.Properties[nameof(u.Title)].Errors.Add("Title is required");
                         }
+
                         if (string.IsNullOrEmpty(u.Notes) || u.Notes.Length < 2)
                         {
                             u.Properties[nameof(u.Notes)].Errors.Add("Notes are required");
@@ -248,6 +261,7 @@ namespace MiraiNotes.UWP.ViewModels
                 t.SubTasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(sts.Result);
                 CurrentTask = t;
             }
+
             ShowTaskProgressRing = false;
         }
 
@@ -312,28 +326,32 @@ namespace MiraiNotes.UWP.ViewModels
                         $"Couldn't find the task to update from db. Error = {dbResponse.Message}");
                     return;
                 }
+
                 entity = dbResponse.Result;
             }
+
             if (!moveToDifferentTaskList || moveToDifferentTaskList && isNewTask)
             {
                 if (isNewTask)
                     entity.CreatedAt = DateTime.Now;
                 entity.CompletedOn = CurrentTask.CompletedOn;
-                entity.GoogleTaskID = CurrentTask.IsNew ?
-                    Guid.NewGuid().ToString() : CurrentTask.TaskID;
+                entity.GoogleTaskID = CurrentTask.IsNew 
+                    ? Guid.NewGuid().ToString() 
+                    : CurrentTask.TaskID;
                 entity.IsDeleted = CurrentTask.IsDeleted;
                 entity.IsHidden = CurrentTask.IsHidden;
                 entity.Notes = CurrentTask.Notes;
                 entity.ParentTask = CurrentTask.ParentTask;
                 entity.Position = CurrentTask.Position;
-                entity.Status = CurrentTask.IsNew ?
-                    GoogleTaskStatus.NEEDS_ACTION.GetString() : CurrentTask.Status;
+                entity.Status = CurrentTask.IsNew 
+                    ? GoogleTaskStatus.NEEDS_ACTION.GetString() 
+                    : CurrentTask.Status;
                 entity.Title = CurrentTask.Title;
-                entity.LocalStatus = CurrentTask.IsNew ?
-                    LocalStatus.CREATED :
-                    entity.LocalStatus == LocalStatus.CREATED ?
-                        LocalStatus.CREATED :
-                        LocalStatus.UPDATED;
+                entity.LocalStatus = CurrentTask.IsNew 
+                    ? LocalStatus.CREATED 
+                    : entity.LocalStatus == LocalStatus.CREATED 
+                        ? LocalStatus.CREATED 
+                        : LocalStatus.UPDATED;
                 entity.ToBeSynced = true;
                 entity.UpdatedAt = DateTime.Now;
                 entity.ToBeCompletedOn = CurrentTask.ToBeCompletedOn;
@@ -355,8 +373,8 @@ namespace MiraiNotes.UWP.ViewModels
             if (moveToDifferentTaskList)
             {
                 response = await _dataService
-                     .TaskService
-                     .AddAsync(SelectedTaskList.TaskListID, entity);
+                    .TaskService
+                    .AddAsync(SelectedTaskList.TaskListID, entity);
 
                 if (!response.Succeed)
                 {
@@ -366,6 +384,7 @@ namespace MiraiNotes.UWP.ViewModels
                         $"Error = {response.Message}.");
                     return;
                 }
+
                 _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
                 subTasksToSave.ForEach(st => st.ParentTask = entity.GoogleTaskID);
@@ -408,9 +427,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (CurrentTask.RemindOn.HasValue)
             {
-                string notes = CurrentTask.Notes.Length > 15 ?
-                    $"{CurrentTask.Notes.Substring(0, 15)}...." :
-                    $"{CurrentTask.Notes}....";
+                string notes = CurrentTask.Notes.Length > 15
+                    ? $"{CurrentTask.Notes.Substring(0, 15)}...."
+                    : $"{CurrentTask.Notes}....";
 
                 _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
                 _toastManager.ScheduleTaskReminderToastNotification(
@@ -453,11 +472,12 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Coudln't delete the selected task. Error = {deleteResponse.Message}.");
                 return;
             }
+
             //If we are deleting a subtask
             if (CurrentTask.HasParentTask)
                 _messenger.Send(
-                     new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID),
-                     $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
+                    new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID),
+                    $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
             else
                 _messenger.Send(
                     CurrentTask.TaskID,
@@ -573,7 +593,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .TaskListService
                 .GetAsNoTrackingAsync(
                     tl => tl.LocalStatus != LocalStatus.DELETED &&
-                        tl.User.IsActive,
+                          tl.User.IsActive,
                     tl => tl.OrderBy(t => t.Title));
 
             if (!dbResponse.Succeed)
@@ -608,6 +628,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Error: {moveResponse.Message}.");
                 return;
             }
+
             if (!CurrentTask.HasParentTask)
                 _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}");
             else
@@ -661,9 +682,9 @@ namespace MiraiNotes.UWP.ViewModels
             List<TaskItemViewModel> currentSubTasks)
         {
             ShowTaskProgressRing = true;
-            string taskListID = moveToDifferentTaskList ?
-                SelectedTaskList.TaskListID :
-                _currentTaskList.TaskListID;
+            string taskListID = moveToDifferentTaskList 
+                ? SelectedTaskList.TaskListID 
+                : _currentTaskList.TaskListID;
 
             if (moveToDifferentTaskList && !isNewTask)
             {
@@ -686,14 +707,16 @@ namespace MiraiNotes.UWP.ViewModels
                     {
                         CompletedOn = subTask.CompletedOn,
                         CreatedAt = DateTime.Now,
-                        GoogleTaskID = subTask.IsNew ? Guid.NewGuid().ToString() : subTask.TaskID,
+                        GoogleTaskID = subTask.IsNew 
+                            ? Guid.NewGuid().ToString() 
+                            : subTask.TaskID,
                         IsDeleted = subTask.IsDeleted,
                         IsHidden = subTask.IsHidden,
                         LocalStatus = LocalStatus.CREATED,
                         Notes = subTask.Notes,
-                        ParentTask = isNewTask && moveToDifferentTaskList ?
-                            subTask.ParentTask :
-                            CurrentTask.TaskID,
+                        ParentTask = isNewTask && moveToDifferentTaskList 
+                            ? subTask.ParentTask 
+                            : CurrentTask.TaskID,
                         Position = lastStID,
                         Status = subTask.Status,
                         Title = subTask.Title,
@@ -710,6 +733,7 @@ namespace MiraiNotes.UWP.ViewModels
                         currentSubTasks.Add(_mapper.Map<TaskItemViewModel>(response.Result));
                 }
             }
+
             ShowTaskProgressRing = false;
 
             return currentSubTasks;
@@ -746,6 +770,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Coudln't delete the selected sub task. Error = {deleteResponse.Message}");
                 return;
             }
+
             CurrentTask.SubTasks?.Remove(subTask);
             _messenger.Send(
                 new KeyValuePair<string, string>(CurrentTask.TaskID, subTask.TaskID),
@@ -754,8 +779,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task RemoveTaskNotificationDateAsync(TaskNotificationDateType dateType)
         {
-            string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE ?
-                "completition" : "reminder";
+            string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE ? "completition" : "reminder";
             bool isConfirmed = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirm",
                 $"Are you sure you want to remove this task's {message} date ?",
@@ -803,30 +827,30 @@ namespace MiraiNotes.UWP.ViewModels
 
         private List<TaskItemViewModel> GetSubTasksToSave(bool isCurrentTaskNew, bool moveToDifferentTaskList)
         {
-            //if the current task is new or the current task is new and we are not moving it to
-            //a different task list, so we choose the st that are new and not completed
-            if (isCurrentTaskNew || !isCurrentTaskNew && !moveToDifferentTaskList)
+            //if the current task is new or we are not moving it to
+            //a different task list, we choose the st that are new and not completed
+            if (isCurrentTaskNew || !moveToDifferentTaskList)
                 return CurrentTask.SubTasks?
-                    .Where(st => st.IsNew && st.CompletedOn == null)
-                    .ToList() ??
-                    Enumerable.Empty<TaskItemViewModel>()
-                        .ToList();
+                           .Where(st => st.IsNew && st.CompletedOn == null)
+                           .ToList() ??
+                       Enumerable.Empty<TaskItemViewModel>()
+                           .ToList();
             //else, the current task is not new and we are moving it to
             //a different task list, so we choose all the st
-            else
-                return CurrentTask.SubTasks?.ToList() ??
-                    Enumerable.Empty<TaskItemViewModel>()
-                        .ToList();
+            return CurrentTask.SubTasks?.ToList() ??
+                   Enumerable.Empty<TaskItemViewModel>()
+                       .ToList();
         }
 
         private List<TaskItemViewModel> GetCurrentSubTasks()
         {
             return CurrentTask.SubTasks?
-                .Where(st => !st.IsNew)
-                .ToList() ??
-                Enumerable.Empty<TaskItemViewModel>()
-                    .ToList();
+                       .Where(st => !st.IsNew)
+                       .ToList() ??
+                   Enumerable.Empty<TaskItemViewModel>()
+                       .ToList();
         }
+
         #endregion
     }
 }
