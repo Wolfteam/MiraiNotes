@@ -28,6 +28,12 @@ namespace MiraiNotes.Data
             modelBuilder.Entity<GoogleTask>()
               .HasIndex(b => b.GoogleTaskID)
               .IsUnique();
+
+            modelBuilder.Entity<GoogleTask>()
+                .Property(b => b.Notes)
+                .HasConversion(
+                    note => Utils.EncryptUtil.EncryptString(note),
+                    encriptedNote => Utils.EncryptUtil.DecryptString(encriptedNote));
         }
 
         public static void Init()
