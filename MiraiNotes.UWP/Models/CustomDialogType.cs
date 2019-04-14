@@ -3,6 +3,7 @@
     public enum CustomDialogType
     {
         PASSWORD_DIALOG,
-        LOGIN_PASSWORD_DIALOG
+        LOGIN_PASSWORD_DIALOG,
+        ACCOUNTS_DIALOG
     }
 }

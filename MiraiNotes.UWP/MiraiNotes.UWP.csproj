@@ -169,6 +169,9 @@
     <Compile Include="Models\SyncBgTaskIntervals.cs" />
     <Compile Include="Models\TaskListSortType.cs" />
     <Compile Include="Models\ToastActionType.cs" />
+    <Compile Include="Pages\Dialogs\AccountsContentDialog.xaml.cs">
+      <DependentUpon>AccountsContentDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Dialogs\LoginPasswordContentDialog.xaml.cs">
       <DependentUpon>LoginPasswordContentDialog.xaml</DependentUpon>
     </Compile>
@@ -200,6 +203,7 @@
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\MiscellaneousUtils.cs" />
     <Compile Include="Utils\SmartObservableCollection.cs" />
+    <Compile Include="ViewModels\Dialogs\AccountsDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\LoginPasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsPasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
@@ -323,6 +327,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\Dialogs\AccountsContentDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Dialogs\LoginPasswordContentDialog.xaml">
       <SubType>Designer</SubType>

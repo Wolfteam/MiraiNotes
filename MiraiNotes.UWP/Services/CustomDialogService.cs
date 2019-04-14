@@ -42,7 +42,8 @@ namespace MiraiNotes.UWP.Services
 
         public async Task<bool> ShowConfirmationDialogAsync(string title, string message, string yesButtonText, string noButtonText)
         {
-            return (await ShowConfirmationDialogAsync(title, message, yesButtonText, noButtonText, string.Empty)).Value;
+            var result = await ShowConfirmationDialogAsync(title, message, yesButtonText, noButtonText, string.Empty);
+            return result ?? false;
         }
 
         public async Task<bool?> ShowConfirmationDialogAsync(string title, string message, string yesButtonText, string noButtonText, string cancelButtonText)
@@ -169,19 +170,20 @@ namespace MiraiNotes.UWP.Services
                     //        args.Cancel = true;
                     //    }
                     //};
-                    result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.None)
-                        return false;
-                    return result == ContentDialogResult.Primary;
+                    break;
                 case CustomDialogType.LOGIN_PASSWORD_DIALOG:
                     dialog = new LoginPasswordContentDialog();
-                    result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.None)
-                        return false;
-                    return result == ContentDialogResult.Primary;
+                    break;
+                case CustomDialogType.ACCOUNTS_DIALOG:
+                    dialog = new AccountsContentDialog();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dialogType), dialogType, "The provided dialog type doesnt exists");
             }
+            result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.None)
+                return false;
+            return result == ContentDialogResult.Primary;
         }
 
         private AcrylicBrush GetBackgroundBrush()

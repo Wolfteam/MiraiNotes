@@ -53,6 +53,9 @@ namespace MiraiNotes.UWP.ViewModels
         public LoginPasswordDialogViewModel LoginPasswordDialog
             => ServiceLocator.Current.GetInstance<LoginPasswordDialogViewModel>();
 
+        public AccountsDialogViewModel AccountsDialog
+            => ServiceLocator.Current.GetInstance<AccountsDialogViewModel>();
+
         public IApplicationSettingsService ApplicationSettingsService
             => ServiceLocator.Current.GetInstance<IApplicationSettingsService>();
 
@@ -144,6 +147,7 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
             SimpleIoc.Default.Register<SettingsPageViewModel>();
 
+            SimpleIoc.Default.Register<AccountsDialogViewModel>();
             SimpleIoc.Default.Register<SettingsPasswordDialogViewModel>();
             SimpleIoc.Default.Register<LoginPasswordDialogViewModel>();
         }

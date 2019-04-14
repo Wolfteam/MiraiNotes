@@ -151,6 +151,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         public ICommand OpenSettingsCommand { get; set; }
 
+        public ICommand OpenUserAccountsCommand { get; set; }
+
         #endregion
 
         public NavPageViewModel(
@@ -201,6 +203,14 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}",
                 SortTaskLists);
+            _messenger.Register<string>(
+                this,
+                $"{MessageType.CURRENT_USER_CHANGED}",
+                async (_) =>
+                {
+                    await LoadProfileInfo();
+                    await InitViewAsync(true);
+                });
         }
 
         private void SetCommands()
@@ -234,6 +244,9 @@ namespace MiraiNotes.UWP.ViewModels
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
 
             OpenSettingsCommand = new RelayCommand(() => IsSettingsPaneOpen = true);
+
+            OpenUserAccountsCommand = new RelayCommand
+                (async () => await _dialogService.ShowCustomDialog(CustomDialogType.ACCOUNTS_DIALOG));
         }
 
         private async Task LoadProfileInfo()
@@ -310,6 +323,10 @@ namespace MiraiNotes.UWP.ViewModels
             SelectedItem = TaskLists.Any(tl => tl.TaskListID == selectedTaskListID)
                 ? TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID)
                 : TaskLists.FirstOrDefault();
+            //For some reason OnNavigationViewSelectionChangeAsync is not getting called
+            //if SelectedItem is null
+            if (SelectedItem is null)
+                OnNavigationViewSelectionChangeAsync(SelectedItem);
         }
 
         public void OnTaskListAutoSuggestBoxTextChange(string currentText)
