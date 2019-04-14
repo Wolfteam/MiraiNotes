@@ -91,7 +91,7 @@ namespace MiraiNotes.UWP.ViewModels
         public async Task InitViewAsync()
         {
             ShowLoading = true;
-            var currentUserResponse = await _dataService
+            var response = await _dataService
                 .UserService
                 .GetCurrentActiveUserAsync();
             string loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
@@ -99,13 +99,19 @@ namespace MiraiNotes.UWP.ViewModels
             bool isUserLoggedIn = loggedUsername != _userCredentialService.DefaultUsername &&
                 !string.IsNullOrEmpty(loggedUsername);
 
-            if (!currentUserResponse.Succeed || isUserLoggedIn && currentUserResponse.Result is null)
+            if (!response.Succeed || isUserLoggedIn && response.Result is null)
             {
+                string errorMsg = string.IsNullOrEmpty(response.Message)
+                    ? $"Did you unninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
+                    : response.Message;
                 ShowLoading = false;
                 ShowLoginButton = true;
                 await _dialogService.ShowMessageDialogAsync(
                     "Error",
-                    $"Coudln't retrieve the current logged user. Error = {currentUserResponse.Message}");
+                    $"Coudln't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
+                _userCredentialService.DeleteUserCredential(
+                    PasswordVaultResourceType.ALL,
+                    _userCredentialService.DefaultUsername);
                 return;
             }
             ShowLoading = false;
@@ -166,9 +172,10 @@ namespace MiraiNotes.UWP.ViewModels
                             await _dialogService.ShowMessageDialogAsync("Something happended...!", "Couldn't get a token");
                             return;
                         }
-                        //We save the token before doing any other network requst..
+                        //We temporaly save and asociate the token to a default user 
+                        //before doing any other network requst..
                         _userCredentialService.DeleteUserCredential(
-                            PasswordVaultResourceType.ALL, 
+                            PasswordVaultResourceType.ALL,
                             _userCredentialService.DefaultUsername);
 
                         _userCredentialService.SaveUserCredential(
@@ -178,7 +185,7 @@ namespace MiraiNotes.UWP.ViewModels
 
                         _userCredentialService.SaveUserCredential(
                             PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
-                            _userCredentialService.DefaultUsername, 
+                            _userCredentialService.DefaultUsername,
                             tokenResponse.RefreshToken);
 
                         _userCredentialService.SaveUserCredential(
@@ -194,7 +201,7 @@ namespace MiraiNotes.UWP.ViewModels
                                 .ChangeCurrentUserStatus(false);
 
                             _userCredentialService.DeleteUserCredential(
-                                PasswordVaultResourceType.ALL, 
+                                PasswordVaultResourceType.ALL,
                                 _userCredentialService.DefaultUsername);
                         }
                         break;
@@ -315,6 +322,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             await _googleUserService.DownloadProfileImage(user.ImageUrl);
 
+            //if you came this far, that means everything is ok!
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
             return !result;
         }
