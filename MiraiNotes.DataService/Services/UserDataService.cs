@@ -520,7 +520,7 @@ namespace MiraiNotes.DataService.Services
                 {
                     try
                     {
-                        var entity = await GetByIdAsync(id);
+                        var entity = await context.Users.FindAsync(id);
                         if (entity == null)
                         {
                             response.Message = "Entity couldn't be removed cause it wasnt found";
