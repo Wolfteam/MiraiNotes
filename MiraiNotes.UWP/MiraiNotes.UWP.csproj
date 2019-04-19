@@ -199,6 +199,7 @@
     <Compile Include="Services\ApplicationSettingsService.cs" />
     <Compile Include="Services\ApplicationSettingsServiceBase.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
+    <Compile Include="Services\BaseGoogleAuthService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\MiscellaneousUtils.cs" />
