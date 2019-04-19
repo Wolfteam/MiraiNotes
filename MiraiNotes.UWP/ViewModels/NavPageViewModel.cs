@@ -205,7 +205,7 @@ namespace MiraiNotes.UWP.ViewModels
                 SortTaskLists);
             _messenger.Register<string>(
                 this,
-                $"{MessageType.CURRENT_USER_CHANGED}",
+                $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}",
                 async (_) =>
                 {
                     await LoadProfileInfo();
@@ -436,7 +436,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             dbResponse.Result.Title = newTitle;
-            dbResponse.Result.UpdatedAt = DateTime.Now;
+            dbResponse.Result.UpdatedAt = DateTimeOffset.UtcNow;
             dbResponse.Result.ToBeSynced = true;
             if (dbResponse.Result.LocalStatus != LocalStatus.CREATED)
                 dbResponse.Result.LocalStatus = LocalStatus.UPDATED;

@@ -333,7 +333,7 @@ namespace MiraiNotes.UWP.ViewModels
             if (!moveToDifferentTaskList || moveToDifferentTaskList && isNewTask)
             {
                 if (isNewTask)
-                    entity.CreatedAt = DateTime.Now;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
                 entity.CompletedOn = CurrentTask.CompletedOn;
                 entity.GoogleTaskID = CurrentTask.IsNew 
                     ? Guid.NewGuid().ToString() 
@@ -353,7 +353,7 @@ namespace MiraiNotes.UWP.ViewModels
                         ? LocalStatus.CREATED 
                         : LocalStatus.UPDATED;
                 entity.ToBeSynced = true;
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTimeOffset.UtcNow;
                 entity.ToBeCompletedOn = CurrentTask.ToBeCompletedOn;
                 entity.RemindOn = CurrentTask.RemindOn;
             }
@@ -668,7 +668,7 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTask.SubTasks.Add(new TaskItemViewModel
             {
                 Title = subTaskTitle,
-                UpdatedAt = DateTime.Now,
+                UpdatedAt = DateTimeOffset.UtcNow,
                 Status = GoogleTaskStatus.NEEDS_ACTION.GetString()
             });
             if (!CurrentTask.HasSubTasks)
@@ -706,7 +706,7 @@ namespace MiraiNotes.UWP.ViewModels
                     var entity = new GoogleTask
                     {
                         CompletedOn = subTask.CompletedOn,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = DateTimeOffset.UtcNow,
                         GoogleTaskID = subTask.IsNew 
                             ? Guid.NewGuid().ToString() 
                             : subTask.TaskID,
@@ -722,7 +722,7 @@ namespace MiraiNotes.UWP.ViewModels
                         Title = subTask.Title,
                         ToBeCompletedOn = subTask.ToBeCompletedOn,
                         ToBeSynced = true,
-                        UpdatedAt = DateTime.Now
+                        UpdatedAt = DateTimeOffset.UtcNow
                     };
 
                     var response = await _dataService

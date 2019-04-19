@@ -665,10 +665,10 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 GoogleTaskListID = Guid.NewGuid().ToString(),
                 Title = taskListName,
-                UpdatedAt = DateTime.Now,
+                UpdatedAt = DateTimeOffset.UtcNow,
                 LocalStatus = LocalStatus.CREATED,
                 ToBeSynced = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTimeOffset.UtcNow
             };
             var response = await _dataService
                 .TaskListService
