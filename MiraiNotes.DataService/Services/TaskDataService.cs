@@ -758,7 +758,7 @@ namespace MiraiNotes.DataService.Services
                         var entity = new GoogleTask
                         {
                             CompletedOn = oldEntity.CompletedOn,
-                            CreatedAt = DateTime.Now,
+                            CreatedAt = DateTimeOffset.UtcNow,
                             GoogleTaskID = Guid.NewGuid().ToString(),
                             IsDeleted = oldEntity.IsDeleted,
                             IsHidden = oldEntity.IsHidden,
@@ -773,7 +773,7 @@ namespace MiraiNotes.DataService.Services
                             Title = oldEntity.Title,
                             ToBeCompletedOn = oldEntity.ToBeCompletedOn,
                             ToBeSynced = true,
-                            UpdatedAt = DateTime.Now
+                            UpdatedAt = DateTimeOffset.UtcNow
                         };
 
                         if (oldEntity.LocalStatus == LocalStatus.CREATED)
@@ -782,7 +782,7 @@ namespace MiraiNotes.DataService.Services
                         {
                             oldEntity.LocalStatus = LocalStatus.DELETED;
                             oldEntity.ToBeSynced = true;
-                            oldEntity.UpdatedAt = DateTime.Now;
+                            oldEntity.UpdatedAt = DateTimeOffset.UtcNow;
                         }
 
                         await context.Tasks.AddAsync(entity);
@@ -839,7 +839,7 @@ namespace MiraiNotes.DataService.Services
                         else
                         {
                             entity.LocalStatus = LocalStatus.DELETED;
-                            entity.UpdatedAt = DateTime.Now;
+                            entity.UpdatedAt = DateTimeOffset.UtcNow;
                             entity.ToBeSynced = true;
 
                             context.Update(entity);
@@ -849,7 +849,7 @@ namespace MiraiNotes.DataService.Services
                                 await subTasks.ForEachAsync(st =>
                                 {
                                     st.LocalStatus = LocalStatus.DELETED;
-                                    st.UpdatedAt = DateTime.Now;
+                                    st.UpdatedAt = DateTimeOffset.UtcNow;
                                     st.ToBeSynced = true;
                                 });
                                 context.UpdateRange(subTasks);
@@ -913,14 +913,14 @@ namespace MiraiNotes.DataService.Services
 
                             await tasksToUpdate.ForEachAsync(t =>
                             {
-                                t.UpdatedAt = DateTime.Now;
+                                t.UpdatedAt = DateTimeOffset.UtcNow;
                                 t.LocalStatus = LocalStatus.DELETED;
                                 t.ToBeSynced = true;
                             });
 
                             await subTasks.ForEachAsync(t =>
                             {
-                                t.UpdatedAt = DateTime.Now;
+                                t.UpdatedAt = DateTimeOffset.UtcNow;
                                 t.LocalStatus = LocalStatus.DELETED;
                                 t.ToBeSynced = true;
                             });
@@ -968,9 +968,9 @@ namespace MiraiNotes.DataService.Services
                         }
 
                         taskToUpdate.CompletedOn = taskStatus == GoogleTaskStatus.COMPLETED ?
-                            DateTime.Now : (DateTime?)null;
+                            DateTimeOffset.UtcNow : (DateTimeOffset?)null;
                         taskToUpdate.Status = taskStatus.GetString();
-                        taskToUpdate.UpdatedAt = DateTime.Now;
+                        taskToUpdate.UpdatedAt = DateTimeOffset.UtcNow;
                         if (taskToUpdate.LocalStatus != LocalStatus.CREATED)
                             taskToUpdate.LocalStatus = LocalStatus.UPDATED;
                         taskToUpdate.ToBeSynced = true;
