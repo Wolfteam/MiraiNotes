@@ -14,8 +14,8 @@ namespace MiraiNotes.UWP.Services
     {
         #region Constans
 
-        private const string ClientId = "442000266621-ueo5g3sfnqe20sn2k0gaf51aoo45tar6.apps.googleusercontent.com";
-        private const string ClientSecret = "WhPYeY662TkXKDGryBqUZP7n";
+        private const string ClientId = "xxx";
+        private const string ClientSecret = "xxx";
 
         #endregion
 
