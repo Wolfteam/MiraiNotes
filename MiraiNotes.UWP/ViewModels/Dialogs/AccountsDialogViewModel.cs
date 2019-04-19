@@ -86,9 +86,6 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             RegisterCommands();
         }
 
-        //TODO: IF WE CHANGE ACCOUNTS, THE TASK PAGE IS NOT GETTING CLEANED, ONLY THE TASKLIST
-        //TODO: GOOGLEUSERVIEWMODEL PROPERTIES MUST RAISE THE PROPERTY CHANGED
-        //TODO: IMG SHOULD BE CACHED, INSTEAD OF BEING DOWNLOADED BY THE URL
         //TODO: SHOULD I STOP RUNNING A BG TASK? BTW THE TASK THAT WILL ONLY GET SYNCED ARE FOR THE CURRENT ACCOUNT
         //TODO: MOVE THE SIGNIN TO A COMMON METHOD
 
@@ -101,21 +98,30 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             AddAccountCommand = new RelayCommand
                 (async () => await AddAccountAsync());
 
-            ChangeCurrentAccountCommand = new RelayCommand<int>
-                (async id =>
-                {
-                    _messenger.Send(new Tuple<bool, string>(true, "Switching account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-                    await ChangeCurrentAccountAsync(id);
-                    _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-                });
+            ChangeCurrentAccountCommand = new RelayCommand<GoogleUserViewModel>(async account =>
+            {
+                HideDialogRequest.Invoke();
+                _messenger.Send(new Tuple<bool, string>(true, $"Switching to {account.Email}..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                await ChangeCurrentAccountAsync(account.ID);
+                _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+            });
 
-            DeleteAccountCommand = new RelayCommand<GoogleUserViewModel>
-                (async account =>
-                {
-                    _messenger.Send(new Tuple<bool, string>(true, "Deleting account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-                    await DeleteAccountAsync(account);
-                    _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-                });
+            DeleteAccountCommand = new RelayCommand<GoogleUserViewModel>(async account =>
+            {
+                HideDialogRequest.Invoke();
+
+                bool confirmed = await _dialogService.ShowConfirmationDialogAsync(
+                    "Confirmation",
+                    $"Are you sure you wanna delete {account.Email} from your accounts?",
+                    "Yes",
+                    "No");
+
+                if (!confirmed)
+                    return;
+                _messenger.Send(new Tuple<bool, string>(true, $"Deleting {account.Email}..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                await DeleteAccountAsync(account);
+                _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+            });
         }
 
         public async Task InitAsync()
@@ -129,8 +135,12 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                     "An error occurred while trying to load the user accounts");
                 return;
             }
-
-            var accounts = _mapper.Map<IEnumerable<GoogleUserViewModel>>(response.Result);
+            var accounts = new List<GoogleUserViewModel>();
+            foreach (var user in response.Result)
+            {
+                var vm = new GoogleUserViewModel(_googleUserService);
+                accounts.Add(_mapper.Map(user, vm));
+            }
             Accounts = new ObservableCollection<GoogleUserViewModel>(accounts);
         }
 
@@ -323,9 +333,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 true,
                 userSaveResponse.Result.Email);
 
-            await _googleUserService.RemoveProfileImage();
-
-            await _googleUserService.DownloadProfileImage(user.ImageUrl);
+            await _googleUserService.DownloadProfileImage(user.ImageUrl, user.ID);
 
             return _mapper.Map<GoogleUserViewModel>(userSaveResponse.Result);
         }
@@ -333,8 +341,6 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         private async Task ChangeCurrentAccountAsync(int id)
         {
             _logger.Information($"{nameof(ChangeCurrentAccountAsync)}: Changing current active user to userId = {id}");
-            HideDialogRequest.Invoke();
-
             var userInDbResponse = await _dataService
                 .UserService
                 .FirstOrDefaultAsNoTrackingAsync(u => u.ID == id);
@@ -382,16 +388,6 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
         private async Task DeleteAccountAsync(GoogleUserViewModel account)
         {
-            HideDialogRequest.Invoke();
-
-            bool confirmed = await _dialogService.ShowConfirmationDialogAsync(
-                "Confirmation",
-                $"Are you sure you wanna delete {account.Email} from your accounts?",
-                "Yes",
-                "No");
-
-            if (!confirmed)
-                return;
             _logger.Information($"{nameof(DeleteAccountAsync)}: Deleting user = {account.Email}...");
 
             var userInDbResponse = await _dataService

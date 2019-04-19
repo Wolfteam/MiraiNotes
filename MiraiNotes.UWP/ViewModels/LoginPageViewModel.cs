@@ -307,9 +307,7 @@ namespace MiraiNotes.UWP.ViewModels
                 true,
                 userSaved.Result.Email);
 
-            await _googleUserService.RemoveProfileImage();
-
-            await _googleUserService.DownloadProfileImage(user.ImageUrl);
+            await _googleUserService.DownloadProfileImage(user.ImageUrl, user.ID);
 
             //if you came this far, that means everything is ok!
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);

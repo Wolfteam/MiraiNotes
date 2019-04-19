@@ -13,22 +13,23 @@ namespace MiraiNotes.UWP.Interfaces
         Task<GoogleUserModel> GetUserInfoAsync();
 
         /// <summary>
-        /// Removes the profile image of the user
+        /// Removes the local profile image of the user specified in <paramref name="googleUserId"/>
         /// </summary>
         /// <returns>Task</returns>
-        Task RemoveProfileImage();
+        Task RemoveProfileImage(string googleUserId);
 
         /// <summary>
         /// Downloads the profile image specified by <paramref name="url"/>
         /// </summary>
         /// <param name="url">Url of the image</param>
         /// <returns>Task</returns>
-        Task DownloadProfileImage(string url);
+        Task DownloadProfileImage(string url, string googleUserId);
 
         /// <summary>
-        /// Gets the full path of the profile image for the current logged user
+        /// Gets the full path of the profile image for user specified
+        /// in <paramref name="googleUserId"/>
         /// </summary>
         /// <returns>The full image path</returns>
-        string GetCurrentUserProfileImagePath();
+        string GetUserProfileImagePath(string googleUserId);
     }
 }

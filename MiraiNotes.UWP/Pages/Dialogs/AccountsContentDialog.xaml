@@ -49,7 +49,7 @@
                     <CommandBar.PrimaryCommands>
                         <AppBarButton
                             Command="{Binding ElementName=AccountsListView, Path=DataContext.ChangeCurrentAccountCommand}"
-                            CommandParameter="{Binding ID}"
+                            CommandParameter="{Binding}"
                             Icon="Accept"
                             IsEnabled="{Binding IsActive, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                             Label="Set as default"

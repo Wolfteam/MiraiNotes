@@ -51,6 +51,7 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _isSelectionInProgress;
         private string _currentUserName;
         private string _userInitials;
+        private string _currentUserProfileImagePath;
 
         #endregion
 
@@ -121,10 +122,11 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _userInitials; }
             set { Set(ref _userInitials, value); }
         }
-
+        
         public string CurrentUserProfileImagePath
         {
-            get => _googleUserService.GetCurrentUserProfileImagePath();
+            get { return _currentUserProfileImagePath; }
+            set { Set(ref _currentUserProfileImagePath, value); }
         }
 
         #endregion
@@ -263,6 +265,7 @@ namespace MiraiNotes.UWP.ViewModels
                         userInitials += part.Substring(0, 1);
                 });
                 CurrentUserInitials = userInitials;
+                CurrentUserProfileImagePath = _googleUserService.GetUserProfileImagePath(currentUser.Result.GoogleUserID);
             }
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
