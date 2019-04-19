@@ -5,20 +5,23 @@ using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.Security.Authentication.Web;
 
 namespace MiraiNotes.UWP.ViewModels.Dialogs
 {
     public class AccountsDialogViewModel : ViewModelBase
     {
+        #region Members
+        private readonly ILogger _logger;
         private readonly IMessenger _messenger;
         private readonly IMapper _mapper;
         private readonly IGoogleAuthService _googleAuthService;
@@ -32,6 +35,18 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         private ObservableCollection<GoogleUserViewModel> _accounts =
             new ObservableCollection<GoogleUserViewModel>();
 
+        #endregion
+
+        #region Properties
+        public ObservableCollection<GoogleUserViewModel> Accounts
+        {
+            get => _accounts;
+            private set => Set(ref _accounts, value);
+        }
+
+        #endregion
+
+        #region Commands
         public ICommand LoadedCommand { get; private set; }
 
         public ICommand AddAccountCommand { get; private set; }
@@ -40,13 +55,14 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
         public ICommand DeleteAccountCommand { get; private set; }
 
-        public ObservableCollection<GoogleUserViewModel> Accounts
-        {
-            get => _accounts;
-            set => Set(ref _accounts, value);
-        }
+        #endregion
+
+        #region Events
+        public HideDialog HideDialogRequest;
+        #endregion
 
         public AccountsDialogViewModel(
+            ILogger logger,
             IMessenger messenger,
             IMapper mapper,
             IGoogleAuthService googleAuthService,
@@ -57,6 +73,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             INetworkService networkService,
             ISyncService syncService)
         {
+            _logger = logger;
             _messenger = messenger;
             _mapper = mapper;
             _googleAuthService = googleAuthService;
@@ -72,11 +89,10 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         //TODO: IF WE CHANGE ACCOUNTS, THE TASK PAGE IS NOT GETTING CLEANED, ONLY THE TASKLIST
         //TODO: GOOGLEUSERVIEWMODEL PROPERTIES MUST RAISE THE PROPERTY CHANGED
         //TODO: IMG SHOULD BE CACHED, INSTEAD OF BEING DOWNLOADED BY THE URL
-        //TODO: IF THE SAME EMAIL IS ALREADY IN DB WE NEED TO VALIDATE IT
-        //TODO: THIS SHIT CRASH IF WE SHOW ANOTHER DIALOG
         //TODO: SHOULD I STOP RUNNING A BG TASK? BTW THE TASK THAT WILL ONLY GET SYNCED ARE FOR THE CURRENT ACCOUNT
-        //TODO: IF WE SWITCH ACCOUNTS, SHOULD I CALL THE SYNC SERVICE?
+        //TODO: MOVE THE SIGNIN TO A COMMON METHOD
 
+        #region Methods
         private void RegisterCommands()
         {
             LoadedCommand = new RelayCommand
@@ -86,14 +102,25 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 (async () => await AddAccountAsync());
 
             ChangeCurrentAccountCommand = new RelayCommand<int>
-                (async id => await ChangeCurrentAccountAsync(id));
+                (async id =>
+                {
+                    _messenger.Send(new Tuple<bool, string>(true, "Switching account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                    await ChangeCurrentAccountAsync(id);
+                    _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                });
 
             DeleteAccountCommand = new RelayCommand<GoogleUserViewModel>
-                (async account => await DeleteAccountAsync(account));
+                (async account =>
+                {
+                    _messenger.Send(new Tuple<bool, string>(true, "Deleting account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                    await DeleteAccountAsync(account);
+                    _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+                });
         }
 
         public async Task InitAsync()
         {
+            _logger.Information($"{nameof(InitAsync)}: Loading all the saved users in db");
             var response = await _dataService.UserService.GetAllAsNoTrackingAsync();
             if (!response.Succeed)
             {
@@ -114,94 +141,73 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 await _dialogService.ShowMessageDialogAsync("Error", "Network is not available");
                 return;
             }
-            _messenger.Send(new Tuple<bool, string>(true, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
-            var requestUri = new Uri(_googleAuthService.GetAuthorizationUrl());
-            var callbackUri = new Uri(_googleAuthService.ApprovalUrl);
+
+            _messenger.Send(new Tuple<bool, string>(true, "Adding a new account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+            _logger.Information($"{nameof(AddAccountAsync)}: Trying to sign in with google...");
+            var response = await _googleAuthService.SignInWithGoogle();
+            await OnGoogleSignInResponse(response);
+
+            _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
+        }
+
+        private async Task OnGoogleSignInResponse(Response<TokenResponse> response)
+        {
+            string currentUser = _userCredentialService.GetCurrentLoggedUsername();
             try
             {
-                var result = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, requestUri, callbackUri);
-                switch (result.ResponseStatus)
+                if (!response.Succeed)
                 {
-                    case WebAuthenticationStatus.Success:
-                        var queryParams = result.ResponseData
-                            .Split('&')
-                            .ToDictionary(c => c.Split('=')[0], c => Uri.UnescapeDataString(c.Split('=')[1]));
-
-                        if (queryParams.ContainsKey("error"))
-                        {
-                            await _dialogService.ShowMessageDialogAsync("Error", $"OAuth authorization error: {queryParams["error"]}");
-                            return;
-                        }
-
-                        if (!queryParams.ContainsKey("approvalCode"))
-                        {
-                            await _dialogService.ShowMessageDialogAsync("Error", "Malformed authorization response.");
-                            return;
-                        }
-
-                        // Gets the Authorization code
-                        string approvalCode = queryParams["approvalCode"];
-                        var tokenResponse = await _googleAuthService.GetTokenAsync(approvalCode);
-                        if (tokenResponse == null)
-                        {
-                            await _dialogService.ShowMessageDialogAsync("Something happended...!", "Couldn't get a token");
-                            return;
-                        }
-
-                        //We temporaly save and asociate the token to a default user 
-                        //before doing any other network requst..
-                        _userCredentialService.SaveUserCredential(
-                            PasswordVaultResourceType.LOGGED_USER_RESOURCE,
-                            _userCredentialService.DefaultUsername,
-                            _userCredentialService.DefaultUsername);
-
-                        _userCredentialService.SaveUserCredential(
-                            PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
-                            _userCredentialService.DefaultUsername,
-                            tokenResponse.RefreshToken);
-
-                        _userCredentialService.SaveUserCredential(
-                            PasswordVaultResourceType.TOKEN_RESOURCE,
-                            _userCredentialService.DefaultUsername,
-                            tokenResponse.AccessToken);
-
-                        //TODO: I NEED TO DO SOMETHING WHEN THIS SHIT FAILS
-                        var user = await SignInAsync();
-                        if (user is null)
-                        {
-                            await _dataService
-                                .UserService
-                                .ChangeCurrentUserStatus(false);
-
-                            _userCredentialService.DeleteUserCredential(
-                                PasswordVaultResourceType.ALL,
-                                _userCredentialService.DefaultUsername);
-                            return;
-                        }
-                        ChangeIsActiveStatus(false);
-                        Accounts.Add(user);
-                        _messenger.Send(user.Fullname, $"{MessageType.CURRENT_USER_CHANGED}");
-                        break;
-                    case WebAuthenticationStatus.UserCancel:
-                        break;
-                    case WebAuthenticationStatus.ErrorHttp:
-                        await _dialogService.ShowMessageDialogAsync("Error", result.ResponseErrorDetail.ToString());
-                        break;
-                    default:
-                        await _dialogService.ShowMessageDialogAsync("Error", result.ResponseData);
-                        break;
+                    //user canceled auth..
+                    if (string.IsNullOrEmpty(response.Message))
+                        return;
+                    _logger.Error($"{nameof(OnGoogleSignInResponse)}: The token response failed. {response.Message}");
+                    await _dialogService.ShowMessageDialogAsync("Error", response.Message);
+                    return;
                 }
+
+                //We temporaly save and asociate the token to a default user 
+                //before doing any other network requst..
+                _userCredentialService.SaveUserCredential(
+                    PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                    _userCredentialService.DefaultUsername,
+                    _userCredentialService.DefaultUsername);
+
+                _userCredentialService.SaveUserCredential(
+                    PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                    _userCredentialService.DefaultUsername,
+                    response.Result.RefreshToken);
+
+                _userCredentialService.SaveUserCredential(
+                    PasswordVaultResourceType.TOKEN_RESOURCE,
+                    _userCredentialService.DefaultUsername,
+                    response.Result.AccessToken);
+
+                var user = await SignInAsync();
+                if (user is null)
+                {
+                    throw new Exception("An error occurred while trying to sign in into the app");
+                }
+
+                ChangeIsActiveStatus(false);
+                Accounts.Add(user);
+                _messenger.Send(user.Fullname, $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}");
             }
             catch (Exception ex)
             {
-                //_userCredentialService.DeleteUserCredential(
-                //    PasswordVaultResourceType.ALL,
-                //    _userCredentialService.DefaultUsername);
+                await _dataService
+                    .UserService
+                    .SetAsCurrentUser(currentUser);
+
+                _userCredentialService.DeleteUserCredential(
+                    PasswordVaultResourceType.ALL,
+                    _userCredentialService.DefaultUsername);
+
+                _userCredentialService.SaveUserCredential(
+                    PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                    _userCredentialService.DefaultUsername,
+                    currentUser);
+                _logger.Error(ex, $"{nameof(OnGoogleSignInResponse)}: An unknown error occurred while signing in the app");
                 await _dialogService.ShowErrorMessageDialogAsync(ex, "An unknown error occurred");
-            }
-            finally
-            {
-                _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
             }
         }
 
@@ -214,6 +220,22 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 return null;
             }
 
+            var userExistsResponse = await _dataService.UserService
+                .ExistsAsync(u => u.GoogleUserID == user.ID);
+
+            if (!userExistsResponse.Succeed)
+            {
+                await _dialogService.ShowMessageDialogAsync("Error", "Couldnt check if user already exists in the db");
+                return null;
+            }
+
+            //if the user is trying to add an existing account
+            if (userExistsResponse.Result)
+            {
+                await _dialogService.ShowMessageDialogAsync("Error", $"{user.Email} already exsits in the db");
+                return null;
+            }
+
             await _dataService
                 .UserService
                 .ChangeCurrentUserStatus(false);
@@ -221,6 +243,8 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             var response = await _dataService
                 .UserService
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
+
+            var now = DateTimeOffset.UtcNow;
             Response<GoogleUser> userSaveResponse;
             if (!response.Result)
             {
@@ -230,7 +254,8 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                     Fullname = user.FullName,
                     PictureUrl = user.ImageUrl,
                     GoogleUserID = user.ID,
-                    IsActive = true
+                    IsActive = true,
+                    CreatedAt = now
                 });
             }
             else
@@ -249,6 +274,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 userInDbResponse.Result.Email = user.Email;
                 userInDbResponse.Result.IsActive = true;
                 userInDbResponse.Result.PictureUrl = user.ImageUrl;
+                userInDbResponse.Result.UpdatedAt = now;
 
                 userSaveResponse = await _dataService
                     .UserService
@@ -263,21 +289,21 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 return null;
             }
 
+            _logger.Information($"{nameof(SignInAsync)}: Trying to get all the task lists that are remote...");
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
             if (!syncResult.Succeed)
             {
-                await _dialogService
-                    .ShowMessageDialogAsync("Error", syncResult.Message);
+                await _dialogService.ShowMessageDialogAsync("Error", syncResult.Message);
                 return null;
             }
 
+            _logger.Information($"{nameof(SignInAsync)}: Trying to get all the tasks that are remote...");
             syncResult = await _syncService.SyncDownTasksAsync(false);
 
             if (!syncResult.Succeed)
             {
-                await _dialogService
-                    .ShowMessageDialogAsync("Error", syncResult.Message);
+                await _dialogService.ShowMessageDialogAsync("Error", syncResult.Message);
                 return null;
             }
 
@@ -306,9 +332,8 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
         private async Task ChangeCurrentAccountAsync(int id)
         {
-            await _dataService
-                .UserService
-                .ChangeCurrentUserStatus(false);
+            _logger.Information($"{nameof(ChangeCurrentAccountAsync)}: Changing current active user to userId = {id}");
+            HideDialogRequest.Invoke();
 
             var userInDbResponse = await _dataService
                 .UserService
@@ -319,6 +344,10 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 await _dialogService.ShowMessageDialogAsync("Error", userInDbResponse.Message);
                 return;
             }
+
+            await _dataService
+                .UserService
+                .ChangeCurrentUserStatus(false);
 
             userInDbResponse.Result.IsActive = true;
 
@@ -333,18 +362,38 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                     $"The user could not be saved / updated into the db. Error = {userSaveResponse.Message}");
                 return;
             }
+
             _userCredentialService.UpdateUserCredential(
                 PasswordVaultResourceType.LOGGED_USER_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 false,
                 userInDbResponse.Result.Email);
 
+            if (_networkService.IsInternetAvailable())
+            {
+                await _syncService.SyncDownTaskListsAsync(false);
+                await _syncService.SyncDownTasksAsync(false);
+                await _syncService.SyncUpTaskListsAsync(false);
+                await _syncService.SyncUpTasksAsync(false);
+            }
             ChangeIsActiveStatus(false, id);
-            _messenger.Send(userSaveResponse.Result.Fullname, $"{MessageType.CURRENT_USER_CHANGED}");
+            _messenger.Send(userSaveResponse.Result.Fullname, $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}");
         }
 
         private async Task DeleteAccountAsync(GoogleUserViewModel account)
         {
+            HideDialogRequest.Invoke();
+
+            bool confirmed = await _dialogService.ShowConfirmationDialogAsync(
+                "Confirmation",
+                $"Are you sure you wanna delete {account.Email} from your accounts?",
+                "Yes",
+                "No");
+
+            if (!confirmed)
+                return;
+            _logger.Information($"{nameof(DeleteAccountAsync)}: Deleting user = {account.Email}...");
+
             var userInDbResponse = await _dataService
                 .UserService
                 .FirstOrDefaultAsNoTrackingAsync(u => u.ID == account.ID);
@@ -355,22 +404,16 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 return;
             }
 
-            //bool confirmed = await _dialogService.ShowConfirmationDialogAsync(
-            //    "Confirmation",
-            //    $"Are you sure you wanna delete {userInDbResponse.Result.Email} from your accounts?",
-            //    "Yes",
-            //    "No");
-
-            //if (!confirmed)
-            //    return;
-
             if (userInDbResponse.Result.IsActive && Accounts.Count == 1)
             {
                 await _dialogService.ShowMessageDialogAsync("Error", "You can not delete the default account");
                 return;
             }
-            else if (userInDbResponse.Result.IsActive)
+
+            if (userInDbResponse.Result.IsActive)
             {
+                _logger.Information($"{nameof(DeleteAccountAsync)}: User = {account.Email} " +
+                    $"is active, setting the active flag to another user");
                 //esto creo q revienta...
                 int nextIndex = 0;
                 int currentIndex = Accounts.IndexOf(account);
@@ -382,26 +425,19 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 else if (next != null)
                     nextIndex = currentIndex + 1;
 
-
                 var defaultAccount = Accounts[nextIndex];
 
-                var userInDbResponse2 = await _dataService
+                _logger.Information($"{nameof(DeleteAccountAsync)}: User = {defaultAccount.Email} will be marked as active");
+
+                var response = await _dataService
                     .UserService
-                    .FirstOrDefaultAsNoTrackingAsync(u => u.ID == defaultAccount.ID);
+                    .SetAsCurrentUser(defaultAccount.Email);
 
-                if (!userInDbResponse2.Succeed)
+                if (!response.Succeed)
                 {
-                    await _dialogService.ShowMessageDialogAsync("Error", userInDbResponse2.Message);
-                    return;
-                }
-
-                userInDbResponse2.Result.IsActive = true;
-                var updatedResponse = await _dataService.UserService
-                    .UpdateAsync(userInDbResponse2.Result);
-
-                if (!updatedResponse.Succeed)
-                {
-                    await _dialogService.ShowMessageDialogAsync("Error", updatedResponse.Message);
+                    await _dialogService.ShowMessageDialogAsync(
+                        "Error",
+                        $"Couldnt set {defaultAccount.Email} as default. Error = {response.Message}");
                     return;
                 }
 
@@ -412,11 +448,11 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                     _userCredentialService.DefaultUsername,
                     false,
                     defaultAccount.Email);
-                _messenger.Send(defaultAccount.Fullname, $"{MessageType.CURRENT_USER_CHANGED}");
+                _messenger.Send(defaultAccount.Fullname, $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}");
             }
 
             _userCredentialService.DeleteUserCredential(
-                PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE, 
+                PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
                 userInDbResponse.Result.Email);
 
             _userCredentialService.DeleteUserCredential(
@@ -444,5 +480,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                     account.IsActive = isActive;
             }
         }
+
+        #endregion
     }
 }

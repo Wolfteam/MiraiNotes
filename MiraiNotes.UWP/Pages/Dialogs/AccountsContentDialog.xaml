@@ -8,6 +8,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vms="using:MiraiNotes.UWP.ViewModels"
+    x:Name="AccountsDialog"
     Title="User accounts"
     HorizontalContentAlignment="Stretch"
     Background="{ThemeResource ContentDialogBackground}"
@@ -52,7 +53,7 @@
                             Icon="Accept"
                             IsEnabled="{Binding IsActive, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                             Label="Set as default"
-                            ToolTipService.ToolTip="Set as the current account" />
+                            ToolTipService.ToolTip="Set as the current active account" />
                         <AppBarButton
                             Command="{Binding ElementName=AccountsListView, Path=DataContext.DeleteAccountCommand}"
                             CommandParameter="{Binding}"
