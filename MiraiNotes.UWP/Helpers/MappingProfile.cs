@@ -61,7 +61,8 @@ namespace MiraiNotes.UWP.Helpers
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
                 .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.GoogleTaskID));
 
-            CreateMap<GoogleUser, GoogleUserViewModel>();
+            CreateMap<GoogleUser, GoogleUserViewModel>()
+                .ConstructUsingServiceLocator();
             #endregion
         }
     }
