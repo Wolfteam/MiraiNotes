@@ -25,5 +25,7 @@ namespace MiraiNotes.UWP.Interfaces
         TaskListSortType DefaultTaskListSortOrder { get; set; }
 
         void ResetAppSettings();
+
+        bool RunFullSyncAfterSwitchingAccounts { get; set; }
     }
 }

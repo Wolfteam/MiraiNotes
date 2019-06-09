@@ -145,6 +145,7 @@ namespace MiraiNotes.DataService.Services
                             .AsNoTracking()
                             .Where(predicate)
                             .CountAsync() == 1;
+                        response.Succeed = true;
                         _logger.Information("ExistsAsync: Completed successfully");
                     }
                     catch (Exception e)
@@ -520,7 +521,7 @@ namespace MiraiNotes.DataService.Services
                 {
                     try
                     {
-                        var entity = await GetByIdAsync(id);
+                        var entity = await context.Users.FindAsync(id);
                         if (entity == null)
                         {
                             response.Message = "Entity couldn't be removed cause it wasnt found";
@@ -650,6 +651,38 @@ namespace MiraiNotes.DataService.Services
             else
                 result = $"{e.Message}. StackTrace: {e.StackTrace}";
             return result;
+        }
+
+        public async Task<EmptyResponse> SetAsCurrentUser(string email)
+        {
+            return await Task.Run(async () =>
+            {
+                _logger.Information("SetAsCurrentUser: Trying to get the current active user");
+                var response = new Response<GoogleUser>
+                {
+                    Succeed = false,
+                    Message = string.Empty
+                };
+                using(var context = new MiraiNotesContext())
+                {
+                    var user = context.Users.FirstOrDefault(u => u.Email == email);
+                    if (user is null)
+                    {
+                        response.Message = $"Email = {email} does not exists in db";
+                        _logger.Warning(response.Message);
+                        return response;
+                    }
+                    var activeUser = context.Users.FirstOrDefault(u => u.IsActive);
+                    if (activeUser != null)
+                    {
+                        activeUser.IsActive = false;
+                    }
+                    user.IsActive = true;
+                    response.Succeed = await context.SaveChangesAsync() > 0;
+                }
+                _logger.Information("SetAsCurrentUser: Completed successfully");
+                return response;
+            }).ConfigureAwait(false);
         }
     }
 }

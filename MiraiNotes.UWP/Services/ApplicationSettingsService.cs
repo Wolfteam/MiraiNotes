@@ -64,6 +64,12 @@ namespace MiraiNotes.UWP.Services
             get => (bool)(_settings[nameof(RunSyncBackgroundTaskAfterStart)] ?? false);
             set => _settings[nameof(RunSyncBackgroundTaskAfterStart)] = value;
         }
+
+        public bool RunFullSyncAfterSwitchingAccounts
+        {
+            get => (bool)(_settings[nameof(RunFullSyncAfterSwitchingAccounts)] ?? true);
+            set => _settings[nameof(RunFullSyncAfterSwitchingAccounts)] = value;
+        }
         #endregion
 
 

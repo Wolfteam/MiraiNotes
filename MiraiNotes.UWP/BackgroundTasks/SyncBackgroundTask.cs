@@ -67,7 +67,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
             };
 
             string message = syncResults.Any(r => !r.Succeed) ?
-                string.Join(",\n", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
+                string.Join($".{Environment.NewLine}", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
                 $"A {(startedManually ? "manual" : "automatic" )} full sync was successfully performed.";
 
             if (string.IsNullOrEmpty(message))

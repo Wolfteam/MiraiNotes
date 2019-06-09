@@ -58,14 +58,11 @@ namespace MiraiNotes.UWP.Helpers
                 .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt));
 
             CreateMap<GoogleTask, ItemModel>()
-            .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
-            .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.GoogleTaskID));
+                .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
+                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.GoogleTaskID));
 
             CreateMap<GoogleUser, GoogleUserViewModel>()
-                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email))
-                .ForMember(d => d.Fullname, opt => opt.MapFrom(s => s.Fullname))
-                .ForMember(d => d.PictureUrl, opt => opt.MapFrom(s => s.PictureUrl))
-                .ForMember(d => d.UserID, opt => opt.MapFrom(s => s.GoogleUserID));
+                .ConstructUsingServiceLocator();
             #endregion
         }
     }

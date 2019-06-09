@@ -9,5 +9,7 @@ namespace MiraiNotes.DataService.Interfaces
         Task<Response<GoogleUser>> GetCurrentActiveUserAsync();
 
         Task<EmptyResponse> ChangeCurrentUserStatus(bool isActive);
+
+        Task<EmptyResponse> SetAsCurrentUser(string email);
     }
 }

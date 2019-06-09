@@ -10,7 +10,6 @@ namespace MiraiNotes.UWP.Services
     public class GoogleUserService : IGoogleUserService
     {
         const string USER_INFO_ENDPOINT = "https://www.googleapis.com/oauth2/v3/userinfo";
-        const string USER_IMAGE_FILE_NAME = "user_image.png";
 
         private readonly IHttpClientsFactory _httpClientsFactory;
 
@@ -37,26 +36,28 @@ namespace MiraiNotes.UWP.Services
             }
         }
 
-        public async Task RemoveProfileImage()
+        public string GetUserProfileImagePath(string googleUserId)
+            => MiscellaneousUtils.GetUserProfileImagePath(googleUserId);
+
+        public async Task RemoveProfileImage(string googleUserId)
         {
-            await MiscellaneousUtils.RemoveFile(USER_IMAGE_FILE_NAME);
+            string filename = MiscellaneousUtils.BuildImageFilename(googleUserId);
+            await MiscellaneousUtils.RemoveFile(filename);
         }
 
-        public async Task DownloadProfileImage(string url)
+        public async Task DownloadProfileImage(string url, string googleUserId)
         {
+            string filename = MiscellaneousUtils.BuildImageFilename(googleUserId);
             try
             {
                 var client = _httpClientsFactory.GetHttpClient();
                 var imageBytes = await client.GetByteArrayAsync(url);
-                await MiscellaneousUtils.SaveFile(USER_IMAGE_FILE_NAME, imageBytes);
+                await MiscellaneousUtils.SaveFile(filename, imageBytes);
             }
             catch (Exception)
             {
                 //Http excep..
             }
         }
-
-        public string GetCurrentUserProfileImagePath()
-            => $"{MiscellaneousUtils.GetApplicationPath()}/{USER_IMAGE_FILE_NAME}";
     }
 }

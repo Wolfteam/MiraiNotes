@@ -51,6 +51,7 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _isSelectionInProgress;
         private string _currentUserName;
         private string _userInitials;
+        private string _currentUserProfileImagePath;
 
         #endregion
 
@@ -121,10 +122,11 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _userInitials; }
             set { Set(ref _userInitials, value); }
         }
-
+        
         public string CurrentUserProfileImagePath
         {
-            get => _googleUserService.GetCurrentUserProfileImagePath();
+            get { return _currentUserProfileImagePath; }
+            set { Set(ref _currentUserProfileImagePath, value); }
         }
 
         #endregion
@@ -150,6 +152,8 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand ClosePaneCommand { get; set; }
 
         public ICommand OpenSettingsCommand { get; set; }
+
+        public ICommand OpenUserAccountsCommand { get; set; }
 
         #endregion
 
@@ -201,6 +205,14 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}",
                 SortTaskLists);
+            _messenger.Register<string>(
+                this,
+                $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}",
+                async (_) =>
+                {
+                    await LoadProfileInfo();
+                    await InitViewAsync(true);
+                });
         }
 
         private void SetCommands()
@@ -234,6 +246,9 @@ namespace MiraiNotes.UWP.ViewModels
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
 
             OpenSettingsCommand = new RelayCommand(() => IsSettingsPaneOpen = true);
+
+            OpenUserAccountsCommand = new RelayCommand
+                (async () => await _dialogService.ShowCustomDialog(CustomDialogType.ACCOUNTS_DIALOG));
         }
 
         private async Task LoadProfileInfo()
@@ -250,6 +265,7 @@ namespace MiraiNotes.UWP.ViewModels
                         userInitials += part.Substring(0, 1);
                 });
                 CurrentUserInitials = userInitials;
+                CurrentUserProfileImagePath = _googleUserService.GetUserProfileImagePath(currentUser.Result.GoogleUserID);
             }
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
@@ -310,6 +326,10 @@ namespace MiraiNotes.UWP.ViewModels
             SelectedItem = TaskLists.Any(tl => tl.TaskListID == selectedTaskListID)
                 ? TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID)
                 : TaskLists.FirstOrDefault();
+            //For some reason OnNavigationViewSelectionChangeAsync is not getting called
+            //if SelectedItem is null
+            if (SelectedItem is null)
+                OnNavigationViewSelectionChangeAsync(SelectedItem);
         }
 
         public void OnTaskListAutoSuggestBoxTextChange(string currentText)
@@ -419,7 +439,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             dbResponse.Result.Title = newTitle;
-            dbResponse.Result.UpdatedAt = DateTime.Now;
+            dbResponse.Result.UpdatedAt = DateTimeOffset.UtcNow;
             dbResponse.Result.ToBeSynced = true;
             if (dbResponse.Result.LocalStatus != LocalStatus.CREATED)
                 dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
