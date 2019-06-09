@@ -41,5 +41,12 @@
                 SelectedItem="{Binding CurrentSyncBackgroundTaskInterval, Mode=TwoWay}"
                 SelectedValuePath="ItemID" />
         </StackPanel>
+        <StackPanel Margin="5">
+            <ToggleSwitch
+                Header="Run a full sync when switching accounts"
+                IsOn="{Binding RunFullSyncAfterSwitchingAccounts, Mode=TwoWay}"
+                OffContent="No"
+                OnContent="Yes" />
+        </StackPanel>
     </StackPanel>
 </Page>

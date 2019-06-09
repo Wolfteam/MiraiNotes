@@ -31,7 +31,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
         private readonly ISyncService _syncService;
-
+        private readonly IApplicationSettingsService _appSettings;
         private ObservableCollection<GoogleUserViewModel> _accounts =
             new ObservableCollection<GoogleUserViewModel>();
 
@@ -71,7 +71,8 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             ICustomDialogService dialogService,
             IMiraiNotesDataService dataService,
             INetworkService networkService,
-            ISyncService syncService)
+            ISyncService syncService,
+            IApplicationSettingsService appSettingsService)
         {
             _logger = logger;
             _messenger = messenger;
@@ -83,10 +84,10 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             _dataService = dataService;
             _networkService = networkService;
             _syncService = syncService;
+            _appSettings = appSettingsService;
             RegisterCommands();
         }
 
-        //TODO: SHOULD I STOP RUNNING A BG TASK? BTW THE TASK THAT WILL ONLY GET SYNCED ARE FOR THE CURRENT ACCOUNT
         //TODO: MOVE THE SIGNIN TO A COMMON METHOD
 
         #region Methods
@@ -375,12 +376,31 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 false,
                 userInDbResponse.Result.Email);
 
-            if (_networkService.IsInternetAvailable())
+            bool isNetworkAvailable = _networkService.IsInternetAvailable();
+            if (isNetworkAvailable && _appSettings.RunFullSyncAfterSwitchingAccounts)
             {
-                await _syncService.SyncDownTaskListsAsync(false);
-                await _syncService.SyncDownTasksAsync(false);
-                await _syncService.SyncUpTaskListsAsync(false);
-                await _syncService.SyncUpTasksAsync(false);
+                var syncResults = new List<EmptyResponse>
+                {
+                    await _syncService.SyncDownTaskListsAsync(false),
+                    await _syncService.SyncDownTasksAsync(false),
+                    await _syncService.SyncUpTaskListsAsync(false),
+                    await _syncService.SyncUpTasksAsync(false)
+                };
+
+                string message = syncResults.Any(r => !r.Succeed)
+                    ? string.Join($".{Environment.NewLine}", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct())
+                    : "A automatic full sync was successfully performed.";
+
+                if (string.IsNullOrEmpty(message))
+                    message = "An unknown error occurred while trying to perform the sync operation.";
+
+                _messenger.Send(message, $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
+            }
+            else if (!isNetworkAvailable)
+            {
+                _messenger.Send(
+                    "Internet is not available, a full sync will not be performed", 
+                    $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
             }
             ChangeIsActiveStatus(false, id);
             _messenger.Send(userSaveResponse.Result.Fullname, $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}");

@@ -299,6 +299,12 @@ namespace MiraiNotes.UWP.ViewModels
                 _backgroundTaskManagerService.RegisterBackgroundTasks(BackgroundTaskType.SYNC, true);
             }
         }
+
+        public bool RunFullSyncAfterSwitchingAccounts
+        {
+            get => _appSettings.RunFullSyncAfterSwitchingAccounts;
+            set => _appSettings.RunFullSyncAfterSwitchingAccounts = value;
+        }
         #endregion
 
         #region Notification Settings Properties
@@ -319,6 +325,7 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand NavigationRequestCommand { get; set; }
         #endregion
 
+        #region Constructors
         public SettingsPageViewModel(
             IApplicationSettingsService appSettings,
             ICustomDialogService dialogService,
@@ -334,6 +341,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             NavigationRequestCommand = new RelayCommand<SettingsPageType>
                 ((page) => NavigationRequest?.Invoke(page));
-        }
+        } 
+        #endregion
     }
 }
