@@ -22,6 +22,7 @@ namespace MiraiNotes.UWP.ViewModels
     public class TasksPageViewModel : BaseViewModel
     {
         #region Members
+
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
@@ -34,8 +35,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         private TaskListItemViewModel _currentTaskList;
 
-        private SmartObservableCollection<TaskItemViewModel> _tasks = new SmartObservableCollection<TaskItemViewModel>();
-        private SmartObservableCollection<ItemModel> _taskAutoSuggestBoxItems = new SmartObservableCollection<ItemModel>();
+        private SmartObservableCollection<TaskItemViewModel>
+            _tasks = new SmartObservableCollection<TaskItemViewModel>();
+
+        private SmartObservableCollection<ItemModel> _taskAutoSuggestBoxItems =
+            new SmartObservableCollection<ItemModel>();
 
         private bool _isTaskListTitleVisible;
         private bool _isTaskListViewVisible;
@@ -52,13 +56,17 @@ namespace MiraiNotes.UWP.ViewModels
 
         private bool _isSelectionInProgress;
 
-        private ObservableCollection<TaskListItemViewModel> _taskLists = new ObservableCollection<TaskListItemViewModel>();
+        private ObservableCollection<TaskListItemViewModel> _taskLists =
+            new ObservableCollection<TaskListItemViewModel>();
+
         private bool _showMoveTaskFlyoutProgressBar;
 
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
+
         #endregion
 
         #region Properties
+
         public SmartObservableCollection<TaskItemViewModel> Tasks
         {
             get { return _tasks; }
@@ -173,9 +181,11 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _showMoveTaskFlyoutProgressBar; }
             set { Set(ref _showMoveTaskFlyoutProgressBar, value); }
         }
+
         #endregion
 
         #region Commands
+
         public ICommand NewTaskCommand { get; set; }
 
         public ICommand NewTaskListCommand { get; set; }
@@ -213,13 +223,17 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand ShowSubTasksCommand { get; set; }
 
         public ICommand SubTaskSelectedItemCommand { get; set; }
+
         #endregion
 
         #region Events
+
         public ShowInAppNotificationRequest InAppNotificationRequest { get; set; }
+
         #endregion
 
         #region Constructors
+
         public TasksPageViewModel(
             ICustomDialogService dialogService,
             IMessenger messenger,
@@ -245,9 +259,11 @@ namespace MiraiNotes.UWP.ViewModels
             SetCommands();
             IsTaskListCommandBarCompact = true;
         }
+
         #endregion
 
         #region Methods
+
         private void RegisterMessages()
         {
             _messenger.Register<TaskListItemViewModel>(
@@ -338,8 +354,8 @@ namespace MiraiNotes.UWP.ViewModels
                     .TaskListService
                     .GetAsNoTrackingAsync(
                         tl => tl.LocalStatus != LocalStatus.DELETED &&
-                            tl.GoogleTaskListID != _currentTaskList.TaskListID &&
-                            tl.User.IsActive,
+                              tl.GoogleTaskListID != _currentTaskList.TaskListID &&
+                              tl.User.IsActive,
                         tl => tl.OrderBy(t => t.Title));
 
                 TaskLists = _mapper.Map<ObservableCollection<TaskListItemViewModel>>(dbResponse.Result);
@@ -367,17 +383,18 @@ namespace MiraiNotes.UWP.ViewModels
                 OnNoTaskListAvailable();
                 return;
             }
+
             ShowTaskListViewProgressRing = true;
 
             Tasks.Clear();
             TaskAutoSuggestBoxItems.Clear();
 
             var dbResponse = await _dataService
-              .TaskService
-              .GetAsNoTrackingAsync(
-                  t => t.TaskList.GoogleTaskListID == taskList.TaskListID &&
-                      t.LocalStatus != LocalStatus.DELETED,
-                  t => t.OrderBy(ta => ta.Position));
+                .TaskService
+                .GetAsNoTrackingAsync(
+                    t => t.TaskList.GoogleTaskListID == taskList.TaskListID &&
+                         t.LocalStatus != LocalStatus.DELETED,
+                    t => t.OrderBy(ta => ta.Position));
 
             if (!dbResponse.Succeed)
             {
@@ -398,8 +415,8 @@ namespace MiraiNotes.UWP.ViewModels
                         return;
                     t.SubTasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(
                         tasks
-                        .Where(st => st.ParentTask == t.TaskID)
-                        .OrderBy(st => st.Position));
+                            .Where(st => st.ParentTask == t.TaskID)
+                            .OrderBy(st => st.Position));
                 });
                 Tasks.AddRange(mainTasks);
                 TaskAutoSuggestBoxItems
@@ -407,6 +424,7 @@ namespace MiraiNotes.UWP.ViewModels
 
                 SortTasks(_appSettings.DefaultTaskSortOrder);
             }
+
             CurrentTaskList = taskList;
 
             //If we have something in the init details, lets select that task
@@ -438,8 +456,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public void OnTaskSelectectionChanged(TaskItemViewModel task)
         {
-            int selectedTasks = GetSelectedTasks()
-                .Count();
+            int selectedTasks = GetSelectedTasks().Count;
             UpdateSelectedTasksText(selectedTasks);
 
             if (_isSelectionInProgress)
@@ -459,7 +476,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
 
             var selectedSubTask = GetSelectedSubTask();
-            if (selectedSubTask.Count() > 0)
+            if (selectedSubTask.Any())
                 MarkAsSelectedAllSubTasks(false);
 
             _messenger.Send(task.IsSelected, $"{MessageType.OPEN_PANE}");
@@ -483,11 +500,11 @@ namespace MiraiNotes.UWP.ViewModels
         public void OnTaskAutoSuggestBoxTextChangeAsync(string currentText)
         {
             //TODO: Refactor this
-            var filteredItems = string.IsNullOrEmpty(currentText) ?
-                _mapper.Map<IEnumerable<ItemModel>>(Tasks
+            var filteredItems = string.IsNullOrEmpty(currentText)
+                ? _mapper.Map<IEnumerable<ItemModel>>(Tasks
                     .OrderBy(t => t.Title)
-                    .Take(10)) :
-                _mapper.Map<IEnumerable<ItemModel>>(Tasks
+                    .Take(10))
+                : _mapper.Map<IEnumerable<ItemModel>>(Tasks
                     .Where(t => t.Title.ToLowerInvariant().Contains(currentText.ToLowerInvariant()))
                     .OrderBy(t => t.Title)
                     .Take(10));
@@ -517,12 +534,13 @@ namespace MiraiNotes.UWP.ViewModels
             if (!dbResponse.Succeed || dbResponse.Result == null)
             {
                 ShowTaskListViewProgressRing = false;
-                string msg = dbResponse.Result == null ?
-                    "Could not find the saved task in db" :
-                    $"An unknown error occurred. Error = {dbResponse.Message}";
+                string msg = dbResponse.Result == null
+                    ? "Could not find the saved task in db"
+                    : $"An unknown error occurred. Error = {dbResponse.Message}";
                 await _dialogService.ShowMessageDialogAsync("Error", msg);
                 return;
             }
+
             var task = _mapper.Map<TaskItemViewModel>(dbResponse.Result);
 
             if (!task.HasParentTask)
@@ -540,8 +558,10 @@ namespace MiraiNotes.UWP.ViewModels
                     await _dialogService.ShowMessageDialogAsync("Error", msg);
                     return;
                 }
+
                 task.SubTasks = _mapper.Map<ObservableCollection<TaskItemViewModel>>(stsResponse.Result);
             }
+
             ShowTaskListViewProgressRing = false;
 
             if (task.HasParentTask)
@@ -554,9 +574,9 @@ namespace MiraiNotes.UWP.ViewModels
                     return;
 
                 int updatedSubTaskIndex = parentTask
-                    .SubTasks?
-                    .ToList()?
-                    .FindIndex(st => st.TaskID == task.TaskID) ?? -1;
+                                              .SubTasks?
+                                              .ToList()?
+                                              .FindIndex(st => st.TaskID == task.TaskID) ?? -1;
 
                 if (updatedSubTaskIndex != -1)
                     parentTask.SubTasks[updatedSubTaskIndex] = task;
@@ -566,8 +586,8 @@ namespace MiraiNotes.UWP.ViewModels
             else
             {
                 int updatedTaskIndex = Tasks?
-                    .ToList()
-                    .FindIndex(t => t.TaskID == task.TaskID) ?? -1;
+                                           .ToList()
+                                           .FindIndex(t => t.TaskID == task.TaskID) ?? -1;
 
                 if (updatedTaskIndex >= 0)
                 {
@@ -599,7 +619,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public void OnTaskStatusChanged(TaskItemViewModel task, bool isSubTask)
         {
-            TaskItemViewModel taskFound = null;
+            TaskItemViewModel taskFound;
             if (!isSubTask)
                 taskFound = Tasks
                     .FirstOrDefault(t => t.TaskID == task.TaskID);
@@ -645,10 +665,10 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 GoogleTaskListID = Guid.NewGuid().ToString(),
                 Title = taskListName,
-                UpdatedAt = DateTime.Now,
+                UpdatedAt = DateTimeOffset.UtcNow,
                 LocalStatus = LocalStatus.CREATED,
                 ToBeSynced = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTimeOffset.UtcNow
             };
             var response = await _dataService
                 .TaskListService
@@ -696,6 +716,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $"Error: {response.Message}.");
                 return;
             }
+
             var t = _mapper.Map<TaskItemViewModel>(response.Result);
             OnTaskStatusChanged(t, isSubTask);
 
@@ -800,6 +821,7 @@ namespace MiraiNotes.UWP.ViewModels
                     new Tuple<TaskItemViewModel, bool>(t, true),
                     $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
             }
+
             if (tasksStatusNotChanged.Count > 0)
             {
                 await _dialogService.ShowMessageDialogAsync(
@@ -906,7 +928,8 @@ namespace MiraiNotes.UWP.ViewModels
 
             var dbResponse = await _dataService
                 .TaskService
-                .MoveAsync(selectedTaskList.TaskListID, selectedTask.TaskID, selectedTask.ParentTask, selectedTask.Position);
+                .MoveAsync(selectedTaskList.TaskListID, selectedTask.TaskID, selectedTask.ParentTask,
+                    selectedTask.Position);
 
             if (!dbResponse.Succeed)
             {
@@ -923,6 +946,7 @@ namespace MiraiNotes.UWP.ViewModels
                 selectedTask.SubTasks.ForEach(st => st.ParentTask = dbResponse.Result.GoogleTaskID);
                 await MoveSubTasksAsync(selectedTaskList.TaskListID, selectedTask.SubTasks);
             }
+
             ShowTaskListViewProgressRing = false;
             SelectedTaskToMove = null;
 
@@ -1044,8 +1068,10 @@ namespace MiraiNotes.UWP.ViewModels
                     Tasks.SortByDescending(t => t.UpdatedAt);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("The TaskSortType doesnt have a default sort type");
+                    throw new ArgumentOutOfRangeException(nameof(sortType),
+                        "The TaskSortType doesnt have a default sort type");
             }
+
             CurrentTasksSortOrder = sortType;
             _isSelectionInProgress = false;
         }
@@ -1066,8 +1092,8 @@ namespace MiraiNotes.UWP.ViewModels
             IsTaskListViewVisible = isVisible;
         }
 
-        private IEnumerable<TaskItemViewModel> GetSelectedTasks()
-            => Tasks?.Where(t => t.IsSelected) ?? Enumerable.Empty<TaskItemViewModel>();
+        private List<TaskItemViewModel> GetSelectedTasks()
+            => Tasks?.Where(t => t.IsSelected).ToList() ?? Enumerable.Empty<TaskItemViewModel>().ToList();
 
         private IEnumerable<TaskItemViewModel> GetSelectedSubTask()
         {
@@ -1110,11 +1136,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         private void UpdateSelectedTasksText(int selectedTasks)
         {
-            if (selectedTasks > 0)
-                SelectedTasksText = $"You have selected {selectedTasks} task(s)";
-            else
-                SelectedTasksText = string.Empty;
+            SelectedTasksText = selectedTasks > 0 
+                ? $"You have selected {selectedTasks} task(s)" 
+                : string.Empty;
         }
+
         #endregion
     }
 }

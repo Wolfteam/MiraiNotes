@@ -53,6 +53,9 @@ namespace MiraiNotes.UWP.ViewModels
         public LoginPasswordDialogViewModel LoginPasswordDialog
             => ServiceLocator.Current.GetInstance<LoginPasswordDialogViewModel>();
 
+        public AccountsDialogViewModel AccountsDialog
+            => ServiceLocator.Current.GetInstance<AccountsDialogViewModel>();
+
         public IApplicationSettingsService ApplicationSettingsService
             => ServiceLocator.Current.GetInstance<IApplicationSettingsService>();
 
@@ -97,6 +100,16 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 // Add all profiles in current assembly
                 cfg.AddProfiles(GetType().Assembly);
+                cfg.ConstructServicesUsing(t =>
+                {
+                    //ConstructServicesUsing gets called if you used it in the
+                    //mapping profile
+                    if (t == typeof(GoogleUserViewModel))
+                    {
+                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
+                    }
+                    return SimpleIoc.Default.GetInstance(t);
+                });
             });
 
             if (ViewModelBase.IsInDesignModeStatic)
@@ -144,8 +157,11 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<NewTaskPageViewModel>();
             SimpleIoc.Default.Register<SettingsPageViewModel>();
 
+            SimpleIoc.Default.Register<AccountsDialogViewModel>();
             SimpleIoc.Default.Register<SettingsPasswordDialogViewModel>();
             SimpleIoc.Default.Register<LoginPasswordDialogViewModel>();
+
+            SimpleIoc.Default.Register<GoogleUserViewModel>();
         }
 
         /// <summary>

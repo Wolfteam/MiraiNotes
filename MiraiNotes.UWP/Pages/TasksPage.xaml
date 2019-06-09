@@ -149,13 +149,13 @@
                                                     Margin="5,0,0,0"
                                                     FontFamily="Segoe MDL2 Assets"
                                                     Glyph="&#xE787;"
-                                                    ToolTipService.ToolTip="Completition date is today or is already passed"
+                                                    ToolTipService.ToolTip="This task has a completition date set"
                                                     Visibility="{Binding IsCompletitionDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                 <FontIcon
                                                     Margin="5,0,0,0"
                                                     FontFamily="Segoe MDL2 Assets"
                                                     Glyph="&#xEC92;"
-                                                    ToolTipService.ToolTip="This task has a reminder date"
+                                                    ToolTipService.ToolTip="This task has a reminder date set"
                                                     Visibility="{Binding HasAReminderDate, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                             </StackPanel>
 

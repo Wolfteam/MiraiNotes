@@ -56,11 +56,8 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 IsErrorVisible = false;
                 return true;
             }
-            else
-            {
-                IsErrorVisible = true;
-                return false;
-            }
+            IsErrorVisible = true;
+            return false;
         }
     }
 }

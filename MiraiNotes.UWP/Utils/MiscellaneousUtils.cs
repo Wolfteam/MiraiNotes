@@ -15,6 +15,8 @@ namespace MiraiNotes.UWP.Utils
 {
     public class MiscellaneousUtils
     {
+        const string USER_IMAGE_FILE_NAME = "user_image.png";
+
         /// <summary>
         /// Gets the app version duh!
         /// </summary>
@@ -149,5 +151,11 @@ namespace MiraiNotes.UWP.Utils
 
         public static Color GetSystemAccentColor()
             => new UISettings().GetColorValue(UIColorType.Accent);
+
+        public static string GetUserProfileImagePath(string id)
+            => Path.Combine(GetApplicationPath(), BuildImageFilename(id));
+
+        public static string BuildImageFilename(string id)
+            => $"{id}_{USER_IMAGE_FILE_NAME}";
     }
 }

@@ -193,11 +193,12 @@
                                 </Style>
                             </StackPanel.Resources>
                             <MenuFlyoutSeparator Background="{ThemeResource SystemAccentColor}" />
-                            <Button Command="{Binding LogoutCommand}">
+                            <Button HorizontalContentAlignment="Stretch" Command="{Binding LogoutCommand}">
                                 <Grid Height="40" Margin="-9,0,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="48" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="48" />
                                     </Grid.ColumnDefinitions>
                                     <PersonPicture
                                         Height="35"
@@ -206,6 +207,13 @@
                                         ProfilePicture="{Binding CurrentUserProfileImagePath, Mode=OneWay}"
                                         ToolTipService.ToolTip="{Binding CurrentUserName}" />
                                     <TextBlock Grid.Column="1" Text="Sign out" />
+
+                                    <Button
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding OpenUserAccountsCommand}">
+                                        <SymbolIcon Symbol="Setting" />
+                                    </Button>
                                 </Grid>
                             </Button>
                             <Button Command="{Binding OpenSettingsCommand}" ToolTipService.ToolTip="Settings">

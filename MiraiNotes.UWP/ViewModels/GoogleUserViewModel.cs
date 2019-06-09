@@ -1,40 +1,28 @@
 ﻿using GalaSoft.MvvmLight;
+using MiraiNotes.UWP.Interfaces;
 
 namespace MiraiNotes.UWP.ViewModels
 {
     public class GoogleUserViewModel : ViewModelBase
     {
-        #region Members
-        private string _userID;
-        private string _fullName;
-        private string _email;
-        private string _pictureUrl;
-        #endregion
+        private readonly IGoogleUserService _googleUserService;
+        private bool _isActive;
 
-        #region Properties
-        public string UserID
-        {
-            get => _userID;
-            set => Set(ref _userID, value);
-        }
-
-        public string Fullname
-        {
-            get => _fullName;
-            set => Set(ref _fullName, value);
-        }
-
-        public string Email
-        {
-            get => _userID;
-            set => Set(ref _email, value);
-        }
-
+        public int ID { get; set; }
+        public string GoogleUserID { get; set; }
+        public string Fullname { get; set; }
+        public string Email { get; set; }
         public string PictureUrl
+            => _googleUserService.GetUserProfileImagePath(GoogleUserID);
+        public bool IsActive
         {
-            get => _pictureUrl;
-            set => Set(ref _pictureUrl, value);
+            get => _isActive;
+            set => Set(ref _isActive, value);
         }
-        #endregion
+
+        public GoogleUserViewModel(IGoogleUserService googleUserService)
+        {
+            _googleUserService = googleUserService;
+        }
     }
 }

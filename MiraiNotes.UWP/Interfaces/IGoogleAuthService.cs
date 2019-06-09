@@ -1,4 +1,6 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Shared.Models;
+using MiraiNotes.UWP.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.UWP.Interfaces
@@ -8,5 +10,6 @@ namespace MiraiNotes.UWP.Interfaces
         string GetAuthorizationUrl();
         Task<TokenResponse> GetTokenAsync(string approvalCode);
         Task<TokenResponse> GetNewTokenAsync(string refreshToken);
+        Task<Response<TokenResponse>> SignInWithGoogle();
     }
 }

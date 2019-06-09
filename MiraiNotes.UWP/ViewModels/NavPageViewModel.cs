@@ -20,6 +20,7 @@ namespace MiraiNotes.UWP.ViewModels
     public class NavPageViewModel : BaseViewModel
     {
         #region Members
+
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
@@ -32,8 +33,12 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IGoogleUserService _googleUserService;
 
         private object _selectedItem;
-        private SmartObservableCollection<TaskListItemViewModel> _taskLists = new SmartObservableCollection<TaskListItemViewModel>();
-        private SmartObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems = new SmartObservableCollection<ItemModel>();
+
+        private SmartObservableCollection<TaskListItemViewModel> _taskLists =
+            new SmartObservableCollection<TaskListItemViewModel>();
+
+        private SmartObservableCollection<ItemModel> _taskListsAutoSuggestBoxItems =
+            new SmartObservableCollection<ItemModel>();
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -46,9 +51,12 @@ namespace MiraiNotes.UWP.ViewModels
         private bool _isSelectionInProgress;
         private string _currentUserName;
         private string _userInitials;
+        private string _currentUserProfileImagePath;
+
         #endregion
 
         #region Properties
+
         public object SelectedItem
         {
             get { return _selectedItem; }
@@ -114,14 +122,17 @@ namespace MiraiNotes.UWP.ViewModels
             get { return _userInitials; }
             set { Set(ref _userInitials, value); }
         }
-
+        
         public string CurrentUserProfileImagePath
         {
-            get => _googleUserService.GetCurrentUserProfileImagePath();
+            get { return _currentUserProfileImagePath; }
+            set { Set(ref _currentUserProfileImagePath, value); }
         }
+
         #endregion
 
         #region Commands
+
         public ICommand PageLoadedCommand { get; set; }
 
         public ICommand TaskListAutoSuggestBoxTextChangedCommand { get; set; }
@@ -141,6 +152,9 @@ namespace MiraiNotes.UWP.ViewModels
         public ICommand ClosePaneCommand { get; set; }
 
         public ICommand OpenSettingsCommand { get; set; }
+
+        public ICommand OpenUserAccountsCommand { get; set; }
+
         #endregion
 
         public NavPageViewModel(
@@ -171,6 +185,7 @@ namespace MiraiNotes.UWP.ViewModels
         }
 
         #region Methods
+
         private void RegisterMessages()
         {
             _messenger.Register<TaskListItemViewModel>(
@@ -190,6 +205,14 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}",
                 SortTaskLists);
+            _messenger.Register<string>(
+                this,
+                $"{MessageType.CURRENT_ACTIVE_USER_CHANGED}",
+                async (_) =>
+                {
+                    await LoadProfileInfo();
+                    await InitViewAsync(true);
+                });
         }
 
         private void SetCommands()
@@ -222,10 +245,10 @@ namespace MiraiNotes.UWP.ViewModels
 
             ClosePaneCommand = new RelayCommand(() => OpenPane(false));
 
-            OpenSettingsCommand = new RelayCommand(() =>
-            {
-                IsSettingsPaneOpen = true;
-            });
+            OpenSettingsCommand = new RelayCommand(() => IsSettingsPaneOpen = true);
+
+            OpenUserAccountsCommand = new RelayCommand
+                (async () => await _dialogService.ShowCustomDialog(CustomDialogType.ACCOUNTS_DIALOG));
         }
 
         private async Task LoadProfileInfo()
@@ -242,13 +265,15 @@ namespace MiraiNotes.UWP.ViewModels
                         userInitials += part.Substring(0, 1);
                 });
                 CurrentUserInitials = userInitials;
+                CurrentUserProfileImagePath = _googleUserService.GetUserProfileImagePath(currentUser.Result.GoogleUserID);
             }
+
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
         }
 
         private async Task InitViewAsync(bool onFullSync = false)
         {
-            string selectedTaskListID = string.Empty;
+            string selectedTaskListID;
 
             if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
             {
@@ -256,7 +281,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
             //If we have something in the init details, lets select that task list
-            else if (!onFullSync &&
+            if (!onFullSync &&
                 InitDetails is null == false &&
                 !string.IsNullOrEmpty(InitDetails.Item1) &&
                 !string.IsNullOrEmpty(InitDetails.Item2))
@@ -298,22 +323,25 @@ namespace MiraiNotes.UWP.ViewModels
             //with that, the progress ring animation doesnt gets swallowed 
             await Task.Delay(500);
 
-            if (TaskLists.Any(tl => tl.TaskListID == selectedTaskListID))
-                SelectedItem = TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID);
-            else
-                SelectedItem = TaskLists.FirstOrDefault();
+            SelectedItem = TaskLists.Any(tl => tl.TaskListID == selectedTaskListID)
+                ? TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID)
+                : TaskLists.FirstOrDefault();
+            //For some reason OnNavigationViewSelectionChangeAsync is not getting called
+            //if SelectedItem is null
+            if (SelectedItem is null)
+                OnNavigationViewSelectionChangeAsync(SelectedItem);
         }
 
         public void OnTaskListAutoSuggestBoxTextChange(string currentText)
         {
-            var filteredItems = string.IsNullOrEmpty(currentText) ?
-            _mapper.Map<IEnumerable<ItemModel>>(TaskLists
-                .OrderBy(t => t.Title)
-                .Take(10)) :
-            _mapper.Map<IEnumerable<ItemModel>>(TaskLists
-                .Where(t => t.Title.ToLowerInvariant().Contains(currentText.ToLowerInvariant()))
-                .OrderBy(t => t.Title)
-                .Take(10));
+            var filteredItems = string.IsNullOrEmpty(currentText)
+                ? _mapper.Map<IEnumerable<ItemModel>>(TaskLists
+                    .OrderBy(t => t.Title)
+                    .Take(10))
+                : _mapper.Map<IEnumerable<ItemModel>>(TaskLists
+                    .Where(t => t.Title.ToLowerInvariant().Contains(currentText.ToLowerInvariant()))
+                    .OrderBy(t => t.Title)
+                    .Take(10));
 
             TaskListsAutoSuggestBoxItems.Clear();
             TaskListsAutoSuggestBoxItems.AddRange(filteredItems);
@@ -342,6 +370,7 @@ namespace MiraiNotes.UWP.ViewModels
                 CurrentTaskList = taskList;
                 _messenger.Send(taskList, $"{MessageType.NAVIGATIONVIEW_SELECTION_CHANGED}");
             }
+
             TaskListkAutoSuggestBoxText = string.Empty;
         }
 
@@ -410,7 +439,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             dbResponse.Result.Title = newTitle;
-            dbResponse.Result.UpdatedAt = DateTime.Now;
+            dbResponse.Result.UpdatedAt = DateTimeOffset.UtcNow;
             dbResponse.Result.ToBeSynced = true;
             if (dbResponse.Result.LocalStatus != LocalStatus.CREATED)
                 dbResponse.Result.LocalStatus = LocalStatus.UPDATED;
@@ -506,6 +535,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
             else if (TaskLists.Count == 1)
                 OnNavigationViewSelectionChangeAsync(null);
+
             TaskLists.Remove(taskList);
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
@@ -544,10 +574,13 @@ namespace MiraiNotes.UWP.ViewModels
                     TaskLists.SortByDescending(tl => tl.UpdatedAt);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(sortType), sortType, "The provided task list sort type does not exists");
+                    throw new ArgumentOutOfRangeException(nameof(sortType), sortType,
+                        "The provided task list sort type does not exists");
             }
+
             _isSelectionInProgress = false;
         }
+
         #endregion
     }
 }
