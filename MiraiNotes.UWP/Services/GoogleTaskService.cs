@@ -158,9 +158,22 @@ namespace MiraiNotes.UWP.Services
 
             try
             {
-                var response = await httpClient.PostAsync(
-                    $"{BASE_ADDRESS}/{taskListID}/tasks?parent={parent}&previous={previous}",
-                    stringContent);
+                if (string.IsNullOrEmpty(taskListID))
+                    throw new ArgumentNullException(nameof(taskListID), "The task list id cant be null");
+
+                string url = $"{BASE_ADDRESS}/{taskListID}/tasks?";
+                if (!string.IsNullOrEmpty(parent))
+                    url += $"parent={parent}";
+
+                if (!string.IsNullOrEmpty(previous))
+                {
+                    if (!string.IsNullOrEmpty(parent))
+                        url += $"&previous={previous}";
+                    else
+                        url += $"previous={previous}";
+                }
+
+                var response = await httpClient.PostAsync(url,stringContent);
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
