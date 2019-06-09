@@ -32,6 +32,7 @@ namespace MiraiNotes.UWP.Services
             _logger = logger.ForContext<SyncService>();
         }
 
+        #region Public sync methods
         public async Task<EmptyResponse> SyncDownTaskListsAsync(bool isInBackground)
         {
             _logger.Information($"{nameof(SyncDownTaskListsAsync)}: Starting the sync down of task lists");
@@ -68,7 +69,8 @@ namespace MiraiNotes.UWP.Services
                     syncResult.Message = response.Errors?.ApiError?.Message ??
                                          response.Errors?.ErrorDescription ?? "Unkwnon error";
                     _logger.Error(
-                        $"{nameof(SyncDownTaskListsAsync)}: Couldn't get all the task lists from api. Error = {syncResult.Message}");
+                        $"{nameof(SyncDownTaskListsAsync)}: Couldn't get all the task lists from api. " +
+                        $"Error = {syncResult.Message}");
                     return syncResult;
                 }
 
@@ -81,7 +83,8 @@ namespace MiraiNotes.UWP.Services
                 if (!dbResponse.Succeed)
                 {
                     _logger.Error(
-                        $"{nameof(SyncDownTaskListsAsync)}: Couldn't get all the task lists from db. Error = {dbResponse.Message}");
+                        $"{nameof(SyncDownTaskListsAsync)}: Couldn't get all the task lists from db. " +
+                        $"Error = {dbResponse.Message}");
                     return dbResponse;
                 }
 
@@ -102,7 +105,8 @@ namespace MiraiNotes.UWP.Services
                         if (!taskListsToSave.Any())
                             return;
                         _logger.Information(
-                            $"{nameof(SyncDownTaskListsAsync)}: Trying to save into db {taskListsToSave.Count} new remote task lists");
+                            $"{nameof(SyncDownTaskListsAsync)}: Trying to save into db {taskListsToSave.Count} " +
+                            $"new remote task lists");
 
                         var r = await _dataService
                             .TaskListService
@@ -147,8 +151,7 @@ namespace MiraiNotes.UWP.Services
                             if (taskList.UpdatedAt >= t.UpdatedAt)
                                 continue;
                             _logger.Information(
-                                $"{nameof(SyncDownTaskListsAsync)}: Trying to update the local {{@TaskList}}",
-                                taskList);
+                                $"{nameof(SyncDownTaskListsAsync)}: Trying to update the local tasklistId = {taskList.ID}");
                             taskList.Title = t.Title;
                             taskList.UpdatedAt = t.UpdatedAt;
                             var r = await _dataService
@@ -200,14 +203,15 @@ namespace MiraiNotes.UWP.Services
             if (!dbResponse.Succeed)
             {
                 _logger.Error(
-                    $"{nameof(SyncDownTasksAsync)}: Couldn't get all the task lists from db. Error = {dbResponse.Message}");
+                    $"{nameof(SyncDownTasksAsync)}: Couldn't get all the task lists from db. " +
+                    $"Error = {dbResponse.Message}");
                 return dbResponse;
             }
             foreach (var taskList in dbResponse.Result)
             {
                 _logger.Information(
-                    $"{nameof(SyncDownTasksAsync)}: Trying to get all the tasks associated to {{@TaskList}} from api",
-                    taskList);
+                    $"{nameof(SyncDownTasksAsync)}: Trying to get all the tasks " +
+                    $"associated to taskListId = {taskList.ID} from api");
                 string nextPageToken = null;
                 bool hasMorePages = true;
                 while (hasMorePages)
@@ -227,8 +231,8 @@ namespace MiraiNotes.UWP.Services
                                              response.Errors?.ErrorDescription ?? "Unknown error";
                         syncResult.Succeed = false;
                         _logger.Error(
-                            $"{nameof(SyncDownTasksAsync)}: Couldn't get all the tasks associated to {{@TaskList}} from api. Error = {{Error}}",
-                            taskList, syncResult.Message);
+                            $"{nameof(SyncDownTasksAsync)}: Couldn't get all the tasks associated to " +
+                            $"taskListId = {taskList.ID} from api. Error = {syncResult.Message}");
                         return syncResult;
                     }
 
@@ -238,7 +242,8 @@ namespace MiraiNotes.UWP.Services
                     if (downloadedTasks == null || !downloadedTasks.Any())
                     {
                         _logger.Information(
-                            $"{nameof(SyncDownTasksAsync)}: Task list = {taskList.Title} does not contains tasks, trying to remove any local task associated to it");
+                            $"{nameof(SyncDownTasksAsync)}: Task list = {taskList.Title} does not contains tasks, " +
+                            $"trying to remove any local task associated to it");
                         var deleteResponse = await _dataService
                             .TaskService
                             .RemoveAsync(
@@ -249,7 +254,8 @@ namespace MiraiNotes.UWP.Services
                     }
 
                     _logger.Information(
-                        $"{nameof(SyncDownTasksAsync)}: Trying to get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
+                        $"{nameof(SyncDownTasksAsync)}: Trying to get all the tasks associated to " +
+                        $"tasklistID = {taskList.GoogleTaskListID} from db");
                     //I think i dont need to include the tasklist property
                     var currentTasksDbResponse = await _dataService
                         .TaskService
@@ -258,7 +264,8 @@ namespace MiraiNotes.UWP.Services
                     if (!currentTasksDbResponse.Succeed)
                     {
                         _logger.Error(
-                            $"{nameof(SyncDownTasksAsync)}: Couldn't get all the tasks associated to tasklistID = {taskList.GoogleTaskListID} from db");
+                            $"{nameof(SyncDownTasksAsync)}: Couldn't get all the tasks associated to " +
+                            $"tasklistID = {taskList.GoogleTaskListID} from db");
                         return currentTasksDbResponse;
                     }
 
@@ -288,7 +295,8 @@ namespace MiraiNotes.UWP.Services
                             if (!tasksToSave.Any())
                                 return;
                             _logger.Information(
-                                $"{nameof(SyncDownTasksAsync)}: Trying to save into db {tasksToSave.Count} new remote task associated to tasklistID = {taskList.GoogleTaskListID}");
+                                $"{nameof(SyncDownTasksAsync)}: Trying to save into db {tasksToSave.Count} " +
+                                $"new remote task associated to tasklistID = {taskList.GoogleTaskListID}");
 
                             syncDownResults.Add(await _dataService
                                 .TaskService
@@ -308,7 +316,8 @@ namespace MiraiNotes.UWP.Services
                             if (!deletedTasks.Any())
                                 return;
                             _logger.Information(
-                                $"{nameof(SyncDownTasksAsync)}: Trying to delete from db {deletedTasks.Count} tasks associated to tasklistID = {taskList.GoogleTaskListID}");
+                                $"{nameof(SyncDownTasksAsync)}: Trying to delete from db {deletedTasks.Count} " +
+                                $"tasks associated to tasklistID = {taskList.GoogleTaskListID}");
 
                             syncDownResults.Add(await _dataService
                                 .TaskService
@@ -319,34 +328,34 @@ namespace MiraiNotes.UWP.Services
                         Task.Run(async () =>
                         {
                             foreach (var task in currentTasksDbResponse.Result)
-                                {
-                                    var downloadedTask = downloadedTasks
-                                        .FirstOrDefault(dt => dt.TaskID == task.GoogleTaskID);
+                            {
+                                var downloadedTask = downloadedTasks
+                                    .FirstOrDefault(dt => dt.TaskID == task.GoogleTaskID);
 
-                                    if (downloadedTask == null)
-                                        return;
+                                if (downloadedTask == null)
+                                    return;
 
-                                    if (task.UpdatedAt >= downloadedTask.UpdatedAt)
-                                        continue;
-                                    _logger.Information(
-                                        $"{nameof(SyncDownTasksAsync)}: Trying to update the local {{@Task}} associated to tasklistID = {{taskListID}}",
-                                        task, taskList.GoogleTaskListID);
-                                    task.CompletedOn = downloadedTask.CompletedOn;
-                                    task.GoogleTaskID = downloadedTask.TaskID;
-                                    task.IsDeleted = downloadedTask.IsDeleted;
-                                    task.IsHidden = downloadedTask.IsHidden;
-                                    task.Notes = downloadedTask.Notes;
-                                    task.ParentTask = downloadedTask.ParentTask;
-                                    task.Position = downloadedTask.Position;
-                                    task.Status = downloadedTask.Status;
-                                    task.Title = downloadedTask.Title;
-                                    task.ToBeCompletedOn = downloadedTask.ToBeCompletedOn;
-                                    task.UpdatedAt = downloadedTask.UpdatedAt;
+                                if (task.UpdatedAt >= downloadedTask.UpdatedAt)
+                                    continue;
+                                _logger.Information(
+                                    $"{nameof(SyncDownTasksAsync)}: Trying to update the local taskId = {task.ID} " +
+                                    $"associated to tasklistID = {taskList.ID}");
+                                task.CompletedOn = downloadedTask.CompletedOn;
+                                task.GoogleTaskID = downloadedTask.TaskID;
+                                task.IsDeleted = downloadedTask.IsDeleted;
+                                task.IsHidden = downloadedTask.IsHidden;
+                                task.Notes = downloadedTask.Notes;
+                                task.ParentTask = downloadedTask.ParentTask;
+                                task.Position = downloadedTask.Position;
+                                task.Status = downloadedTask.Status;
+                                task.Title = downloadedTask.Title;
+                                task.ToBeCompletedOn = downloadedTask.ToBeCompletedOn;
+                                task.UpdatedAt = downloadedTask.UpdatedAt;
 
-                                    syncDownResults.Add(await _dataService
-                                        .TaskService
-                                        .UpdateAsync(task));
-                                }
+                                syncDownResults.Add(await _dataService
+                                    .TaskService
+                                    .UpdateAsync(task));
+                            }
                         })
                     };
 
@@ -389,7 +398,8 @@ namespace MiraiNotes.UWP.Services
             if (!taskListToSyncDbResponse.Succeed)
             {
                 _logger.Error(
-                    $"{nameof(SyncUpTaskListsAsync)}: Couldn't get all the task lists to sync from db. Error = {taskListToSyncDbResponse.Message}");
+                    $"{nameof(SyncUpTaskListsAsync)}: Couldn't get all the task lists to sync from db. " +
+                    $"Error = {taskListToSyncDbResponse.Message}");
                 return taskListToSyncDbResponse;
             }
 
@@ -483,13 +493,13 @@ namespace MiraiNotes.UWP.Services
                 .TaskService
                 .GetAsNoTrackingAsync(
                     task => task.ToBeSynced && task.TaskList.User.IsActive,
-                    task => task.OrderBy(t => t.ParentTask).ThenBy(t => t.Position),
-                    nameof(GoogleTask.TaskList));
+                    includeProperties: nameof(GoogleTask.TaskList));
 
             if (!tasksToBeSyncedDbResponse.Succeed)
             {
                 _logger.Error(
-                    $"{nameof(SyncUpTasksAsync)}: Couldn't get all the tasks to sync from db. Error = {tasksToBeSyncedDbResponse.Message}");
+                    $"{nameof(SyncUpTasksAsync)}: Couldn't get all the tasks to sync from db. " +
+                    $"Error = {tasksToBeSyncedDbResponse.Message}");
                 return tasksToBeSyncedDbResponse;
             }
 
@@ -500,6 +510,7 @@ namespace MiraiNotes.UWP.Services
                 {
                     var tasksToCreate = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.CREATED)
+                        .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
                         .ToList();
 
                     if (!tasksToCreate.Any())
@@ -509,6 +520,7 @@ namespace MiraiNotes.UWP.Services
 
                     foreach (var task in tasksToCreate)
                     {
+                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to save remotely taskId = {task.ID}");
                         string localID = task.GoogleTaskID;
                         var result = await SaveUpTask(task);
                         syncUpResults.Add(result);
@@ -516,21 +528,30 @@ namespace MiraiNotes.UWP.Services
                         if (!result.Succeed)
                             continue;
 
-                        //If this isn't a sub task
+                        //If this isn't a sub task, lets update the sub tasks that belong to this one
                         if (string.IsNullOrEmpty(task.ParentTask))
                         {
-                            tasksToCreate
-                                .Where(st => st.ParentTask == localID)
-                                .ForEach(st => st.ParentTask = task.GoogleTaskID);
+                            _logger.Information(
+                                $"{nameof(SyncUpTasksAsync)}: Checking if taskId = {task.ID} contains subtask, " +
+                                $"and if it does, we are updating their parenttask with the new googletaskid");
+                            foreach (var st in tasksToCreate
+                                .Where(st => st.ParentTask == localID))
+                            {
+                                _logger.Information(
+                                    $"{nameof(SyncUpTasksAsync)}: TaskId = {st.ID} is a subtask of taskId = {task.ID}");
+                                st.ParentTask = task.GoogleTaskID;
+                            }
                         }
                         //If this is a sub task and there are sts whose position depends in the current one
                         //we need to update them
                         else if (tasksToCreate.Any(st => st.Position == localID))
                         {
                             //In theory this should only affect 1 st
-                            tasksToCreate
-                                .Where(st => st.Position == localID)
-                                .ForEach(st => st.Position = task.GoogleTaskID);
+                            foreach (var st in tasksToCreate
+                                .Where(st => st.Position == localID))
+                            {
+                                st.Position = task.GoogleTaskID;
+	                        }
                         }
                     }
                 }),
@@ -540,6 +561,7 @@ namespace MiraiNotes.UWP.Services
                 {
                     var tasksToDelete = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.DELETED)
+                        .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
                         .ToList();
 
                     if (!tasksToDelete.Any())
@@ -548,14 +570,18 @@ namespace MiraiNotes.UWP.Services
                         $"{nameof(SyncUpTasksAsync)}: Trying to delete remotely {tasksToDelete.Count} tasks");
 
                     foreach (var task in tasksToDelete)
+                    {
+                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to delete remotely taskId = {task.ID}");
                         syncUpResults.Add(await DeleteUpTask(task));
+                    }
                 }),
 
-                //Here we update the tasks that were updated locallyhjddtryfugy
+                //Here we update the tasks that were updated locally
                 Task.Run(async () =>
                 {
                     var tasksToUpdate = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.UPDATED)
+                        .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
                         .ToList();
 
                     if (!tasksToUpdate.Any())
@@ -564,7 +590,10 @@ namespace MiraiNotes.UWP.Services
                         $"{nameof(SyncUpTasksAsync)}: Trying to update remotely {tasksToUpdate.Count} tasks");
 
                     foreach (var task in tasksToUpdate)
+                    {
+                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to update remotely taskId = {task.ID}");
                         syncUpResults.Add(await UpdateUpTask(task));
+                    }
                 })
             };
 
@@ -584,8 +613,9 @@ namespace MiraiNotes.UWP.Services
             _logger.Information($"{nameof(SyncUpTasksAsync)}: Completed successfully");
             return syncUpResult;
         }
+        #endregion
 
-
+        #region Private task list sync methods
         private async Task<EmptyResponse> SaveUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService.TaskListService.SaveAsync(new GoogleTaskListModel
@@ -613,10 +643,9 @@ namespace MiraiNotes.UWP.Services
                 result.Message = response.Errors?.ApiError?.Message ??
                                  $"An unkwon error occurred while trying to create task list {taskList.Title}";
                 _logger.Error(
-                    $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to save remotely {{@TaskList}}. {{Error}}",
-                    taskList, result.Message);
+                    $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to " +
+                    $"save remotely taskListId = {taskList.ID}. {result.Message}");
             }
-
             return result;
         }
 
@@ -638,8 +667,8 @@ namespace MiraiNotes.UWP.Services
                 result.Message = response.Errors?.ApiError?.Message ??
                                  $"An unkwon error occurred while trying to delete task list {taskList.Title}";
                 _logger.Error(
-                    $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to delete remotely {{@TaskList}}. {{Error}}",
-                    taskList, result.Message);
+                    $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to " +
+                    $"delete remotely taskListId = {taskList.ID}. {result.Message}");
             }
 
             return result;
@@ -660,8 +689,8 @@ namespace MiraiNotes.UWP.Services
                 result.Message = response.Errors?.ApiError?.Message ??
                                  $"An unknow error occurred while trying to get {taskList.Title} from remote to be updated";
                 _logger.Error(
-                    $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to get the task to update remotely {{@TaskList}}. {{Error}}",
-                    taskList, result.Message);
+                    $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to get the task to " +
+                    $"update remotely taskListId = {taskList.ID}. {result.Message}");
             }
             //We need to update the remote contrapart
             else if (taskList.UpdatedAt > response.Result.UpdatedAt)
@@ -678,8 +707,8 @@ namespace MiraiNotes.UWP.Services
                     result.Message = response.Errors?.ApiError?.Message ??
                                      $"An unknow error occurred while trying to get {taskList.Title} from remote to be updated";
                     _logger.Error(
-                        $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to update remotely {{@TaskList}}. {{Error}}",
-                        taskList, result.Message);
+                        $"{nameof(SyncUpTaskListsAsync)}: An error occurred while trying to " +
+                        $"update remotely taskListId = {taskList.ID}. {result.Message}");
                 }
                 else
                 {
@@ -700,8 +729,9 @@ namespace MiraiNotes.UWP.Services
 
             return result;
         }
+        #endregion
 
-
+        #region Private task sync methods
         private async Task<EmptyResponse> SaveUpTask(GoogleTask task)
         {
             var t = new GoogleTaskModel
@@ -738,8 +768,8 @@ namespace MiraiNotes.UWP.Services
                 result.Message = response.Errors?.ApiError?.Message ??
                                  $"An unkwon error occurred while trying to create task {task.Title}";
                 _logger.Error(
-                    $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to save remotely {{@Task}}. {{Error}}",
-                    task, result.Message);
+                    $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to " +
+                    $"save remotely taskId = {task.ID}. {result.Message}");
             }
 
             return result;
@@ -763,7 +793,8 @@ namespace MiraiNotes.UWP.Services
                 result.Message = response.Errors?.ApiError?.Message ??
                                  $"An unkwon error occurred while trying to delete task {task.Title}";
                 _logger.Error(
-                    $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to delete remotely {{@Task}}. {{Error}}",
+                    $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to " +
+                    $"delete remotely taskId = {task.ID}. {result.Message}",
                     task, result.Message);
             }
 
@@ -785,8 +816,8 @@ namespace MiraiNotes.UWP.Services
                 result.Message = response.Errors?.ApiError?.Message ??
                                  $"An unkwon error occurred while trying to get task {task.Title}";
                 _logger.Error(
-                    $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to get the task to update remotely {{@Task}}. {{Error}}",
-                    task, result.Message);
+                    $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to get the task to " +
+                    $"update remotely taskId = {task.ID}. {result.Message}");
             }
             else if (task.UpdatedAt > response.Result.UpdatedAt)
             {
@@ -815,8 +846,8 @@ namespace MiraiNotes.UWP.Services
                     result.Message = response.Errors?.ApiError?.Message ??
                                      $"An unkwon error occurred while trying to delete task {task.Title}";
                     _logger.Error(
-                        $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to update remotely {{@Task}}. {{Error}}",
-                        task, result.Message);
+                        $"{nameof(SyncUpTasksAsync)}: An error occurred while trying to " +
+                        $"update remotely taskId = {task.ID}. {result.Message}");
                 }
             }
             else
@@ -838,5 +869,6 @@ namespace MiraiNotes.UWP.Services
 
             return result;
         }
+        #endregion
     }
 }
