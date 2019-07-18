@@ -1,6 +1,6 @@
 ﻿namespace MiraiNotes.Shared.Models
 {
-    public class Response<T> : EmptyResponse
+    public class ResponseDto<T> : EmptyResponseDto
     {
         public T Result { get; set; }
     }
