@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.DataService.Interfaces;
 using MiraiNotes.DataService.Services;
+using MiraiNotes.Shared.Interfaces;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Design;
 using MiraiNotes.UWP.Handlers;
@@ -18,6 +19,7 @@ using Serilog;
 using Serilog.Filters;
 using System.IO;
 using Windows.Storage;
+using IGoogleApiService = MiraiNotes.UWP.Interfaces.IGoogleApiService;
 
 namespace MiraiNotes.UWP.ViewModels
 {

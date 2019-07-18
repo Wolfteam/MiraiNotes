@@ -157,7 +157,6 @@
     <Compile Include="Models\API\GoogleTaskListModel.cs" />
     <Compile Include="Models\API\GoogleUserModel.cs" />
     <Compile Include="Models\API\GoogleResponseModel.cs" />
-    <Compile Include="Models\API\TokenResponse.cs" />
     <Compile Include="Models\AppThemeType.cs" />
     <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\CustomDialogType.cs" />
@@ -225,8 +224,6 @@
     <Compile Include="Services\CustomDialogService.cs" />
     <Compile Include="Services\GoogleApiService.cs" />
     <Compile Include="Services\GoogleAuthService.cs" />
-    <Compile Include="Interfaces\IGoogleAuthService.cs" />
-    <Compile Include="Interfaces\IProvider.cs" />
     <Compile Include="Interfaces\IGoogleTaskListService.cs" />
     <Compile Include="Services\GoogleTaskService.cs" />
     <Compile Include="Services\GoogleUserService.cs" />
@@ -412,7 +409,7 @@
       <Version>5.4.1</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
+      <Version>12.0.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.7.1</Version>

@@ -4,6 +4,8 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
+using MiraiNotes.Shared.Dto.Google.Responses;
+using MiraiNotes.Shared.Interfaces;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
@@ -161,7 +163,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
         }
 
-        private async Task OnGoogleSignInResponse(Response<TokenResponse> response)
+        private async Task OnGoogleSignInResponse(ResponseDto<TokenResponseDto> response)
         {
             string currentUser = _userCredentialService.GetCurrentLoggedUsername();
             try
@@ -256,7 +258,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
 
             var now = DateTimeOffset.UtcNow;
-            Response<GoogleUser> userSaveResponse;
+            ResponseDto<GoogleUser> userSaveResponse;
             if (!response.Result)
             {
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser
@@ -379,7 +381,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             bool isNetworkAvailable = _networkService.IsInternetAvailable();
             if (isNetworkAvailable && _appSettings.RunFullSyncAfterSwitchingAccounts)
             {
-                var syncResults = new List<EmptyResponse>
+                var syncResults = new List<EmptyResponseDto>
                 {
                     await _syncService.SyncDownTaskListsAsync(false),
                     await _syncService.SyncDownTasksAsync(false),

@@ -366,7 +366,7 @@ namespace MiraiNotes.UWP.ViewModels
                 entity.RemindOnGUID = Guid.NewGuid().ToString("N").Substring(0, 12);
             }
 
-            Response<GoogleTask> response;
+            ResponseDto<GoogleTask> response;
             var subTasksToSave = GetSubTasksToSave(isNewTask, moveToDifferentTaskList);
             var currentSts = GetCurrentSubTasks();
             //If we are creating a new task but in a different tasklist

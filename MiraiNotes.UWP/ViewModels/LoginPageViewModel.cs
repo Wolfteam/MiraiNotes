@@ -3,6 +3,8 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.Data.Models;
 using MiraiNotes.DataService.Interfaces;
+using MiraiNotes.Shared.Dto.Google.Responses;
+using MiraiNotes.Shared.Interfaces;
 using MiraiNotes.Shared.Models;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -35,14 +37,14 @@ namespace MiraiNotes.UWP.ViewModels
         #region Properties
         public bool ShowLoading
         {
-            get { return _showLoading; }
-            set { Set(ref _showLoading, value); }
+            get => _showLoading;
+            set => Set(ref _showLoading, value);
         }
 
         public bool ShowLoginButton
         {
-            get { return _showLoginButton; }
-            set { Set(ref _showLoginButton, value); }
+            get => _showLoginButton;
+            set => Set(ref _showLoginButton, value);
         }
         #endregion
 
@@ -95,14 +97,14 @@ namespace MiraiNotes.UWP.ViewModels
             var response = await _dataService
                 .UserService
                 .GetCurrentActiveUserAsync();
-            string loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+            var loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
 
-            bool isUserLoggedIn = loggedUsername != _userCredentialService.DefaultUsername &&
-                !string.IsNullOrEmpty(loggedUsername);
+            var isUserLoggedIn = loggedUsername != _userCredentialService.DefaultUsername &&
+                                 !string.IsNullOrEmpty(loggedUsername);
 
             if (!response.Succeed || isUserLoggedIn && response.Result is null)
             {
-                string errorMsg = string.IsNullOrEmpty(response.Message)
+                var errorMsg = string.IsNullOrEmpty(response.Message)
                     ? $"Did you unninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
                     : response.Message;
                 ShowLoading = false;
@@ -115,9 +117,10 @@ namespace MiraiNotes.UWP.ViewModels
                     _userCredentialService.DefaultUsername);
 
                 _logger.Warning($"{nameof(InitViewAsync)}: Couldnt get a user in the db = {response.Succeed} " +
-                    $"or isUserLoggedIn and no user exists in db. {errorMsg}");
+                                $"or isUserLoggedIn and no user exists in db. {errorMsg}");
                 return;
             }
+
             ShowLoading = false;
 
             if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
@@ -129,9 +132,13 @@ namespace MiraiNotes.UWP.ViewModels
                     ShowLoginButton = true;
             }
             else if (isUserLoggedIn)
+            {
                 _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
+            }
             else
+            {
                 ShowLoginButton = true;
+            }
         }
 
         public async void SignInWithGoogleAsync()
@@ -153,7 +160,7 @@ namespace MiraiNotes.UWP.ViewModels
             ShowLoginButton = true;
         }
 
-        private async Task OnGoogleSignInResponse(Response<TokenResponse> response)
+        private async Task OnGoogleSignInResponse(ResponseDto<TokenResponseDto> response)
         {
             try
             {
@@ -188,7 +195,7 @@ namespace MiraiNotes.UWP.ViewModels
                     _userCredentialService.DefaultUsername,
                     response.Result.AccessToken);
 
-                bool isSignedIn = await SignInAsync();
+                var isSignedIn = await SignInAsync();
                 if (!isSignedIn)
                 {
                     await _dataService
@@ -202,7 +209,8 @@ namespace MiraiNotes.UWP.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"{nameof(OnGoogleSignInResponse)}: An unknown error occurred while signing in the app");
+                _logger.Error(ex,
+                    $"{nameof(OnGoogleSignInResponse)}: An unknown error occurred while signing in the app");
                 _userCredentialService.DeleteUserCredential(
                     PasswordVaultResourceType.ALL,
                     _userCredentialService.DefaultUsername);
@@ -212,8 +220,9 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            _logger.Information($"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
-            bool result = false;
+            _logger.Information(
+                $"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
+            var result = false;
             var user = await _googleUserService.GetUserInfoAsync();
             if (user == null)
             {
@@ -226,7 +235,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
 
             var now = DateTimeOffset.UtcNow;
-            Response<GoogleUser> userSaved;
+            ResponseDto<GoogleUser> userSaved;
             if (!response.Result)
             {
                 _logger.Information($"{nameof(SignInAsync)}: User doesnt exist in db. Creating a new one...");
@@ -271,6 +280,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
                 return result;
             }
+
             _logger.Information($"{nameof(SignInAsync)}: Trying to get all the task lists that are remote...");
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
@@ -313,6 +323,7 @@ namespace MiraiNotes.UWP.ViewModels
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
             return !result;
         }
+
         #endregion
     }
 }

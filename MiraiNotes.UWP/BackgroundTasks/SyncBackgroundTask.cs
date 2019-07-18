@@ -58,7 +58,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
                     $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
             }
 
-            var syncResults = new List<EmptyResponse>
+            var syncResults = new List<EmptyResponseDto>
             {
                 await _syncService.SyncDownTaskListsAsync(true),
                 await _syncService.SyncDownTasksAsync(true),

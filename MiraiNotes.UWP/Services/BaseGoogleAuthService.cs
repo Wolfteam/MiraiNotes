@@ -1,6 +1,7 @@
+using MiraiNotes.Shared;
+using MiraiNotes.Shared.Dto.Google.Responses;
+using MiraiNotes.Shared.Interfaces;
 using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,13 +13,6 @@ namespace MiraiNotes.UWP.Services
 {
     public abstract class BaseGoogleAuthService : IGoogleAuthService
     {
-        #region Constans
-
-        private const string ClientId = "xxx";
-        private const string ClientSecret = "xxx";
-
-        #endregion
-
         #region Members
 
         private readonly IReadOnlyList<string> _scopes = new List<string>
@@ -31,37 +25,27 @@ namespace MiraiNotes.UWP.Services
         #endregion
 
         #region Properties
-
-        public string ProviderName => "GOOGLE";
-
-        public string AuthorizationEndpoint => "https://accounts.google.com/o/oauth2/auth";
-
         public string TokenEndpoint => "https://accounts.google.com/o/oauth2/token";
 
         public string RefreshTokenEndpoint => "https://www.googleapis.com/oauth2/v4/token";
-
-        public string RedirectUrl => "urn:ietf:wg:oauth:2.0:oob:auto";
-
-        public string ApprovalUrl => "https://accounts.google.com/o/oauth2/approval";
-
         #endregion
 
         public string GetAuthorizationUrl()
         {
-            return $"{AuthorizationEndpoint}" +
-                   $"?client_id={Uri.EscapeDataString(ClientId)}" +
+            return $"{AppConstants.BaseGoogleApiUrl}" +
+                   $"?client_id={Uri.EscapeDataString(AppConstants.ClientId)}" +
                    $"&scope={string.Join(" ", _scopes)}" +
-                   $"&redirect_uri={Uri.EscapeDataString(RedirectUrl)}" +
-                   $"&response_type=code" +
-                   $"&include_granted_scopes=true";
+                   $"&redirect_uri={Uri.EscapeDataString(AppConstants.RedirectUrl)}" +
+                   "&response_type=code" +
+                   "&include_granted_scopes=true";
         }
 
-        public async Task<TokenResponse> GetNewTokenAsync(string refreshToken)
+        public async Task<TokenResponseDto> GetNewTokenAsync(string refreshToken)
         {
-            string tokenRequestBody = $"refresh_token={refreshToken}" +
-                                      $"&client_id={ClientId}" +
-                                      $"&client_secret={ClientSecret}" +
-                                      $"&grant_type=refresh_token";
+            var tokenRequestBody = $"refresh_token={refreshToken}" +
+                                   $"&client_id={AppConstants.ClientId}" +
+                                   $"&client_secret={AppConstants.ClientSecret}" +
+                                   "&grant_type=refresh_token";
 
             var content = new StringContent(tokenRequestBody, Encoding.UTF8, "application/x-www-form-urlencoded");
             var httpClient = new HttpClient();
@@ -70,13 +54,10 @@ namespace MiraiNotes.UWP.Services
             try
             {
                 var response = await httpClient.PostAsync(RefreshTokenEndpoint, content);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return null;
-                }
+                if (!response.IsSuccessStatusCode) return null;
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponseDto>(responseBody);
                 tokenResponse.RefreshToken = refreshToken;
                 return tokenResponse;
             }
@@ -86,14 +67,14 @@ namespace MiraiNotes.UWP.Services
             }
         }
 
-        public async Task<TokenResponse> GetTokenAsync(string approvalCode)
+        public async Task<TokenResponseDto> GetAccessTokenAsync(string approvalCode)
         {
             // Builds the Token request
-            string tokenRequestBody = $"code={approvalCode}" +
-                                      $"&client_id={ClientId}" +
-                                      $"&redirect_uri={Uri.EscapeDataString(RedirectUrl)}" +
-                                      $"&client_secret={ClientSecret}" +
-                                      $"&scope=&grant_type=authorization_code";
+            var tokenRequestBody = $"code={approvalCode}" +
+                                   $"&client_id={AppConstants.ClientId}" +
+                                   $"&redirect_uri={Uri.EscapeDataString(AppConstants.RedirectUrl)}" +
+                                   $"&client_secret={AppConstants.ClientSecret}" +
+                                   "&scope=&grant_type=authorization_code";
 
             var content = new StringContent(tokenRequestBody, Encoding.UTF8, "application/x-www-form-urlencoded");
 
@@ -107,13 +88,10 @@ namespace MiraiNotes.UWP.Services
             try
             {
                 var response = await client.PostAsync(TokenEndpoint, content);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return null;
-                }
+                if (!response.IsSuccessStatusCode) return null;
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseBody);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponseDto>(responseBody);
                 return tokenResponse;
             }
             catch (Exception)
@@ -121,7 +99,7 @@ namespace MiraiNotes.UWP.Services
                 return null;
             }
         }
-        
-        public abstract Task<Response<TokenResponse>> SignInWithGoogle();
+
+        public abstract Task<ResponseDto<TokenResponseDto>> SignInWithGoogle();
     }
 }

@@ -33,16 +33,16 @@ namespace MiraiNotes.UWP.Services
         }
 
         #region Public sync methods
-        public async Task<EmptyResponse> SyncDownTaskListsAsync(bool isInBackground)
+        public async Task<EmptyResponseDto> SyncDownTaskListsAsync(bool isInBackground)
         {
             _logger.Information($"{nameof(SyncDownTaskListsAsync)}: Starting the sync down of task lists");
-            var syncResult = new EmptyResponse
+            var syncResult = new EmptyResponseDto
             {
                 Message = string.Empty,
                 Succeed = false
             };
 
-            var syncDownResults = new List<EmptyResponse>();
+            var syncDownResults = new List<EmptyResponseDto>();
 
             if (!_networkService.IsInternetAvailable())
             {
@@ -175,16 +175,16 @@ namespace MiraiNotes.UWP.Services
             return syncResult;
         }
 
-        public async Task<EmptyResponse> SyncDownTasksAsync(bool isInBackground)
+        public async Task<EmptyResponseDto> SyncDownTasksAsync(bool isInBackground)
         {
             _logger.Information($"{nameof(SyncDownTasksAsync)}: Starting the sync down of tasks");
-            var syncResult = new EmptyResponse
+            var syncResult = new EmptyResponseDto
             {
                 Message = string.Empty,
                 Succeed = false
             };
 
-            var syncDownResults = new List<EmptyResponse>();
+            var syncDownResults = new List<EmptyResponseDto>();
 
             if (!_networkService.IsInternetAvailable())
             {
@@ -371,15 +371,15 @@ namespace MiraiNotes.UWP.Services
             return syncResult;
         }
 
-        public async Task<EmptyResponse> SyncUpTaskListsAsync(bool isInBackground)
+        public async Task<EmptyResponseDto> SyncUpTaskListsAsync(bool isInBackground)
         {
             _logger.Information($"{nameof(SyncUpTaskListsAsync)}: Starting the sync up of task lists");
-            var syncUpResult = new EmptyResponse
+            var syncUpResult = new EmptyResponseDto
             {
                 Succeed = false,
                 Message = string.Empty
             };
-            var syncUpResults = new List<EmptyResponse>();
+            var syncUpResults = new List<EmptyResponseDto>();
 
             if (!_networkService.IsInternetAvailable())
             {
@@ -471,16 +471,16 @@ namespace MiraiNotes.UWP.Services
             return syncUpResult;
         }
 
-        public async Task<EmptyResponse> SyncUpTasksAsync(bool isInBackground)
+        public async Task<EmptyResponseDto> SyncUpTasksAsync(bool isInBackground)
         {
             _logger.Information($"{nameof(SyncUpTasksAsync)}: Starting the sync up of tasks");
-            var syncUpResult = new EmptyResponse
+            var syncUpResult = new EmptyResponseDto
             {
                 Message = string.Empty,
                 Succeed = false
             };
 
-            var syncUpResults = new List<EmptyResponse>();
+            var syncUpResults = new List<EmptyResponseDto>();
 
             if (!_networkService.IsInternetAvailable())
             {
@@ -616,7 +616,7 @@ namespace MiraiNotes.UWP.Services
         #endregion
 
         #region Private task list sync methods
-        private async Task<EmptyResponse> SaveUpTaskList(GoogleTaskList taskList)
+        private async Task<EmptyResponseDto> SaveUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService.TaskListService.SaveAsync(new GoogleTaskListModel
             {
@@ -624,7 +624,7 @@ namespace MiraiNotes.UWP.Services
                 UpdatedAt = taskList.UpdatedAt
             });
 
-            var result = new EmptyResponse
+            var result = new EmptyResponseDto
             {
                 Succeed = response.Succeed
             };
@@ -649,13 +649,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<EmptyResponse> DeleteUpTaskList(GoogleTaskList taskList)
+        private async Task<EmptyResponseDto> DeleteUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService
                 .TaskListService
                 .DeleteAsync(taskList.GoogleTaskListID);
 
-            var result = new EmptyResponse
+            var result = new EmptyResponseDto
             {
                 Succeed = response.Succeed
             };
@@ -674,13 +674,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<EmptyResponse> UpdateUpTaskList(GoogleTaskList taskList)
+        private async Task<EmptyResponseDto> UpdateUpTaskList(GoogleTaskList taskList)
         {
             var response = await _apiService
                 .TaskListService
                 .GetAsync(taskList.GoogleTaskListID);
 
-            var result = new EmptyResponse
+            var result = new EmptyResponseDto
             {
                 Succeed = response.Succeed
             };
@@ -732,7 +732,7 @@ namespace MiraiNotes.UWP.Services
         #endregion
 
         #region Private task sync methods
-        private async Task<EmptyResponse> SaveUpTask(GoogleTask task)
+        private async Task<EmptyResponseDto> SaveUpTask(GoogleTask task)
         {
             var t = new GoogleTaskModel
             {
@@ -747,7 +747,7 @@ namespace MiraiNotes.UWP.Services
                 .TaskService
                 .SaveAsync(task.TaskList.GoogleTaskListID, t, task.ParentTask, task.Position);
 
-            var result = new EmptyResponse
+            var result = new EmptyResponseDto
             {
                 Succeed = response.Succeed
             };
@@ -775,13 +775,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<EmptyResponse> DeleteUpTask(GoogleTask task)
+        private async Task<EmptyResponseDto> DeleteUpTask(GoogleTask task)
         {
             var response = await _apiService
                 .TaskService
                 .DeleteAsync(task.TaskList.GoogleTaskListID, task.GoogleTaskID);
 
-            var result = new EmptyResponse
+            var result = new EmptyResponseDto
             {
                 Succeed = response.Succeed
             };
@@ -801,13 +801,13 @@ namespace MiraiNotes.UWP.Services
             return result;
         }
 
-        private async Task<EmptyResponse> UpdateUpTask(GoogleTask task)
+        private async Task<EmptyResponseDto> UpdateUpTask(GoogleTask task)
         {
             var response = await _apiService
                 .TaskService
                 .GetAsync(task.TaskList.GoogleTaskListID, task.GoogleTaskID);
 
-            var result = new EmptyResponse
+            var result = new EmptyResponseDto
             {
                 Succeed = response.Succeed
             };

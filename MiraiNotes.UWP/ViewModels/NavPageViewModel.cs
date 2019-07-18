@@ -496,7 +496,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            EmptyResponse response;
+            EmptyResponseDto response;
             //if the task is created but wasnt synced, we remove it from the db
             if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
             {
