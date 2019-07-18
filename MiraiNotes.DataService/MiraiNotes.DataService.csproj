@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MiraiNotes.Data\MiraiNotes.Data.csproj" />
+    <ProjectReference Include="..\MiraiNotes.Shared\MiraiNotes.Shared.csproj" />
   </ItemGroup>
 
 </Project>

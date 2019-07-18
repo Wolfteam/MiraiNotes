@@ -20,12 +20,12 @@ namespace MiraiNotes.DataService.Services
             _logger = logger.ForContext<UserDataService>();
         }
 
-        public async Task<Response<GoogleUser>> GetCurrentActiveUserAsync()
+        public async Task<ResponseDto<GoogleUser>> GetCurrentActiveUserAsync()
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetCurrentActiveUserAsync: Trying to get the current active user");
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Succeed = false,
                     Message = string.Empty
@@ -49,12 +49,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> ChangeCurrentUserStatus(bool isActive)
+        public async Task<EmptyResponseDto> ChangeCurrentUserStatus(bool isActive)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"ChangeCurrentUserStatus: Trying to change the current active user status to {(isActive ? "Active" : "Inactive")}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Succeed = false,
                     Message = string.Empty
@@ -69,12 +69,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleUser>> AddAsync(GoogleUser entity)
+        public async Task<ResponseDto<GoogleUser>> AddAsync(GoogleUser entity)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("AddAsync: Trying to add a new user {@User}", entity);
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -98,12 +98,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleUser>>> AddRangeAsync(IEnumerable<GoogleUser> entities)
+        public async Task<ResponseDto<IEnumerable<GoogleUser>>> AddRangeAsync(IEnumerable<GoogleUser> entities)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"AddRangeAsync: Trying to add {entities.Count()} users");
-                var response = new Response<IEnumerable<GoogleUser>>
+                var response = new ResponseDto<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -127,12 +127,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<bool>> ExistsAsync(Expression<Func<GoogleUser, bool>> predicate)
+        public async Task<ResponseDto<bool>> ExistsAsync(Expression<Func<GoogleUser, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"ExistsAsync: Trying to find the first user that matches {predicate.ToString()}");
-                var response = new Response<bool>
+                var response = new ResponseDto<bool>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -158,12 +158,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleUser>> FirstOrDefaultAsync(Expression<Func<GoogleUser, bool>> predicate)
+        public async Task<ResponseDto<GoogleUser>> FirstOrDefaultAsync(Expression<Func<GoogleUser, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"FirstOrDefaultAsync: Trying to find the user that matches {predicate.ToString()}");
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -188,12 +188,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleUser>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> predicate)
+        public async Task<ResponseDto<GoogleUser>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"FirstOrDefaultAsNoTrackingAsync: Trying to find the user that matches {predicate.ToString()}");
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -219,12 +219,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleUser>>> GetAllAsNoTrackingAsync()
+        public async Task<ResponseDto<IEnumerable<GoogleUser>>> GetAllAsNoTrackingAsync()
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetAllAsNoTrackingAsync: Trying to get all users");
-                var response = new Response<IEnumerable<GoogleUser>>
+                var response = new ResponseDto<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -250,12 +250,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleUser>>> GetAllAsync()
+        public async Task<ResponseDto<IEnumerable<GoogleUser>>> GetAllAsync()
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetAllAsync: Trying to get all the users");
-                var response = new Response<IEnumerable<GoogleUser>>
+                var response = new ResponseDto<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -280,12 +280,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleUser>>> GetAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
+        public async Task<ResponseDto<IEnumerable<GoogleUser>>> GetAsNoTrackingAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetAsNoTrackingAsync: Getting all users");
-                var response = new Response<IEnumerable<GoogleUser>>
+                var response = new ResponseDto<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -331,12 +331,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleUser>>> GetAsync(Expression<Func<GoogleUser, bool>> predicate)
+        public async Task<ResponseDto<IEnumerable<GoogleUser>>> GetAsync(Expression<Func<GoogleUser, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetAsync: Getting all users that matches {predicate.ToString()}");
-                var response = new Response<IEnumerable<GoogleUser>>
+                var response = new ResponseDto<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -362,12 +362,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleUser>> GetAsync(Expression<Func<GoogleUser, bool>> filter, string includeProperties = "")
+        public async Task<ResponseDto<GoogleUser>> GetAsync(Expression<Func<GoogleUser, bool>> filter, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetAsync: Getting all users with {filter.ToString()}");
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -402,12 +402,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleUser>>> GetAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
+        public async Task<ResponseDto<IEnumerable<GoogleUser>>> GetAsync(Expression<Func<GoogleUser, bool>> filter = null, Func<IQueryable<GoogleUser>, IOrderedQueryable<GoogleUser>> orderBy = null, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetAsync: Getting all users with {filter?.ToString() ?? string.Empty}");
-                var response = new Response<IEnumerable<GoogleUser>>
+                var response = new ResponseDto<IEnumerable<GoogleUser>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -449,12 +449,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleUser>> GetByIdAsync(object id)
+        public async Task<ResponseDto<GoogleUser>> GetByIdAsync(object id)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetByIdAsync: Looking for user with id = {id}");
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -479,12 +479,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(GoogleUser entity)
+        public async Task<EmptyResponseDto> RemoveAsync(GoogleUser entity)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("RemoveAsync: Trying to delete {@User}", entity);
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -507,12 +507,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(object id)
+        public async Task<EmptyResponseDto> RemoveAsync(object id)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveAsync: Trying to delete user with id {id}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -544,12 +544,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleUser, bool>> filter)
+        public async Task<EmptyResponseDto> RemoveAsync(Expression<Func<GoogleUser, bool>> filter)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveAsync: Trying to delete user that matches {filter.ToString()}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -580,12 +580,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveRangeAsync(IEnumerable<GoogleUser> entities)
+        public async Task<EmptyResponseDto> RemoveRangeAsync(IEnumerable<GoogleUser> entities)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveRangeAsync: Trying to delete {entities.Count()} users");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -608,12 +608,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleUser>> UpdateAsync(GoogleUser entity)
+        public async Task<ResponseDto<GoogleUser>> UpdateAsync(GoogleUser entity)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("UpdateAsync: Trying to update {@User}", entity);
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -637,7 +637,7 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public Task<Response<IEnumerable<GoogleUser>>> UpdateRangeAsync(IEnumerable<GoogleUser> entities)
+        public Task<ResponseDto<IEnumerable<GoogleUser>>> UpdateRangeAsync(IEnumerable<GoogleUser> entities)
         {
             throw new NotImplementedException();
         }
@@ -653,12 +653,12 @@ namespace MiraiNotes.DataService.Services
             return result;
         }
 
-        public async Task<EmptyResponse> SetAsCurrentUser(string email)
+        public async Task<EmptyResponseDto> SetAsCurrentUser(string email)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("SetAsCurrentUser: Trying to get the current active user");
-                var response = new Response<GoogleUser>
+                var response = new ResponseDto<GoogleUser>
                 {
                     Succeed = false,
                     Message = string.Empty

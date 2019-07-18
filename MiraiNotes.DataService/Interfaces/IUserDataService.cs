@@ -6,10 +6,10 @@ namespace MiraiNotes.DataService.Interfaces
 {
     public interface IUserDataService : IRepository<GoogleUser>
     {
-        Task<Response<GoogleUser>> GetCurrentActiveUserAsync();
+        Task<ResponseDto<GoogleUser>> GetCurrentActiveUserAsync();
 
-        Task<EmptyResponse> ChangeCurrentUserStatus(bool isActive);
+        Task<EmptyResponseDto> ChangeCurrentUserStatus(bool isActive);
 
-        Task<EmptyResponse> SetAsCurrentUser(string email);
+        Task<EmptyResponseDto> SetAsCurrentUser(string email);
     }
 }

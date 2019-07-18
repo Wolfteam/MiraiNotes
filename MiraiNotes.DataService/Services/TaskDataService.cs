@@ -21,12 +21,12 @@ namespace MiraiNotes.DataService.Services
             _logger = logger.ForContext<TaskDataService>();
         }
 
-        public async Task<Response<GoogleTask>> AddAsync(GoogleTask entity)
+        public async Task<ResponseDto<GoogleTask>> AddAsync(GoogleTask entity)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("AddAsync: Trying to add a new task {@Task}", entity);
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -50,12 +50,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> AddAsync(string taskListID, GoogleTask task)
+        public async Task<ResponseDto<GoogleTask>> AddAsync(string taskListID, GoogleTask task)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("AddAsync: Trying to add a new task {@Task}", task);
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -91,12 +91,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> AddRangeAsync(IEnumerable<GoogleTask> entities)
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> AddRangeAsync(IEnumerable<GoogleTask> entities)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"AddRangeAsync: Trying to add {entities.Count()} tasks");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -120,12 +120,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> AddRangeAsync(string taskListID, IEnumerable<GoogleTask> tasks)
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> AddRangeAsync(string taskListID, IEnumerable<GoogleTask> tasks)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"AddRangeAsync: Trying to add {tasks.Count()} tasks to tasklist = {taskListID}");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -163,12 +163,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<bool>> ExistsAsync(Expression<Func<GoogleTask, bool>> predicate)
+        public async Task<ResponseDto<bool>> ExistsAsync(Expression<Func<GoogleTask, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"ExistsAsync: Trying to find the first task that matches {predicate.ToString()}");
-                var response = new Response<bool>
+                var response = new ResponseDto<bool>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -194,12 +194,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> FirstOrDefaultAsync(Expression<Func<GoogleTask, bool>> predicate)
+        public async Task<ResponseDto<GoogleTask>> FirstOrDefaultAsync(Expression<Func<GoogleTask, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"FirstOrDefaultAsync: Trying to find the first task that matches {predicate.ToString()}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -224,12 +224,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> predicate)
+        public async Task<ResponseDto<GoogleTask>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"FirstOrDefaultAsNoTrackingAsync: Trying to find the first task that matches {predicate.ToString()}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -255,12 +255,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> GetAllAsNoTrackingAsync()
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAllAsNoTrackingAsync()
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetAllAsNoTrackingAsync: Trying to get all the task");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -286,12 +286,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> GetAllAsync()
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAllAsync()
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetAllAsync: Trying to get all the task");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -316,12 +316,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> GetAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "")
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("GetAsNoTrackingAsync: Getting all tasks");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -367,12 +367,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> predicate)
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetAsync: Getting all tasks with {predicate.ToString()}");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -398,12 +398,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> GetAsync(Expression<Func<GoogleTask, bool>> filter, string includeProperties = "")
+        public async Task<ResponseDto<GoogleTask>> GetAsync(Expression<Func<GoogleTask, bool>> filter, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetAsync: Getting all tasks with {filter.ToString()}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -438,12 +438,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "")
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetAsync: Getting all tasks with {filter.ToString()}");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -485,12 +485,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> GetByIdAsync(object id)
+        public async Task<ResponseDto<GoogleTask>> GetByIdAsync(object id)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"GetByIdAsync: Looking for task with id = {id}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -515,12 +515,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(GoogleTask entity)
+        public async Task<EmptyResponseDto> RemoveAsync(GoogleTask entity)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("RemoveAsync: Trying to delete {@Task}", entity);
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -543,12 +543,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(object id)
+        public async Task<EmptyResponseDto> RemoveAsync(object id)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveAsync: Trying to delete task with id {id}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -580,12 +580,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveAsync(Expression<Func<GoogleTask, bool>> filter)
+        public async Task<EmptyResponseDto> RemoveAsync(Expression<Func<GoogleTask, bool>> filter)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveAsync: Trying to delete tasks that matches {filter.ToString()}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -617,12 +617,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveRangeAsync(IEnumerable<GoogleTask> entities)
+        public async Task<EmptyResponseDto> RemoveRangeAsync(IEnumerable<GoogleTask> entities)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveRangeAsync: Trying to delete {entities.Count()} tasks");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -645,12 +645,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> UpdateAsync(GoogleTask entity)
+        public async Task<ResponseDto<GoogleTask>> UpdateAsync(GoogleTask entity)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information("UpdateAsync: Trying to update {@Task}", entity);
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -674,12 +674,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<IEnumerable<GoogleTask>>> UpdateRangeAsync(IEnumerable<GoogleTask> entities)
+        public async Task<ResponseDto<IEnumerable<GoogleTask>>> UpdateRangeAsync(IEnumerable<GoogleTask> entities)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"UpdateRangeAsync: Trying to update {entities.Count()} tasks");
-                var response = new Response<IEnumerable<GoogleTask>>
+                var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -706,12 +706,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string previous)
+        public async Task<ResponseDto<GoogleTask>> MoveAsync(string selectedTaskListID, string taskID, string parentTask, string previous)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"MoveAsync: Trying to move the taskID = {taskID} to tasklistID {selectedTaskListID} with parentTask = {parentTask} and previousTaskID = {previous}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -801,12 +801,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveTaskAsync(string taskID)
+        public async Task<EmptyResponseDto> RemoveTaskAsync(string taskID)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveTaskAsync: Trying to remove taskID = {taskID}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -868,12 +868,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponse> RemoveTaskAsync(IEnumerable<string> taskIds)
+        public async Task<EmptyResponseDto> RemoveTaskAsync(IEnumerable<string> taskIds)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"RemoveTaskAsync: Trying to remove following taskIDs = {string.Join(",", taskIds)}");
-                var response = new EmptyResponse
+                var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -942,12 +942,12 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> ChangeTaskStatusAsync(string taskID, GoogleTaskStatus taskStatus)
+        public async Task<ResponseDto<GoogleTask>> ChangeTaskStatusAsync(string taskID, GoogleTaskStatus taskStatus)
         {
             return await Task.Run(async () =>
             {
                 _logger.Information($"ChangeTaskStatusAsync: Trying to change the status of taskID = {taskID} to {taskStatus}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
@@ -991,14 +991,14 @@ namespace MiraiNotes.DataService.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<Response<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType)
+        public async Task<ResponseDto<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType)
         {
             return await Task.Run(async () =>
             {
                 string dateToRemoveType = dateType == TaskNotificationDateType.REMINDER_DATE ?
                     "reminder" : "completition";
                 _logger.Information($"RemoveDate: Trying to remove the {dateToRemoveType} date of taskID = {taskID}");
-                var response = new Response<GoogleTask>
+                var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
                     Succeed = false
