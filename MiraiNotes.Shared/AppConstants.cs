@@ -7,12 +7,13 @@ namespace MiraiNotes.Shared
         public const string BaseGoogleApprovalUrl = "https://accounts.google.com/o/oauth2/approval";
 
 #if Android
-        public const string ClientId = "xxx";
-        public const string RedirectUrl = "xxx";
+        public const string ClientId = "xxxx";
+        public const string ClientSecret = "";
+        public const string RedirectUrl = "xxxx";
 #else
-        public const string ClientId = "xxx";
-        public const string ClientSecret = "xxx";
-        public const string RedirectUrl = "xxx";
+        public const string ClientId = "xxxx";
+        public const string ClientSecret = "xxxx";
+        public const string RedirectUrl = "xxxx";
 #endif
     }
 }
