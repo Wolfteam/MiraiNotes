@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+    <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <!--<android.support.design.widget.AppBarLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content">-->
+            <android.support.v7.widget.Toolbar
+                    android:id="@+id/AppToolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/actionBarSize"
+                    android:background="@color/colorAccent"
+                    app:titleTextColor="@color/white"
+                    app:subtitleTextColor="@color/white"
+                    android:minHeight="?attr/actionBarSize">
+            </android.support.v7.widget.Toolbar>
+        <!--</android.support.design.widget.AppBarLayout>-->
+
+        <android.support.v4.widget.DrawerLayout
+                android:id="@+id/AppDrawerLayout"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:fitsSystemWindows="true">
+
+            <android.support.design.widget.NavigationView
+                    android:id="@+id/AppNavView"
+                    android:layout_gravity="start"
+                    android:layout_height="match_parent"
+                    android:layout_width="250dp"
+                    android:fitsSystemWindows="true"
+                    app:headerLayout="@layout/drawerheader"/>
+        </android.support.v4.widget.DrawerLayout>
+
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
