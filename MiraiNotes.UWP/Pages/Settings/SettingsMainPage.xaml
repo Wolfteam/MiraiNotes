@@ -7,7 +7,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="{ThemeResource SystemControlBaseLowAcrylicWindowBrush}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Settings, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
