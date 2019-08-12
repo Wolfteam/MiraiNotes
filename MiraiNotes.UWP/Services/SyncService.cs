@@ -1,14 +1,15 @@
-﻿using MiraiNotes.Data.Models;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Extensions;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models.API;
-using Serilog;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models.GoogleApi;
+using IGoogleApiService = MiraiNotes.UWP.Interfaces.IGoogleApiService;
 
 namespace MiraiNotes.UWP.Services
 {

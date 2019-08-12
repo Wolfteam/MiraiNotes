@@ -1,10 +1,10 @@
-using MiraiNotes.Shared.Dto.Google.Responses;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.Shared;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Security.Authentication.Web;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Dto.Google.Responses;
+using MiraiNotes.Shared;
 
 namespace MiraiNotes.UWP.Services
 {
@@ -43,14 +43,8 @@ namespace MiraiNotes.UWP.Services
                         // Gets the Authorization code
                         var approvalCode = queryParams["approvalCode"];
                         var tokenResponse = await GetAccessTokenAsync(approvalCode);
-                        if (tokenResponse == null)
-                        {
-                            response.Message = "Couldn't get a token";
-                            break;
-                        }
 
-                        response.Result = tokenResponse;
-                        response.Succeed = true;
+                        response = tokenResponse;
                         break;
                     case WebAuthenticationStatus.UserCancel:
                         break;

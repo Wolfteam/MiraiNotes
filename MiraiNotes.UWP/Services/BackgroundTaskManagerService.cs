@@ -3,14 +3,15 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using System;
+using MiraiNotes.Abstractions.Services;
 
 namespace MiraiNotes.UWP.Services
 {
     public class BackgroundTaskManagerService : IBackgroundTaskManagerService
     {
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
 
-        public BackgroundTaskManagerService(IApplicationSettingsService appSettings)
+        public BackgroundTaskManagerService(IAppSettingsService appSettings)
         {
             _appSettings = appSettings;
         }

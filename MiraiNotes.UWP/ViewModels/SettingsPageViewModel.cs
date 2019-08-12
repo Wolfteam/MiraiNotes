@@ -1,21 +1,23 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
     public class SettingsPageViewModel : ViewModelBase
     {
         #region Members
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
         private readonly IDispatcherHelper _dispatcher;
         private readonly IMessenger _messenger;
@@ -327,7 +329,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Constructors
         public SettingsPageViewModel(
-            IApplicationSettingsService appSettings,
+            IAppSettingsService appSettings,
             ICustomDialogService dialogService,
             IDispatcherHelper dispatcher,
             IMessenger messenger,

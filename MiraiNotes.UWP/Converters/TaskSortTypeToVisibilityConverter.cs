@@ -1,7 +1,7 @@
-﻿using MiraiNotes.UWP.Models;
-using System;
+﻿using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
+using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.Converters
 {

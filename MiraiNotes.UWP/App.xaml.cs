@@ -168,8 +168,8 @@ namespace MiraiNotes.UWP
         {
             var vml = new ViewModelLocator();
             MiscellaneousUtils.ChangeCurrentTheme(
-                vml.ApplicationSettingsService.AppTheme, 
-                vml.ApplicationSettingsService.AppHexAccentColor);
+                vml.AppSettingsService.AppTheme, 
+                vml.AppSettingsService.AppHexAccentColor);
         }
 
         /// <summary>

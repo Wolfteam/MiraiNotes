@@ -1,14 +1,15 @@
-﻿using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Utils;
 
 namespace MiraiNotes.UWP.Services
 {
-    public class ApplicationSettingsService : IApplicationSettingsService
+    public class AppSettingsService : IAppSettingsService
     {
         private readonly IApplicationSettingsServiceBase _settings;
 
-        public ApplicationSettingsService(IApplicationSettingsServiceBase settings)
+        public AppSettingsService(IApplicationSettingsServiceBase settings)
         {
             _settings = settings;
         }

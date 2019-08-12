@@ -1,15 +1,15 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Linq;
+using Windows.ApplicationModel.Background;
+using Windows.UI.Notifications;
+using AutoMapper;
 using GalaSoft.MvvmLight.Messaging;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Models;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.ViewModels;
 using Serilog;
-using System;
-using System.Linq;
-using Windows.ApplicationModel.Background;
-using Windows.UI.Notifications;
 
 namespace MiraiNotes.UWP.BackgroundTasks
 {

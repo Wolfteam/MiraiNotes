@@ -132,7 +132,6 @@
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
     <Compile Include="Helpers\CustomToastNotificationManager.cs" />
-    <Compile Include="Interfaces\IApplicationSettingsService.cs" />
     <Compile Include="Interfaces\IApplicationSettingsServiceBase.cs" />
     <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
@@ -142,31 +141,16 @@
     <Compile Include="Interfaces\IGoogleTaskService.cs" />
     <Compile Include="Interfaces\IGoogleUserService.cs" />
     <Compile Include="Interfaces\IHttpClientsFactory.cs" />
-    <Compile Include="Interfaces\INetworkService.cs" />
-    <Compile Include="Interfaces\ISyncService.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AccentColorModel.cs" />
-    <Compile Include="Models\API\GoogleApiErrorModel.cs" />
-    <Compile Include="Models\API\GoogleBaseModel.cs" />
-    <Compile Include="Models\API\GoogleEmptyResponseModel.cs" />
-    <Compile Include="Models\API\GoogleResponseErrorModel.cs" />
-    <Compile Include="Models\API\GoogleTaskModel.cs" />
-    <Compile Include="Models\API\GoogleTaskApiResponseModel.cs" />
-    <Compile Include="Models\API\GoogleTaskListModel.cs" />
-    <Compile Include="Models\API\GoogleUserModel.cs" />
-    <Compile Include="Models\API\GoogleResponseModel.cs" />
-    <Compile Include="Models\AppThemeType.cs" />
     <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\CustomDialogType.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\MessageType.cs" />
-    <Compile Include="Models\PasswordVaultResourceType.cs" />
     <Compile Include="Models\SettingsPageType.cs" />
     <Compile Include="Models\SettingsPageItem.cs" />
-    <Compile Include="Models\SyncBgTaskIntervals.cs" />
-    <Compile Include="Models\TaskListSortType.cs" />
     <Compile Include="Models\ToastActionType.cs" />
     <Compile Include="Pages\Dialogs\AccountsContentDialog.xaml.cs">
       <DependentUpon>AccountsContentDialog.xaml</DependentUpon>
@@ -195,7 +179,7 @@
     <Compile Include="Pages\Settings\SettingsSynchronizationPage.xaml.cs">
       <DependentUpon>SettingsSynchronizationPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\ApplicationSettingsService.cs" />
+    <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\ApplicationSettingsServiceBase.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\BaseGoogleAuthService.cs" />
@@ -210,7 +194,6 @@
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\TaskListItemViewModel.cs" />
     <Compile Include="ViewModels\TaskItemViewModel.cs" />
-    <Compile Include="Models\TaskSortType.cs" />
     <Compile Include="Pages\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -229,7 +212,6 @@
     <Compile Include="Services\GoogleUserService.cs" />
     <Compile Include="Services\GoogleTaskListService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
-    <Compile Include="Interfaces\IUserCredentialService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\NavPageViewModel.cs" />
     <Compile Include="ViewModels\LoginPageViewModel.cs" />
@@ -425,16 +407,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MiraiNotes.UWP_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MiraiNotes.DataService\MiraiNotes.DataService.csproj">
-      <Project>{d46856f5-8558-4735-b2c8-195021ee2960}</Project>
-      <Name>MiraiNotes.DataService</Name>
+    <ProjectReference Include="..\MiraiNotes.Abstractions\MiraiNotes.Abstractions.csproj">
+      <Project>{6d6bfee5-9534-4b2b-aa4c-c7cfd9d06f04}</Project>
+      <Name>MiraiNotes.Abstractions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MiraiNotes.Data\MiraiNotes.Data.csproj">
-      <Project>{5ebd0bc2-8279-41ed-9c43-7b531220b95f}</Project>
-      <Name>MiraiNotes.Data</Name>
+    <ProjectReference Include="..\MiraiNotes.Core\MiraiNotes.Core.csproj">
+      <Project>{c1948fba-b65e-438b-8fbd-62e2d1acb3fc}</Project>
+      <Name>MiraiNotes.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\MiraiNotes.Shared\MiraiNotes.Shared.csproj">
       <Project>{13c950f5-4dbb-4992-8a4f-407a61626963}</Project>
@@ -444,8 +423,92 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\API\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidDebug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\AndroidDebug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidDebug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\AndroidDebug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidDebug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\AndroidDebug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidRelease|x86'">
+    <OutputPath>bin\x86\AndroidRelease\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidRelease|ARM'">
+    <OutputPath>bin\ARM\AndroidRelease\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidRelease|x64'">
+    <OutputPath>bin\x64\AndroidRelease\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

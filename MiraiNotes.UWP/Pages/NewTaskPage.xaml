@@ -10,7 +10,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages"
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sharedModels="using:MiraiNotes.Shared.Models"
+    xmlns:sharedEnums="using:MiraiNotes.Core.Enums"
     DataContext="{Binding NewTask, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -110,7 +110,7 @@
                         Height="25"
                         Background="Transparent"
                         Command="{Binding RemoveTaskNotificationDateCommand}"
-                        CommandParameter="{x:Bind sharedModels:TaskNotificationDateType.TO_BE_COMPLETED_DATE}">
+                        CommandParameter="{x:Bind sharedEnums:TaskNotificationDateType.TO_BE_COMPLETED_DATE}">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
                     </Button>
                 </Grid>
@@ -140,7 +140,7 @@
                         Height="25"
                         Background="Transparent"
                         Command="{Binding RemoveTaskNotificationDateCommand}"
-                        CommandParameter="{x:Bind sharedModels:TaskNotificationDateType.REMINDER_DATE}">
+                        CommandParameter="{x:Bind sharedEnums:TaskNotificationDateType.REMINDER_DATE}">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
                     </Button>
                 </StackPanel>

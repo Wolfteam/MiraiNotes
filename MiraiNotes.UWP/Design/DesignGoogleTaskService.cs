@@ -1,11 +1,9 @@
-﻿using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models.GoogleApi;
+using MiraiNotes.UWP.Interfaces;
 
 namespace MiraiNotes.UWP.Design
 {

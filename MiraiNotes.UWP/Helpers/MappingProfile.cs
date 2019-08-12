@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using MiraiNotes.Data.Models;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Models.GoogleApi;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Models.API;
 using MiraiNotes.UWP.ViewModels;
 
 namespace MiraiNotes.UWP.Helpers

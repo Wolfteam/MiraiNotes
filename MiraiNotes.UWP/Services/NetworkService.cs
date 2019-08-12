@@ -1,5 +1,5 @@
 ﻿using Microsoft.Toolkit.Uwp.Connectivity;
-using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.Abstractions.Services;
 
 namespace MiraiNotes.UWP.Services
 {

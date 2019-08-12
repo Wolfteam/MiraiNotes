@@ -1,24 +1,26 @@
-﻿using MiraiNotes.Shared.Interfaces;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.Interfaces;
+using IGoogleApiService = MiraiNotes.Abstractions.Services.IGoogleApiService;
 
 namespace MiraiNotes.UWP.Handlers
 {
     public class AuthorizationHandler : DelegatingHandler
     {
         private readonly ICustomDialogService _dialogService;
-        private readonly IGoogleAuthService _googleAuthService;
+        private readonly IGoogleApiService _googleAuthService;
         private readonly IUserCredentialService _userCredentialService;
 
-        public AuthorizationHandler(IUserCredentialService userCredentialService,
-            IGoogleAuthService googleAuthService,
+        public AuthorizationHandler(
+            IUserCredentialService userCredentialService,
+            IGoogleApiService googleAuthService,
             ICustomDialogService dialogService)
         {
             _userCredentialService = userCredentialService;
@@ -48,7 +50,7 @@ namespace MiraiNotes.UWP.Handlers
                     }
 
                     var refreshToken = _userCredentialService.GetUserCredential(
-                        PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                        ResourceType.REFRESH_TOKEN_RESOURCE,
                         currentLoggedUsername);
                     if (string.IsNullOrEmpty(refreshToken))
                     {
@@ -58,14 +60,16 @@ namespace MiraiNotes.UWP.Handlers
                         return response;
                     }
 
-                    var token = await _googleAuthService.GetNewTokenAsync(refreshToken);
-                    if (token is null)
+                    var tokenResponse = await _googleAuthService.GetNewTokenAsync(refreshToken);
+                    if (!tokenResponse.Succeed)
                     {
                         await _dialogService.ShowMessageDialogAsync(
                             "Error",
                             "Could't get a new token. Did you remove access to our app :C?");
                         return response;
                     }
+
+                    var token = tokenResponse.Result;
 
                     // we're now logged in again.
 
@@ -74,12 +78,12 @@ namespace MiraiNotes.UWP.Handlers
 
                     // Save the user to the app settings
                     _userCredentialService.UpdateUserCredential(
-                        PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                        ResourceType.REFRESH_TOKEN_RESOURCE,
                         currentLoggedUsername,
                         false,
                         token.RefreshToken);
                     _userCredentialService.UpdateUserCredential(
-                        PasswordVaultResourceType.TOKEN_RESOURCE,
+                        ResourceType.TOKEN_RESOURCE,
                         currentLoggedUsername,
                         false,
                         token.AccessToken);

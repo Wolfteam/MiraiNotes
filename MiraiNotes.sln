@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiraiNotes.Shared", "MiraiN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiraiNotes.Android", "MiraiNotes.Android\MiraiNotes.Android.csproj", "{3BC0AC7E-3B3B-4D3F-9CC0-B2BDECC460A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiraiNotes.Abstractions", "MiraiNotes.Abstractions\MiraiNotes.Abstractions.csproj", "{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiraiNotes.Abstractions", "MiraiNotes.Abstractions\MiraiNotes.Abstractions.csproj", "{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiraiNotes.Core", "MiraiNotes.Core\MiraiNotes.Core.csproj", "{C1948FBA-B65E-438B-8FBD-62E2D1ACB3FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiraiNotes.Core", "MiraiNotes.Core\MiraiNotes.Core.csproj", "{C1948FBA-B65E-438B-8FBD-62E2D1ACB3FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,12 +131,16 @@ Global
 		{3BC0AC7E-3B3B-4D3F-9CC0-B2BDECC460A6}.Release|ARM.ActiveCfg = Release|Any CPU
 		{3BC0AC7E-3B3B-4D3F-9CC0-B2BDECC460A6}.Release|x64.ActiveCfg = Release|Any CPU
 		{3BC0AC7E-3B3B-4D3F-9CC0-B2BDECC460A6}.Release|x86.ActiveCfg = Release|Any CPU
+		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|Any CPU.ActiveCfg = AndroidDebug|Any CPU
+		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|Any CPU.Build.0 = AndroidDebug|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|ARM.ActiveCfg = Debug|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|ARM.Build.0 = Debug|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|x64.ActiveCfg = Debug|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|x64.Build.0 = Debug|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|x86.ActiveCfg = Debug|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|x86.Build.0 = Debug|Any CPU
+		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|Any CPU.ActiveCfg = AndroidRelease|Any CPU
+		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|Any CPU.Build.0 = AndroidRelease|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|ARM.ActiveCfg = Release|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|ARM.Build.0 = Release|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|x64.ActiveCfg = Release|Any CPU
@@ -159,10 +163,6 @@ Global
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.Release|x64.Build.0 = Release|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.Release|x86.ActiveCfg = Release|Any CPU
 		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.Release|x86.Build.0 = Release|Any CPU
-		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|Any CPU.ActiveCfg = AndroidDebug|Any CPU
-		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidDebug|Any CPU.Build.0 = AndroidDebug|Any CPU
-		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|Any CPU.ActiveCfg = AndroidRelease|Any CPU
-		{6D6BFEE5-9534-4B2B-AA4C-C7CFD9D06F04}.AndroidRelease|Any CPU.Build.0 = AndroidRelease|Any CPU
 		{C1948FBA-B65E-438B-8FBD-62E2D1ACB3FC}.AndroidDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1948FBA-B65E-438B-8FBD-62E2D1ACB3FC}.AndroidDebug|Any CPU.Build.0 = Debug|Any CPU
 		{C1948FBA-B65E-438B-8FBD-62E2D1ACB3FC}.AndroidDebug|ARM.ActiveCfg = Debug|Any CPU

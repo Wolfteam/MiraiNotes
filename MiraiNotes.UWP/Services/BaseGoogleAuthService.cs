@@ -1,17 +1,17 @@
-using MiraiNotes.Shared;
-using MiraiNotes.Shared.Dto.Google.Responses;
-using MiraiNotes.Shared.Interfaces;
-using MiraiNotes.Shared.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Dto.Google.Responses;
+using MiraiNotes.Shared;
+using Newtonsoft.Json;
 
 namespace MiraiNotes.UWP.Services
 {
-    public abstract class BaseGoogleAuthService : IGoogleAuthService
+    public abstract class BaseGoogleAuthService : IGoogleApiService
     {
         #region Members
 
@@ -25,14 +25,16 @@ namespace MiraiNotes.UWP.Services
         #endregion
 
         #region Properties
+
         public string TokenEndpoint => "https://accounts.google.com/o/oauth2/token";
 
         public string RefreshTokenEndpoint => "https://www.googleapis.com/oauth2/v4/token";
+
         #endregion
 
         public string GetAuthorizationUrl()
         {
-            return $"{AppConstants.BaseGoogleApiUrl}" +
+            return $"{AppConstants.BaseGoogleAuthUrl}" +
                    $"?client_id={Uri.EscapeDataString(AppConstants.ClientId)}" +
                    $"&scope={string.Join(" ", _scopes)}" +
                    $"&redirect_uri={Uri.EscapeDataString(AppConstants.RedirectUrl)}" +
@@ -40,8 +42,10 @@ namespace MiraiNotes.UWP.Services
                    "&include_granted_scopes=true";
         }
 
-        public async Task<TokenResponseDto> GetNewTokenAsync(string refreshToken)
+        public async Task<ResponseDto<TokenResponseDto>> GetNewTokenAsync(string refreshToken)
         {
+            var result = new ResponseDto<TokenResponseDto>();
+
             var tokenRequestBody = $"refresh_token={refreshToken}" +
                                    $"&client_id={AppConstants.ClientId}" +
                                    $"&client_secret={AppConstants.ClientSecret}" +
@@ -59,16 +63,21 @@ namespace MiraiNotes.UWP.Services
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var tokenResponse = JsonConvert.DeserializeObject<TokenResponseDto>(responseBody);
                 tokenResponse.RefreshToken = refreshToken;
-                return tokenResponse;
+
+                result.Result = tokenResponse;
+                result.Succeed = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                result.Message = ex.Message;
             }
+
+            return result;
         }
 
-        public async Task<TokenResponseDto> GetAccessTokenAsync(string approvalCode)
+        public async Task<ResponseDto<TokenResponseDto>> GetAccessTokenAsync(string approvalCode)
         {
+            var result = new ResponseDto<TokenResponseDto>();
             // Builds the Token request
             var tokenRequestBody = $"code={approvalCode}" +
                                    $"&client_id={AppConstants.ClientId}" +
@@ -92,12 +101,16 @@ namespace MiraiNotes.UWP.Services
 
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var tokenResponse = JsonConvert.DeserializeObject<TokenResponseDto>(responseBody);
-                return tokenResponse;
+
+                result.Result = tokenResponse;
+                result.Succeed = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                result.Message = ex.Message;
             }
+
+            return result;
         }
 
         public abstract Task<ResponseDto<TokenResponseDto>> SignInWithGoogle();

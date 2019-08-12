@@ -1,5 +1,4 @@
-﻿using MiraiNotes.UWP.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.Utils
 {

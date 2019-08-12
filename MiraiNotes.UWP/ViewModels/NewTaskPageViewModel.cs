@@ -1,21 +1,23 @@
-﻿using AutoMapper;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Views;
-using MiraiNotes.Data.Models;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Helpers;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AutoMapper;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Views;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Shared.Helpers;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 
 namespace MiraiNotes.UWP.ViewModels
 {
