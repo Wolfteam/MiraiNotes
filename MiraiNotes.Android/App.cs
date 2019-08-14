@@ -2,9 +2,11 @@
 using System.IO;
 using System.Net.Http;
 using Android.App;
+using AutoMapper;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.GoogleApi;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Services;
 using MiraiNotes.Android.ViewModels;
@@ -15,9 +17,11 @@ using MiraiNotes.Shared.Services.Data;
 using MvvmCross;
 using MvvmCross.IoC;
 using MvvmCross.Localization;
+using MvvmCross.Platforms.Android;
 using MvvmCross.ViewModels;
 using Refit;
 using Serilog;
+using Serilog.Core;
 using Serilog.Filters;
 
 namespace MiraiNotes.Android
@@ -41,10 +45,12 @@ namespace MiraiNotes.Android
 
             Mvx.IoCProvider.RegisterType<IAppSettingsService, AppSettingsService>();
             Mvx.IoCProvider.RegisterType<IAndroidAppSettings, AppSettingsService>();
+            Mvx.IoCProvider.RegisterType<IDialogService, DialogService>();
 
             Mvx.IoCProvider.RegisterType<IUserCredentialService, UserCredentialService>();
             Mvx.IoCProvider.RegisterType<INetworkService, NetworkService>();
             Mvx.IoCProvider.RegisterType<ISyncService, SyncService>();
+            Mvx.IoCProvider.RegisterType(CreateMapper);
 
             Mvx.IoCProvider.RegisterType<IUserDataService, UserDataService>();
             Mvx.IoCProvider.RegisterType<ITaskListDataService, TaskListDataService>();
@@ -111,9 +117,31 @@ namespace MiraiNotes.Android
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
+                .WriteTo.AndroidLog()
+                    .Enrich.WithProperty(Constants.SourceContextPropertyName, "MiraiSoft") //Sets the Tag field.
                 .CreateLogger();
             Log.Logger = logger;
             return logger;
+        }
+
+        private IMapper CreateMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                // Add all profiles in current assembly
+                cfg.AddProfile<MappingProfile>();
+//                cfg.ConstructServicesUsing(t =>
+//                {
+//                    //ConstructServicesUsing gets called if you used it in the
+//                    //mapping profile
+//                    if (t == typeof(GoogleUserViewModel))
+//                    {
+//                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
+//                    }
+//                    return SimpleIoc.Default.GetInstance(t);
+//                });
+            });
+            return config.CreateMapper();
         }
     }
 }
