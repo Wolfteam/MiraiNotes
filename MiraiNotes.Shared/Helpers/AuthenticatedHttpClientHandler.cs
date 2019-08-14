@@ -49,7 +49,7 @@ namespace MiraiNotes.Shared.Helpers
                 ResourceType.TOKEN_RESOURCE,
                 currentLoggedUsername);
 
-            if (string.IsNullOrEmpty(currentLoggedUsername))
+            if (string.IsNullOrEmpty(token))
             {
                 throw new NullReferenceException(
                     $"A token should be set before trying to to authenticate using {auth.Scheme}");
@@ -79,9 +79,9 @@ namespace MiraiNotes.Shared.Helpers
                 var tokenResponse = await googleAuthService.GetNewTokenAsync(refreshToken);
                 if (!tokenResponse.Succeed)
                 {
-//                    await _dialogService.ShowMessageDialogAsync(
-//                        "Error",
-//                        "Could't get a new token. Did you remove access to our app :C?");
+                    //                    await _dialogService.ShowMessageDialogAsync(
+                    //                        "Error",
+                    //                        "Could't get a new token. Did you remove access to our app :C?");
                     return response;
                 }
 
@@ -106,7 +106,10 @@ namespace MiraiNotes.Shared.Helpers
                 // Set the authentication header
                 clonedRequest.Headers.Authorization = new AuthenticationHeaderValue(auth.Scheme, newToken.AccessToken);
                 // Resend the request
-                response = await base.SendAsync(clonedRequest, cancellationToken);
+                using (var r = await base.SendAsync(clonedRequest, cancellationToken))
+                {
+                    response = r;
+                }
             }
             catch (InvalidOperationException)
             {

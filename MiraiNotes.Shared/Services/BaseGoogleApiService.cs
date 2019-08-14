@@ -152,7 +152,10 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                response.Result = await _googleApiService.GetAllTaskLists(maxResults, pageToken);
+                response.Result = string.IsNullOrEmpty(pageToken)
+                    ? await _googleApiService.GetAllTaskLists(maxResults)
+                    : await _googleApiService.GetAllTaskLists(pageToken, maxResults);
+
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -312,7 +315,10 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                response.Result = await _googleApiService.GetAllTasks(taskListId, maxResults, pageToken, showHidden);
+                if (!string.IsNullOrEmpty(pageToken))
+                    response.Result = await _googleApiService.GetAllTasks(taskListId, pageToken, maxResults, showHidden);
+                else
+                    response.Result = await _googleApiService.GetAllTasks(taskListId, maxResults, showHidden);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -359,9 +365,16 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                var googleResponse = await _googleApiService.SaveTask(taskListId, task, parent, previous);
+                if (!string.IsNullOrEmpty(parent) && !string.IsNullOrEmpty(previous))
+                    response.Result = await _googleApiService.SaveTask(taskListId, task, parent, previous);
+                else if (!string.IsNullOrEmpty(parent))
+                    response.Result = await _googleApiService.SaveTask(taskListId, task, parent);
+                else if (!string.IsNullOrEmpty(previous))
+                    throw new NotImplementedException("I think that if you have a previous valid you need a parent one");
+                else
+                    response.Result = await _googleApiService.SaveTask(taskListId, task);
+
                 response.Succeed = true;
-                response.Result = googleResponse;
             }
             catch (ApiException apiEx)
             {
@@ -404,15 +417,22 @@ namespace MiraiNotes.Shared.Services
 
         private static async Task HandleApiException<T>(ApiException apiEx, T response) where T : EmptyResponseDto
         {
-            var error = await apiEx.GetContentAsAsync<GoogleResponseErrorModel>();
-            if (error is null)
+            try
+            {
+                var error = await apiEx.GetContentAsAsync<GoogleResponseErrorModel>();
+                if (error is null)
+                {
+                    response.Message = apiEx.Message;
+                }
+                else
+                {
+                    string msg = GetGoogleError(error);
+                    response.Message = msg;
+                }
+            }
+            catch (Exception)
             {
                 response.Message = apiEx.Message;
-            }
-            else
-            {
-                string msg = GetGoogleError(error);
-                response.Message = msg;
             }
         }
 
