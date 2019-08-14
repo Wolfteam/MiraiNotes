@@ -15,6 +15,7 @@ using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
+using MiraiNotes.Shared.Utils;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;

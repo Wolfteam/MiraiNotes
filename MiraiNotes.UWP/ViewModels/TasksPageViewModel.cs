@@ -12,6 +12,9 @@ using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Extensions;
+using MiraiNotes.Shared.Utils;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
@@ -520,7 +523,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             MarkAsSelectedAllTasks(false);
 
-            var task = Tasks.FirstOrDefault(t => t.TaskID == selectedItem.ItemID);
+            var task = Tasks.FirstOrDefault(t => t.TaskID == selectedItem.ItemId);
             task.IsSelected = true;
             TaskAutoSuggestBoxText = string.Empty;
         }

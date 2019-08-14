@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Models;
 using MiraiNotes.Core.Models.GoogleApi;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.ViewModels;
@@ -17,19 +18,19 @@ namespace MiraiNotes.UWP.Helpers
             CreateMap<TaskListItemViewModel, GoogleTaskListModel>();
 
             CreateMap<GoogleTaskListModel, ItemModel>()
-                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskListID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<GoogleTaskModel, ItemModel>()
-                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<TaskListItemViewModel, ItemModel>()
-                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskListID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<TaskItemViewModel, ItemModel>()
-                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskID))
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<TaskItemViewModel, TaskItemViewModel>();
@@ -42,7 +43,7 @@ namespace MiraiNotes.UWP.Helpers
 
             CreateMap<GoogleTaskList, ItemModel>()
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
-                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.GoogleTaskListID));
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.GoogleTaskListID));
 
             CreateMap<GoogleTask, TaskItemViewModel>()
                 .ForMember(d => d.CompletedOn, opt => opt.MapFrom(s => s.CompletedOn))
@@ -59,7 +60,7 @@ namespace MiraiNotes.UWP.Helpers
 
             CreateMap<GoogleTask, ItemModel>()
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
-                .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.GoogleTaskID));
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.GoogleTaskID));
 
             CreateMap<GoogleUser, GoogleUserViewModel>()
                 .ConstructUsingServiceLocator();

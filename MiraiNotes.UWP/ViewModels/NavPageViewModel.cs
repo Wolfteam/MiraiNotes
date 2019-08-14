@@ -11,7 +11,9 @@ using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Enums;
-using MiraiNotes.UWP.Extensions;
+using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Extensions;
+using MiraiNotes.Shared.Utils;
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
@@ -353,7 +355,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             if (selectedItem == null)
                 return;
-            SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
+            SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemId);
         }
 
         public void OnNavigationViewSelectionChangeAsync(object selectedItem)
