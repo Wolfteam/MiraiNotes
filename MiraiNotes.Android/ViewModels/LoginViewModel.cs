@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Android.Common.Utils;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Messages;
-using MiraiNotes.Android.Services;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
@@ -13,6 +15,7 @@ using MvvmCross.Commands;
 using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using MvvmCross.ViewModels;
 using Serilog;
 
 namespace MiraiNotes.Android.ViewModels
@@ -21,14 +24,15 @@ namespace MiraiNotes.Android.ViewModels
     {
         private readonly IMvxNavigationService _navigationService;
         private readonly ILogger _logger;
-
         private readonly IAppSettingsService _appSettings;
-
-        //        private readonly ISyncService _syncService;
+        private readonly ISyncService _syncService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleApiService _googleApiService;
         private readonly IMiraiNotesDataService _dataService;
+        private readonly IDialogService _dialogService;
+
         private bool _showLoading;
+        private bool _viewWasLoaded = false;
 
         public bool ShowLoading
         {
@@ -51,20 +55,21 @@ namespace MiraiNotes.Android.ViewModels
             IMvxNavigationService navigationService,
             ILogger logger,
             IAppSettingsService appSettings,
-            //            ISyncService syncService,
+            ISyncService syncService,
             IUserCredentialService userCredentialService,
             IGoogleApiService googleAuthService,
-            IMiraiNotesDataService dataService)
+            IMiraiNotesDataService dataService,
+            IDialogService dialogService)
             : base(textProvider, messenger)
         {
             _navigationService = navigationService;
             _logger = logger;
             _appSettings = appSettings;
-            //            _syncService = syncService;
+            _syncService = syncService;
             _userCredentialService = userCredentialService;
             _googleApiService = googleAuthService;
             _dataService = dataService;
-
+            _dialogService = dialogService;
             SetCommands();
 
             //CUANDO VUELVES DEL ONRESUME EL CONSTRUCTOR ES VUELTO A LLAMAR POR LO QUE 
@@ -75,22 +80,36 @@ namespace MiraiNotes.Android.ViewModels
 
         public override async Task Initialize()
         {
+            if (_viewWasLoaded)
+                return;
+
             await base.Initialize();
             await InitViewAsync();
+            _viewWasLoaded = true;
+        }
+
+        protected override void ReloadFromBundle(IMvxBundle state)
+        {
+            base.ReloadFromBundle(state);
+            _viewWasLoaded = bool.Parse(state.Data["InitView"] ?? "false");
+        }
+
+        protected override void SaveStateToBundle(IMvxBundle bundle)
+        {
+            bundle.Data["InitView"] = $"{_viewWasLoaded}";
+            base.SaveStateToBundle(bundle);
+
         }
 
         public void SetCommands()
         {
-            LoginCommand = new MvxCommand(async () => await OnLoginRequest());
+            LoginCommand = new MvxCommand(OnLoginRequest);
         }
 
-        public async Task OnLoginRequest()
+        public void OnLoginRequest()
         {
             ShowLoading = true;
             ShowLoginButton = false;
-            await Task.Delay(5000);
-            await _navigationService.Navigate<MainViewModel>();
-            return;
             var url = _googleApiService.GetAuthorizationUrl();
             Messenger.Publish(new LoginRequestMsg(this, url));
         }
@@ -161,12 +180,11 @@ namespace MiraiNotes.Android.ViewModels
             _logger.Information(
                 $"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
 
-            var result = false;
             var userResponse = await _googleApiService.GetUser();
             if (!userResponse.Succeed)
             {
-                //                await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
-                return result;
+                _dialogService.ShowErrorToast("User info not found");
+                return false;
             }
 
             var user = userResponse.Result;
@@ -199,8 +217,8 @@ namespace MiraiNotes.Android.ViewModels
 
                 if (!userInDbResponse.Succeed)
                 {
-                    //                    await _dialogService.ShowMessageDialogAsync("Error", userInDbResponse.Message);
-                    return result;
+                    _dialogService.ShowErrorToast(userInDbResponse.Message);
+                    return false;
                 }
 
                 userInDbResponse.Result.Fullname = user.FullName;
@@ -216,31 +234,28 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!userSaved.Succeed)
             {
-                //                await _dialogService.ShowMessageDialogAsync(
-                //                    "Error",
-                //                    $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
-                return result;
+                _dialogService.ShowErrorToast(
+                    $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
+                return false;
             }
 
             _logger.Information($"{nameof(SignInAsync)}: Trying to get all the task lists that are remote...");
-            //            var syncResult = await _syncService.SyncDownTaskListsAsync(false);
-            //
-            //            if (!syncResult.Succeed)
-            //            {
-            ////                await _dialogService
-            ////                    .ShowMessageDialogAsync("Error", syncResult.Message);
-            //                return result;
-            //            }
-            //
-            //            _logger.Information($"{nameof(SignInAsync)}: Trying to get all the tasks that are remote...");
-            //            syncResult = await _syncService.SyncDownTasksAsync(false);
-            //
-            //            if (!syncResult.Succeed)
-            //            {
-            ////                await _dialogService
-            ////                    .ShowMessageDialogAsync("Error", syncResult.Message);
-            //                return result;
-            //            }
+            var syncResult = await _syncService.SyncDownTaskListsAsync(false);
+
+            if (!syncResult.Succeed)
+            {
+                _dialogService.ShowErrorToast(syncResult.Message);
+                return false;
+            }
+
+            _logger.Information($"{nameof(SignInAsync)}: Trying to get all the tasks that are remote...");
+            syncResult = await _syncService.SyncDownTasksAsync(false);
+
+            if (!syncResult.Succeed)
+            {
+                _dialogService.ShowErrorToast(syncResult.Message);
+                return false;
+            }
 
             _userCredentialService.UpdateUserCredential(
                 ResourceType.LOGGED_USER_RESOURCE,
@@ -258,11 +273,11 @@ namespace MiraiNotes.Android.ViewModels
                 true,
                 userSaved.Result.Email);
 
-            //            await _googleUserService.DownloadProfileImage(user.ImageUrl, user.ID);
+            await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
 
             //if you came this far, that means everything is ok!
             await _navigationService.Navigate<MainViewModel>();
-            return !result;
+            return true;
         }
 
         public async Task InitViewAsync()
@@ -272,7 +287,6 @@ namespace MiraiNotes.Android.ViewModels
                 .UserService
                 .GetCurrentActiveUserAsync();
 
-            var _dialogService = new DialogService();
 
             var loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
 
@@ -282,21 +296,20 @@ namespace MiraiNotes.Android.ViewModels
             if (!response.Succeed || isUserLoggedIn && response.Result is null)
             {
                 var errorMsg = string.IsNullOrEmpty(response.Message)
-                    ? $"Did you unninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
+                    ? $"Did you uninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
                     : response.Message;
                 ShowLoading = false;
                 ShowLoginButton = true;
-                _dialogService.ShowInfoToast(
-                    $"Coudln't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
-                //                await _dialogService.(
-                //                    "Error",
-                //                    $"Coudln't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
-                //                _userCredentialService.DeleteUserCredential(
-                //                    PasswordVaultResourceType.ALL,
-                //                    _userCredentialService.DefaultUsername);
+                _dialogService.ShowWarningToast(
+                    $"Couldn't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
 
-                //                _logger.Warning($"{nameof(InitViewAsync)}: Couldnt get a user in the db = {response.Succeed} " +
-                //                                $"or isUserLoggedIn and no user exists in db. {errorMsg}");
+                _userCredentialService.DeleteUserCredential(
+                    ResourceType.ALL,
+                    _userCredentialService.DefaultUsername);
+
+                _logger.Warning(
+                    $"{nameof(InitViewAsync)}: Couldnt get a user in the db = {response.Succeed} " +
+                    $"or isUserLoggedIn and no user exists in db. {errorMsg}");
                 return;
             }
 
@@ -304,21 +317,35 @@ namespace MiraiNotes.Android.ViewModels
 
             if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
             {
-                //                var result = await _dialogService.ShowCustomDialog(CustomDialogType.LOGIN_PASSWORD_DIALOG);
-                //                if (result)
-                //                    _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
-                //                else
-                //                    ShowLoginButton = true;
+                _dialogService.ShowLoginDialog(async password =>
+                {
+                    var result = await PasswordMatches(password);
+                    if (result)
+                        await _navigationService.Navigate<MainViewModel>();
+                    else
+                        ShowLoginButton = true;
+                }, () => { ShowLoginButton = true; });
             }
             else if (isUserLoggedIn)
             {
-                _dialogService.ShowInfoToast("navegando...");
+                _dialogService.ShowSucceedToast("navegando...");
                 await _navigationService.Navigate<MainViewModel>();
             }
             else
             {
                 ShowLoginButton = true;
             }
+        }
+
+        private async Task<bool> PasswordMatches(string pass)
+        {
+            var response = await _dataService.UserService.GetCurrentActiveUserAsync();
+            string currentPassword = _userCredentialService.GetUserCredential(
+                ResourceType.SETTINGS_PASSWORD_RESOURCE,
+                response.Result.Email);
+
+            return currentPassword == pass;
+            //            IsErrorVisible = true;
         }
     }
 }
