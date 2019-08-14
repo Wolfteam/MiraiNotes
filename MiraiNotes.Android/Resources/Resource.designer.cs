@@ -9397,26 +9397,26 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f020054
 			public const int avd_hide_password = 2130837588;
 			
-			// aapt resource value: 0x7f02008f
-			public const int avd_hide_password_1 = 2130837647;
+			// aapt resource value: 0x7f020096
+			public const int avd_hide_password_1 = 2130837654;
 			
-			// aapt resource value: 0x7f020090
-			public const int avd_hide_password_2 = 2130837648;
+			// aapt resource value: 0x7f020097
+			public const int avd_hide_password_2 = 2130837655;
 			
-			// aapt resource value: 0x7f020091
-			public const int avd_hide_password_3 = 2130837649;
+			// aapt resource value: 0x7f020098
+			public const int avd_hide_password_3 = 2130837656;
 			
 			// aapt resource value: 0x7f020055
 			public const int avd_show_password = 2130837589;
 			
-			// aapt resource value: 0x7f020092
-			public const int avd_show_password_1 = 2130837650;
+			// aapt resource value: 0x7f020099
+			public const int avd_show_password_1 = 2130837657;
 			
-			// aapt resource value: 0x7f020093
-			public const int avd_show_password_2 = 2130837651;
+			// aapt resource value: 0x7f02009a
+			public const int avd_show_password_2 = 2130837658;
 			
-			// aapt resource value: 0x7f020094
-			public const int avd_show_password_3 = 2130837652;
+			// aapt resource value: 0x7f02009b
+			public const int avd_show_password_3 = 2130837659;
 			
 			// aapt resource value: 0x7f020056
 			public const int common_full_open_on_phone = 2130837590;
@@ -9500,94 +9500,115 @@ namespace MiraiNotes.Android
 			public const int googleg_standard_color_18 = 2130837616;
 			
 			// aapt resource value: 0x7f020071
-			public const int ic_mtrl_chip_checked_black = 2130837617;
+			public const int ic_check_white_48dp = 2130837617;
 			
 			// aapt resource value: 0x7f020072
-			public const int ic_mtrl_chip_checked_circle = 2130837618;
+			public const int ic_clear_white_48dp = 2130837618;
 			
 			// aapt resource value: 0x7f020073
-			public const int ic_mtrl_chip_close_circle = 2130837619;
+			public const int ic_error_outline_white_48dp = 2130837619;
 			
 			// aapt resource value: 0x7f020074
-			public const int logo = 2130837620;
+			public const int ic_info_outline_white_48dp = 2130837620;
 			
 			// aapt resource value: 0x7f020075
-			public const int material_drawer_badge = 2130837621;
+			public const int ic_mtrl_chip_checked_black = 2130837621;
 			
 			// aapt resource value: 0x7f020076
-			public const int material_drawer_circle_mask = 2130837622;
+			public const int ic_mtrl_chip_checked_circle = 2130837622;
 			
 			// aapt resource value: 0x7f020077
-			public const int material_drawer_shadow_bottom = 2130837623;
+			public const int ic_mtrl_chip_close_circle = 2130837623;
 			
 			// aapt resource value: 0x7f020078
-			public const int material_drawer_shadow_left = 2130837624;
+			public const int ic_warning_outline_white = 2130837624;
 			
 			// aapt resource value: 0x7f020079
-			public const int material_drawer_shadow_right = 2130837625;
+			public const int ic_warning_white_48dp = 2130837625;
 			
 			// aapt resource value: 0x7f02007a
-			public const int material_drawer_shadow_top = 2130837626;
+			public const int logo = 2130837626;
 			
 			// aapt resource value: 0x7f02007b
-			public const int mtrl_snackbar_background = 2130837627;
+			public const int material_drawer_badge = 2130837627;
 			
 			// aapt resource value: 0x7f02007c
-			public const int mtrl_tabs_default_indicator = 2130837628;
+			public const int material_drawer_circle_mask = 2130837628;
 			
 			// aapt resource value: 0x7f02007d
-			public const int navigation_empty_icon = 2130837629;
+			public const int material_drawer_shadow_bottom = 2130837629;
 			
 			// aapt resource value: 0x7f02007e
-			public const int notification_action_background = 2130837630;
+			public const int material_drawer_shadow_left = 2130837630;
 			
 			// aapt resource value: 0x7f02007f
-			public const int notification_bg = 2130837631;
+			public const int material_drawer_shadow_right = 2130837631;
 			
 			// aapt resource value: 0x7f020080
-			public const int notification_bg_low = 2130837632;
+			public const int material_drawer_shadow_top = 2130837632;
 			
 			// aapt resource value: 0x7f020081
-			public const int notification_bg_low_normal = 2130837633;
+			public const int mtrl_snackbar_background = 2130837633;
 			
 			// aapt resource value: 0x7f020082
-			public const int notification_bg_low_pressed = 2130837634;
+			public const int mtrl_tabs_default_indicator = 2130837634;
 			
 			// aapt resource value: 0x7f020083
-			public const int notification_bg_normal = 2130837635;
+			public const int navigation_empty_icon = 2130837635;
 			
 			// aapt resource value: 0x7f020084
-			public const int notification_bg_normal_pressed = 2130837636;
+			public const int notification_action_background = 2130837636;
 			
 			// aapt resource value: 0x7f020085
-			public const int notification_icon_background = 2130837637;
-			
-			// aapt resource value: 0x7f02008d
-			public const int notification_template_icon_bg = 2130837645;
-			
-			// aapt resource value: 0x7f02008e
-			public const int notification_template_icon_low_bg = 2130837646;
+			public const int notification_bg = 2130837637;
 			
 			// aapt resource value: 0x7f020086
-			public const int notification_tile_bg = 2130837638;
+			public const int notification_bg_low = 2130837638;
 			
 			// aapt resource value: 0x7f020087
-			public const int notify_panel_notification_icon_bg = 2130837639;
+			public const int notification_bg_low_normal = 2130837639;
 			
 			// aapt resource value: 0x7f020088
-			public const int splash = 2130837640;
+			public const int notification_bg_low_pressed = 2130837640;
 			
 			// aapt resource value: 0x7f020089
-			public const int splash_centered = 2130837641;
+			public const int notification_bg_normal = 2130837641;
 			
 			// aapt resource value: 0x7f02008a
-			public const int tag = 2130837642;
+			public const int notification_bg_normal_pressed = 2130837642;
 			
 			// aapt resource value: 0x7f02008b
-			public const int tooltip_frame_dark = 2130837643;
+			public const int notification_icon_background = 2130837643;
+			
+			// aapt resource value: 0x7f020094
+			public const int notification_template_icon_bg = 2130837652;
+			
+			// aapt resource value: 0x7f020095
+			public const int notification_template_icon_low_bg = 2130837653;
 			
 			// aapt resource value: 0x7f02008c
-			public const int tooltip_frame_light = 2130837644;
+			public const int notification_tile_bg = 2130837644;
+			
+			// aapt resource value: 0x7f02008d
+			public const int notify_panel_notification_icon_bg = 2130837645;
+			
+			// aapt resource value: 0x7f02008e
+			public const int splash = 2130837646;
+			
+			// aapt resource value: 0x7f02008f
+			public const int splash_centered = 2130837647;
+			
+			// aapt resource value: 0x7f020090
+			public const int tag = 2130837648;
+			
+			// aapt resource value: 0x7f020091
+			public const int toast_frame = 2130837649;
+			
+			// aapt resource value: 0x7f020092
+			public const int tooltip_frame_dark = 2130837650;
+			
+			// aapt resource value: 0x7f020093
+			public const int tooltip_frame_light = 2130837651;
 			
 			static Drawable()
 			{
@@ -9605,20 +9626,23 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d005a
 			public const int ALT = 2131558490;
 			
-			// aapt resource value: 0x7f0d00cc
-			public const int AppDrawerLayout = 2131558604;
-			
 			// aapt resource value: 0x7f0d00cd
-			public const int AppNavView = 2131558605;
+			public const int AppDrawerLayout = 2131558605;
 			
-			// aapt resource value: 0x7f0d00cb
-			public const int AppToolbar = 2131558603;
+			// aapt resource value: 0x7f0d00ce
+			public const int AppNavView = 2131558606;
+			
+			// aapt resource value: 0x7f0d00cc
+			public const int AppToolbar = 2131558604;
 			
 			// aapt resource value: 0x7f0d005b
 			public const int CTRL = 2131558491;
 			
 			// aapt resource value: 0x7f0d005c
 			public const int FUNCTION = 2131558492;
+			
+			// aapt resource value: 0x7f0d00cb
+			public const int LoginPasswordEditText = 2131558603;
 			
 			// aapt resource value: 0x7f0d005d
 			public const int META = 2131558493;
@@ -9635,8 +9659,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d005f
 			public const int SYM = 2131558495;
 			
-			// aapt resource value: 0x7f0d00eb
-			public const int action0 = 2131558635;
+			// aapt resource value: 0x7f0d00ec
+			public const int action0 = 2131558636;
 			
 			// aapt resource value: 0x7f0d00ad
 			public const int action_bar = 2131558573;
@@ -9659,17 +9683,17 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0089
 			public const int action_bar_title = 2131558537;
 			
-			// aapt resource value: 0x7f0d00e8
-			public const int action_container = 2131558632;
+			// aapt resource value: 0x7f0d00e9
+			public const int action_container = 2131558633;
 			
 			// aapt resource value: 0x7f0d00ae
 			public const int action_context_bar = 2131558574;
 			
-			// aapt resource value: 0x7f0d00ef
-			public const int action_divider = 2131558639;
+			// aapt resource value: 0x7f0d00f0
+			public const int action_divider = 2131558640;
 			
-			// aapt resource value: 0x7f0d00e9
-			public const int action_image = 2131558633;
+			// aapt resource value: 0x7f0d00ea
+			public const int action_image = 2131558634;
 			
 			// aapt resource value: 0x7f0d0003
 			public const int action_menu_divider = 2131558403;
@@ -9686,14 +9710,14 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d008b
 			public const int action_mode_close_button = 2131558539;
 			
-			// aapt resource value: 0x7f0d00ff
-			public const int action_settings = 2131558655;
+			// aapt resource value: 0x7f0d0103
+			public const int action_settings = 2131558659;
 			
-			// aapt resource value: 0x7f0d00ea
-			public const int action_text = 2131558634;
+			// aapt resource value: 0x7f0d00eb
+			public const int action_text = 2131558635;
 			
-			// aapt resource value: 0x7f0d00f8
-			public const int actions = 2131558648;
+			// aapt resource value: 0x7f0d00f9
+			public const int actions = 2131558649;
 			
 			// aapt resource value: 0x7f0d008c
 			public const int activity_chooser_view_content = 2131558540;
@@ -9734,8 +9758,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0092
 			public const int buttonPanel = 2131558546;
 			
-			// aapt resource value: 0x7f0d00ec
-			public const int cancel_action = 2131558636;
+			// aapt resource value: 0x7f0d00ed
+			public const int cancel_action = 2131558637;
 			
 			// aapt resource value: 0x7f0d006d
 			public const int center = 2131558509;
@@ -9749,8 +9773,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d00a6
 			public const int checkbox = 2131558566;
 			
-			// aapt resource value: 0x7f0d00f4
-			public const int chronometer = 2131558644;
+			// aapt resource value: 0x7f0d00f5
+			public const int chronometer = 2131558645;
 			
 			// aapt resource value: 0x7f0d0081
 			public const int clip_horizontal = 2131558529;
@@ -9770,8 +9794,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0095
 			public const int contentPanel = 2131558549;
 			
-			// aapt resource value: 0x7f0d00e7
-			public const int content_layout = 2131558631;
+			// aapt resource value: 0x7f0d00e8
+			public const int content_layout = 2131558632;
 			
 			// aapt resource value: 0x7f0d00c2
 			public const int coordinator = 2131558594;
@@ -9815,8 +9839,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0058
 			public const int end = 2131558488;
 			
-			// aapt resource value: 0x7f0d00fa
-			public const int end_padder = 2131558650;
+			// aapt resource value: 0x7f0d00fb
+			public const int end_padder = 2131558651;
 			
 			// aapt resource value: 0x7f0d0067
 			public const int enterAlways = 2131558503;
@@ -9869,8 +9893,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0091
 			public const int icon = 2131558545;
 			
-			// aapt resource value: 0x7f0d00f9
-			public const int icon_group = 2131558649;
+			// aapt resource value: 0x7f0d00fa
+			public const int icon_group = 2131558650;
 			
 			// aapt resource value: 0x7f0d0040
 			public const int icon_only = 2131558464;
@@ -9884,8 +9908,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d008e
 			public const int image = 2131558542;
 			
-			// aapt resource value: 0x7f0d00f5
-			public const int info = 2131558645;
+			// aapt resource value: 0x7f0d00f6
+			public const int info = 2131558646;
 			
 			// aapt resource value: 0x7f0d0088
 			public const int italic = 2131558536;
@@ -9917,68 +9941,68 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0090
 			public const int list_item = 2131558544;
 			
-			// aapt resource value: 0x7f0d00fe
-			public const int masked = 2131558654;
-			
-			// aapt resource value: 0x7f0d00d0
-			public const int material_drawer_account_header = 2131558608;
-			
-			// aapt resource value: 0x7f0d00cf
-			public const int material_drawer_account_header_background = 2131558607;
-			
-			// aapt resource value: 0x7f0d00d4
-			public const int material_drawer_account_header_current = 2131558612;
-			
-			// aapt resource value: 0x7f0d00d7
-			public const int material_drawer_account_header_email = 2131558615;
-			
-			// aapt resource value: 0x7f0d00d6
-			public const int material_drawer_account_header_name = 2131558614;
+			// aapt resource value: 0x7f0d0102
+			public const int masked = 2131558658;
 			
 			// aapt resource value: 0x7f0d00d1
-			public const int material_drawer_account_header_small_first = 2131558609;
+			public const int material_drawer_account_header = 2131558609;
 			
-			// aapt resource value: 0x7f0d00d2
-			public const int material_drawer_account_header_small_second = 2131558610;
-			
-			// aapt resource value: 0x7f0d00d3
-			public const int material_drawer_account_header_small_third = 2131558611;
+			// aapt resource value: 0x7f0d00d0
+			public const int material_drawer_account_header_background = 2131558608;
 			
 			// aapt resource value: 0x7f0d00d5
-			public const int material_drawer_account_header_text_section = 2131558613;
+			public const int material_drawer_account_header_current = 2131558613;
 			
 			// aapt resource value: 0x7f0d00d8
-			public const int material_drawer_account_header_text_switcher = 2131558616;
+			public const int material_drawer_account_header_email = 2131558616;
+			
+			// aapt resource value: 0x7f0d00d7
+			public const int material_drawer_account_header_name = 2131558615;
+			
+			// aapt resource value: 0x7f0d00d2
+			public const int material_drawer_account_header_small_first = 2131558610;
+			
+			// aapt resource value: 0x7f0d00d3
+			public const int material_drawer_account_header_small_second = 2131558611;
+			
+			// aapt resource value: 0x7f0d00d4
+			public const int material_drawer_account_header_small_third = 2131558612;
+			
+			// aapt resource value: 0x7f0d00d6
+			public const int material_drawer_account_header_text_section = 2131558614;
+			
+			// aapt resource value: 0x7f0d00d9
+			public const int material_drawer_account_header_text_switcher = 2131558617;
 			
 			// aapt resource value: 0x7f0d0027
 			public const int material_drawer_animation = 2131558439;
 			
-			// aapt resource value: 0x7f0d00de
-			public const int material_drawer_arrow = 2131558622;
+			// aapt resource value: 0x7f0d00df
+			public const int material_drawer_arrow = 2131558623;
 			
-			// aapt resource value: 0x7f0d00dd
-			public const int material_drawer_arrow_container = 2131558621;
+			// aapt resource value: 0x7f0d00de
+			public const int material_drawer_arrow_container = 2131558622;
+			
+			// aapt resource value: 0x7f0d00e1
+			public const int material_drawer_badge = 2131558625;
 			
 			// aapt resource value: 0x7f0d00e0
-			public const int material_drawer_badge = 2131558624;
+			public const int material_drawer_badge_container = 2131558624;
 			
-			// aapt resource value: 0x7f0d00df
-			public const int material_drawer_badge_container = 2131558623;
-			
-			// aapt resource value: 0x7f0d00dc
-			public const int material_drawer_description = 2131558620;
-			
-			// aapt resource value: 0x7f0d00d9
-			public const int material_drawer_divider = 2131558617;
-			
-			// aapt resource value: 0x7f0d00e2
-			public const int material_drawer_email = 2131558626;
+			// aapt resource value: 0x7f0d00dd
+			public const int material_drawer_description = 2131558621;
 			
 			// aapt resource value: 0x7f0d00da
-			public const int material_drawer_icon = 2131558618;
+			public const int material_drawer_divider = 2131558618;
 			
-			// aapt resource value: 0x7f0d00e6
-			public const int material_drawer_inner_shadow = 2131558630;
+			// aapt resource value: 0x7f0d00e3
+			public const int material_drawer_email = 2131558627;
+			
+			// aapt resource value: 0x7f0d00db
+			public const int material_drawer_icon = 2131558619;
+			
+			// aapt resource value: 0x7f0d00e7
+			public const int material_drawer_inner_shadow = 2131558631;
 			
 			// aapt resource value: 0x7f0d0028
 			public const int material_drawer_item_container = 2131558440;
@@ -10025,23 +10049,23 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0036
 			public const int material_drawer_item_section = 2131558454;
 			
-			// aapt resource value: 0x7f0d00ce
-			public const int material_drawer_layout = 2131558606;
+			// aapt resource value: 0x7f0d00cf
+			public const int material_drawer_layout = 2131558607;
 			
 			// aapt resource value: 0x7f0d0037
 			public const int material_drawer_menu_default_group = 2131558455;
 			
-			// aapt resource value: 0x7f0d00db
-			public const int material_drawer_name = 2131558619;
+			// aapt resource value: 0x7f0d00dc
+			public const int material_drawer_name = 2131558620;
 			
-			// aapt resource value: 0x7f0d00e1
-			public const int material_drawer_profileIcon = 2131558625;
+			// aapt resource value: 0x7f0d00e2
+			public const int material_drawer_profileIcon = 2131558626;
 			
 			// aapt resource value: 0x7f0d0038
 			public const int material_drawer_profile_header = 2131558456;
 			
-			// aapt resource value: 0x7f0d00e5
-			public const int material_drawer_recycler_view = 2131558629;
+			// aapt resource value: 0x7f0d00e6
+			public const int material_drawer_recycler_view = 2131558630;
 			
 			// aapt resource value: 0x7f0d0039
 			public const int material_drawer_slider_layout = 2131558457;
@@ -10052,17 +10076,17 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d003b
 			public const int material_drawer_sticky_header = 2131558459;
 			
-			// aapt resource value: 0x7f0d00e3
-			public const int material_drawer_switch = 2131558627;
-			
 			// aapt resource value: 0x7f0d00e4
-			public const int material_drawer_toggle = 2131558628;
+			public const int material_drawer_switch = 2131558628;
+			
+			// aapt resource value: 0x7f0d00e5
+			public const int material_drawer_toggle = 2131558629;
 			
 			// aapt resource value: 0x7f0d0026
 			public const int materialize_root = 2131558438;
 			
-			// aapt resource value: 0x7f0d00ee
-			public const int media_actions = 2131558638;
+			// aapt resource value: 0x7f0d00ef
+			public const int media_actions = 2131558639;
 			
 			// aapt resource value: 0x7f0d00bc
 			public const int message = 2131558588;
@@ -10094,14 +10118,14 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0047
 			public const int normal = 2131558471;
 			
-			// aapt resource value: 0x7f0d00f7
-			public const int notification_background = 2131558647;
+			// aapt resource value: 0x7f0d00f8
+			public const int notification_background = 2131558648;
+			
+			// aapt resource value: 0x7f0d00f2
+			public const int notification_main_column = 2131558642;
 			
 			// aapt resource value: 0x7f0d00f1
-			public const int notification_main_column = 2131558641;
-			
-			// aapt resource value: 0x7f0d00f0
-			public const int notification_main_column_container = 2131558640;
+			public const int notification_main_column_container = 2131558641;
 			
 			// aapt resource value: 0x7f0d0080
 			public const int outline = 2131558528;
@@ -10130,11 +10154,11 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0075
 			public const int right = 2131558517;
 			
-			// aapt resource value: 0x7f0d00f6
-			public const int right_icon = 2131558646;
+			// aapt resource value: 0x7f0d00f7
+			public const int right_icon = 2131558647;
 			
-			// aapt resource value: 0x7f0d00f2
-			public const int right_side = 2131558642;
+			// aapt resource value: 0x7f0d00f3
+			public const int right_side = 2131558643;
 			
 			// aapt resource value: 0x7f0d000c
 			public const int save_image_matrix = 2131558412;
@@ -10247,8 +10271,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0076
 			public const int start = 2131558518;
 			
-			// aapt resource value: 0x7f0d00ed
-			public const int status_bar_latest_event_content = 2131558637;
+			// aapt resource value: 0x7f0d00ee
+			public const int status_bar_latest_event_content = 2131558638;
 			
 			// aapt resource value: 0x7f0d007b
 			public const int stretch = 2131558523;
@@ -10271,11 +10295,11 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d0020
 			public const int tag_unhandled_key_listeners = 2131558432;
 			
-			// aapt resource value: 0x7f0d00fc
-			public const int taskContent = 2131558652;
+			// aapt resource value: 0x7f0d00fd
+			public const int taskContent = 2131558653;
 			
-			// aapt resource value: 0x7f0d00fb
-			public const int taskName = 2131558651;
+			// aapt resource value: 0x7f0d00fc
+			public const int taskName = 2131558652;
 			
 			// aapt resource value: 0x7f0d0021
 			public const int text = 2131558433;
@@ -10304,8 +10328,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d001a
 			public const int textinput_helper_text = 2131558426;
 			
-			// aapt resource value: 0x7f0d00f3
-			public const int time = 2131558643;
+			// aapt resource value: 0x7f0d00f4
+			public const int time = 2131558644;
 			
 			// aapt resource value: 0x7f0d0023
 			public const int title = 2131558435;
@@ -10315,6 +10339,15 @@ namespace MiraiNotes.Android
 			
 			// aapt resource value: 0x7f0d009e
 			public const int title_template = 2131558558;
+			
+			// aapt resource value: 0x7f0d00ff
+			public const int toast_icon = 2131558655;
+			
+			// aapt resource value: 0x7f0d00fe
+			public const int toast_root = 2131558654;
+			
+			// aapt resource value: 0x7f0d0100
+			public const int toast_text = 2131558656;
 			
 			// aapt resource value: 0x7f0d00bd
 			public const int toolbar = 2131558589;
@@ -10358,8 +10391,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0d001b
 			public const int view_offset_helper = 2131558427;
 			
-			// aapt resource value: 0x7f0d00fd
-			public const int visible = 2131558653;
+			// aapt resource value: 0x7f0d0101
+			public const int visible = 2131558657;
 			
 			// aapt resource value: 0x7f0d0042
 			public const int wide = 2131558466;
@@ -10608,139 +10641,145 @@ namespace MiraiNotes.Android
 			public const int Login = 2130968621;
 			
 			// aapt resource value: 0x7f04002e
-			public const int Main = 2130968622;
+			public const int LoginPasswordDialog = 2130968622;
 			
 			// aapt resource value: 0x7f04002f
-			public const int material_drawer = 2130968623;
+			public const int Main = 2130968623;
 			
 			// aapt resource value: 0x7f040030
-			public const int material_drawer_compact_header = 2130968624;
+			public const int material_drawer = 2130968624;
 			
 			// aapt resource value: 0x7f040031
-			public const int material_drawer_fits_not = 2130968625;
+			public const int material_drawer_compact_header = 2130968625;
 			
 			// aapt resource value: 0x7f040032
-			public const int material_drawer_header = 2130968626;
+			public const int material_drawer_fits_not = 2130968626;
 			
 			// aapt resource value: 0x7f040033
-			public const int material_drawer_item_container = 2130968627;
+			public const int material_drawer_header = 2130968627;
 			
 			// aapt resource value: 0x7f040034
-			public const int material_drawer_item_divider = 2130968628;
+			public const int material_drawer_item_container = 2130968628;
 			
 			// aapt resource value: 0x7f040035
-			public const int material_drawer_item_expandable = 2130968629;
+			public const int material_drawer_item_divider = 2130968629;
 			
 			// aapt resource value: 0x7f040036
-			public const int material_drawer_item_expandable_badge = 2130968630;
+			public const int material_drawer_item_expandable = 2130968630;
 			
 			// aapt resource value: 0x7f040037
-			public const int material_drawer_item_mini = 2130968631;
+			public const int material_drawer_item_expandable_badge = 2130968631;
 			
 			// aapt resource value: 0x7f040038
-			public const int material_drawer_item_mini_profile = 2130968632;
+			public const int material_drawer_item_mini = 2130968632;
 			
 			// aapt resource value: 0x7f040039
-			public const int material_drawer_item_primary = 2130968633;
+			public const int material_drawer_item_mini_profile = 2130968633;
 			
 			// aapt resource value: 0x7f04003a
-			public const int material_drawer_item_profile = 2130968634;
+			public const int material_drawer_item_primary = 2130968634;
 			
 			// aapt resource value: 0x7f04003b
-			public const int material_drawer_item_profile_setting = 2130968635;
+			public const int material_drawer_item_profile = 2130968635;
 			
 			// aapt resource value: 0x7f04003c
-			public const int material_drawer_item_secondary = 2130968636;
+			public const int material_drawer_item_profile_setting = 2130968636;
 			
 			// aapt resource value: 0x7f04003d
-			public const int material_drawer_item_secondary_switch = 2130968637;
+			public const int material_drawer_item_secondary = 2130968637;
 			
 			// aapt resource value: 0x7f04003e
-			public const int material_drawer_item_secondary_toggle = 2130968638;
+			public const int material_drawer_item_secondary_switch = 2130968638;
 			
 			// aapt resource value: 0x7f04003f
-			public const int material_drawer_item_section = 2130968639;
+			public const int material_drawer_item_secondary_toggle = 2130968639;
 			
 			// aapt resource value: 0x7f040040
-			public const int material_drawer_item_switch = 2130968640;
+			public const int material_drawer_item_section = 2130968640;
 			
 			// aapt resource value: 0x7f040041
-			public const int material_drawer_item_toggle = 2130968641;
+			public const int material_drawer_item_switch = 2130968641;
 			
 			// aapt resource value: 0x7f040042
-			public const int material_drawer_recycler_view = 2130968642;
+			public const int material_drawer_item_toggle = 2130968642;
 			
 			// aapt resource value: 0x7f040043
-			public const int material_drawer_slider = 2130968643;
+			public const int material_drawer_recycler_view = 2130968643;
 			
 			// aapt resource value: 0x7f040044
-			public const int materialize = 2130968644;
+			public const int material_drawer_slider = 2130968644;
 			
 			// aapt resource value: 0x7f040045
-			public const int mtrl_layout_snackbar = 2130968645;
+			public const int materialize = 2130968645;
 			
 			// aapt resource value: 0x7f040046
-			public const int mtrl_layout_snackbar_include = 2130968646;
+			public const int mtrl_layout_snackbar = 2130968646;
 			
 			// aapt resource value: 0x7f040047
-			public const int notification_action = 2130968647;
+			public const int mtrl_layout_snackbar_include = 2130968647;
 			
 			// aapt resource value: 0x7f040048
-			public const int notification_action_tombstone = 2130968648;
+			public const int notification_action = 2130968648;
 			
 			// aapt resource value: 0x7f040049
-			public const int notification_media_action = 2130968649;
+			public const int notification_action_tombstone = 2130968649;
 			
 			// aapt resource value: 0x7f04004a
-			public const int notification_media_cancel_action = 2130968650;
+			public const int notification_media_action = 2130968650;
 			
 			// aapt resource value: 0x7f04004b
-			public const int notification_template_big_media = 2130968651;
+			public const int notification_media_cancel_action = 2130968651;
 			
 			// aapt resource value: 0x7f04004c
-			public const int notification_template_big_media_custom = 2130968652;
+			public const int notification_template_big_media = 2130968652;
 			
 			// aapt resource value: 0x7f04004d
-			public const int notification_template_big_media_narrow = 2130968653;
+			public const int notification_template_big_media_custom = 2130968653;
 			
 			// aapt resource value: 0x7f04004e
-			public const int notification_template_big_media_narrow_custom = 2130968654;
+			public const int notification_template_big_media_narrow = 2130968654;
 			
 			// aapt resource value: 0x7f04004f
-			public const int notification_template_custom_big = 2130968655;
+			public const int notification_template_big_media_narrow_custom = 2130968655;
 			
 			// aapt resource value: 0x7f040050
-			public const int notification_template_icon_group = 2130968656;
+			public const int notification_template_custom_big = 2130968656;
 			
 			// aapt resource value: 0x7f040051
-			public const int notification_template_lines_media = 2130968657;
+			public const int notification_template_icon_group = 2130968657;
 			
 			// aapt resource value: 0x7f040052
-			public const int notification_template_media = 2130968658;
+			public const int notification_template_lines_media = 2130968658;
 			
 			// aapt resource value: 0x7f040053
-			public const int notification_template_media_custom = 2130968659;
+			public const int notification_template_media = 2130968659;
 			
 			// aapt resource value: 0x7f040054
-			public const int notification_template_part_chronometer = 2130968660;
+			public const int notification_template_media_custom = 2130968660;
 			
 			// aapt resource value: 0x7f040055
-			public const int notification_template_part_time = 2130968661;
+			public const int notification_template_part_chronometer = 2130968661;
 			
 			// aapt resource value: 0x7f040056
-			public const int select_dialog_item_material = 2130968662;
+			public const int notification_template_part_time = 2130968662;
 			
 			// aapt resource value: 0x7f040057
-			public const int select_dialog_multichoice_material = 2130968663;
+			public const int select_dialog_item_material = 2130968663;
 			
 			// aapt resource value: 0x7f040058
-			public const int select_dialog_singlechoice_material = 2130968664;
+			public const int select_dialog_multichoice_material = 2130968664;
 			
 			// aapt resource value: 0x7f040059
-			public const int support_simple_spinner_dropdown_item = 2130968665;
+			public const int select_dialog_singlechoice_material = 2130968665;
 			
 			// aapt resource value: 0x7f04005a
-			public const int task_item = 2130968666;
+			public const int support_simple_spinner_dropdown_item = 2130968666;
+			
+			// aapt resource value: 0x7f04005b
+			public const int task_item = 2130968667;
+			
+			// aapt resource value: 0x7f04005c
+			public const int toast_layout = 2130968668;
 			
 			static Layout()
 			{
@@ -10793,11 +10832,11 @@ namespace MiraiNotes.Android
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f0a007f
-			public const int Close = 2131361919;
+			// aapt resource value: 0x7f0a0080
+			public const int Close = 2131361920;
 			
-			// aapt resource value: 0x7f0a007e
-			public const int Open = 2131361918;
+			// aapt resource value: 0x7f0a007f
+			public const int Open = 2131361919;
 			
 			// aapt resource value: 0x7f0a0011
 			public const int abc_action_bar_home_description = 2131361809;
@@ -10916,11 +10955,11 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a002b
 			public const int abc_toolbar_collapse_description = 2131361835;
 			
-			// aapt resource value: 0x7f0a007d
-			public const int action_settings = 2131361917;
+			// aapt resource value: 0x7f0a007e
+			public const int action_settings = 2131361918;
 			
-			// aapt resource value: 0x7f0a0070
-			public const int app_name = 2131361904;
+			// aapt resource value: 0x7f0a0064
+			public const int app_name = 2131361892;
 			
 			// aapt resource value: 0x7f0a0039
 			public const int appbar_scrolling_view_behavior = 2131361849;
@@ -10985,11 +11024,11 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a0010
 			public const int common_signin_button_text_long = 2131361808;
 			
-			// aapt resource value: 0x7f0a0071
-			public const int define_AndroidIconics = 2131361905;
+			// aapt resource value: 0x7f0a0072
+			public const int define_AndroidIconics = 2131361906;
 			
-			// aapt resource value: 0x7f0a0064
-			public const int define_fastadapter = 2131361892;
+			// aapt resource value: 0x7f0a0066
+			public const int define_fastadapter = 2131361894;
 			
 			// aapt resource value: 0x7f0a0057
 			public const int define_materialdrawer = 2131361879;
@@ -11009,71 +11048,71 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a003f
 			public const int hide_bottom_view_on_scroll_behavior = 2131361855;
 			
-			// aapt resource value: 0x7f0a0072
-			public const int library_AndroidIconics_author = 2131361906;
-			
 			// aapt resource value: 0x7f0a0073
-			public const int library_AndroidIconics_authorWebsite = 2131361907;
+			public const int library_AndroidIconics_author = 2131361907;
 			
 			// aapt resource value: 0x7f0a0074
-			public const int library_AndroidIconics_isOpenSource = 2131361908;
+			public const int library_AndroidIconics_authorWebsite = 2131361908;
 			
 			// aapt resource value: 0x7f0a0075
-			public const int library_AndroidIconics_libraryDescription = 2131361909;
+			public const int library_AndroidIconics_isOpenSource = 2131361909;
 			
 			// aapt resource value: 0x7f0a0076
-			public const int library_AndroidIconics_libraryName = 2131361910;
+			public const int library_AndroidIconics_libraryDescription = 2131361910;
 			
 			// aapt resource value: 0x7f0a0077
-			public const int library_AndroidIconics_libraryVersion = 2131361911;
+			public const int library_AndroidIconics_libraryName = 2131361911;
 			
 			// aapt resource value: 0x7f0a0078
-			public const int library_AndroidIconics_libraryWebsite = 2131361912;
+			public const int library_AndroidIconics_libraryVersion = 2131361912;
 			
 			// aapt resource value: 0x7f0a0079
-			public const int library_AndroidIconics_licenseId = 2131361913;
+			public const int library_AndroidIconics_libraryWebsite = 2131361913;
 			
 			// aapt resource value: 0x7f0a007a
-			public const int library_AndroidIconics_owner = 2131361914;
+			public const int library_AndroidIconics_licenseId = 2131361914;
 			
 			// aapt resource value: 0x7f0a007b
-			public const int library_AndroidIconics_repositoryLink = 2131361915;
+			public const int library_AndroidIconics_owner = 2131361915;
 			
 			// aapt resource value: 0x7f0a007c
-			public const int library_AndroidIconics_year = 2131361916;
+			public const int library_AndroidIconics_repositoryLink = 2131361916;
 			
-			// aapt resource value: 0x7f0a0065
-			public const int library_fastadapter_author = 2131361893;
-			
-			// aapt resource value: 0x7f0a0066
-			public const int library_fastadapter_authorWebsite = 2131361894;
+			// aapt resource value: 0x7f0a007d
+			public const int library_AndroidIconics_year = 2131361917;
 			
 			// aapt resource value: 0x7f0a0067
-			public const int library_fastadapter_isOpenSource = 2131361895;
+			public const int library_fastadapter_author = 2131361895;
 			
 			// aapt resource value: 0x7f0a0068
-			public const int library_fastadapter_libraryDescription = 2131361896;
+			public const int library_fastadapter_authorWebsite = 2131361896;
 			
 			// aapt resource value: 0x7f0a0069
-			public const int library_fastadapter_libraryName = 2131361897;
+			public const int library_fastadapter_isOpenSource = 2131361897;
 			
 			// aapt resource value: 0x7f0a006a
-			public const int library_fastadapter_libraryVersion = 2131361898;
+			public const int library_fastadapter_libraryDescription = 2131361898;
 			
 			// aapt resource value: 0x7f0a006b
-			public const int library_fastadapter_libraryWebsite = 2131361899;
+			public const int library_fastadapter_libraryName = 2131361899;
 			
 			// aapt resource value: 0x7f0a006c
-			public const int library_fastadapter_licenseId = 2131361900;
+			public const int library_fastadapter_libraryVersion = 2131361900;
 			
 			// aapt resource value: 0x7f0a006d
-			public const int library_fastadapter_owner = 2131361901;
+			public const int library_fastadapter_libraryWebsite = 2131361901;
 			
 			// aapt resource value: 0x7f0a006e
-			public const int library_fastadapter_repositoryLink = 2131361902;
+			public const int library_fastadapter_licenseId = 2131361902;
 			
 			// aapt resource value: 0x7f0a006f
-			public const int library_fastadapter_year = 2131361903;
+			public const int library_fastadapter_owner = 2131361903;
+			
+			// aapt resource value: 0x7f0a0070
+			public const int library_fastadapter_repositoryLink = 2131361904;
+			
+			// aapt resource value: 0x7f0a0071
+			public const int library_fastadapter_year = 2131361905;
 			
 			// aapt resource value: 0x7f0a0058
 			public const int library_materialdrawer_author = 2131361880;
@@ -11173,6 +11212,9 @@ namespace MiraiNotes.Android
 			
 			// aapt resource value: 0x7f0a0046
 			public const int status_bar_notification_info_overflow = 2131361862;
+			
+			// aapt resource value: 0x7f0a0065
+			public const int toast_message = 2131361893;
 			
 			// aapt resource value: 0x7f0a0048
 			public const int view_scroll_translation_autohide_behavior = 2131361864;
