@@ -29,12 +29,15 @@ namespace MiraiNotes.Abstractions.GoogleApi
         #endregion
 
         #region TaskLists
+        [Get("/tasks/v1/users/@me/lists")]
+        [Headers("Authorization: Bearer")]
+        Task<GoogleTaskApiResponseModel<GoogleTaskListModel>> GetAllTaskLists(int maxResults = 100);
 
         [Get("/tasks/v1/users/@me/lists")]
         [Headers("Authorization: Bearer")]
         Task<GoogleTaskApiResponseModel<GoogleTaskListModel>> GetAllTaskLists(
-            [Query] int maxResults = 100,
-            [Query] string pageToken = null);
+            string pageToken,
+            int maxResults = 100);
 
         [Get("/tasks/v1/users/@me/lists/{taskListId}")]
         [Headers("Authorization: Bearer")]
@@ -56,7 +59,7 @@ namespace MiraiNotes.Abstractions.GoogleApi
 
         #region Tasks
 
-        [Post("/tasks/v1/lists/{taskListId}")]
+        [Post("/tasks/v1/lists/{taskListId}/clear")]
         [Headers("Authorization: Bearer")]
         Task ClearTasks(string taskListId);
 
@@ -64,13 +67,20 @@ namespace MiraiNotes.Abstractions.GoogleApi
         [Headers("Authorization: Bearer")]
         Task DeleteTask(string taskListId, string taskId);
 
-        [Get("/tasks/v1/lists/{taskListId}")]
+        [Get("/tasks/v1/lists/{taskListId}/tasks")]
         [Headers("Authorization: Bearer")]
         Task<GoogleTaskApiResponseModel<GoogleTaskModel>> GetAllTasks(
-            [Query] string taskListId,
-            [Query] int maxResults = 100,
-            [Query] string pageToken = null,
-            [Query] bool showHidden = true);
+        string taskListId,
+        int maxResults = 100,
+        bool showHidden = true);
+
+        [Get("/tasks/v1/lists/{taskListId}/tasks")]
+        [Headers("Authorization: Bearer")]
+        Task<GoogleTaskApiResponseModel<GoogleTaskModel>> GetAllTasks(
+            string taskListId,
+            string pageToken,
+            int maxResults = 100,
+            bool showHidden = true);
 
         [Get("/tasks/v1/lists/{taskListId}/tasks/{taskId}")]
         [Headers("Authorization: Bearer")]
@@ -79,11 +89,23 @@ namespace MiraiNotes.Abstractions.GoogleApi
         [Post("/tasks/v1/lists/{taskListId}/tasks")]
         [Headers("Authorization: Bearer")]
         Task<GoogleTaskModel> SaveTask(
-            [Query] string taskListId,
-            GoogleTaskModel task,
-            [Query] string parent = null,
-            [Query] string previous = null);
+            string taskListId,
+            GoogleTaskModel task);
 
+        [Post("/tasks/v1/lists/{taskListId}/tasks")]
+        [Headers("Authorization: Bearer")]
+        Task<GoogleTaskModel> SaveTask(
+            string taskListId,
+            GoogleTaskModel task,
+            string parent);
+
+        [Post("/tasks/v1/lists/{taskListId}/tasks")]
+        [Headers("Authorization: Bearer")]
+        Task<GoogleTaskModel> SaveTask(
+            string taskListId,
+            GoogleTaskModel task,
+            string parent,
+            string previous);
 
         [Put("/tasks/v1/lists/{taskListId}/tasks/{taskId}")]
         [Headers("Authorization: Bearer")]

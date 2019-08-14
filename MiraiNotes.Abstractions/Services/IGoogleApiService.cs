@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Dto.Google.Responses;
+using MiraiNotes.Core.Models.GoogleApi;
 
 namespace MiraiNotes.Abstractions.Services
 {
