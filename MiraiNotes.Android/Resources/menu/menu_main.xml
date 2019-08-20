@@ -1,9 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+
+  <item
+    android:id="@+id/Accounts"
+    android:orderInCategory="100"
+    android:title="Accounts"
+    app:showAsAction="never" />
+
+  <item 
+      android:id="@+id/Settings"
+      android:orderInCategory="101"
+      android:title="@string/action_settings"
+      app:showAsAction="never" />
+
+  <item
+    android:id="@+id/Logout"
+    android:orderInCategory="101"
+    android:title="Logout"
+    app:showAsAction="never" />
 </menu>

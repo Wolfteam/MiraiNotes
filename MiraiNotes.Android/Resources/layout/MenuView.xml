@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.NavigationView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/AppNavView"
+    android:layout_gravity="start"
+    android:layout_height="match_parent"
+    android:layout_width="250dp"
+    android:fitsSystemWindows="true"
+    app:headerLayout="@layout/drawerheader"
+    app:itemBackground="@drawable/nav_view_item_background"
+    app:itemTextColor="@drawable/nav_view_item_textcolor"/>
+

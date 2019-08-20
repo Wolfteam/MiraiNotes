@@ -102,8 +102,13 @@
     <Compile Include="Common\Messages\CultureChangedMessage.cs" />
     <Compile Include="Common\Messages\LanguageChangedMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
+    <Compile Include="Common\Messages\TaskDeletedMsg.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Common\Messages\TaskSavedMsg.cs" />
     <Compile Include="Common\ResxTextProvider.cs" />
     <Compile Include="Common\Utils\MiscellaneousUtils.cs" />
+    <Compile Include="CustomAppStart.cs" />
     <Compile Include="Dialogs\LoginPasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
     <Compile Include="Interfaces\IDialogService.cs" />
@@ -121,12 +126,20 @@
     <Compile Include="Setup.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
+    <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\TaskItemViewModel.cs" />
+    <Compile Include="ViewModels\TasksViewModel.cs" />
+    <Compile Include="ViewModels\NewTaskViewModel.cs" />
     <Compile Include="Views\Activities\LoginActivity.cs" />
     <Compile Include="Views\Activities\MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\Activities\SplashActivity.cs" />
+    <Compile Include="Views\Fragments\BaseFragment.cs" />
+    <Compile Include="Views\Fragments\MenuFragmet.cs" />
+    <Compile Include="Views\Fragments\NewTaskFragment.cs" />
+    <Compile Include="Views\Fragments\TasksFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -134,10 +147,10 @@
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\activity_main.axml">
+    <AndroidResource Include="Resources\layout\activity_main.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\content_main.axml">
+    <AndroidResource Include="Resources\layout\content_main.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\values\colors.xml" />
@@ -174,7 +187,13 @@
     <PackageReference Include="MvvmCross">
       <Version>6.3.1</Version>
     </PackageReference>
+    <PackageReference Include="MvvmCross.Droid.Support.Core.UI">
+      <Version>6.3.1</Version>
+    </PackageReference>
     <PackageReference Include="MvvmCross.Droid.Support.V7.AppCompat">
+      <Version>6.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="MvvmCross.Droid.Support.V7.RecyclerView">
       <Version>6.3.1</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.Messenger">
@@ -189,6 +208,9 @@
     <PackageReference Include="Refit">
       <Version>4.7.9</Version>
     </PackageReference>
+    <PackageReference Include="Refractored.Controls.CircleImageView">
+      <Version>1.2.0-beta</Version>
+    </PackageReference>
     <PackageReference Include="Serilog.Sinks.Xamarin">
       <Version>0.1.29</Version>
     </PackageReference>
@@ -197,6 +219,9 @@
     </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Android.Support.Constraint.Layout">
+      <Version>1.1.2</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.Media.Compat">
@@ -208,20 +233,13 @@
     <PackageReference Include="Xamarin.Android.Support.v7.AppCompat">
       <Version>28.0.0.1</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.GooglePlayServices.Auth">
-      <Version>60.1142.1</Version>
-    </PackageReference>
-    <PackageReference Include="Xamarin.MikePenz.MaterialDrawer">
-      <Version>6.0.8</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BackgroundTasks\" />
     <Folder Include="Models\" />
-    <Folder Include="Views\Fragments\" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\task_item.axml">
+    <AndroidResource Include="Resources\layout\task_item.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -258,7 +276,7 @@
     <AndroidResource Include="Resources\values\attrs.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\Login.axml">
+    <AndroidResource Include="Resources\layout\Login.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -277,13 +295,98 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\Main.axml" />
+    <AndroidResource Include="Resources\layout\Main.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\DrawerHeader.axml" />
+    <AndroidResource Include="Resources\layout\DrawerHeader.xml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\LoginPasswordDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\MenuView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\no_image.png">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\TasksView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\TaskItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\AppToolbar.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\nav_view_item_background.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\nav_view_item_textcolor.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_list_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_settings_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_account_circle_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_arrow_back_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\NewTaskView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_edit_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_add_circle_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_add_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_note_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\menu_new_task.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

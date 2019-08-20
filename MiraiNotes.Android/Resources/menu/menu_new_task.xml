@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+  <item
+    android:id="@+id/SaveTask"
+    android:orderInCategory="100"
+    android:title="Save"
+    android:icon="@android:drawable/ic_menu_save"
+    app:showAsAction="always" />
+
+  <item
+      android:id="@+id/DiscardChanges"
+      android:orderInCategory="101"
+      android:title="Discard"
+      android:icon="@android:drawable/ic_menu_close_clear_cancel"
+      app:showAsAction="always" />
+
+  <item
+    android:id="@+id/DeleteTask"
+    android:orderInCategory="101"
+    android:icon="@android:drawable/ic_menu_delete"
+    android:title="Delete"
+    app:showAsAction="ifRoom" />
+</menu>

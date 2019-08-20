@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Welcome to Mirai Notes"
+            android:textAlignment="center"
+            android:textSize="22dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="Login"
+            android:textSize="22dp"
+            app:MvxBind="Click LoginCommand; Visibility Visibility(ShowLoginButton)"/>
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        app:MvxBind="Visibility Visibility(ShowLoading)"/>
+    <!--
     <com.google.android.gms.common.SignInButton
             android:layout_width="match_parent"
             android:layout_marginTop="10dp"
@@ -13,7 +43,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="30dp"
             android:layout_height="wrap_content"
-            app:MvxBind="Click LoginCommand; Clickable ShowLoginButton"/>
+            app:MvxBind="Click LoginCommand; Clickable ShowLoginButton"/>-->
     <!--<RelativeLayout android:layout_width="match_parent"-->
     <!--android:layout_height="wrap_content"-->
     <!--android:layout_below="@id/GoogleSignUp"-->
@@ -47,7 +77,5 @@
     <!--<ImageView android:src="@android:drawable/ic_menu_gallery" android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content" android:layout_below="@id/relativeLayout2"-->
     <!--android:id="@+id/ImgProfile" android:layout_centerInParent="true" android:layout_marginTop="50dp"/>-->
-    <ProgressBar android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 app:MvxBind="Visibility Visibility(ShowLoading)"/>
+
 </RelativeLayout>
