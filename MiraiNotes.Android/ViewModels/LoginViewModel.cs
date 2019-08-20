@@ -32,22 +32,28 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IDialogService _dialogService;
 
         private bool _showLoading;
-        private bool _viewWasLoaded = false;
+        private bool _showLoginButton = true;
 
         public bool ShowLoading
         {
             get => _showLoading;
-            set => SetProperty(ref _showLoading, value);
+            set
+            {
+                SetProperty(ref _showLoading, value);
+                ShowLoginButton = !value;
+            }
         }
 
         public bool ShowLoginButton
         {
-            get => _showLoading;
-            set => SetProperty(ref _showLoading, value);
+            get => _showLoginButton;
+            set => SetProperty(ref _showLoginButton, value);
         }
 
 
-        public ICommand LoginCommand { get; set; }
+        public IMvxCommand LoginCommand { get; private set; }
+        public IMvxCommand OnAuthCodeGrantedCommand { get; private set; }
+        public IMvxCommand InitViewCommand { get; private set; }
 
         public LoginViewModel(
             IMvxTextProvider textProvider,
@@ -71,45 +77,18 @@ namespace MiraiNotes.Android.ViewModels
             _dataService = dataService;
             _dialogService = dialogService;
             SetCommands();
-
-            //CUANDO VUELVES DEL ONRESUME EL CONSTRUCTOR ES VUELTO A LLAMAR POR LO QUE 
-            //OBTIENES 2 SUBSCRIBCIONES Y ESO HACE Q SE EJECUTE 2 VECES EL CODIGO DE ABAJP
-            SubscriptionTokens.Add(Messenger.Subscribe<AuthCodeGrantedMsg>
-                (async msg => await OnCodeGranted(msg.AuthCode)));
-        }
-
-        public override async Task Initialize()
-        {
-            if (_viewWasLoaded)
-                return;
-
-            await base.Initialize();
-            await InitViewAsync();
-            _viewWasLoaded = true;
-        }
-
-        protected override void ReloadFromBundle(IMvxBundle state)
-        {
-            base.ReloadFromBundle(state);
-            _viewWasLoaded = bool.Parse(state.Data["InitView"] ?? "false");
-        }
-
-        protected override void SaveStateToBundle(IMvxBundle bundle)
-        {
-            bundle.Data["InitView"] = $"{_viewWasLoaded}";
-            base.SaveStateToBundle(bundle);
-
         }
 
         public void SetCommands()
         {
             LoginCommand = new MvxCommand(OnLoginRequest);
+            OnAuthCodeGrantedCommand = new MvxAsyncCommand<string>(OnCodeGranted);
+            InitViewCommand = new MvxAsyncCommand(InitView);
         }
 
         public void OnLoginRequest()
         {
             ShowLoading = true;
-            ShowLoginButton = false;
             var url = _googleApiService.GetAuthorizationUrl();
             Messenger.Publish(new LoginRequestMsg(this, url));
         }
@@ -117,11 +96,12 @@ namespace MiraiNotes.Android.ViewModels
         public void OnLoginCanceled()
         {
             ShowLoading = false;
-            ShowLoginButton = true;
         }
 
         public async Task OnCodeGranted(string approvalCode)
         {
+            ShowLoading = true;
+
             try
             {
                 var response = await _googleApiService.GetAccessTokenAsync(approvalCode);
@@ -153,7 +133,7 @@ namespace MiraiNotes.Android.ViewModels
                     _userCredentialService.DefaultUsername,
                     response.Result.AccessToken);
 
-                var isSignedIn = await SignInAsync();
+                var isSignedIn = await SignIn();
                 if (!isSignedIn)
                 {
                     await _dataService
@@ -173,12 +153,13 @@ namespace MiraiNotes.Android.ViewModels
                     ResourceType.ALL,
                     _userCredentialService.DefaultUsername);
             }
+            ShowLoading = false;
         }
 
-        private async Task<bool> SignInAsync()
+        private async Task<bool> SignIn()
         {
             _logger.Information(
-                $"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
+                $"{nameof(SignIn)}: Sign in the app started. Trying to get the user info from google");
 
             var userResponse = await _googleApiService.GetUser();
             if (!userResponse.Succeed)
@@ -197,7 +178,7 @@ namespace MiraiNotes.Android.ViewModels
             ResponseDto<GoogleUser> userSaved;
             if (!response.Result)
             {
-                _logger.Information($"{nameof(SignInAsync)}: User doesnt exist in db. Creating a new one...");
+                _logger.Information($"{nameof(SignIn)}: User doesnt exist in db. Creating a new one...");
                 userSaved = await _dataService.UserService.AddAsync(new GoogleUser
                 {
                     Email = user.Email,
@@ -210,7 +191,7 @@ namespace MiraiNotes.Android.ViewModels
             }
             else
             {
-                _logger.Information($"{nameof(SignInAsync)}: User exist in db. Updating it...");
+                _logger.Information($"{nameof(SignIn)}: User exist in db. Updating it...");
                 var userInDbResponse = await _dataService
                     .UserService
                     .FirstOrDefaultAsNoTrackingAsync(u => u.GoogleUserID == user.ID);
@@ -239,7 +220,7 @@ namespace MiraiNotes.Android.ViewModels
                 return false;
             }
 
-            _logger.Information($"{nameof(SignInAsync)}: Trying to get all the task lists that are remote...");
+            _logger.Information($"{nameof(SignIn)}: Trying to get all the task lists that are remote...");
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
             if (!syncResult.Succeed)
@@ -248,7 +229,7 @@ namespace MiraiNotes.Android.ViewModels
                 return false;
             }
 
-            _logger.Information($"{nameof(SignInAsync)}: Trying to get all the tasks that are remote...");
+            _logger.Information($"{nameof(SignIn)}: Trying to get all the tasks that are remote...");
             syncResult = await _syncService.SyncDownTasksAsync(false);
 
             if (!syncResult.Succeed)
@@ -276,11 +257,12 @@ namespace MiraiNotes.Android.ViewModels
             await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
 
             //if you came this far, that means everything is ok!
+            await _navigationService.Close(this);
             await _navigationService.Navigate<MainViewModel>();
             return true;
         }
 
-        public async Task InitViewAsync()
+        public async Task InitView()
         {
             ShowLoading = true;
             var response = await _dataService
@@ -299,7 +281,6 @@ namespace MiraiNotes.Android.ViewModels
                     ? $"Did you uninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
                     : response.Message;
                 ShowLoading = false;
-                ShowLoginButton = true;
                 _dialogService.ShowWarningToast(
                     $"Couldn't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
 
@@ -308,32 +289,32 @@ namespace MiraiNotes.Android.ViewModels
                     _userCredentialService.DefaultUsername);
 
                 _logger.Warning(
-                    $"{nameof(InitViewAsync)}: Couldnt get a user in the db = {response.Succeed} " +
+                    $"{nameof(InitView)}: Couldnt get a user in the db = {response.Succeed} " +
                     $"or isUserLoggedIn and no user exists in db. {errorMsg}");
                 return;
             }
 
-            ShowLoading = false;
-
             if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
             {
+                ShowLoading = false;
                 _dialogService.ShowLoginDialog(async password =>
                 {
-                    var result = await PasswordMatches(password);
-                    if (result)
+                    var passwordMatches = await PasswordMatches(password);
+                    if (passwordMatches)
+                    {
+                        await _navigationService.Close(this);
                         await _navigationService.Navigate<MainViewModel>();
-                    else
-                        ShowLoginButton = true;
-                }, () => { ShowLoginButton = true; });
+                    }
+                });
             }
             else if (isUserLoggedIn)
             {
-                _dialogService.ShowSucceedToast("navegando...");
+                await _navigationService.Close(this);
                 await _navigationService.Navigate<MainViewModel>();
             }
             else
             {
-                ShowLoginButton = true;
+                ShowLoading = false;
             }
         }
 
