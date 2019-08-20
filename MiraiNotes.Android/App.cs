@@ -12,12 +12,10 @@ using MiraiNotes.Android.Services;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Helpers;
-using MiraiNotes.Shared.Services;
 using MiraiNotes.Shared.Services.Data;
 using MvvmCross;
 using MvvmCross.IoC;
 using MvvmCross.Localization;
-using MvvmCross.Platforms.Android;
 using MvvmCross.ViewModels;
 using Refit;
 using Serilog;
@@ -77,6 +75,7 @@ namespace MiraiNotes.Android
 
 
             RegisterAppStart<LoginViewModel>();
+            //RegisterCustomAppStart<CustomAppStart>();
             // if you want to use a custom AppStart, you should replace the previous line with this one:
             // RegisterCustomAppStart<MyCustomAppStart>();
         }
@@ -86,7 +85,7 @@ namespace MiraiNotes.Android
             const string fileOutputTemplate =
                 "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
             var externalFolder = Application.Context.GetExternalFilesDir(null).AbsolutePath;
-//            var path = Path.Combine(externalFolder, "log.txt");
+            //            var path = Path.Combine(externalFolder, "log.txt");
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
@@ -130,16 +129,16 @@ namespace MiraiNotes.Android
             {
                 // Add all profiles in current assembly
                 cfg.AddProfile<MappingProfile>();
-//                cfg.ConstructServicesUsing(t =>
-//                {
-//                    //ConstructServicesUsing gets called if you used it in the
-//                    //mapping profile
-//                    if (t == typeof(GoogleUserViewModel))
-//                    {
-//                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
-//                    }
-//                    return SimpleIoc.Default.GetInstance(t);
-//                });
+                //                cfg.ConstructServicesUsing(t =>
+                //                {
+                //                    //ConstructServicesUsing gets called if you used it in the
+                //                    //mapping profile
+                //                    if (t == typeof(GoogleUserViewModel))
+                //                    {
+                //                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
+                //                    }
+                //                    return SimpleIoc.Default.GetInstance(t);
+                //                });
             });
             return config.CreateMapper();
         }
