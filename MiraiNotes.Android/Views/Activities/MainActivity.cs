@@ -1,49 +1,109 @@
 ﻿using Android.App;
 using Android.Content;
-using Android.Content.Res;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V7.App;
-using Android.Views;
-using Java.Util;
-using MiraiNotes.Android.ViewModels;
-using MvvmCross;
-using MvvmCross.Droid.Support.V7.AppCompat;
-using MvvmCross.Localization;
-using MvvmCross.Platforms.Android.Views;
-using MvvmCross.Plugin.Messenger;
-using System;
-using Android.Graphics;
+using Android.Support.V4.View;
 using Android.Support.V4.Widget;
-using Android.Widget;
-using Com.Mikepenz.Materialdrawer;
-using Com.Mikepenz.Materialdrawer.Model;
-using Toolbar = Android.Support.V7.Widget.Toolbar;
-using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
+using Android.Views;
+using Android.Views.InputMethods;
+using MiraiNotes.Android.ViewModels;
+using MvvmCross.Droid.Support.V7.AppCompat;
+using System;
 
 namespace MiraiNotes.Android
 {
-    [Activity(Label = "@string/app_name")]
+    [Activity(Label = "@string/app_name", LaunchMode = LaunchMode.SingleTask)]
     public class MainActivity : MvxAppCompatActivity<MainViewModel>
     {
-        private MvxSubscriptionToken _token;
+        public DrawerLayout DrawerLayout { get; set; }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetTheme(MainViewModel.IsDarkTheme);
-            _token = ViewModel.Messenger.Subscribe<ChangeThemeMsg>(msg =>
+            var token = ViewModel.Messenger.Subscribe<ChangeThemeMsg>(msg =>
             {
                 var intent = new Intent(this, typeof(MainActivity));
                 intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
                 Finish();
                 StartActivity(intent);
             });
+            ViewModel.SubscriptionTokens.Add(token);
             SetContentView(Resource.Layout.Main);
 
-            var navView = FindViewById<NavigationView>(Resource.Id.AppNavView);
+            DrawerLayout = FindViewById<DrawerLayout>(Resource.Id.AppDrawerLayout);
 
-            var menu = navView.Menu;
+            ViewModel.InitViewCommand.Execute();
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.menu_main, menu);
+            return true;
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            int id = item.ItemId;
+
+            switch (id)
+            {
+                case Resource.Id.Accounts:
+                    ViewModel.OnAccountsSelectedCommand.Execute();
+                    break;
+                case Resource.Id.Settings:
+                    ViewModel.OnSettingsSelectedCommand.Execute();
+                    break;
+                case Resource.Id.Logout:
+                    ViewModel.LogoutCommand.Execute(null);
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override void OnBackPressed()
+        {
+            if (DrawerLayout != null && DrawerLayout.IsDrawerOpen(GravityCompat.Start))
+                DrawerLayout.CloseDrawers();
+            else
+                base.OnBackPressed();
+        }
+
+        public void HideSoftKeyboard()
+        {
+            if (CurrentFocus == null)
+                return;
+
+            var inputMethodManager = (InputMethodManager)GetSystemService(InputMethodService);
+            inputMethodManager.HideSoftInputFromWindow(CurrentFocus.WindowToken, 0);
+
+            CurrentFocus.ClearFocus();
+        }
+
+        private void FabOnClick(object sender, EventArgs eventArgs)
+        {
+            View view = (View)sender;
+            Snackbar.Make(view, "Replace with your own action", Snackbar.LengthLong)
+                .SetAction("Action", (View.IOnClickListener)null).Show();
+        }
+
+        private void SetTheme(bool dark)
+        {
+            if (dark)
+                SetTheme(Resource.Style.Theme_MiraiNotes_Dark);
+            else
+                SetTheme(Resource.Style.Theme_MiraiNotes_Light);
+        }
+        /*
+        private void InitDrawer()
+        {
+            _navView = FindViewById<NavigationView>(Resource.Id.AppNavView);
+
+            var menu = _navView.Menu;
 
             for (int i = 0; i < 40; i++)
             {
@@ -56,22 +116,22 @@ namespace MiraiNotes.Android
                 subMenu.Add("SubMenu Item " + i);
             }
 
-            for (int i = 0, count = navView.ChildCount; i < count; i++)
+            for (int i = 0, count = _navView.ChildCount; i < count; i++)
             {
-                var child = navView.GetChildAt(i);
+                var child = _navView.GetChildAt(i);
                 if (child != null && child is ListView lv)
                 {
                     ListView menuView = lv;
-                    HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.Adapter;
-                    BaseAdapter wrapped = (BaseAdapter) adapter.WrappedAdapter;
+                    HeaderViewListAdapter adapter = (HeaderViewListAdapter)menuView.Adapter;
+                    BaseAdapter wrapped = (BaseAdapter)adapter.WrappedAdapter;
                     wrapped.NotifyDataSetChanged();
                 }
             }
-            
+
             var toolbar = FindViewById<Toolbar>(Resource.Id.AppToolbar);
-//            toolbar.Title = "Task list 1";
-//            toolbar.ShowOverflowMenu();
-//            toolbar.ShowContextMenu();
+            //            toolbar.Title = "Task list 1";
+            //            toolbar.ShowOverflowMenu();
+            //            toolbar.ShowContextMenu();
             SetSupportActionBar(toolbar);
 
             var drawerLayout = FindViewById<DrawerLayout>(Resource.Id.AppDrawerLayout);
@@ -83,60 +143,7 @@ namespace MiraiNotes.Android
             SupportActionBar.SetDisplayHomeAsUpEnabled(false);
             SupportActionBar.SetHomeButtonEnabled(true);
             drawerToggle.SyncState();
-
-//            SupportActionBar.SetHomeAsUpIndicator(Resource.Drawable.ic_menu);
         }
-
-        public override bool OnCreateOptionsMenu(IMenu menu)
-        {
-            MenuInflater.Inflate(Resource.Menu.menu_main, menu);
-            return true;
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            int id = item.ItemId;
-            if (id == Resource.Id.action_settings)
-            {
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-        private void FabOnClick(object sender, EventArgs eventArgs)
-        {
-            View view = (View) sender;
-            Snackbar.Make(view, "Replace with your own action", Snackbar.LengthLong)
-                .SetAction("Action", (View.IOnClickListener) null).Show();
-        }
-
-        private void SetTheme(bool dark)
-        {
-            if (dark)
-                SetTheme(Resource.Style.Theme_MiraiNotes_Dark);
-            else
-                SetTheme(Resource.Style.Theme_MiraiNotes_Light);
-        }
-
-        private void InitDrawer()
-        {
-            var item1 = new PrimaryDrawerItem();
-            item1.WithName("Item 1");
-            item1.WithIdentifier(1);
-
-            var item2 = new PrimaryDrawerItem();
-            item1.WithName("Item 2");
-            item1.WithIdentifier(2);
-
-            var drawer = new DrawerBuilder()
-                .WithActivity(this)
-                .AddDrawerItems(
-                    item1,
-                    new DividerDrawerItem(),
-                    item2,
-                    new DividerDrawerItem())
-                .Build();
-        }
+        */
     }
 }
