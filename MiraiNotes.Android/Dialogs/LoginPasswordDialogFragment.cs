@@ -35,10 +35,9 @@ namespace MiraiNotes.Android.Dialogs
                         editText.RequestFocus();
                         return;
                     }
-
-                    _onOkClick(txt);
+                    _onOkClick?.Invoke(txt);
                 })
-                .SetNegativeButton("Cancel", (sender, args) => _onCancelClick())
+                .SetNegativeButton("Cancel", (sender, args) => _onCancelClick?.Invoke())
                 .Create();
         }
 
