@@ -71,7 +71,7 @@
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidSupportedAbis />
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidRelease|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Background\NotificationSchedulerReceiver.cs" />
     <Compile Include="Common\MappingProfile.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
     <Compile Include="Common\Messages\ChangeThemeMsg.cs" />
@@ -106,6 +107,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
+    <Compile Include="Common\Messages\TaskStatusChangedMsg.cs" />
     <Compile Include="Common\ResxTextProvider.cs" />
     <Compile Include="Common\Utils\MiscellaneousUtils.cs" />
     <Compile Include="CustomAppStart.cs" />
@@ -119,6 +121,7 @@
     </Compile>
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\NetworkService.cs" />
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="Services\DialogService.cs" />
@@ -235,7 +238,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="BackgroundTasks\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>

@@ -28,6 +28,7 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMiraiNotesDataService _dataService;
         private readonly IAppSettingsService _appSettings;
         private readonly IGoogleApiService _googleApiService;
+        private readonly INotificationService _notificationService;
         private readonly IUserCredentialService _userCredentialService;
 
         private ItemModel _currentTaskList;
@@ -64,6 +65,7 @@ namespace MiraiNotes.Android.ViewModels
 
         public IMvxAsyncCommand SaveChangesCommand { get; private set; }
         public IMvxAsyncCommand CloseCommand { get; private set; }
+        public IMvxAsyncCommand ChangeTaskStatusCommand { get; private set; }
         public IMvxCommand DeleteTaskCommand { get; private set; }
 
         public NewTaskViewModel(
@@ -75,6 +77,7 @@ namespace MiraiNotes.Android.ViewModels
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
             IGoogleApiService googleApiService,
+            INotificationService notificationService,
             IUserCredentialService userCredentialService)
             : base(textProvider, messenger)
         {
@@ -84,6 +87,7 @@ namespace MiraiNotes.Android.ViewModels
             _dataService = dataService;
             _appSettings = appSettings;
             _googleApiService = googleApiService;
+            _notificationService = notificationService;
             _userCredentialService = userCredentialService;
 
             SetCommands();
@@ -199,7 +203,7 @@ namespace MiraiNotes.Android.ViewModels
                 if (minutesDiff < 2)
                 {
                     _dialogService.ShowSnackBar(
-                        "The date of the reminder must be at least 2 mins above the current time.", 
+                        "The date of the reminder must be at least 2 mins above the current time.",
                         string.Empty);
                     return;
                 }
@@ -278,8 +282,7 @@ namespace MiraiNotes.Android.ViewModels
             //a reminder guid, we set it up. I do this to avoid replacing the guid
             if (Task.RemindOn.HasValue && string.IsNullOrEmpty(entity.RemindOnGUID))
             {
-                //TODO: I SHOULD FIND A WORKAROUND FOR THE RemindOnGUID
-                entity.RemindOnGUID = Guid.NewGuid().ToString("N").Substring(0, 12);
+                entity.RemindOnGUID = string.Join("", $"{entity.GetHashCode()}".Where(c => c != '-'));
             }
 
             ResponseDto<GoogleTask> response;
@@ -310,7 +313,7 @@ namespace MiraiNotes.Android.ViewModels
                     Enumerable.Empty<TaskItemViewModel>().ToList());
 
                 _dialogService.ShowSnackBar(
-                    $"The task was sucessfully created into {SelectedTaskList.Text}", 
+                    $"The task was sucessfully created into {SelectedTaskList.Text}",
                     string.Empty);
 
                 //TODO: I SHOULD DO SOMETHING HERE WHEN MOVING THE TASK
@@ -352,22 +355,78 @@ namespace MiraiNotes.Android.ViewModels
                     ? $"{Task.Notes.Substring(0, 15)}...."
                     : $"{Task.Notes}....";
 
-                //_toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
-                //_toastManager.ScheduleTaskReminderToastNotification(
-                //    response.Result.RemindOnGUID,
-                //    _currentTaskList.TaskListID,
-                //    Task.TaskID,
-                //    _currentTaskList.Title,
-                //    Task.Title,
-                //    notes,
-                //    Task.RemindOn.Value);
+                int id = int.Parse(response.Result.RemindOnGUID);
+
+                _notificationService.RemoveScheduledNotification(id);
+                _notificationService.ScheduleNotification(new TaskReminderNotification
+                {
+                    Id = id,
+                    TaskListId = _currentTaskList.ItemId,
+                    TaskId = Task.TaskID,
+                    TaskListTitle = _currentTaskList.Text,
+                    TaskTitle = Task.Title,
+                    TaskBody = notes,
+                    DeliveryOn = Task.RemindOn.Value
+                });
             }
             Messenger.Publish(new TaskSavedMsg(this, Task.TaskID));
 
             await CloseCommand.ExecuteAsync();
         }
 
-        public async Task DeleteTask()
+        private void PromptTaskStatusChange(TaskItemViewModel task, GoogleTaskStatus newStatus)
+        {
+            string statusMessage =
+                $"{(newStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
+
+            _dialogService.ShowDialog(
+                "Confirmation",
+                $"Mark {task.Title} as {statusMessage}?",
+                "Yes",
+                "No",
+                async () => await ChangeTaskStatus(task, newStatus));
+        }
+
+        private async Task ChangeTaskStatus(TaskItemViewModel task, GoogleTaskStatus newStatus)
+        {
+            string statusMessage =
+                $"{(newStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
+
+            ShowProgressBar = true;
+
+            var response = await _dataService
+                .TaskService
+                .ChangeTaskStatusAsync(task.TaskID, newStatus);
+
+            ShowProgressBar = false;
+
+            if (!response.Succeed)
+            {
+                _dialogService.ShowErrorToast(
+                    $"An error occurred while trying to mark {task.Title} as {statusMessage}. " +
+                    $"Error = {response.Message}.");
+                return;
+            }
+
+            task.Status = response.Result.Status;
+            task.CompletedOn = response.Result.CompletedOn;
+            task.UpdatedAt = response.Result.UpdatedAt;
+
+            Messenger.Publish(new TaskStatusChangedMsg(
+                this, 
+                task.TaskID, 
+                task.ParentTask, 
+                task.CompletedOn, 
+                task.UpdatedAt, 
+                task.Status));
+
+
+            _dialogService.ShowSnackBar(
+                $"{task.Title} was marked as {statusMessage}.",
+                string.Empty);
+        }
+
+        private async Task DeleteTask()
         {
             ShowProgressBar = true;
 
@@ -416,11 +475,93 @@ namespace MiraiNotes.Android.ViewModels
             await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
 
             _dialogService.ShowSnackBar(
-                $"Task sucessfully moved from: {_currentTaskList.Text} to: {SelectedTaskList.Text}", 
+                $"Task sucessfully moved from: {_currentTaskList.Text} to: {SelectedTaskList.Text}",
                 string.Empty);
 
             //TODO: SHOULD I DO SOMETHING HERE WHEN MOVING THE TASK ?
             await CloseCommand.ExecuteAsync();
+        }
+
+        private async Task DeleteSubTask(TaskItemViewModel subTask)
+        {
+            if (subTask.IsNew)
+            {
+                Task.SubTasks?.Remove(subTask);
+                return;
+            }
+
+            ShowProgressBar = true;
+
+            var deleteResponse = await _dataService
+                .TaskService
+                .RemoveTaskAsync(subTask.TaskID);
+
+            ShowProgressBar = false;
+            if (!deleteResponse.Succeed)
+            {
+                _dialogService.ShowErrorToast(
+                    $"Coudln't delete the selected sub task. Error = {deleteResponse.Message}");
+                return;
+            }
+
+            Task.SubTasks?.Remove(subTask);
+
+            Messenger.Publish(new TaskDeletedMsg(this, Task.TaskID, subTask.TaskID));
+        }
+
+        private async Task RemoveTaskNotificationDate(TaskNotificationDateType dateType)
+        {
+            string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE 
+                ? "completition" 
+                : "reminder";
+
+            ShowProgressBar = true;
+            try
+            {
+                if (!Task.IsNew)
+                {
+                    var response = await _dataService
+                        .TaskService
+                        .RemoveNotificationDate(Task.TaskID, dateType);
+
+                    if (!response.Succeed)
+                    {
+                        _dialogService.ShowErrorToast(
+                            $"Could not remove the {message} date of {Task.Title}");
+                        return;
+                    }
+
+                    if (dateType == TaskNotificationDateType.REMINDER_DATE)
+                    {
+                        int id = int.Parse(response.Result.RemindOnGUID);
+                        _notificationService.RemoveScheduledNotification(id);
+                    }
+
+                    Task = _mapper.Map<TaskItemViewModel>(response.Result);
+                }
+                else
+                {
+                    switch (dateType)
+                    {
+                        case TaskNotificationDateType.TO_BE_COMPLETED_DATE:
+                            Task.ToBeCompletedOn = null;
+                            break;
+                        case TaskNotificationDateType.REMINDER_DATE:
+                            Task.RemindOn = null;
+                            break;
+                    }
+                }
+
+                Messenger.Publish(new TaskSavedMsg(this, Task.TaskID));
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                ShowProgressBar = false;
+            }
         }
 
         private async Task<IEnumerable<TaskItemViewModel>> SaveSubTasksAsync(

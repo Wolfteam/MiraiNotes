@@ -100,7 +100,8 @@ namespace MiraiNotes.Android.ViewModels
         {
             var subscriptions = new[] {
                 Messenger.Subscribe<TaskDeletedMsg>(OnTaskDeleted),
-                Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg))
+                Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg)),
+                Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged)
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -250,6 +251,30 @@ namespace MiraiNotes.Android.ViewModels
                     Tasks.Add(task);
                 }
             }
+        }
+
+        public void OnTaskStatusChanged(TaskStatusChangedMsg msg)
+        {
+            TaskItemViewModel taskFound;
+            if (!msg.HasParentTask)
+            {
+                taskFound = Tasks
+                    .FirstOrDefault(t => t.TaskID == msg.TaskId);
+            }
+            else
+            {
+                taskFound = Tasks
+                    .FirstOrDefault(t => t.TaskID == msg.ParentTask)?
+                    .SubTasks?
+                    .FirstOrDefault(st => st.TaskID == msg.TaskId);
+            }
+
+            if (taskFound == null)
+                return;
+
+            taskFound.CompletedOn = msg.CompletedOn;
+            taskFound.UpdatedAt = msg.UpdatedAt;
+            taskFound.Status = msg.NewStatus;
         }
 
         public void OnTaskDeleted(TaskDeletedMsg msg)

@@ -79,7 +79,7 @@ namespace MiraiNotes.Android
             // if you want to use a custom AppStart, you should replace the previous line with this one:
             // RegisterCustomAppStart<MyCustomAppStart>();
         }
-
+        //this shit is not logging to file system
         private ILogger SetupLogging()
         {
             const string fileOutputTemplate =
