@@ -14,11 +14,11 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Utils;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -33,7 +33,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDispatcherHelper _dispatcherHelper;
-        private readonly ICustomToastNotificationManager _toastManager;
+        private readonly INotificationService _notificationService;
 
 
         private string _taskOperationTitle;
@@ -128,7 +128,7 @@ namespace MiraiNotes.UWP.ViewModels
             IMapper mapper,
             IMiraiNotesDataService dataService,
             IDispatcherHelper dispatcherHelper,
-            ICustomToastNotificationManager toastManager)
+            INotificationService toastManager)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -137,7 +137,7 @@ namespace MiraiNotes.UWP.ViewModels
             _mapper = mapper;
             _dataService = dataService;
             _dispatcherHelper = dispatcherHelper;
-            _toastManager = toastManager;
+            _notificationService = toastManager;
 
             RegisterMessages();
             SetCommands();
@@ -365,8 +365,9 @@ namespace MiraiNotes.UWP.ViewModels
             //a reminder guid, we set it up. I do this to avoid replacing the guid
             if (CurrentTask.RemindOn.HasValue && string.IsNullOrEmpty(entity.RemindOnGUID))
             {
-                //TODO: I SHOULD FIND A WORKAROUND FOR THE RemindOnGUID
-                entity.RemindOnGUID = Guid.NewGuid().ToString("N").Substring(0, 12);
+                //the 12 is because uwp toast notif. doesnt work with strings longer than that
+                //and the '-' is because hashcode can return a negative integer
+                entity.RemindOnGUID = string.Join("", $"{entity.GetHashCode()}".Take(12).Where(c => c != '-'));
             }
 
             ResponseDto<GoogleTask> response;
@@ -434,15 +435,19 @@ namespace MiraiNotes.UWP.ViewModels
                     ? $"{CurrentTask.Notes.Substring(0, 15)}...."
                     : $"{CurrentTask.Notes}....";
 
-                _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
-                _toastManager.ScheduleTaskReminderToastNotification(
-                    response.Result.RemindOnGUID,
-                    _currentTaskList.TaskListID,
-                    CurrentTask.TaskID,
-                    _currentTaskList.Title,
-                    CurrentTask.Title,
-                    notes,
-                    CurrentTask.RemindOn.Value);
+                int id = int.Parse(response.Result.RemindOnGUID);
+
+                _notificationService.RemoveScheduledNotification(id);
+                _notificationService.ScheduleNotification(new TaskReminderNotification
+                {
+                    Id = id,
+                    TaskListId = _currentTaskList.TaskListID,
+                    TaskId = CurrentTask.TaskID,
+                    TaskListTitle = _currentTaskList.Title,
+                    TaskTitle = CurrentTask.Title,
+                    TaskBody = notes,
+                    DeliveryOn = CurrentTask.RemindOn.Value
+                });
             }
 
             _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
@@ -807,7 +812,10 @@ namespace MiraiNotes.UWP.ViewModels
                 }
 
                 if (dateType == TaskNotificationDateType.REMINDER_DATE)
-                    _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
+                {
+                    int id = int.Parse(response.Result.RemindOnGUID);
+                    _notificationService.RemoveScheduledNotification(id);
+                }
 
                 CurrentTask = _mapper.Map<TaskItemViewModel>(response.Result);
             }

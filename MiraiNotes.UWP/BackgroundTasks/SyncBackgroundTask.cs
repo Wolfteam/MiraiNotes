@@ -5,10 +5,10 @@ using Windows.ApplicationModel.Background;
 using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
-using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.ViewModels;
 using Serilog;
+using MiraiNotes.Core.Models;
 
 namespace MiraiNotes.UWP.BackgroundTasks
 {
@@ -18,7 +18,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
         private readonly ISyncService _syncService;
         private readonly ILogger _logger;
         private readonly IMessenger _messenger;
-        private readonly ICustomToastNotificationManager _toastNotificationManager;
+        private readonly INotificationService _notificationService;
         private readonly bool _isAppRunning;
         private BackgroundTaskDeferral _deferral;
 
@@ -31,7 +31,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
             _syncService = vml.SyncService;
             _logger = vml.Logger.ForContext<SyncBackgroundTask>();
             _messenger = vml.Messenger;
-            _toastNotificationManager = vml.ToastNotificationManager;
+            _notificationService = vml.NotificationService;
 
             if (_isAppRunning)
                 _logger.Information($"{nameof(SyncBackgroundTask)}: is being started when the app is already running");
@@ -77,7 +77,13 @@ namespace MiraiNotes.UWP.BackgroundTasks
             _logger.Information($"{nameof(SyncBackgroundTask)}: results = {message}");
 
             if (!_isAppRunning && !startedManually && _appSettings.ShowToastNotificationAfterFullSync)
-                _toastNotificationManager.ShowSimpleToastNotification("Sync Results" ,message);
+            {
+                _notificationService.ShowNotification(new TaskNotification
+                {
+                    Title = "Sync Results",
+                    Conntent = message
+                });
+            }
             else
             {
                 _messenger.Send(message, $"{MessageType.SHOW_IN_APP_NOTIFICATION}");

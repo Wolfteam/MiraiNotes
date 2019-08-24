@@ -1,61 +1,53 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
-using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Models;
 using MiraiNotes.UWP.Models;
-using System;
 using System.Linq;
 using Windows.UI.Notifications;
 
-namespace MiraiNotes.UWP.Helpers
+namespace MiraiNotes.UWP.Services
 {
-    public class CustomToastNotificationManager : ICustomToastNotificationManager
+    public class NotificationService : INotificationService
     {
-        public void ShowSimpleToastNotification(string title, string body, bool showDismissButton = true)
+        private const string TaskReminderToastTag = "TaskReminderToastTag";
+
+        public void ShowNotification(TaskNotification notification)
         {
-            var content = GenerateSimpleToastContent(title, body, showDismissButton);
+            var content = GenerateSimpleToastContent(
+                notification.Title,
+                notification.Conntent,
+                notification.UwpSettings?.ShowDismissButton ?? true,
+                notification.UwpSettings?.IsAudioSilent ?? false);
             var toastNotifcation = new ToastNotification(content.GetXml());
+            if (!string.IsNullOrEmpty(notification.UwpSettings?.Tag))
+                toastNotifcation.Tag = notification.UwpSettings.Tag;
             ShowToastNotification(toastNotifcation);
         }
 
-        public void ShowSimpleToastNotification(
-            string title,
-            string body,
-            string tag,
-            bool showDismissButton = true,
-            bool isAudioSilent = false)
+        public void ScheduleNotification(TaskReminderNotification notification)
         {
-            var content = GenerateSimpleToastContent(title, body, showDismissButton, isAudioSilent);
-            var toastNotifcation = new ToastNotification(content.GetXml());
-            if (!string.IsNullOrEmpty(tag))
-                toastNotifcation.Tag = tag;
-            ShowToastNotification(toastNotifcation);
-        }
-
-        public void ScheduleTaskReminderToastNotification(
-            string toastID,
-            string taskListID,
-            string taskID,
-            string taskListTitle,
-            string taskTitle,
-            string taskBody,
-            DateTimeOffset deliveryTime)
-        {
-            var content = GenerateTaskReminderToastContent(taskListID, taskID, taskListTitle, taskTitle, taskBody);
-            var toastNotification = new ScheduledToastNotification(content.GetXml(), deliveryTime)
+            var content = GenerateTaskReminderToastContent(
+               notification.TaskListId,
+               notification.TaskId,
+               notification.TaskListTitle,
+               notification.TaskTitle,
+               notification.TaskBody);
+            var toastNotification = new ScheduledToastNotification(content.GetXml(), notification.DeliveryOn)
             {
-                Id = toastID,
-                Tag = "TaskReminderToastTag"
+                Id = $"{notification.Id}",
+                Tag = TaskReminderToastTag
             };
             ScheduleToastNotification(toastNotification);
         }
 
-        public void RemoveScheduledToast(string id)
+        public void RemoveScheduledNotification(int id)
         {
             var scheduledToast = ToastNotificationManager
                 .CreateToastNotifier()
                 .GetScheduledToastNotifications()
-                .FirstOrDefault(st => st.Id == id);
+                .FirstOrDefault(st => st.Id == $"{id}");
 
-            if (scheduledToast is null == false)
+            if (scheduledToast != null)
                 ToastNotificationManager.CreateToastNotifier().RemoveFromSchedule(scheduledToast);
         }
 

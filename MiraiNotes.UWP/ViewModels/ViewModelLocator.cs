@@ -79,8 +79,8 @@ namespace MiraiNotes.UWP.ViewModels
         public IUserCredentialService UserCredentialService
             => ServiceLocator.Current.GetInstance<IUserCredentialService>();
 
-        public ICustomToastNotificationManager ToastNotificationManager
-            => ServiceLocator.Current.GetInstance<ICustomToastNotificationManager>();
+        public INotificationService NotificationService
+            => ServiceLocator.Current.GetInstance<INotificationService>();
 
         public static bool IsAppRunning { get; set; }
         #endregion
@@ -151,7 +151,7 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<ITaskDataService, TaskDataService>();
             SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
 
-            SimpleIoc.Default.Register<ICustomToastNotificationManager, CustomToastNotificationManager>();
+            SimpleIoc.Default.Register<INotificationService, NotificationService>();
 
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();

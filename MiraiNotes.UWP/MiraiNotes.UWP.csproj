@@ -130,11 +130,10 @@
     <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
-    <Compile Include="Helpers\CustomToastNotificationManager.cs" />
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Interfaces\IApplicationSettingsServiceBase.cs" />
     <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
-    <Compile Include="Interfaces\ICustomToastNotificationManager.cs" />
     <Compile Include="Interfaces\IDispatcherHelper.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
     <Compile Include="Interfaces\IGoogleTaskService.cs" />

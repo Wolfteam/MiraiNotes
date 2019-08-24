@@ -1,21 +1,22 @@
-﻿using System;
-using System.Linq;
-using Windows.ApplicationModel.Background;
-using Windows.UI.Notifications;
-using AutoMapper;
+﻿using AutoMapper;
 using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Enums;
-using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.Core.Models;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.ViewModels;
 using Serilog;
+using System;
+using System.Linq;
+using Windows.ApplicationModel.Background;
+using Windows.UI.Notifications;
 
 namespace MiraiNotes.UWP.BackgroundTasks
 {
     public class MarkAsCompletedBackgroundTask : IBackgroundTask
     {
-        private readonly ICustomToastNotificationManager _toastNotificationManager;
+        private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly IMessenger _messenger;
@@ -26,7 +27,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
         public MarkAsCompletedBackgroundTask()
         {
             var vml = new ViewModelLocator();
-            _toastNotificationManager = vml.ToastNotificationManager;
+            _notificationService = vml.NotificationService;
             _dataService = vml.DataService;
             _logger = vml.Logger.ForContext<MarkAsCompletedBackgroundTask>();
             _mapper = vml.Mapper;
@@ -67,21 +68,30 @@ namespace MiraiNotes.UWP.BackgroundTasks
                         new Tuple<TaskItemViewModel, bool>(task, task.HasParentTask),
                         $"{MessageType.TASK_STATUS_CHANGED_FROM_CONTENT_FRAME}");
                 }
-                _toastNotificationManager.ShowSimpleToastNotification(
-                    "Succeess",
-                    $"Task {response.Result.Title} was marked as completed",
-                    "TaskReminderToastTag",
-                    true,
-                    true);
+
+                _notificationService.ShowNotification(new TaskNotification
+                {
+                    Conntent = $"Task {response.Result.Title} was marked as completed",
+                    Title = "Succeess",
+                    UwpSettings = new UwpNotificationSettings
+                    {
+                        IsAudioSilent = true,
+                        Tag = "TaskReminderToastTag"
+                    }
+                });
             }
             else
             {
-                _toastNotificationManager.ShowSimpleToastNotification(
-                    "Error",
-                    $"Task {response.Result.Title} could not be marked as completed. Error = {response.Message}",
-                    "TaskReminderToastTag",
-                    true,
-                    true);
+                _notificationService.ShowNotification(new TaskNotification
+                {
+                    Conntent = $"Task {response.Result.Title} could not be marked as completed. Error = {response.Message}",
+                    Title = "Error",
+                    UwpSettings = new UwpNotificationSettings
+                    {
+                        IsAudioSilent = true,
+                        Tag = "TaskReminderToastTag"
+                    }
+                });
                 _logger.Error($"{nameof(MarkAsCompletedBackgroundTask)}: an unknown error ocurred = {response.Message}");
             }
             _logger.Information($"{nameof(MarkAsCompletedBackgroundTask)}: completed successfully");
