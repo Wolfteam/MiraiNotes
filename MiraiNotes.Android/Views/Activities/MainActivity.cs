@@ -8,7 +8,10 @@ using Android.Support.V4.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using MiraiNotes.Android.ViewModels;
+using MiraiNotes.Android.Views.Fragments;
+using MvvmCross.Binding.BindingContext;
 using MvvmCross.Droid.Support.V7.AppCompat;
+using MvvmCross.ViewModels;
 using System;
 
 namespace MiraiNotes.Android
@@ -16,6 +19,23 @@ namespace MiraiNotes.Android
     [Activity(Label = "@string/app_name", LaunchMode = LaunchMode.SingleTask)]
     public class MainActivity : MvxAppCompatActivity<MainViewModel>
     {
+        private IMvxInteraction<bool> _showDrawerRequest;
+
+        public IMvxInteraction<bool> ShowDrawerRequest
+        {
+            get => _showDrawerRequest;
+            set
+            {
+                if (_showDrawerRequest != null)
+                    _showDrawerRequest.Requested -= (sender, args)
+                        => ShowDrawer(args.Value);
+
+                _showDrawerRequest = value;
+                _showDrawerRequest.Requested += (sender, args)
+                        => ShowDrawer(args.Value);
+            }
+        }
+
         public DrawerLayout DrawerLayout { get; set; }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -33,6 +53,10 @@ namespace MiraiNotes.Android
             SetContentView(Resource.Layout.Main);
 
             DrawerLayout = FindViewById<DrawerLayout>(Resource.Id.AppDrawerLayout);
+
+            var set = this.CreateBindingSet<MainActivity, MainViewModel>();
+            set.Bind(this).For(v => v.ShowDrawerRequest).To(vm => vm.ShowDrawer).OneWay();
+            set.Apply();
 
             ViewModel.InitViewCommand.Execute();
         }
@@ -68,9 +92,18 @@ namespace MiraiNotes.Android
         public override void OnBackPressed()
         {
             if (DrawerLayout != null && DrawerLayout.IsDrawerOpen(GravityCompat.Start))
+            {
                 DrawerLayout.CloseDrawers();
+            }
+            else if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is TasksFragment tasksFragment &&
+                tasksFragment.IsFabOpen)
+            {
+                tasksFragment.CloseFabMenu();
+            }
             else
+            {
                 base.OnBackPressed();
+            }
         }
 
         public void HideSoftKeyboard()
@@ -83,6 +116,18 @@ namespace MiraiNotes.Android
 
             CurrentFocus.ClearFocus();
         }
+
+        public void ShowDrawer(bool show)
+        {
+            if (show)
+                DrawerLayout.OpenDrawer((int)GravityFlags.Start);
+            else
+                DrawerLayout.CloseDrawers();
+        }
+
+
+
+
 
         private void FabOnClick(object sender, EventArgs eventArgs)
         {

@@ -1,5 +1,6 @@
 ﻿using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
 using MiraiNotes.Android.Common.Utils;
@@ -58,6 +59,10 @@ namespace MiraiNotes.Android.Views.Fragments
             _navView = view.FindViewById<NavigationView>(Resource.Id.AppNavView);
             _navView.SetNavigationItemSelectedListener(this);
 
+            var headerLayout = _navView.GetHeaderView(0);
+            var circleImg = headerLayout.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
+            circleImg.Click += (sender, ar) => ViewModel.SwitchAccountCommand.Execute();
+
             var set = this.CreateBindingSet<MenuFragmet, MenuViewModel>();
             set.Bind(this).For(v => v.OnUserImgLoadedRequest).To(viewModel => viewModel.OnUserProfileImgLoaded).OneWay();
             set.Bind(this).For(v => v.OnTaskListsLoadedRequest).To(viewModel => viewModel.OnTaskListsLoaded).OneWay();
@@ -68,9 +73,8 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
-            ((MainActivity)Activity).DrawerLayout.CloseDrawers();
-            if (_previousMenuItem != null)
-                _previousMenuItem.SetChecked(false);
+            ((MainActivity)Activity).ShowDrawer(false);
+            _previousMenuItem?.SetChecked(false);
 
             _previousMenuItem = menuItem;
 
@@ -100,43 +104,48 @@ namespace MiraiNotes.Android.Views.Fragments
             return true;
         }
 
-
         private async void OnUserImgLoaded(object sender, MvxValueEventArgs<string> eventArgs)
         {
             if (string.IsNullOrEmpty(eventArgs.Value))
                 return;
+            var headerLayout = _navView.GetHeaderView(0);
+            var circleImg = headerLayout.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
 
-            var circleImg = _navView.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
-
-            using (var img = await MiscellaneousUtils.GetImageBitmap(eventArgs.Value))
+            using (var img = await MiscellaneousUtils.GetImageBitmapAsync(eventArgs.Value))
             {
-                if (img != null && circleImg != null)
-                    circleImg.SetImageBitmap(img);
+                if (img != null)
+                    circleImg?.SetImageBitmap(img);
             }
         }
 
-
         private void OnTaskListsLoaded(object sender, EventArgs eventArgs)
         {
+            _navView.Menu.Clear();
             var menu = _navView.Menu;
 
             for (int i = 0; i < ViewModel.TaskLists.Count; i++)
             {
+                var numberOfTaskView = LayoutInflater.Inflate(Resource.Layout.NumberOfTasks, null);
+                var textView = numberOfTaskView.FindViewById<TextView>(Resource.Id.NumberOfTasksBadge);
                 var taskList = ViewModel.TaskLists[i];
-                var menuItem = menu
-                    .Add(0, i, i, taskList.Text)
-                    .SetIcon(Resource.Drawable.ic_list_black_24dp)
-                    .SetChecked(false);
+                textView.Text = $"{taskList.NumberOfTasks}".PadLeft(2, '0');
+                //var rightIcon = new TextView(Activity);
+                //rightIcon.Text = $"{ViewModel.TaskLists[i].NumberOfTasks}";
+                //rightIcon.SetCompoundDrawablesWithIntrinsicBounds(0, 0, Resource.Drawable.ic_edit_black_24dp, 0);
 
-                if (i == 0)
-                {
-                    menuItem.SetChecked(true).SetCheckable(true);
-                    _previousMenuItem = menuItem;
-                }
+                var menuItem = menu
+                    .Add(0, i, i, taskList.Title)
+                    .SetIcon(Resource.Drawable.ic_list_black_24dp)
+                    .SetChecked(false)
+                    .SetActionView(numberOfTaskView);
+
+                if (i != 0) 
+                    continue;
+                menuItem.SetChecked(true).SetCheckable(true);
+                _previousMenuItem = menuItem;
             }
 
             var subMenu = menu.AddSubMenu(1, 100, 100, "Others");
-
             subMenu.Add(1, Resource.Id.Accounts, 101, "Accounts").SetIcon(Resource.Drawable.ic_account_circle_black_24dp);
             subMenu.Add(1, Resource.Id.Settings, 102, "Settings").SetIcon(Resource.Drawable.ic_settings_black_24dp);
             subMenu.Add(1, Resource.Id.Logout, 103, "Logout").SetIcon(Resource.Drawable.ic_arrow_back_black_24dp);
@@ -144,13 +153,12 @@ namespace MiraiNotes.Android.Views.Fragments
             for (int i = 0, count = _navView.ChildCount; i < count; i++)
             {
                 var child = _navView.GetChildAt(i);
-                if (child != null && child is ListView lv)
-                {
-                    ListView menuView = lv;
-                    HeaderViewListAdapter adapter = (HeaderViewListAdapter)menuView.Adapter;
-                    BaseAdapter wrapped = (BaseAdapter)adapter.WrappedAdapter;
-                    wrapped.NotifyDataSetChanged();
-                }
+                if (child == null || !(child is ListView lv)) 
+                    continue;
+                ListView menuView = lv;
+                HeaderViewListAdapter adapter = (HeaderViewListAdapter)menuView.Adapter;
+                BaseAdapter wrapped = (BaseAdapter)adapter.WrappedAdapter;
+                wrapped.NotifyDataSetChanged();
             }
             if (ViewModel.TaskLists.Any())
                 ViewModel.OnTaskListSelectedCommand.Execute(0);

@@ -96,9 +96,14 @@ namespace MiraiNotes.Android.Common.Utils
             }
         }
 
-        public static async Task<AndroidGraphics.Bitmap> GetImageBitmap(string fullPath)
+        public static async Task<AndroidGraphics.Bitmap> GetImageBitmapAsync(string fullPath)
         {
             return await AndroidGraphics.BitmapFactory.DecodeFileAsync(fullPath);
+        }
+
+        public static AndroidGraphics.Bitmap GetImageBitmap(string fullPath)
+        {
+            return AndroidGraphics.BitmapFactory.DecodeFile(fullPath);
         }
     }
 }

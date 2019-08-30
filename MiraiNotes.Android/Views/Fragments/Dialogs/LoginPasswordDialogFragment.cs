@@ -6,7 +6,7 @@ using MvvmCross;
 using MvvmCross.Platforms.Android;
 using DialogFragment = Android.Support.V4.App.DialogFragment;
 
-namespace MiraiNotes.Android.Dialogs
+namespace MiraiNotes.Android.Views.Fragments.Dialogs
 {
     public class LoginPasswordDialogFragment : DialogFragment
     {
