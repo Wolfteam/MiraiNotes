@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class NewTaskViewModel : BaseViewModel<Tuple<ItemModel, string>>
+    public class NewTaskViewModel : BaseViewModel<Tuple<TaskListItemViewModel, string>>
     {
         private readonly IMvxNavigationService _navigationService;
         private readonly IMapper _mapper;
@@ -31,12 +31,12 @@ namespace MiraiNotes.Android.ViewModels
         private readonly INotificationService _notificationService;
         private readonly IUserCredentialService _userCredentialService;
 
-        private ItemModel _currentTaskList;
+        private TaskListItemViewModel _currentTaskList;
         private string _selectedTaskId;
         private bool _showProgressBar;
         private TaskItemViewModel _task;
-        private MvxObservableCollection<ItemModel> _taskLists = new MvxObservableCollection<ItemModel>();
-        private ItemModel _selectedTaskList;
+        private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
+        private TaskListItemViewModel _selectedTaskList;
 
         public bool ShowProgressBar
         {
@@ -50,13 +50,13 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _task, value);
         }
 
-        public MvxObservableCollection<ItemModel> TaskLists
+        public MvxObservableCollection<TaskListItemViewModel> TaskLists
         {
             get => _taskLists;
             set => SetProperty(ref _taskLists, value);
         }
 
-        public ItemModel SelectedTaskList
+        public TaskListItemViewModel SelectedTaskList
         {
             get => _selectedTaskList;
             set => SetProperty(ref _selectedTaskList, value);
@@ -93,7 +93,7 @@ namespace MiraiNotes.Android.ViewModels
             SetCommands();
         }
 
-        public override void Prepare(Tuple<ItemModel, string> kvp)
+        public override void Prepare(Tuple<TaskListItemViewModel, string> kvp)
         {
             _currentTaskList = kvp.Item1;
             _selectedTaskId = kvp.Item2;
@@ -143,10 +143,8 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
-            TaskLists = _mapper.Map<MvxObservableCollection<ItemModel>>(dbResponse.Result);
-
             SelectedTaskList = TaskLists
-                .FirstOrDefault(t => t.ItemId == _currentTaskList.ItemId);
+                .FirstOrDefault(t => t.Id == _currentTaskList.Id);
             ShowProgressBar = false;
         }
 
@@ -156,7 +154,9 @@ namespace MiraiNotes.Android.ViewModels
 
             ShowProgressBar = true;
             if (string.IsNullOrEmpty(taskId))
+            {
                 Task = new TaskItemViewModel();
+            }
             else
             {
                 var ta = await _dataService
@@ -189,7 +189,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             bool isNewTask = Task.IsNew;
 
-            if (SelectedTaskList?.ItemId == null || _currentTaskList?.ItemId == null)
+            if (SelectedTaskList?.Id == null || _currentTaskList?.Id == null)
             {
                 _dialogService.ShowSnackBar(
                     $"An error occurred while trying to {(isNewTask ? "save" : "update")} the task." +
@@ -212,7 +212,7 @@ namespace MiraiNotes.Android.ViewModels
             //If the task list selected in the combo is not the same as the one in the 
             //navigation view, its because we are trying to save/update a 
             //task into a different task list
-            bool moveToDifferentTaskList = SelectedTaskList.ItemId != _currentTaskList.ItemId;
+            bool moveToDifferentTaskList = SelectedTaskList.Id != _currentTaskList.Id;
 
             //If we are updating a task but also moving it into a different tasklist
             if (moveToDifferentTaskList && !isNewTask)
@@ -250,33 +250,30 @@ namespace MiraiNotes.Android.ViewModels
                 entity = dbResponse.Result;
             }
 
-            if (!moveToDifferentTaskList || moveToDifferentTaskList && isNewTask)
-            {
-                if (isNewTask)
-                    entity.CreatedAt = DateTimeOffset.UtcNow;
-                entity.CompletedOn = Task.CompletedOn;
-                entity.GoogleTaskID = Task.IsNew
-                    ? Guid.NewGuid().ToString()
-                    : Task.TaskID;
-                entity.IsDeleted = Task.IsDeleted;
-                entity.IsHidden = Task.IsHidden;
-                entity.Notes = Task.Notes;
-                entity.ParentTask = Task.ParentTask;
-                entity.Position = Task.Position;
-                entity.Status = Task.IsNew
-                    ? GoogleTaskStatus.NEEDS_ACTION.GetString()
-                    : Task.Status;
-                entity.Title = Task.Title;
-                entity.LocalStatus = Task.IsNew
+            if (isNewTask)
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+            entity.CompletedOn = Task.CompletedOn;
+            entity.GoogleTaskID = Task.IsNew
+                ? Guid.NewGuid().ToString()
+                : Task.TaskID;
+            entity.IsDeleted = Task.IsDeleted;
+            entity.IsHidden = Task.IsHidden;
+            entity.Notes = Task.Notes;
+            entity.ParentTask = Task.ParentTask;
+            entity.Position = Task.Position;
+            entity.Status = Task.IsNew
+                ? GoogleTaskStatus.NEEDS_ACTION.GetString()
+                : Task.Status;
+            entity.Title = Task.Title;
+            entity.LocalStatus = Task.IsNew
+                ? LocalStatus.CREATED
+                : entity.LocalStatus == LocalStatus.CREATED
                     ? LocalStatus.CREATED
-                    : entity.LocalStatus == LocalStatus.CREATED
-                        ? LocalStatus.CREATED
-                        : LocalStatus.UPDATED;
-                entity.ToBeSynced = true;
-                entity.UpdatedAt = DateTimeOffset.UtcNow;
-                entity.ToBeCompletedOn = Task.ToBeCompletedOn;
-                entity.RemindOn = Task.RemindOn;
-            }
+                    : LocalStatus.UPDATED;
+            entity.ToBeSynced = true;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+            entity.ToBeCompletedOn = Task.ToBeCompletedOn;
+            entity.RemindOn = Task.RemindOn;
 
             //If the current task has a reminder date and the entity doesn't have
             //a reminder guid, we set it up. I do this to avoid replacing the guid
@@ -293,13 +290,13 @@ namespace MiraiNotes.Android.ViewModels
             {
                 response = await _dataService
                     .TaskService
-                    .AddAsync(SelectedTaskList.ItemId, entity);
+                    .AddAsync(SelectedTaskList.Id, entity);
 
                 if (!response.Succeed)
                 {
                     ShowProgressBar = false;
                     _dialogService.ShowErrorToast(
-                        $"An error occurred while trying to seve the task into {SelectedTaskList.Text}." +
+                        $"An error occurred while trying to seve the task into {SelectedTaskList.Title}." +
                         $"Error = {response.Message}.");
                     return;
                 }
@@ -313,18 +310,19 @@ namespace MiraiNotes.Android.ViewModels
                     Enumerable.Empty<TaskItemViewModel>().ToList());
 
                 _dialogService.ShowSnackBar(
-                    $"The task was sucessfully created into {SelectedTaskList.Text}",
+                    $"The task was sucessfully created into {SelectedTaskList.Title}",
                     string.Empty);
 
                 //TODO: I SHOULD DO SOMETHING HERE WHEN MOVING THE TASK
                 await CloseCommand.ExecuteAsync();
                 return;
             }
-            else if (isNewTask)
+
+            if (isNewTask)
             {
                 response = await _dataService
                     .TaskService
-                    .AddAsync(_currentTaskList.ItemId, entity);
+                    .AddAsync(_currentTaskList.Id, entity);
             }
             else
             {
@@ -361,9 +359,9 @@ namespace MiraiNotes.Android.ViewModels
                 _notificationService.ScheduleNotification(new TaskReminderNotification
                 {
                     Id = id,
-                    TaskListId = _currentTaskList.ItemId,
+                    TaskListId = _currentTaskList.Id,
                     TaskId = Task.TaskID,
-                    TaskListTitle = _currentTaskList.Text,
+                    TaskListTitle = _currentTaskList.Title,
                     TaskTitle = Task.Title,
                     TaskBody = notes,
                     DeliveryOn = Task.RemindOn.Value
@@ -439,7 +437,7 @@ namespace MiraiNotes.Android.ViewModels
             if (!deleteResponse.Succeed)
             {
                 _dialogService.ShowErrorToast(
-                    $"Coudln't delete the selected task. Error = {deleteResponse.Message}.");
+                    $"Couldn't delete the selected task. Error = {deleteResponse.Message}.");
                 return;
             }
 
@@ -453,13 +451,13 @@ namespace MiraiNotes.Android.ViewModels
 
             var moveResponse = await _dataService
                 .TaskService
-                .MoveAsync(SelectedTaskList.ItemId, Task.TaskID, null, null);
+                .MoveAsync(SelectedTaskList.Id, Task.TaskID, null, null);
 
             if (!moveResponse.Succeed)
             {
                 ShowProgressBar = false;
                 _dialogService.ShowErrorToast(
-                    $"An error occurred while trying to move the selected task from {_currentTaskList.Text} to {SelectedTaskList.Text}." +
+                    $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}." +
                     $"Error: {moveResponse.Message}.");
                 return;
             }
@@ -475,7 +473,7 @@ namespace MiraiNotes.Android.ViewModels
             await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
 
             _dialogService.ShowSnackBar(
-                $"Task sucessfully moved from: {_currentTaskList.Text} to: {SelectedTaskList.Text}",
+                $"Task successfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}",
                 string.Empty);
 
             //TODO: SHOULD I DO SOMETHING HERE WHEN MOVING THE TASK ?
@@ -500,7 +498,7 @@ namespace MiraiNotes.Android.ViewModels
             if (!deleteResponse.Succeed)
             {
                 _dialogService.ShowErrorToast(
-                    $"Coudln't delete the selected sub task. Error = {deleteResponse.Message}");
+                    $"Couldn't delete the selected sub task. Error = {deleteResponse.Message}");
                 return;
             }
 
@@ -554,10 +552,6 @@ namespace MiraiNotes.Android.ViewModels
 
                 Messenger.Publish(new TaskSavedMsg(this, Task.TaskID));
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 ShowProgressBar = false;
@@ -571,18 +565,18 @@ namespace MiraiNotes.Android.ViewModels
             List<TaskItemViewModel> currentSubTasks)
         {
             ShowProgressBar = true;
-            string taskListID = moveToDifferentTaskList
-                ? SelectedTaskList.ItemId
-                : _currentTaskList.ItemId;
+            string taskListId = moveToDifferentTaskList
+                ? SelectedTaskList.Id
+                : _currentTaskList.Id;
 
             if (moveToDifferentTaskList && !isNewTask)
             {
                 foreach (var subTask in subTasksToSave)
                 {
-                    var lastStID = currentSubTasks.LastOrDefault()?.TaskID;
+                    var lastStId = currentSubTasks.LastOrDefault()?.TaskID;
                     var moveResponse = await _dataService
                         .TaskService
-                        .MoveAsync(taskListID, subTask.TaskID, subTask.ParentTask, lastStID);
+                        .MoveAsync(taskListId, subTask.TaskID, subTask.ParentTask, lastStId);
                     if (moveResponse.Succeed)
                         currentSubTasks.Add(_mapper.Map<TaskItemViewModel>(moveResponse.Result));
                 }
@@ -591,7 +585,7 @@ namespace MiraiNotes.Android.ViewModels
             {
                 foreach (var subTask in subTasksToSave)
                 {
-                    var lastStID = currentSubTasks.LastOrDefault()?.TaskID;
+                    var lastStId = currentSubTasks.LastOrDefault()?.TaskID;
                     var entity = new GoogleTask
                     {
                         CompletedOn = subTask.CompletedOn,
@@ -606,7 +600,7 @@ namespace MiraiNotes.Android.ViewModels
                         ParentTask = isNewTask && moveToDifferentTaskList
                             ? subTask.ParentTask
                             : Task.TaskID,
-                        Position = lastStID,
+                        Position = lastStId,
                         Status = subTask.Status,
                         Title = subTask.Title,
                         ToBeCompletedOn = subTask.ToBeCompletedOn,
@@ -616,7 +610,7 @@ namespace MiraiNotes.Android.ViewModels
 
                     var response = await _dataService
                         .TaskService
-                        .AddAsync(taskListID, entity);
+                        .AddAsync(taskListId, entity);
 
                     if (response.Succeed)
                         currentSubTasks.Add(_mapper.Map<TaskItemViewModel>(response.Result));

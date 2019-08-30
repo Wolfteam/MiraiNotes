@@ -1,15 +1,19 @@
 ﻿using AutoMapper;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.ViewModels.Dialogs;
+using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
-using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
 using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +32,8 @@ namespace MiraiNotes.Android.ViewModels
 
 
         private string _currentUserName;
-        private List<ItemModel> _taskLists = new List<ItemModel>();
+        private string _currentUserEmail;
+        private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
 
 
         private readonly MvxInteraction<string> _onUserProfileImgLoaded = new MvxInteraction<string>();
@@ -44,7 +49,14 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _currentUserName, value);
         }
 
-        public List<ItemModel> TaskLists
+        public string CurrentUserEmail
+        {
+            get => _currentUserEmail;
+            set => SetProperty(ref _currentUserEmail, value);
+        }
+
+
+        public MvxObservableCollection<TaskListItemViewModel> TaskLists
         {
             get => _taskLists;
             set => SetProperty(ref _taskLists, value);
@@ -52,7 +64,7 @@ namespace MiraiNotes.Android.ViewModels
 
 
         public IMvxAsyncCommand<int> OnTaskListSelectedCommand { get; private set; }
-
+        public IMvxAsyncCommand SwitchAccountCommand { get; private set; }
 
         public MenuViewModel(
             IMvxTextProvider textProvider,
@@ -75,20 +87,51 @@ namespace MiraiNotes.Android.ViewModels
             _navigationService = navigationService;
 
             SetCommands();
+            RegisterMessages();
         }
 
         public override async Task Initialize()
         {
             await base.Initialize();
 
+            Messenger.Publish(new ShowTasksLoadingMsg(this));
+            Messenger.Publish(new ShowProgressOverlayMsg(this));
             await LoadProfileInfo();
 
             await InitView();
+            Messenger.Publish(new ShowTasksLoadingMsg(this, false));
+            Messenger.Publish(new ShowProgressOverlayMsg(this));
         }
 
         private void SetCommands()
         {
             OnTaskListSelectedCommand = new MvxAsyncCommand<int>(OnTaskListSelected);
+            SwitchAccountCommand = new MvxAsyncCommand(async () =>
+            {
+                Messenger.Publish(new ShowDrawerMsg(this, false));
+                await _navigationService.Navigate<AccountDialogViewModel>();
+            });
+        }
+
+        private void RegisterMessages()
+        {
+            var tokens = new[]
+            {
+                Messenger.Subscribe<ActiveAccountChangedMsg>(async(msg) =>
+                {
+                    Messenger.Publish(new ShowTasksLoadingMsg(this));
+                    Messenger.Publish(new ShowProgressOverlayMsg(this));
+
+                    await LoadProfileInfo();
+
+                    await InitView();
+
+                    Messenger.Publish(new ShowTasksLoadingMsg(this, false));
+                    Messenger.Publish(new ShowProgressOverlayMsg(this));
+                })
+            };
+
+            SubscriptionTokens.AddRange(tokens);
         }
 
         private async Task LoadProfileInfo()
@@ -97,11 +140,12 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!userResponse.Succeed)
             {
-                _dialogService.ShowErrorToast($"Current user couldnt be loaded. {userResponse.Message}");
+                _dialogService.ShowErrorToast($"Current user couldn't be loaded. {userResponse.Message}");
                 return;
             }
 
             CurrentUserName = userResponse.Result.Fullname;
+            CurrentUserEmail = userResponse.Result.Email;
             string imgPath = MiscellaneousUtils.GetUserProfileImagePath(userResponse.Result.GoogleUserID);
             _onUserProfileImgLoaded.Raise(imgPath);
         }
@@ -110,11 +154,11 @@ namespace MiraiNotes.Android.ViewModels
         {
             string selectedTaskListID;
 
-            if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
-            {
-                //                _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC);
-                return;
-            }
+            //if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
+            //{
+            //    _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC);
+            //    return;
+            //}
 
 
 
@@ -140,7 +184,7 @@ namespace MiraiNotes.Android.ViewModels
                 .TaskListService
                 .GetAsNoTrackingAsync(
                     tl => tl.User.IsActive && tl.LocalStatus != LocalStatus.DELETED,
-                    tl => tl.OrderBy(t => t.Title));
+                    includeProperties: nameof(GoogleTaskList.Tasks));
 
             if (!dbResponse.Succeed)
             {
@@ -149,8 +193,19 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
+            var taskLists = _mapper.Map<List<TaskListItemViewModel>>(dbResponse.Result);
+            foreach (var taskList in taskLists)
+            {
+                taskList.NumberOfTasks = dbResponse.Result
+                    .First(tl => tl.GoogleTaskListID == taskList.Id)
+                    .Tasks
+                    .Count();
+            }
 
-            TaskLists.AddRange(_mapper.Map<List<ItemModel>>(dbResponse.Result));
+            TaskLists.AddRange(taskLists);
+
+            SortTaskLists(_appSettings.DefaultTaskListSortOrder);
+
             _onTaskListsLoaded.Raise();
             //
             //            TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
@@ -171,11 +226,36 @@ namespace MiraiNotes.Android.ViewModels
             //                OnNavigationViewSelectionChangeAsync(SelectedItem);
         }
 
+        private void SortTaskLists(TaskListSortType sortType)
+        {
+            if (TaskLists.Count == 0)
+                return;
+
+            switch (sortType)
+            {
+                case TaskListSortType.BY_NAME_ASC:
+                    TaskLists.SortBy(tl => tl.Title);
+                    break;
+                case TaskListSortType.BY_NAME_DESC:
+                    TaskLists.SortByDescending(tl => tl.Title);
+                    break;
+                case TaskListSortType.BY_UPDATED_DATE_ASC:
+                    TaskLists.SortBy(tl => tl.UpdatedAt);
+                    break;
+                case TaskListSortType.BY_UPDATED_DATE_DESC:
+                    TaskLists.SortByDescending(tl => tl.UpdatedAt);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sortType), sortType,
+                        "The provided task list sort type does not exists");
+            }
+        }
+
         private async Task OnTaskListSelected(int position)
         {
             var taskList = TaskLists[position];
             await Task.Delay(300);
-            await _navigationService.Navigate<TasksViewModel, ItemModel>(taskList);
+            await _navigationService.Navigate<TasksViewModel, TaskListItemViewModel>(taskList);
         }
     }
 }

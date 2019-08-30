@@ -4,7 +4,6 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
-using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
 using MvvmCross.Localization;
@@ -18,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class TasksViewModel : BaseViewModel<ItemModel>
+    public class TasksViewModel : BaseViewModel<TaskListItemViewModel>
     {
         private readonly IMvxNavigationService _navigationService;
         private readonly IMapper _mapper;
@@ -28,10 +27,11 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IGoogleApiService _googleApiService;
         private readonly IUserCredentialService _userCredentialService;
 
-        private ItemModel _currentTaskList;
+        private TaskListItemViewModel _currentTaskList;
         private MvxObservableCollection<TaskItemViewModel> _tasks = new MvxObservableCollection<TaskItemViewModel>();
         private bool _isBusy;
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
+        private bool _showProgressOverlay;
 
         public MvxObservableCollection<TaskItemViewModel> Tasks
         {
@@ -51,8 +51,16 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _currentTasksSortOrder, value);
         }
 
-        public IMvxAsyncCommand<TaskItemViewModel> TaskSelectedCommand { get; set; }
-        public IMvxAsyncCommand RefreshTasksCommand { get; set; }
+        public bool ShowProgressOverlay
+        {
+            get => _showProgressOverlay;
+            set => SetProperty(ref _showProgressOverlay, value);
+        }
+
+        public IMvxAsyncCommand<TaskItemViewModel> TaskSelectedCommand { get; private set; }
+        public IMvxAsyncCommand RefreshTasksCommand { get; private set; }
+        public IMvxCommand AddNewTaskListCommand { get; private set; }
+        public IMvxAsyncCommand AddNewTaskCommand { get; private set; }
 
         public TasksViewModel(
             IMvxTextProvider textProvider,
@@ -78,7 +86,7 @@ namespace MiraiNotes.Android.ViewModels
             RegisterMessages();
         }
 
-        public override void Prepare(ItemModel taskList)
+        public override void Prepare(TaskListItemViewModel taskList)
         {
             _currentTaskList = taskList;
         }
@@ -92,8 +100,10 @@ namespace MiraiNotes.Android.ViewModels
 
         private void SetCommands()
         {
-            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>(OnTaskSelected);
+            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.TaskID));
             RefreshTasksCommand = new MvxAsyncCommand(Refresh);
+            AddNewTaskListCommand = new MvxCommand(() => _dialogService.ShowSnackBar("not implemented", string.Empty));
+            AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
         }
 
         private void RegisterMessages()
@@ -101,20 +111,21 @@ namespace MiraiNotes.Android.ViewModels
             var subscriptions = new[] {
                 Messenger.Subscribe<TaskDeletedMsg>(OnTaskDeleted),
                 Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg)),
-                Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged)
+                Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
+                Messenger.Subscribe<ShowTasksLoadingMsg>(msg => IsBusy = msg.Show),
+                Messenger.Subscribe<ShowProgressOverlayMsg>(msg => ShowProgressOverlay = msg.Show)
             };
 
             SubscriptionTokens.AddRange(subscriptions);
         }
 
-        public async Task InitView(ItemModel taskList)
+        public async Task InitView(TaskListItemViewModel taskList)
         {
             if (taskList == null)
             {
                 //OnNoTaskListAvailable();
                 return;
             }
-
             IsBusy = true;
 
             Tasks.Clear();
@@ -123,7 +134,7 @@ namespace MiraiNotes.Android.ViewModels
             var dbResponse = await _dataService
                 .TaskService
                 .GetAsNoTrackingAsync(
-                    t => t.TaskList.GoogleTaskListID == taskList.ItemId &&
+                    t => t.TaskList.GoogleTaskListID == taskList.Id &&
                          t.LocalStatus != LocalStatus.DELETED,
                     t => t.OrderBy(ta => ta.Position));
 
@@ -172,9 +183,9 @@ namespace MiraiNotes.Android.ViewModels
             IsBusy = false;
         }
 
-        public async Task OnTaskSelected(TaskItemViewModel task)
-            => await _navigationService.Navigate<NewTaskViewModel, Tuple<ItemModel, string>>(
-                new Tuple<ItemModel, string>(_currentTaskList, task.TaskID));
+        public async Task OnTaskSelected(string taskId)
+            => await _navigationService.Navigate<NewTaskViewModel, Tuple<TaskListItemViewModel, string>>(
+                new Tuple<TaskListItemViewModel, string>(_currentTaskList, taskId));
 
         public async Task OnTaskSaved(TaskSavedMsg msg)
         {
@@ -227,7 +238,7 @@ namespace MiraiNotes.Android.ViewModels
 
                 int updatedSubTaskIndex = parentTask
                                               .SubTasks?
-                                              .ToList()?
+                                              .ToList()
                                               .FindIndex(st => st.TaskID == task.TaskID) ?? -1;
 
                 if (updatedSubTaskIndex != -1)

@@ -1,11 +1,14 @@
 ﻿using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
 using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using MvvmCross.ViewModels;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
@@ -19,10 +22,14 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMiraiNotesDataService _dataService;
         private readonly IAppSettingsService _appSettings;
         private readonly IMvxNavigationService _navigationService;
+
+        private readonly MvxInteraction<bool> _showDrawer = new MvxInteraction<bool>();
         #endregion
 
 
-        //private readonly IMvxMessenger _messenger;
+        public IMvxInteraction<bool> ShowDrawer
+            => _showDrawer;
+
         private string _language = "English";
         private MvxSubscriptionToken _cultureChangedToken;
 
@@ -39,9 +46,9 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxCommand ChangeLanguageCommand { get; private set; }
         public IMvxCommand ChangeThemeCommand { get; private set; }
         public IMvxCommand OnSettingsSelectedCommand { get; private set; }
-        public IMvxCommand OnAccountsSelectedCommand { get; private set; }
+        public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
         public IMvxCommand LogoutCommand { get; private set; }
-        public IMvxCommand InitViewCommand { get; private set; }
+        public IMvxAsyncCommand InitViewCommand { get; private set; }
 
         public MainViewModel(
             IMvxTextProvider textProvider,
@@ -61,14 +68,17 @@ namespace MiraiNotes.Android.ViewModels
             _cultureChangedToken = Messenger.Subscribe<CultureChangedMessage>(ChangeCurrentLanguage);
 
             SetCommands();
+            RegisterMessages();
         }
 
         private void SetCommands()
         {
             ChangeLanguageCommand = new MvxCommand(ChangeLanguage);
             ChangeThemeCommand = new MvxCommand(ChangeTheme);
-            OnSettingsSelectedCommand = new MvxCommand(() => _dialogService.ShowWarningToast("Settings is not implemented"));
-            OnAccountsSelectedCommand = new MvxCommand(() => _dialogService.ShowWarningToast("Accounts is not implemented"));
+            OnSettingsSelectedCommand = new MvxCommand(
+                () => _dialogService.ShowWarningToast("Settings is not implemented"));
+            OnAccountsSelectedCommand = new MvxAsyncCommand(
+                async () => await _navigationService.Navigate<AccountDialogViewModel>());
             LogoutCommand = new MvxCommand(() =>
             {
                 _dialogService.ShowDialog(
@@ -78,7 +88,18 @@ namespace MiraiNotes.Android.ViewModels
                 "No",
                 async () => await Logout());
             });
-            InitViewCommand = new MvxAsyncCommand(async () => await _navigationService.Navigate<MenuViewModel>());
+            InitViewCommand = new MvxAsyncCommand(
+                async () => await _navigationService.Navigate<MenuViewModel>());
+        }
+
+        private void RegisterMessages()
+        {
+            var tokens = new[]
+            {
+                Messenger.Subscribe<ShowDrawerMsg>(msg => _showDrawer.Raise(msg.Show))
+            };
+
+            SubscriptionTokens.AddRange(tokens);
         }
 
         public async Task Logout()

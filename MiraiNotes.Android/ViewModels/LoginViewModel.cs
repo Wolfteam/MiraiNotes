@@ -93,11 +93,6 @@ namespace MiraiNotes.Android.ViewModels
             Messenger.Publish(new LoginRequestMsg(this, url));
         }
 
-        public void OnLoginCanceled()
-        {
-            ShowLoading = false;
-        }
-
         public async Task OnCodeGranted(string approvalCode)
         {
             ShowLoading = true;
@@ -268,7 +263,6 @@ namespace MiraiNotes.Android.ViewModels
             var response = await _dataService
                 .UserService
                 .GetCurrentActiveUserAsync();
-
 
             var loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
 
