@@ -1,9 +1,10 @@
 using Android.App;
 using Android.Support.Design.Widget;
+using Android.Views;
 using Android.Widget;
 using ES.DMoral.ToastyLib;
-using MiraiNotes.Android.Dialogs;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Views.Fragments.Dialogs;
 using MvvmCross;
 using MvvmCross.Platforms.Android;
 using System;
@@ -36,18 +37,16 @@ namespace MiraiNotes.Android.Services
             Toasty.Success(Application.Context, message, toastLength, true).Show();
         }
 
-        public void ShowSnackBar(string msg, string action, bool? longSnackbar = null)
+        public void ShowSnackBar(string msg, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false)
         {
-            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-            var view = top.Activity.FindViewById(Resource.Id.content);
+            var view = GetSnackbarView(displayOnContentFrame);
             var duration = GetSnackbarLength(longSnackbar);
             Snackbar.Make(view, msg, duration).Show();
         }
 
-        public void ShowSnackBar(string msg, string action, Action onClick, bool? longSnackbar = null)
+        public void ShowSnackBar(string msg, Action onClick, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false)
         {
-            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-            var view = top.Activity.FindViewById(Resource.Id.content);
+            var view = GetSnackbarView(displayOnContentFrame);
             var duration = GetSnackbarLength(longSnackbar);
             Snackbar.Make(view, msg, duration).SetAction(action, (v) => onClick.Invoke()).Show();
         }
@@ -55,9 +54,11 @@ namespace MiraiNotes.Android.Services
         public void ShowLoginDialog(Action<string> onOk = null, Action onCancel = null)
         {
             var dialog = new LoginPasswordDialogFragment(onOk, onCancel);
-            var fm = dialog.FragmentManager.BeginTransaction();
-            dialog.Show(fm, nameof(LoginPasswordDialogFragment));
+            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
+            var activity = top.Activity as MainActivity;
+            dialog.Show(activity.SupportFragmentManager, nameof(LoginPasswordDialogFragment));
         }
+
 
         public void ShowDialog(
             string title,
@@ -90,5 +91,15 @@ namespace MiraiNotes.Android.Services
                     ? Snackbar.LengthLong
                     : Snackbar.LengthShort
                 : Snackbar.LengthIndefinite;
+
+        private View GetSnackbarView(bool displayOnContentFrame)
+        {
+            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
+            var view = top.Activity.FindViewById(displayOnContentFrame
+                ? Resource.Id.ContentFrame
+                : Resource.Id.TaskViewLayout);
+
+            return view;
+        }
     }
 }
