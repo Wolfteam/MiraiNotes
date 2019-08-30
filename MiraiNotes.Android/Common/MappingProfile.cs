@@ -10,11 +10,16 @@ namespace MiraiNotes.Android.Common
     {
         public MappingProfile()
         {
+            #region Api mappings
 
             CreateMap<GoogleTaskModel, TaskItemViewModel>();
             CreateMap<TaskItemViewModel, GoogleTaskModel>();
 
-            //CreateMap<GoogleTaskListModel, TaskListItemViewModel>();
+            CreateMap<GoogleTaskListModel, TaskListItemViewModel>()
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.TaskListID))
+                .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
+                .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
+                .ForMember(d => d.NumberOfTasks, opt => opt.Ignore());
             //CreateMap<TaskListItemViewModel, GoogleTaskListModel>();
 
             CreateMap<GoogleTaskListModel, ItemModel>()
@@ -34,13 +39,15 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<TaskItemViewModel, TaskItemViewModel>();
+            #endregion
 
             #region Database mappings
 
-            //CreateMap<GoogleTaskList, TaskListItemViewModel>()
-            //    .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
-            //    .ForMember(d => d.TaskListID, opt => opt.MapFrom(s => s.GoogleTaskListID))
-            //    .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt));
+            CreateMap<GoogleTaskList, TaskListItemViewModel>()
+                .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.GoogleTaskListID))
+                .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
+                .ForMember(d => d.NumberOfTasks, opt => opt.Ignore());
 
             CreateMap<GoogleTaskList, ItemModel>()
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
@@ -63,8 +70,9 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
                 .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.GoogleTaskID));
 
-            //CreateMap<GoogleUser, GoogleUserViewModel>()
-            //    .ConstructUsingServiceLocator();
+            CreateMap<GoogleUser, GoogleUserViewModel>()
+                .ForMember(d => d.Id, opts => opts.MapFrom(s => s.ID))
+                .ConstructUsingServiceLocator();
             #endregion
 
         }
