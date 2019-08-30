@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical">
+    <refractored.controls.CircleImageView
+        android:id="@+id/AccountImg"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/no_image"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@android:color/white"
+        app:MvxBind="Bitmap PictureUrl, Converter=ImgPathToBitmap"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/AccountName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:ellipsize="end" 
+            android:maxLines="1"
+            android:gravity="center"
+            android:text="@string/PersonName"
+            app:MvxBind="Text Fullname;"/>
+        <TextView
+            android:id="@+id/AccountEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end" 
+            android:maxLines="1"
+            android:gravity="center"
+            android:text="@string/PersonEmail"
+            app:MvxBind="Text Email;"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/ChangeAccount"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/ic_done_black_24dp"
+            android:contentDescription="Change"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:MvxBind="Click ChangeCurrentAccountCommand; Enabled InverseBoolean(IsActive); Clickable InverseBoolean(IsActive); Visibility InvertedVisibility(IsActive)"/>
+        <ImageButton
+            android:id="@+id/DeleteAccount"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/ic_delete_black_24dp"
+            android:contentDescription="Delete"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:MvxBind="Click DeleteAccountCommand; Enabled CanBeDeleted; Clickable CanBeDeleted; Visibility Visibility(CanBeDeleted)"/>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/fab_margin"
+    app:MvxBind="Visibility Visibility(IsDialogVisible)">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Accounts"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="5dp"/>
+    <MvvmCross.Platforms.Android.Binding.Views.MvxListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="#aeaeae"
+        android:dividerHeight="1px"
+        android:clickable="false"
+        android:focusableInTouchMode="true"
+        android:choiceMode="none"
+        app:MvxBind="ItemsSource Accounts;"
+        app:MvxItemTemplate="@layout/accountdialogitem">
+    </MvvmCross.Platforms.Android.Binding.Views.MvxListView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:textColor="@android:color/holo_red_dark"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click NewAccountCommand;"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="@android:color/holo_red_dark"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click CloseCommand;"/>
+    </LinearLayout>
+</LinearLayout>
+
+

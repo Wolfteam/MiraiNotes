@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/TaskViewLayout">
+
     <include
         layout="@layout/apptoolbar" />
     <RelativeLayout
@@ -27,5 +29,94 @@
         </MvxSwipeRefreshLayout>
     </RelativeLayout>
 
+    <include
+        layout="@layout/progressoverlay"/>
+    <View
+        android:id="@+id/FabBgLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparentBg"
+        android:visibility="gone"/>
+    <LinearLayout
+        android:id="@+id/AddNewTaskListFabLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/standard_23"
+        android:layout_marginBottom="@dimen/standard_23"
+        android:padding="@dimen/standard_12"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        app:layout_behavior="MiraiNotes.Android.Common.Utils.MoveUpwardBehavior">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="New Task List"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/AddNewTaskListFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginLeft="10dp"
+            android:background="@color/material_grey_850"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_add_black_24dp"
+            app:MvxBind="Click AddNewTaskListCommand"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/AddNewTaskFabLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/standard_23"
+        android:layout_marginBottom="@dimen/standard_23"
+        android:padding="@dimen/standard_12"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        app:layout_behavior="MiraiNotes.Android.Common.Utils.MoveUpwardBehavior">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="New Task"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/AddNewTaskFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginLeft="10dp"
+            android:background="@color/material_grey_850"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_add_black_24dp"
+            app:MvxBind="Click AddNewTaskCommand" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:clipToPadding="false"
+        android:padding="@dimen/standard_12"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_gravity="bottom|end"
+        app:layout_behavior="MiraiNotes.Android.Common.Utils.MoveUpwardBehavior">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/AppFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/material_grey_850"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@drawable/ic_add_black_24dp"/>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

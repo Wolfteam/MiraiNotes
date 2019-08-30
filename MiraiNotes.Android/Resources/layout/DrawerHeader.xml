@@ -22,4 +22,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:MvxBind="Text CurrentUserName"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:MvxBind="Text CurrentUserEmail"/>
 </LinearLayout>
