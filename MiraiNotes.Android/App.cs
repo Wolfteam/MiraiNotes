@@ -73,6 +73,8 @@ namespace MiraiNotes.Android
                 AppConstants.RedirectUrl)
             );
 
+            //since im using automapper to resolve this one, i need to explicit register it
+            Mvx.IoCProvider.RegisterType<GoogleUserViewModel>();
 
             RegisterAppStart<LoginViewModel>();
             //RegisterCustomAppStart<CustomAppStart>();
@@ -129,17 +131,9 @@ namespace MiraiNotes.Android
             {
                 // Add all profiles in current assembly
                 cfg.AddProfile<MappingProfile>();
-                //                cfg.ConstructServicesUsing(t =>
-                //                {
-                //                    //ConstructServicesUsing gets called if you used it in the
-                //                    //mapping profile
-                //                    if (t == typeof(GoogleUserViewModel))
-                //                    {
-                //                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
-                //                    }
-                //                    return SimpleIoc.Default.GetInstance(t);
-                //                });
+                cfg.ConstructServicesUsing(Mvx.IoCProvider.Resolve);
             });
+            //config.AssertConfigurationIsValid();
             return config.CreateMapper();
         }
     }
