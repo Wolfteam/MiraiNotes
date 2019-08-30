@@ -71,7 +71,7 @@
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidSupportedAbis />
-    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidDexTool>d8</AndroidDexTool>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
@@ -102,25 +102,40 @@
     <Reference Include="Mono.Android" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adapters\AccountsDialogAdapter.cs" />
     <Compile Include="App.cs" />
     <Compile Include="Background\NotificationSchedulerReceiver.cs" />
     <Compile Include="Common\MappingProfile.cs" />
+    <Compile Include="Common\Messages\AccountChangeRequestMsg.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
     <Compile Include="Common\Messages\ChangeThemeMsg.cs" />
     <Compile Include="Common\Messages\CultureChangedMessage.cs" />
+    <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
     <Compile Include="Common\Messages\LanguageChangedMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
+    <Compile Include="Common\Messages\ShowDrawerMsg.cs" />
+    <Compile Include="Common\Messages\ShowProgressOverlayMsg.cs" />
+    <Compile Include="Common\Messages\ShowTasksLoadingMsg.cs" />
     <Compile Include="Common\Messages\TaskDeletedMsg.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskStatusChangedMsg.cs" />
     <Compile Include="Common\ResxTextProvider.cs" />
+    <Compile Include="Common\Utils\AndroidUtils.cs" />
     <Compile Include="Common\Utils\MiscellaneousUtils.cs" />
+    <Compile Include="Common\Utils\MoveUpwardBehavior.cs" />
+    <Compile Include="Converters\ImgPathToBitmapConverter.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
-    <Compile Include="Dialogs\LoginPasswordDialogFragment.cs" />
+    <Compile Include="Listeners\ProgressOverlayListener.cs" />
+    <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
+    <Compile Include="ViewModels\GoogleUserViewModel.cs" />
+    <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\LoginPasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
     <Compile Include="Interfaces\IDialogService.cs" />
+    <Compile Include="Listeners\TasksFabListener.cs" />
     <Compile Include="Localization\Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -138,6 +153,7 @@
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
     <Compile Include="ViewModels\TaskItemViewModel.cs" />
+    <Compile Include="ViewModels\TaskListItemViewModel.cs" />
     <Compile Include="ViewModels\TasksViewModel.cs" />
     <Compile Include="ViewModels\NewTaskViewModel.cs" />
     <Compile Include="Views\Activities\LoginActivity.cs" />
@@ -216,7 +232,7 @@
       <Version>6.3.1</Version>
     </PackageReference>
     <PackageReference Include="Refit">
-      <Version>4.7.9</Version>
+      <Version>4.7.51</Version>
     </PackageReference>
     <PackageReference Include="Refractored.Controls.CircleImageView">
       <Version>1.2.0-beta</Version>
@@ -396,6 +412,41 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\menu_new_task.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\item_count.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\NumberOfTasks.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_done_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_delete_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\AccountsDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\AccountDialogItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\ProgressOverlay.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
