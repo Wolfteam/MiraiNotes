@@ -1,4 +1,4 @@
-﻿using MiraiNotes.Core.Models;
+﻿using MiraiNotes.Core.Enums;
 using MvvmCross.Converters;
 using System;
 using System.Globalization;

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/fab_margin">
+
+        <!--App theme-->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="App Theme"
+                android:textStyle="bold"
+                android:textSize="@dimen/settings_font_size_header"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Choose a base app color"
+                android:textSize="@dimen/settings_font_size_content"/>
+
+            <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"
+                android:gravity="center"
+                android:tooltipText="Select an app theme"
+                app:MvxBind="ItemsSource AppThemes; SelectedItem SelectedAppTheme"
+                app:MvxItemTemplate="@layout/defaultspinneritem"
+                app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Divider"/>
+        <!--Accent color-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/settings_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Accent Color"
+                android:textStyle="bold"
+                android:textSize="@dimen/settings_font_size_header"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Choose an accent color"
+                android:textSize="@dimen/settings_font_size_content"/>
+
+            <mvvmcross.platforms.android.binding.views.MvxGridView
+                android:id="@+id/SettingsAccentColorsGridView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="5"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="5dp"
+                android:horizontalSpacing="5dp"
+                android:padding="20dp"
+                android:drawSelectorOnTop="true"
+                app:MvxBind="ItemsSource AccentColors; ItemClick AccentColorChangedCommand;"
+                app:MvxItemTemplate="@layout/settingsaccentcoloritem"/>
+            <!--SelectedItem SelectedAccentColor; ItemClick AccentColorChangedCommand-->
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Divider"/>
+        <!--Tasklist and task default sort order-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/settings_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tasklists and Tasks"
+                android:textStyle="bold"
+                android:textSize="@dimen/settings_font_size_header"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Default tasklist sort order"
+                android:textSize="@dimen/settings_font_size_content"/>
+
+            <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dialog"
+                android:gravity="center"
+                android:tooltipText="Select a tasklist sort order"
+                app:MvxBind="ItemsSource TaskListSortTypes; SelectedItem SelectedTaskListSortOrder"
+                app:MvxItemTemplate="@layout/defaultspinneritem"
+                app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/settings_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Default task sort order"
+                android:textSize="@dimen/settings_font_size_content"/>
+
+            <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"
+                android:gravity="center"
+                android:tooltipText="Select a task sort order"
+                app:MvxBind="ItemsSource TasksSortTypes; SelectedItem SelectedTaskSortOrder"
+                app:MvxItemTemplate="@layout/defaultspinneritem"
+                app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Divider"/>
+        <!--Others-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/settings_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Others"
+                android:textStyle="bold"
+                android:textSize="@dimen/settings_font_size_header"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Aks for a password when the app starts"
+                android:textSize="@dimen/settings_font_size_content"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yes"
+                app:MvxBind="Checked AskForPasswordWhenAppStarts"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+

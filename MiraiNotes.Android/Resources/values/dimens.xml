@@ -11,4 +11,8 @@
   <dimen name="standard_155">155dp</dimen>
   <dimen name="dialog_width">400dp</dimen>
   <dimen name="dialog_height">200dp</dimen>
+  <dimen name="settings_accent_color">45dp</dimen>
+  <dimen name="settings_margin">10dp</dimen>
+  <dimen name="settings_font_size_header">20sp</dimen>
+  <dimen name="settings_font_size_content">15sp</dimen>
 </resources>
