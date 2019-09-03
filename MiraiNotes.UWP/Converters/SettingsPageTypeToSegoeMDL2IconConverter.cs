@@ -1,4 +1,4 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Core.Enums;
 using System;
 using Windows.UI.Xaml.Data;
 
@@ -16,8 +16,6 @@ namespace MiraiNotes.UWP.Converters
             {
                 case SettingsPageType.GENERAL:
                     return "\uE80F";
-                case SettingsPageType.ACCOUNT:
-                    return "\uE77B";
                 case SettingsPageType.SYNCHRONIZATION:
                     return "\uE895";
                 case SettingsPageType.NOTIFICATIONS:

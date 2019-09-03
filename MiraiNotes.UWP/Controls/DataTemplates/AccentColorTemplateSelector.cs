@@ -1,4 +1,4 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Core.Models;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 

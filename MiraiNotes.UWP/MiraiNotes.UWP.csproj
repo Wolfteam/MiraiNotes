@@ -142,12 +142,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccentColorModel.cs" />
     <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\CustomDialogType.cs" />
     <Compile Include="Models\MessageType.cs" />
-    <Compile Include="Models\SettingsPageType.cs" />
-    <Compile Include="Models\SettingsPageItem.cs" />
     <Compile Include="Models\ToastActionType.cs" />
     <Compile Include="Pages\Dialogs\AccountsContentDialog.xaml.cs">
       <DependentUpon>AccountsContentDialog.xaml</DependentUpon>

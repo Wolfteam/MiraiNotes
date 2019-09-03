@@ -1,10 +1,9 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MiraiNotes.UWP.Pages.Settings;
 using MiraiNotes.UWP.ViewModels;
 using System;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -45,8 +44,6 @@ namespace MiraiNotes.UWP.Pages
                     ViewModel.CurrentPageText = "General";
                     page = typeof(SettingsGeneralPage);
                     break;
-                case SettingsPageType.ACCOUNT:
-                    throw new NotImplementedException("Account settings page is not implemented");
                 case SettingsPageType.SYNCHRONIZATION:
                     ViewModel.CurrentPageText = "Syncrhonization";
                     page = typeof(SettingsSynchronizationPage);

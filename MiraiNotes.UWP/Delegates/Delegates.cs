@@ -1,4 +1,4 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.Delegates
 {
