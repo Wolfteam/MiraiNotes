@@ -64,7 +64,6 @@ namespace MiraiNotes.Android.ViewModels
 
 
         public IMvxAsyncCommand<int> OnTaskListSelectedCommand { get; private set; }
-        public IMvxAsyncCommand SwitchAccountCommand { get; private set; }
 
         public MenuViewModel(
             IMvxTextProvider textProvider,
@@ -93,7 +92,7 @@ namespace MiraiNotes.Android.ViewModels
         public override async Task Initialize()
         {
             await base.Initialize();
-
+            //TODO: AVOID RELOADING EVERYTHING ON SCREEN CHANGES
             Messenger.Publish(new ShowTasksLoadingMsg(this));
             Messenger.Publish(new ShowProgressOverlayMsg(this));
             await LoadProfileInfo();
@@ -106,11 +105,6 @@ namespace MiraiNotes.Android.ViewModels
         private void SetCommands()
         {
             OnTaskListSelectedCommand = new MvxAsyncCommand<int>(OnTaskListSelected);
-            SwitchAccountCommand = new MvxAsyncCommand(async () =>
-            {
-                Messenger.Publish(new ShowDrawerMsg(this, false));
-                await _navigationService.Navigate<AccountDialogViewModel>();
-            });
         }
 
         private void RegisterMessages()

@@ -288,6 +288,12 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
+            //TODO: REMOVE THIS WHEN THE LOGIN DIALOG AND SETTINGS ARE READY
+            if (_appSettings.AskForPasswordWhenAppStarts)
+            {
+                _appSettings.AskForPasswordWhenAppStarts = false;
+            }
+
             if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
             {
                 ShowLoading = false;

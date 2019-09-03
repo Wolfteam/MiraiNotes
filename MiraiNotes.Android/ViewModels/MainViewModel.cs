@@ -3,6 +3,7 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.ViewModels.Dialogs;
+using MiraiNotes.Android.ViewModels.Settings;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
 using MvvmCross.Localization;
@@ -45,7 +46,7 @@ namespace MiraiNotes.Android.ViewModels
 
         public IMvxCommand ChangeLanguageCommand { get; private set; }
         public IMvxCommand ChangeThemeCommand { get; private set; }
-        public IMvxCommand OnSettingsSelectedCommand { get; private set; }
+        public IMvxAsyncCommand OnSettingsSelectedCommand { get; private set; }
         public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
         public IMvxCommand LogoutCommand { get; private set; }
         public IMvxAsyncCommand InitViewCommand { get; private set; }
@@ -75,10 +76,9 @@ namespace MiraiNotes.Android.ViewModels
         {
             ChangeLanguageCommand = new MvxCommand(ChangeLanguage);
             ChangeThemeCommand = new MvxCommand(ChangeTheme);
-            OnSettingsSelectedCommand = new MvxCommand(
-                () => _dialogService.ShowWarningToast("Settings is not implemented"));
-            OnAccountsSelectedCommand = new MvxAsyncCommand(
-                async () => await _navigationService.Navigate<AccountDialogViewModel>());
+            OnSettingsSelectedCommand = new MvxAsyncCommand(
+                async () => await _navigationService.Navigate<SettingsMainViewModel>());
+            OnAccountsSelectedCommand = new MvxAsyncCommand(OnAccountsSelected);
             LogoutCommand = new MvxCommand(() =>
             {
                 _dialogService.ShowDialog(
@@ -129,7 +129,11 @@ namespace MiraiNotes.Android.ViewModels
             //ShowLoading(false);
         }
 
-
+        private async Task OnAccountsSelected()
+        {
+            Messenger.Publish(new ShowDrawerMsg(this, false));
+            await _navigationService.Navigate<AccountDialogViewModel>();
+        }
 
 
 

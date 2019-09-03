@@ -4,6 +4,8 @@ using Android.Preferences;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Shared;
+using System.Linq;
 
 namespace MiraiNotes.Android.Services
 {
@@ -25,7 +27,7 @@ namespace MiraiNotes.Android.Services
         //TODO: CHECK THE SYSTEM ACCENT COLOR?
         public string AppHexAccentColor
         {
-            get => GetString(nameof(AppHexAccentColor)) ?? "fffff";
+            get => GetString(nameof(AppHexAccentColor)) ?? AppConstants.AppAccentColors.First();
             set => SetString(nameof(AppHexAccentColor), value);
         }
 

@@ -1,5 +1,4 @@
-﻿using Android.Content;
-using MvvmCross.Converters;
+﻿using MvvmCross.Converters;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Localization;
 using MvvmCross.ViewModels;
