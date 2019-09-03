@@ -11,12 +11,17 @@ using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Droid.Support.V7.AppCompat;
+using MvvmCross.Platforms.Android.Presenters.Attributes;
 using MvvmCross.ViewModels;
 using System;
 
 namespace MiraiNotes.Android
 {
-    [Activity(Label = "@string/app_name", LaunchMode = LaunchMode.SingleTask)]
+    [MvxActivityPresentation]
+    [Activity(
+        Label = "@string/app_name",
+        LaunchMode = LaunchMode.SingleTask,
+        Theme = "@style/Theme.MiraiNotes.Dark")]
     public class MainActivity : MvxAppCompatActivity<MainViewModel>
     {
         private IMvxInteraction<bool> _showDrawerRequest;

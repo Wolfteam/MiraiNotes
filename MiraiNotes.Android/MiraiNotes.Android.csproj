@@ -127,10 +127,18 @@
     <Compile Include="Common\Utils\MoveUpwardBehavior.cs" />
     <Compile Include="Converters\ImgPathToBitmapConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Converters\SettingsPageTypeToResourceDrawableConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsAboutViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsGeneralViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsMainViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsNotificationsViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsSyncViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsHomeViewModel.cs" />
+    <Compile Include="Views\Activities\SettingsActivity.cs" />
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\LoginPasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
@@ -165,6 +173,11 @@
     <Compile Include="Views\Fragments\BaseFragment.cs" />
     <Compile Include="Views\Fragments\MenuFragmet.cs" />
     <Compile Include="Views\Fragments\NewTaskFragment.cs" />
+    <Compile Include="Views\Fragments\Settings\SettingsAboutFragment.cs" />
+    <Compile Include="Views\Fragments\Settings\SettingsNotificationsFragment.cs" />
+    <Compile Include="Views\Fragments\Settings\SettingsSyncFragment.cs" />
+    <Compile Include="Views\Fragments\Settings\SettingsGeneralFragment.cs" />
+    <Compile Include="Views\Fragments\Settings\SettingsHomeFragment.cs" />
     <Compile Include="Views\Fragments\TasksFragment.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +235,9 @@
     <PackageReference Include="MvvmCross.Droid.Support.V7.RecyclerView">
       <Version>6.3.1</Version>
     </PackageReference>
+    <PackageReference Include="MvvmCross.Plugin.Color">
+      <Version>6.3.1</Version>
+    </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.Messenger">
       <Version>6.3.1</Version>
     </PackageReference>
@@ -262,6 +278,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Resources\xml\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\task_item.xml">
@@ -447,6 +464,85 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\ProgressOverlay.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\Settings.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsHomeView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsGeneralView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsSyncView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsNotificationsView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsAboutView.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\drawer_header_b.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\drawer_header_c.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\drawer_header_d.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsAccentColorItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_home_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_sync_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_notifications_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_info_outline_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_done_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\DefaultSpinnerItem.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

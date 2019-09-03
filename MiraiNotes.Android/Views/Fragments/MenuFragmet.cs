@@ -51,6 +51,9 @@ namespace MiraiNotes.Android.Views.Fragments
             }
         }
 
+        public MainActivity MainActivity
+            => (MainActivity)Activity;
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreateView(inflater, container, savedInstanceState);
@@ -61,7 +64,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
             var headerLayout = _navView.GetHeaderView(0);
             var circleImg = headerLayout.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
-            circleImg.Click += (sender, ar) => ViewModel.SwitchAccountCommand.Execute();
+            circleImg.Click += (sender, ar) => MainActivity.ViewModel.OnAccountsSelectedCommand.Execute();
 
             var set = this.CreateBindingSet<MenuFragmet, MenuViewModel>();
             set.Bind(this).For(v => v.OnUserImgLoadedRequest).To(viewModel => viewModel.OnUserProfileImgLoaded).OneWay();
@@ -73,7 +76,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
-            ((MainActivity)Activity).ShowDrawer(false);
+            MainActivity.ShowDrawer(false);
             _previousMenuItem?.SetChecked(false);
 
             _previousMenuItem = menuItem;
@@ -83,13 +86,13 @@ namespace MiraiNotes.Android.Views.Fragments
                 switch (menuItem.ItemId)
                 {
                     case Resource.Id.Logout:
-                        ((MainActivity)Activity).ViewModel.LogoutCommand.Execute();
+                        MainActivity.ViewModel.LogoutCommand.Execute();
                         break;
                     case Resource.Id.Accounts:
-                        ((MainActivity)Activity).ViewModel.OnAccountsSelectedCommand.Execute();
+                        MainActivity.ViewModel.OnAccountsSelectedCommand.Execute();
                         break;
                     case Resource.Id.Settings:
-                        ((MainActivity)Activity).ViewModel.OnSettingsSelectedCommand.Execute();
+                        MainActivity.ViewModel.OnSettingsSelectedCommand.Execute();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(menuItem.ItemId), menuItem.ItemId, "Invalid drawer menu item id");
