@@ -5,4 +5,9 @@
   <string name="Close">Close</string>
   <string name="PersonName">Efrain Bastidas</string>
   <string name="PersonEmail">mimo4325@gmail.com</string>
+  <string name="GithubPage">
+    <a href="https://github.com/Wolfteam/MiraiNotes/issues">
+      Mirai Notes Github Page
+    </a>
+  </string>
 </resources>

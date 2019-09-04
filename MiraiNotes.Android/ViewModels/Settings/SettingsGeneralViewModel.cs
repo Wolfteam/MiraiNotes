@@ -190,6 +190,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
             set
             {
                 _appSettings.AskForPasswordWhenAppStarts = value;
+                RaisePropertyChanged(() => AskForPasswordWhenAppStarts);
                 //if (value)
                 //{
                 //    //_dispatcher.CheckBeginInvokeOnUi(async () =>
@@ -214,6 +215,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
         #region Commands
         public IMvxCommand<MvxColor> AccentColorChangedCommand { get; private set; }
+        public IMvxCommand AskForPasswordWhenAppStartsCommand { get; private set; }
         #endregion
 
 
@@ -245,6 +247,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 _onAccentColorSelected.Raise(color);
                 SelectedAccentColor = color;
             });
+            AskForPasswordWhenAppStartsCommand = new MvxCommand(
+                () => AskForPasswordWhenAppStarts = !AskForPasswordWhenAppStarts);
         }
     }
 }

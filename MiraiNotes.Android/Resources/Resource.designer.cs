@@ -8757,20 +8757,20 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a00ad
 			public const int AccountName = 2131361965;
 			
-			// aapt resource value: 0x7f0a00f3
-			public const int Accounts = 2131362035;
+			// aapt resource value: 0x7f0a00f4
+			public const int Accounts = 2131362036;
+			
+			// aapt resource value: 0x7f0a00ed
+			public const int AddNewTaskFab = 2131362029;
 			
 			// aapt resource value: 0x7f0a00ec
-			public const int AddNewTaskFab = 2131362028;
+			public const int AddNewTaskFabLayout = 2131362028;
 			
 			// aapt resource value: 0x7f0a00eb
-			public const int AddNewTaskFabLayout = 2131362027;
+			public const int AddNewTaskListFab = 2131362027;
 			
 			// aapt resource value: 0x7f0a00ea
-			public const int AddNewTaskListFab = 2131362026;
-			
-			// aapt resource value: 0x7f0a00e9
-			public const int AddNewTaskListFabLayout = 2131362025;
+			public const int AddNewTaskListFabLayout = 2131362026;
 			
 			// aapt resource value: 0x7f0a00b3
 			public const int AppBar = 2131361971;
@@ -8778,8 +8778,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a00c3
 			public const int AppDrawerLayout = 2131361987;
 			
-			// aapt resource value: 0x7f0a00ed
-			public const int AppFab = 2131362029;
+			// aapt resource value: 0x7f0a00ee
+			public const int AppFab = 2131362030;
 			
 			// aapt resource value: 0x7f0a00c7
 			public const int AppNavView = 2131361991;
@@ -8799,23 +8799,26 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a00b0
 			public const int DeleteAccount = 2131361968;
 			
-			// aapt resource value: 0x7f0a00f8
-			public const int DeleteTask = 2131362040;
+			// aapt resource value: 0x7f0a00f9
+			public const int DeleteTask = 2131362041;
 			
-			// aapt resource value: 0x7f0a00f7
-			public const int DiscardChanges = 2131362039;
+			// aapt resource value: 0x7f0a00f8
+			public const int DiscardChanges = 2131362040;
 			
 			// aapt resource value: 0x7f0a003d
 			public const int FUNCTION = 2131361853;
 			
-			// aapt resource value: 0x7f0a00e8
-			public const int FabBgLayout = 2131362024;
+			// aapt resource value: 0x7f0a00e9
+			public const int FabBgLayout = 2131362025;
+			
+			// aapt resource value: 0x7f0a00e0
+			public const int GitHubLink = 2131362016;
 			
 			// aapt resource value: 0x7f0a00c2
 			public const int LoginPasswordEditText = 2131361986;
 			
-			// aapt resource value: 0x7f0a00f5
-			public const int Logout = 2131362037;
+			// aapt resource value: 0x7f0a00f6
+			public const int Logout = 2131362038;
 			
 			// aapt resource value: 0x7f0a003e
 			public const int META = 2131361854;
@@ -8847,32 +8850,32 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a0040
 			public const int SYM = 2131361856;
 			
-			// aapt resource value: 0x7f0a00f6
-			public const int SaveTask = 2131362038;
+			// aapt resource value: 0x7f0a00f7
+			public const int SaveTask = 2131362039;
 			
-			// aapt resource value: 0x7f0a00f4
-			public const int Settings = 2131362036;
+			// aapt resource value: 0x7f0a00f5
+			public const int Settings = 2131362037;
 			
-			// aapt resource value: 0x7f0a00e0
-			public const int SettingsAccentColorsGridView = 2131362016;
+			// aapt resource value: 0x7f0a00e1
+			public const int SettingsAccentColorsGridView = 2131362017;
 			
 			// aapt resource value: 0x7f0a00df
 			public const int SettingsContentFrame = 2131362015;
 			
-			// aapt resource value: 0x7f0a00e2
-			public const int SettingsItemHeader = 2131362018;
-			
-			// aapt resource value: 0x7f0a00e1
-			public const int SettingsItemIcon = 2131362017;
-			
 			// aapt resource value: 0x7f0a00e3
-			public const int SettingsItemSubtitle = 2131362019;
+			public const int SettingsItemHeader = 2131362019;
+			
+			// aapt resource value: 0x7f0a00e2
+			public const int SettingsItemIcon = 2131362018;
+			
+			// aapt resource value: 0x7f0a00e4
+			public const int SettingsItemSubtitle = 2131362020;
+			
+			// aapt resource value: 0x7f0a00e8
+			public const int TaskRecyclerView = 2131362024;
 			
 			// aapt resource value: 0x7f0a00e7
-			public const int TaskRecyclerView = 2131362023;
-			
-			// aapt resource value: 0x7f0a00e6
-			public const int TaskViewLayout = 2131362022;
+			public const int TaskViewLayout = 2131362023;
 			
 			// aapt resource value: 0x7f0a00cc
 			public const int action0 = 2131361996;
@@ -9153,8 +9156,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a007f
 			public const int list_item = 2131361919;
 			
-			// aapt resource value: 0x7f0a00f2
-			public const int masked = 2131362034;
+			// aapt resource value: 0x7f0a00f3
+			public const int masked = 2131362035;
 			
 			// aapt resource value: 0x7f0a00cf
 			public const int media_actions = 2131361999;
@@ -9384,11 +9387,11 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a0020
 			public const int tag_unhandled_key_listeners = 2131361824;
 			
-			// aapt resource value: 0x7f0a00e5
-			public const int taskContent = 2131362021;
+			// aapt resource value: 0x7f0a00e6
+			public const int taskContent = 2131362022;
 			
-			// aapt resource value: 0x7f0a00e4
-			public const int taskName = 2131362020;
+			// aapt resource value: 0x7f0a00e5
+			public const int taskName = 2131362021;
 			
 			// aapt resource value: 0x7f0a0021
 			public const int text = 2131361825;
@@ -9429,14 +9432,14 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a008d
 			public const int title_template = 2131361933;
 			
-			// aapt resource value: 0x7f0a00ef
-			public const int toast_icon = 2131362031;
-			
-			// aapt resource value: 0x7f0a00ee
-			public const int toast_root = 2131362030;
-			
 			// aapt resource value: 0x7f0a00f0
-			public const int toast_text = 2131362032;
+			public const int toast_icon = 2131362032;
+			
+			// aapt resource value: 0x7f0a00ef
+			public const int toast_root = 2131362031;
+			
+			// aapt resource value: 0x7f0a00f1
+			public const int toast_text = 2131362033;
 			
 			// aapt resource value: 0x7f0a00b1
 			public const int toolbar = 2131361969;
@@ -9480,8 +9483,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0a001b
 			public const int view_offset_helper = 2131361819;
 			
-			// aapt resource value: 0x7f0a00f1
-			public const int visible = 2131362033;
+			// aapt resource value: 0x7f0a00f2
+			public const int visible = 2131362034;
 			
 			// aapt resource value: 0x7f0a0045
 			public const int withText = 2131361861;
@@ -9911,6 +9914,9 @@ namespace MiraiNotes.Android
 			
 			// aapt resource value: 0x7f0d003c
 			public const int Close = 2131558460;
+			
+			// aapt resource value: 0x7f0d003f
+			public const int GithubPage = 2131558463;
 			
 			// aapt resource value: 0x7f0d003b
 			public const int Open = 2131558459;

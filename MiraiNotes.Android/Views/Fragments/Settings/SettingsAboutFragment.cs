@@ -1,5 +1,7 @@
 ﻿using Android.OS;
+using Android.Text.Method;
 using Android.Views;
+using Android.Widget;
 using MiraiNotes.Android.ViewModels.Settings;
 using MvvmCross.Droid.Support.V4;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
@@ -15,6 +17,10 @@ namespace MiraiNotes.Android.Views.Fragments
             base.OnCreateView(inflater, container, savedInstanceState);
 
             var view = this.BindingInflate(Resource.Layout.SettingsAboutView, null);
+
+            var githubLink = view.FindViewById<TextView>(Resource.Id.GitHubLink);
+
+            githubLink.MovementMethod = LinkMovementMethod.Instance;
             return view;
         }
     }

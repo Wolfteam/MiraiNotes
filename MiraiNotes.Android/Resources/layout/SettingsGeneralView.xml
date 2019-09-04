@@ -32,7 +32,7 @@
             <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:spinnerMode="dropdown"
+                android:spinnerMode="dialog"
                 android:gravity="center"
                 android:tooltipText="Select an app theme"
                 app:MvxBind="ItemsSource AppThemes; SelectedItem SelectedAppTheme"
@@ -129,7 +129,7 @@
             <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:spinnerMode="dropdown"
+                android:spinnerMode="dialog"
                 android:gravity="center"
                 android:tooltipText="Select a task sort order"
                 app:MvxBind="ItemsSource TasksSortTypes; SelectedItem SelectedTaskSortOrder"
@@ -141,13 +141,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Divider"/>
+
         <!--Others-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/settings_margin">
-
+            android:clickable="true"
+            android:layout_marginTop="@dimen/settings_margin"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click AskForPasswordWhenAppStartsCommand">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -155,17 +158,28 @@
                 android:textStyle="bold"
                 android:textSize="@dimen/settings_font_size_header"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Aks for a password when the app starts"
-                android:textSize="@dimen/settings_font_size_content"/>
+                android:orientation="horizontal">
 
-            <android.support.v7.widget.SwitchCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Yes"
-                app:MvxBind="Checked AskForPasswordWhenAppStarts"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="wrap_content"
+                    android:text="Aks for a password when the app starts"
+                    android:textSize="@dimen/settings_font_size_content"/>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:clickable="false"
+                    app:MvxBind="Checked AskForPasswordWhenAppStarts"/>
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
+using MvvmCross.Commands;
 using MvvmCross.Localization;
 using MvvmCross.Plugin.Messenger;
 
@@ -17,7 +18,11 @@ namespace MiraiNotes.Android.ViewModels.Settings
         public bool ShowToastNotificationAfterFullSync
         {
             get => _appSettings.ShowToastNotificationAfterFullSync;
-            set => _appSettings.ShowToastNotificationAfterFullSync = value;
+            set
+            {
+                _appSettings.ShowToastNotificationAfterFullSync = value;
+                RaisePropertyChanged(() => ShowToastNotificationAfterFullSync);
+            }
         }
 
         public bool ShowToastNotificationForCompletedTasks
@@ -26,6 +31,11 @@ namespace MiraiNotes.Android.ViewModels.Settings
             set => _appSettings.ShowToastNotificationForCompletedTasks = value;
         }
         #endregion
+
+        #region Commands
+        public IMvxCommand ShowToastNotificationAfterFullSyncCommand { get; private set; }
+        #endregion
+
 
         public SettingsNotificationsViewModel(
             IMvxTextProvider textProvider,
@@ -36,6 +46,14 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
+
+            SetCommands();
+        }
+
+        private void SetCommands()
+        {
+            ShowToastNotificationAfterFullSyncCommand = new MvxCommand(
+                () => ShowToastNotificationAfterFullSync = !ShowToastNotificationAfterFullSync);
         }
     }
 }

@@ -74,6 +74,7 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidDexTool>d8</AndroidDexTool>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidRelease|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>

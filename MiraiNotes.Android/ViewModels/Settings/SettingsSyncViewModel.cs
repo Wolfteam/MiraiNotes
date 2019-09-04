@@ -2,6 +2,7 @@
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
+using MvvmCross.Commands;
 using MvvmCross.Localization;
 using MvvmCross.Plugin.Messenger;
 using System;
@@ -48,12 +49,14 @@ namespace MiraiNotes.Android.ViewModels.Settings
             }
         };
 
-
-
         public bool RunSyncBackgroundTaskAfterStart
         {
             get => _appSettings.RunSyncBackgroundTaskAfterStart;
-            set => _appSettings.RunSyncBackgroundTaskAfterStart = value;
+            set
+            {
+                _appSettings.RunSyncBackgroundTaskAfterStart = value;
+                RaisePropertyChanged(() => RunSyncBackgroundTaskAfterStart);
+            }
         }
 
         public ItemModel CurrentSyncBackgroundTaskInterval
@@ -74,10 +77,19 @@ namespace MiraiNotes.Android.ViewModels.Settings
         public bool RunFullSyncAfterSwitchingAccounts
         {
             get => _appSettings.RunFullSyncAfterSwitchingAccounts;
-            set => _appSettings.RunFullSyncAfterSwitchingAccounts = value;
+            set
+            {
+                _appSettings.RunFullSyncAfterSwitchingAccounts = value;
+                RaisePropertyChanged(() => RunFullSyncAfterSwitchingAccounts);
+            }
         }
         #endregion
 
+
+        #region Commands
+        public IMvxCommand RunSyncBackgroundTaskAfterStartCommand { get; private set; }
+        public IMvxCommand RunFullSyncAfterSwitchingAccountsCommand { get; private set; }
+        #endregion
 
         public SettingsSyncViewModel(
             IMvxTextProvider textProvider,
@@ -88,6 +100,17 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
+
+            SetCommands();
+        }
+
+        private void SetCommands()
+        {
+            RunSyncBackgroundTaskAfterStartCommand = new MvxCommand(
+                () => RunSyncBackgroundTaskAfterStart = !RunSyncBackgroundTaskAfterStart);
+
+            RunFullSyncAfterSwitchingAccountsCommand = new MvxCommand(
+                () => RunFullSyncAfterSwitchingAccounts = !RunFullSyncAfterSwitchingAccounts);
         }
     }
 }
