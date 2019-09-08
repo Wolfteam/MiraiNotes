@@ -1,10 +1,10 @@
 ﻿using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.ViewModels;
+using MiraiNotes.Android.Views.Activities;
 using MvvmCross.Base;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Droid.Support.V4;
@@ -77,7 +77,8 @@ namespace MiraiNotes.Android.Views.Fragments
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             MainActivity.ShowDrawer(false);
-            _previousMenuItem?.SetChecked(false);
+            if (menuItem.GroupId == 0)
+                _previousMenuItem?.SetChecked(false);
 
             _previousMenuItem = menuItem;
 
@@ -142,7 +143,7 @@ namespace MiraiNotes.Android.Views.Fragments
                     .SetChecked(false)
                     .SetActionView(numberOfTaskView);
 
-                if (i != 0) 
+                if (i != 0)
                     continue;
                 menuItem.SetChecked(true).SetCheckable(true);
                 _previousMenuItem = menuItem;
@@ -156,7 +157,7 @@ namespace MiraiNotes.Android.Views.Fragments
             for (int i = 0, count = _navView.ChildCount; i < count; i++)
             {
                 var child = _navView.GetChildAt(i);
-                if (child == null || !(child is ListView lv)) 
+                if (child == null || !(child is ListView lv))
                     continue;
                 ListView menuView = lv;
                 HeaderViewListAdapter adapter = (HeaderViewListAdapter)menuView.Adapter;

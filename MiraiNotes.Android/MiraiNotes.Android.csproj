@@ -109,9 +109,10 @@
     <Compile Include="Common\MappingProfile.cs" />
     <Compile Include="Common\Messages\AccountChangeRequestMsg.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
-    <Compile Include="Common\Messages\ChangeThemeMsg.cs" />
+    <Compile Include="Common\Messages\AppThemeChangedMsg.cs" />
     <Compile Include="Common\Messages\CultureChangedMessage.cs" />
     <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
+    <Compile Include="Common\Messages\HideKeyboardMsg.cs" />
     <Compile Include="Common\Messages\LanguageChangedMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
     <Compile Include="Common\Messages\ShowDrawerMsg.cs" />
@@ -120,7 +121,9 @@
     <Compile Include="Common\Messages\TaskDeletedMsg.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Common\Messages\TaskListSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
+    <Compile Include="Common\Messages\TaskSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskStatusChangedMsg.cs" />
     <Compile Include="Common\ResxTextProvider.cs" />
     <Compile Include="Common\Utils\AndroidUtils.cs" />
@@ -130,6 +133,7 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\SettingsPageTypeToResourceDrawableConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
+    <Compile Include="Listeners\ClickListener.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
@@ -139,6 +143,7 @@
     <Compile Include="ViewModels\Settings\SettingsNotificationsViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsSyncViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsHomeViewModel.cs" />
+    <Compile Include="Views\Activities\BaseActivity.cs" />
     <Compile Include="Views\Activities\SettingsActivity.cs" />
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\LoginPasswordDialogFragment.cs" />
@@ -544,6 +549,31 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\DefaultSpinnerItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\nav_view_item_icon.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\spinner_item_textcolor.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\spinner_item_textstyle.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_close_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_save_black_24dp.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

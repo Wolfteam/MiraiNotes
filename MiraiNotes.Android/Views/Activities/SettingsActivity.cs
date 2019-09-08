@@ -2,17 +2,20 @@
 using Android.Content.PM;
 using Android.OS;
 using MiraiNotes.Android.ViewModels.Settings;
-using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 
 namespace MiraiNotes.Android.Views.Activities
 {
     [MvxActivityPresentation]
     [Activity(
-        Label = "Settings", 
-        LaunchMode = LaunchMode.SingleTask)]
-    public class SettingsActivity : MvxAppCompatActivity<SettingsMainViewModel>
+        Label = "Settings",
+        LaunchMode = LaunchMode.SingleTask
+    )]
+    public class SettingsActivity : BaseActivity<SettingsMainViewModel>
     {
+        public override int LayoutId =>
+            Resource.Layout.Settings;
+
         //private IMvxInteraction<SettingsPageType> _onSettingItemSelected;
 
         //public IMvxInteraction<SettingsPageType> OnSettingItemSelected
@@ -33,13 +36,10 @@ namespace MiraiNotes.Android.Views.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.Settings);
-
             if (savedInstanceState == null)
                 ViewModel.InitViewCommand.Execute();
 
-            SupportActionBar.Title = "Settings";
-            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+            SetActionBar("Settings", true);
         }
 
         //public override bool OnOptionsItemSelected(IMenuItem item)
@@ -52,12 +52,6 @@ namespace MiraiNotes.Android.Views.Activities
         //    OnBackPressed();
         //    return base.OnOptionsItemSelected(item);
         //}
-
-        public override bool OnSupportNavigateUp()
-        {
-            OnBackPressed();
-            return true;
-        }
 
         //private void SetFragment(SettingsPageType page)
         //{

@@ -4,6 +4,7 @@ using Android.Views;
 using Android.Widget;
 using ES.DMoral.ToastyLib;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Views.Activities;
 using MiraiNotes.Android.Views.Fragments.Dialogs;
 using MvvmCross;
 using MvvmCross.Platforms.Android;

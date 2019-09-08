@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
+﻿using Android.OS;
 using Android.Views;
-using Android.Widget;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 
@@ -25,14 +16,12 @@ namespace MiraiNotes.Android.Views.Fragments
             //this is required to populate the options menu from 
             //this fragment. it will call the invalidate options menu of the activity
             HasOptionsMenu = true;
-            
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
-            //ParentActivity.SupportActionBar.InvalidateOptionsMenu();
-            ParentActivity.SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+            SetActionBarTitle("New Task", true);
             return view;
         }
 

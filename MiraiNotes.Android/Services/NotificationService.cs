@@ -6,6 +6,7 @@ using Android.OS;
 using Android.Support.V4.App;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Background;
+using MiraiNotes.Android.Views.Activities;
 using MiraiNotes.Core.Models;
 using Newtonsoft.Json;
 using System;

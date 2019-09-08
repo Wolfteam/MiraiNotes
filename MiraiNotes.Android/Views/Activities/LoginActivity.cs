@@ -6,25 +6,28 @@ using Android.Preferences;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments.Dialogs;
-using MvvmCross.Droid.Support.V7.AppCompat;
-using System.Linq;
 using AndroidUri = Android.Net.Uri;
 
 namespace MiraiNotes.Android.Views.Activities
 {
-    [Activity(Label = "@string/app_name", NoHistory = true, LaunchMode = LaunchMode.SingleTask)]
+    [Activity(
+        Label = "@string/app_name", 
+        NoHistory = true, 
+        LaunchMode = LaunchMode.SingleTask
+    )]
     [IntentFilter(
         actions: new[] { Intent.ActionView },
         Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
         DataSchemes = new[] { "com.miraisoft.notes" }
     )]
-    public class LoginActivity : MvxAppCompatActivity<LoginViewModel>
+    public class LoginActivity : BaseActivity<LoginViewModel>
     {
+        public override int LayoutId =>
+            Resource.Layout.Login;
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            SetContentView(Resource.Layout.Login);
-
             var loginMsg = ViewModel.Messenger.Subscribe<LoginRequestMsg>(msg => Login(msg.Url));
             ViewModel.SubscriptionTokens.Add(loginMsg);
         }
@@ -44,8 +47,8 @@ namespace MiraiNotes.Android.Views.Activities
                 sp.Edit().PutString(AccountDialogFragment.AuthCodeKey, code).Commit();
             }
 
-            if (data == null || 
-                string.IsNullOrEmpty(data.Path) || 
+            if (data == null ||
+                string.IsNullOrEmpty(data.Path) ||
                 string.IsNullOrEmpty(code) ||
                 addingAccount)
             {
