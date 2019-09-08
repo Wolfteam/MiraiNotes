@@ -1,61 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <include
-            layout="@layout/apptoolbar"/>
-    
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <LinearLayout
-            android:orientation="vertical"
-            android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <include
+            layout="@layout/apptoolbar"/>
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="match_parent">
 
-        <ProgressBar
-                android:id="@+id/indeterminateBar"
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:progressBackgroundTint="@android:color/holo_red_dark"
-                android:progressBackgroundTintMode="multiply"
-                android:indeterminateOnly="true"
-                app:MvxBind="Visibility Visibility(ShowProgressBar)"/>
+                android:layout_height="match_parent">
 
-        <TextView
-                android:drawableStart="@drawable/ic_edit_black_24dp"
-                android:drawablePadding="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="30sp"
-                android:text="New Task"/>
+                <ProgressBar
+                    android:id="@+id/indeterminateBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:progressBackgroundTint="?AccentColor"
+                    android:progressBackgroundTintMode="multiply"
+                    android:indeterminateOnly="true"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    app:MvxBind="Visibility Visibility(ShowProgressBar)"/>
 
-        <EditText
-                android:drawableStart="@drawable/ic_note_black_24dp"
-                android:drawablePadding="16dp"
-                android:layout_margin="12dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Title"
-                android:background="@android:color/transparent"
-                android:inputType="textShortMessage"
-                app:MvxBind="Text Task.Title"/>
+                <TextView
+                    android:drawableStart="@drawable/ic_edit_black_24dp"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?IconColor"
+                    android:layout_margin="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp"
+                    android:focusedByDefault="true"
+                    android:text="New Task"
+                    android:textStyle="bold"/>
 
-        <EditText
-                android:drawableStart="@drawable/ic_list_black_24dp"
-                android:drawablePadding="16dp"
-                android:layout_margin="12dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="10"
-                android:inputType="textMultiLine"
-                android:verticalScrollbarPosition="right"
-                android:elegantTextHeight="true"
-                android:background="@android:color/transparent"
-                android:hint="Notes"
-                app:MvxBind="Text Task.Notes"/>
+                <android.support.v7.widget.AppCompatEditText
+                    android:drawableStart="@drawable/ic_note_black_24dp"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?IconColor"
+                    android:layout_margin="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Title"
+                    android:textColorHint="?TextInvertedColor"
+                    android:inputType="textShortMessage"
+                    android:background="@android:color/transparent"
+                    app:MvxBind="Text Task.Title"/>
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:drawableStart="@drawable/ic_list_black_24dp"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?IconColor"
+                    android:layout_margin="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="100dp"
+                    android:inputType="textMultiLine"
+                    android:verticalScrollbarPosition="right"
+                    android:elegantTextHeight="true"
+                    android:scrollbars="vertical"
+                    android:hint="Notes"
+                    android:textColorHint="?TextInvertedColor"
+                    android:background="@android:color/transparent"
+                    app:MvxBind="Text Task.Notes"/>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

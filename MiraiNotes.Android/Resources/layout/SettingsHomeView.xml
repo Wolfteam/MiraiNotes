@@ -9,8 +9,8 @@
     <MvvmCross.Platforms.Android.Binding.Views.MvxListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="#aeaeae"
-        android:dividerHeight="1px"
+        android:divider="?DividerColor"
+        android:dividerHeight="@dimen/divider_height"
         android:clickable="false"
         android:focusableInTouchMode="true"
         android:choiceMode="singleChoice"

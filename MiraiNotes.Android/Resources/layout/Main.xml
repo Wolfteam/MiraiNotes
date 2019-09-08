@@ -17,7 +17,8 @@
             android:id="@+id/ContentFrame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"
+            android:background="?AppBackground"/>
     </android.support.design.widget.CoordinatorLayout>
     <FrameLayout
         android:id="@+id/MenuFrame"

@@ -5461,8 +5461,23 @@ namespace MiraiNotes.Android
 		public partial class Attribute
 		{
 			
+			// aapt resource value: 0x7f010223
+			public const int AccentColor = 2130772515;
+			
+			// aapt resource value: 0x7f010224
+			public const int AccentColorDark = 2130772516;
+			
+			// aapt resource value: 0x7f010225
+			public const int AccentColorLight = 2130772517;
+			
 			// aapt resource value: 0x7f010222
 			public const int AppBackground = 2130772514;
+			
+			// aapt resource value: 0x7f010226
+			public const int DividerColor = 2130772518;
+			
+			// aapt resource value: 0x7f010227
+			public const int IconColor = 2130772519;
 			
 			// aapt resource value: 0x7f01021c
 			public const int MvxBind = 2130772508;
@@ -5484,6 +5499,9 @@ namespace MiraiNotes.Android
 			
 			// aapt resource value: 0x7f01021b
 			public const int MvxTemplateSelector = 2130772507;
+			
+			// aapt resource value: 0x7f010228
+			public const int TextInvertedColor = 2130772520;
 			
 			// aapt resource value: 0x7f010062
 			public const int actionBarDivider = 2130772066;
@@ -7140,44 +7158,191 @@ namespace MiraiNotes.Android
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f0c005e
-			public const int abc_background_cache_hint_selector_material_dark = 2131492958;
+			// aapt resource value: 0x7f0c005a
+			public const int AppBackgroundDark = 2131492954;
 			
-			// aapt resource value: 0x7f0c005f
-			public const int abc_background_cache_hint_selector_material_light = 2131492959;
+			// aapt resource value: 0x7f0c005b
+			public const int AppBackgroundLight = 2131492955;
+			
+			// aapt resource value: 0x7f0c005d
+			public const int Black = 2131492957;
+			
+			// aapt resource value: 0x7f0c0084
+			public const int DarkBlueAccentColorDark = 2131492996;
+			
+			// aapt resource value: 0x7f0c0083
+			public const int DarkBlueAccentColorLight = 2131492995;
+			
+			// aapt resource value: 0x7f0c0082
+			public const int DarkBlueAccentColorPrimary = 2131492994;
+			
+			// aapt resource value: 0x7f0c006f
+			public const int DarkCyanAccentColorDark = 2131492975;
+			
+			// aapt resource value: 0x7f0c006e
+			public const int DarkCyanAccentColorLight = 2131492974;
+			
+			// aapt resource value: 0x7f0c006d
+			public const int DarkCyanAccentColorPrimary = 2131492973;
+			
+			// aapt resource value: 0x7f0c007b
+			public const int DarkGrayAccentColorDark = 2131492987;
+			
+			// aapt resource value: 0x7f0c007a
+			public const int DarkGrayAccentColorLight = 2131492986;
+			
+			// aapt resource value: 0x7f0c0079
+			public const int DarkGrayAccentColorPrimary = 2131492985;
+			
+			// aapt resource value: 0x7f0c0072
+			public const int DarkGreenAccentColorDark = 2131492978;
+			
+			// aapt resource value: 0x7f0c0071
+			public const int DarkGreenAccentColorLight = 2131492977;
+			
+			// aapt resource value: 0x7f0c0070
+			public const int DarkGreenAccentColorPrimary = 2131492976;
+			
+			// aapt resource value: 0x7f0c0075
+			public const int DarkMagentaAccentColorDark = 2131492981;
+			
+			// aapt resource value: 0x7f0c0074
+			public const int DarkMagentaAccentColorLight = 2131492980;
+			
+			// aapt resource value: 0x7f0c0073
+			public const int DarkMagentaAccentColorPrimary = 2131492979;
+			
+			// aapt resource value: 0x7f0c0069
+			public const int DarkOrangeAccentColorDark = 2131492969;
+			
+			// aapt resource value: 0x7f0c0068
+			public const int DarkOrangeAccentColorLight = 2131492968;
+			
+			// aapt resource value: 0x7f0c0067
+			public const int DarkOrangeAccentColorPrimary = 2131492967;
+			
+			// aapt resource value: 0x7f0c008a
+			public const int LightGreyAccentColorDark = 2131493002;
+			
+			// aapt resource value: 0x7f0c0089
+			public const int LightGreyAccentColorLight = 2131493001;
+			
+			// aapt resource value: 0x7f0c0088
+			public const int LightGreyAccentColorPrimary = 2131493000;
 			
 			// aapt resource value: 0x7f0c0060
-			public const int abc_btn_colored_borderless_text_material = 2131492960;
+			public const int LigthBlueAccentColorDark = 2131492960;
 			
-			// aapt resource value: 0x7f0c0061
-			public const int abc_btn_colored_text_material = 2131492961;
+			// aapt resource value: 0x7f0c005f
+			public const int LigthBlueAccentColorLight = 2131492959;
 			
-			// aapt resource value: 0x7f0c0062
-			public const int abc_color_highlight_material = 2131492962;
+			// aapt resource value: 0x7f0c005e
+			public const int LigthBlueAccentColorPrimary = 2131492958;
 			
 			// aapt resource value: 0x7f0c0063
-			public const int abc_hint_foreground_material_dark = 2131492963;
+			public const int LimeGreenAccentColorDark = 2131492963;
+			
+			// aapt resource value: 0x7f0c0062
+			public const int LimeGreenAccentColorLight = 2131492962;
+			
+			// aapt resource value: 0x7f0c0061
+			public const int LimeGreenAccentColorPrimary = 2131492961;
+			
+			// aapt resource value: 0x7f0c0078
+			public const int MagentaAccentColorDark = 2131492984;
+			
+			// aapt resource value: 0x7f0c0077
+			public const int MagentaAccentColorLight = 2131492983;
+			
+			// aapt resource value: 0x7f0c0076
+			public const int MagentaAccentColorPrimary = 2131492982;
+			
+			// aapt resource value: 0x7f0c007e
+			public const int OrangeAccentColorDark = 2131492990;
+			
+			// aapt resource value: 0x7f0c007d
+			public const int OrangeAccentColorLight = 2131492989;
+			
+			// aapt resource value: 0x7f0c007c
+			public const int OrangeAccentColorPrimary = 2131492988;
+			
+			// aapt resource value: 0x7f0c0066
+			public const int PinkAccentColorDark = 2131492966;
+			
+			// aapt resource value: 0x7f0c0065
+			public const int PinkAccentColorLight = 2131492965;
 			
 			// aapt resource value: 0x7f0c0064
-			public const int abc_hint_foreground_material_light = 2131492964;
+			public const int PinkAccentColorPrimary = 2131492964;
+			
+			// aapt resource value: 0x7f0c0087
+			public const int VioletAccentColorDark = 2131492999;
+			
+			// aapt resource value: 0x7f0c0086
+			public const int VioletAccentColorLight = 2131492998;
+			
+			// aapt resource value: 0x7f0c0085
+			public const int VioletAccentColorPrimary = 2131492997;
+			
+			// aapt resource value: 0x7f0c006c
+			public const int VividRedAccentColorDark = 2131492972;
+			
+			// aapt resource value: 0x7f0c006b
+			public const int VividRedAccentColorLight = 2131492971;
+			
+			// aapt resource value: 0x7f0c006a
+			public const int VividRedAccentColorPrimary = 2131492970;
+			
+			// aapt resource value: 0x7f0c005c
+			public const int White = 2131492956;
+			
+			// aapt resource value: 0x7f0c0081
+			public const int YellowAccentColorDark = 2131492993;
+			
+			// aapt resource value: 0x7f0c0080
+			public const int YellowAccentColorLight = 2131492992;
+			
+			// aapt resource value: 0x7f0c007f
+			public const int YellowAccentColorPrimary = 2131492991;
+			
+			// aapt resource value: 0x7f0c008c
+			public const int abc_background_cache_hint_selector_material_dark = 2131493004;
+			
+			// aapt resource value: 0x7f0c008d
+			public const int abc_background_cache_hint_selector_material_light = 2131493005;
+			
+			// aapt resource value: 0x7f0c008e
+			public const int abc_btn_colored_borderless_text_material = 2131493006;
+			
+			// aapt resource value: 0x7f0c008f
+			public const int abc_btn_colored_text_material = 2131493007;
+			
+			// aapt resource value: 0x7f0c0090
+			public const int abc_color_highlight_material = 2131493008;
+			
+			// aapt resource value: 0x7f0c0091
+			public const int abc_hint_foreground_material_dark = 2131493009;
+			
+			// aapt resource value: 0x7f0c0092
+			public const int abc_hint_foreground_material_light = 2131493010;
 			
 			// aapt resource value: 0x7f0c0004
 			public const int abc_input_method_navigation_guard = 2131492868;
 			
-			// aapt resource value: 0x7f0c0065
-			public const int abc_primary_text_disable_only_material_dark = 2131492965;
+			// aapt resource value: 0x7f0c0093
+			public const int abc_primary_text_disable_only_material_dark = 2131493011;
 			
-			// aapt resource value: 0x7f0c0066
-			public const int abc_primary_text_disable_only_material_light = 2131492966;
+			// aapt resource value: 0x7f0c0094
+			public const int abc_primary_text_disable_only_material_light = 2131493012;
 			
-			// aapt resource value: 0x7f0c0067
-			public const int abc_primary_text_material_dark = 2131492967;
+			// aapt resource value: 0x7f0c0095
+			public const int abc_primary_text_material_dark = 2131493013;
 			
-			// aapt resource value: 0x7f0c0068
-			public const int abc_primary_text_material_light = 2131492968;
+			// aapt resource value: 0x7f0c0096
+			public const int abc_primary_text_material_light = 2131493014;
 			
-			// aapt resource value: 0x7f0c0069
-			public const int abc_search_url_text = 2131492969;
+			// aapt resource value: 0x7f0c0097
+			public const int abc_search_url_text = 2131493015;
 			
 			// aapt resource value: 0x7f0c0005
 			public const int abc_search_url_text_normal = 2131492869;
@@ -7188,41 +7353,35 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c0007
 			public const int abc_search_url_text_selected = 2131492871;
 			
-			// aapt resource value: 0x7f0c006a
-			public const int abc_secondary_text_material_dark = 2131492970;
+			// aapt resource value: 0x7f0c0098
+			public const int abc_secondary_text_material_dark = 2131493016;
 			
-			// aapt resource value: 0x7f0c006b
-			public const int abc_secondary_text_material_light = 2131492971;
+			// aapt resource value: 0x7f0c0099
+			public const int abc_secondary_text_material_light = 2131493017;
 			
-			// aapt resource value: 0x7f0c006c
-			public const int abc_tint_btn_checkable = 2131492972;
+			// aapt resource value: 0x7f0c009a
+			public const int abc_tint_btn_checkable = 2131493018;
 			
-			// aapt resource value: 0x7f0c006d
-			public const int abc_tint_default = 2131492973;
+			// aapt resource value: 0x7f0c009b
+			public const int abc_tint_default = 2131493019;
 			
-			// aapt resource value: 0x7f0c006e
-			public const int abc_tint_edittext = 2131492974;
+			// aapt resource value: 0x7f0c009c
+			public const int abc_tint_edittext = 2131493020;
 			
-			// aapt resource value: 0x7f0c006f
-			public const int abc_tint_seek_thumb = 2131492975;
+			// aapt resource value: 0x7f0c009d
+			public const int abc_tint_seek_thumb = 2131493021;
 			
-			// aapt resource value: 0x7f0c0070
-			public const int abc_tint_spinner = 2131492976;
+			// aapt resource value: 0x7f0c009e
+			public const int abc_tint_spinner = 2131493022;
 			
-			// aapt resource value: 0x7f0c0071
-			public const int abc_tint_switch_track = 2131492977;
+			// aapt resource value: 0x7f0c009f
+			public const int abc_tint_switch_track = 2131493023;
 			
 			// aapt resource value: 0x7f0c0008
 			public const int accent_material_dark = 2131492872;
 			
 			// aapt resource value: 0x7f0c0009
 			public const int accent_material_light = 2131492873;
-			
-			// aapt resource value: 0x7f0c0059
-			public const int appBackgroundDark = 2131492953;
-			
-			// aapt resource value: 0x7f0c005a
-			public const int appBackgroundLight = 2131492954;
 			
 			// aapt resource value: 0x7f0c000a
 			public const int background_floating_material_dark = 2131492874;
@@ -7290,8 +7449,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c0043
 			public const int design_default_color_primary_dark = 2131492931;
 			
-			// aapt resource value: 0x7f0c0072
-			public const int design_error = 2131492978;
+			// aapt resource value: 0x7f0c00a0
+			public const int design_error = 2131493024;
 			
 			// aapt resource value: 0x7f0c0044
 			public const int design_fab_shadow_end_color = 2131492932;
@@ -7317,8 +7476,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c004b
 			public const int design_snackbar_background_color = 2131492939;
 			
-			// aapt resource value: 0x7f0c0073
-			public const int design_tint_password_toggle = 2131492979;
+			// aapt resource value: 0x7f0c00a1
+			public const int design_tint_password_toggle = 2131493025;
 			
 			// aapt resource value: 0x7f0c0016
 			public const int dim_foreground_disabled_material_dark = 2131492886;
@@ -7350,8 +7509,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c001f
 			public const int highlighted_text_material_light = 2131492895;
 			
-			// aapt resource value: 0x7f0c005d
-			public const int ic_launcher_background = 2131492957;
+			// aapt resource value: 0x7f0c008b
+			public const int ic_launcher_background = 2131493003;
 			
 			// aapt resource value: 0x7f0c0020
 			public const int material_blue_grey_800 = 2131492896;
@@ -7389,71 +7548,71 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c002b
 			public const int material_grey_900 = 2131492907;
 			
-			// aapt resource value: 0x7f0c0074
-			public const int mtrl_bottom_nav_colored_item_tint = 2131492980;
+			// aapt resource value: 0x7f0c00a2
+			public const int mtrl_bottom_nav_colored_item_tint = 2131493026;
 			
-			// aapt resource value: 0x7f0c0075
-			public const int mtrl_bottom_nav_item_tint = 2131492981;
+			// aapt resource value: 0x7f0c00a3
+			public const int mtrl_bottom_nav_item_tint = 2131493027;
 			
 			// aapt resource value: 0x7f0c004c
 			public const int mtrl_btn_bg_color_disabled = 2131492940;
 			
-			// aapt resource value: 0x7f0c0076
-			public const int mtrl_btn_bg_color_selector = 2131492982;
+			// aapt resource value: 0x7f0c00a4
+			public const int mtrl_btn_bg_color_selector = 2131493028;
 			
-			// aapt resource value: 0x7f0c0077
-			public const int mtrl_btn_ripple_color = 2131492983;
+			// aapt resource value: 0x7f0c00a5
+			public const int mtrl_btn_ripple_color = 2131493029;
 			
-			// aapt resource value: 0x7f0c0078
-			public const int mtrl_btn_stroke_color_selector = 2131492984;
+			// aapt resource value: 0x7f0c00a6
+			public const int mtrl_btn_stroke_color_selector = 2131493030;
 			
-			// aapt resource value: 0x7f0c0079
-			public const int mtrl_btn_text_btn_ripple_color = 2131492985;
+			// aapt resource value: 0x7f0c00a7
+			public const int mtrl_btn_text_btn_ripple_color = 2131493031;
 			
 			// aapt resource value: 0x7f0c004d
 			public const int mtrl_btn_text_color_disabled = 2131492941;
 			
-			// aapt resource value: 0x7f0c007a
-			public const int mtrl_btn_text_color_selector = 2131492986;
+			// aapt resource value: 0x7f0c00a8
+			public const int mtrl_btn_text_color_selector = 2131493032;
 			
 			// aapt resource value: 0x7f0c004e
 			public const int mtrl_btn_transparent_bg_color = 2131492942;
 			
-			// aapt resource value: 0x7f0c007b
-			public const int mtrl_chip_background_color = 2131492987;
+			// aapt resource value: 0x7f0c00a9
+			public const int mtrl_chip_background_color = 2131493033;
 			
-			// aapt resource value: 0x7f0c007c
-			public const int mtrl_chip_close_icon_tint = 2131492988;
+			// aapt resource value: 0x7f0c00aa
+			public const int mtrl_chip_close_icon_tint = 2131493034;
 			
-			// aapt resource value: 0x7f0c007d
-			public const int mtrl_chip_ripple_color = 2131492989;
+			// aapt resource value: 0x7f0c00ab
+			public const int mtrl_chip_ripple_color = 2131493035;
 			
-			// aapt resource value: 0x7f0c007e
-			public const int mtrl_chip_text_color = 2131492990;
+			// aapt resource value: 0x7f0c00ac
+			public const int mtrl_chip_text_color = 2131493036;
 			
-			// aapt resource value: 0x7f0c007f
-			public const int mtrl_fab_ripple_color = 2131492991;
+			// aapt resource value: 0x7f0c00ad
+			public const int mtrl_fab_ripple_color = 2131493037;
 			
 			// aapt resource value: 0x7f0c004f
 			public const int mtrl_scrim_color = 2131492943;
 			
-			// aapt resource value: 0x7f0c0080
-			public const int mtrl_tabs_colored_ripple_color = 2131492992;
+			// aapt resource value: 0x7f0c00ae
+			public const int mtrl_tabs_colored_ripple_color = 2131493038;
 			
-			// aapt resource value: 0x7f0c0081
-			public const int mtrl_tabs_icon_color_selector = 2131492993;
+			// aapt resource value: 0x7f0c00af
+			public const int mtrl_tabs_icon_color_selector = 2131493039;
 			
-			// aapt resource value: 0x7f0c0082
-			public const int mtrl_tabs_icon_color_selector_colored = 2131492994;
+			// aapt resource value: 0x7f0c00b0
+			public const int mtrl_tabs_icon_color_selector_colored = 2131493040;
 			
-			// aapt resource value: 0x7f0c0083
-			public const int mtrl_tabs_legacy_text_color_selector = 2131492995;
+			// aapt resource value: 0x7f0c00b1
+			public const int mtrl_tabs_legacy_text_color_selector = 2131493041;
 			
-			// aapt resource value: 0x7f0c0084
-			public const int mtrl_tabs_ripple_color = 2131492996;
+			// aapt resource value: 0x7f0c00b2
+			public const int mtrl_tabs_ripple_color = 2131493042;
 			
-			// aapt resource value: 0x7f0c0085
-			public const int mtrl_text_btn_text_color_selector = 2131492997;
+			// aapt resource value: 0x7f0c00b3
+			public const int mtrl_text_btn_text_color_selector = 2131493043;
 			
 			// aapt resource value: 0x7f0c0050
 			public const int mtrl_textinput_default_box_stroke_color = 2131492944;
@@ -7524,11 +7683,11 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c003b
 			public const int switch_thumb_disabled_material_light = 2131492923;
 			
-			// aapt resource value: 0x7f0c0086
-			public const int switch_thumb_material_dark = 2131492998;
+			// aapt resource value: 0x7f0c00b4
+			public const int switch_thumb_material_dark = 2131493044;
 			
-			// aapt resource value: 0x7f0c0087
-			public const int switch_thumb_material_light = 2131492999;
+			// aapt resource value: 0x7f0c00b5
+			public const int switch_thumb_material_light = 2131493045;
 			
 			// aapt resource value: 0x7f0c003c
 			public const int switch_thumb_normal_material_dark = 2131492924;
@@ -7542,11 +7701,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0c003f
 			public const int tooltip_background_light = 2131492927;
 			
-			// aapt resource value: 0x7f0c005c
-			public const int transparentBg = 2131492956;
-			
-			// aapt resource value: 0x7f0c005b
-			public const int white = 2131492955;
+			// aapt resource value: 0x7f0c0059
+			public const int transparentBg = 2131492953;
 			
 			static Color()
 			{
@@ -7959,6 +8115,9 @@ namespace MiraiNotes.Android
 			
 			// aapt resource value: 0x7f090055
 			public const int disabled_alpha_material_light = 2131296341;
+			
+			// aapt resource value: 0x7f0900eb
+			public const int divider_height = 2131296491;
 			
 			// aapt resource value: 0x7f0900db
 			public const int fab_margin = 2131296475;
@@ -8534,26 +8693,26 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f020054
 			public const int avd_hide_password = 2130837588;
 			
-			// aapt resource value: 0x7f020091
-			public const int avd_hide_password_1 = 2130837649;
+			// aapt resource value: 0x7f020096
+			public const int avd_hide_password_1 = 2130837654;
 			
-			// aapt resource value: 0x7f020092
-			public const int avd_hide_password_2 = 2130837650;
+			// aapt resource value: 0x7f020097
+			public const int avd_hide_password_2 = 2130837655;
 			
-			// aapt resource value: 0x7f020093
-			public const int avd_hide_password_3 = 2130837651;
+			// aapt resource value: 0x7f020098
+			public const int avd_hide_password_3 = 2130837656;
 			
 			// aapt resource value: 0x7f020055
 			public const int avd_show_password = 2130837589;
 			
-			// aapt resource value: 0x7f020094
-			public const int avd_show_password_1 = 2130837652;
+			// aapt resource value: 0x7f020099
+			public const int avd_show_password_1 = 2130837657;
 			
-			// aapt resource value: 0x7f020095
-			public const int avd_show_password_2 = 2130837653;
+			// aapt resource value: 0x7f02009a
+			public const int avd_show_password_2 = 2130837658;
 			
-			// aapt resource value: 0x7f020096
-			public const int avd_show_password_3 = 2130837654;
+			// aapt resource value: 0x7f02009b
+			public const int avd_show_password_3 = 2130837659;
 			
 			// aapt resource value: 0x7f020056
 			public const int design_bottom_navigation_item_background = 2130837590;
@@ -8601,136 +8760,151 @@ namespace MiraiNotes.Android
 			public const int ic_clear_white_48dp = 2130837604;
 			
 			// aapt resource value: 0x7f020065
-			public const int ic_delete_black_24dp = 2130837605;
+			public const int ic_close_black_24dp = 2130837605;
 			
 			// aapt resource value: 0x7f020066
-			public const int ic_done_24dp = 2130837606;
+			public const int ic_delete_black_24dp = 2130837606;
 			
 			// aapt resource value: 0x7f020067
-			public const int ic_done_black_24dp = 2130837607;
+			public const int ic_done_24dp = 2130837607;
 			
 			// aapt resource value: 0x7f020068
-			public const int ic_edit_black_24dp = 2130837608;
+			public const int ic_done_black_24dp = 2130837608;
 			
 			// aapt resource value: 0x7f020069
-			public const int ic_error_outline_white_48dp = 2130837609;
+			public const int ic_edit_black_24dp = 2130837609;
 			
 			// aapt resource value: 0x7f02006a
-			public const int ic_home_24dp = 2130837610;
+			public const int ic_error_outline_white_48dp = 2130837610;
 			
 			// aapt resource value: 0x7f02006b
-			public const int ic_info_outline_black_24dp = 2130837611;
+			public const int ic_home_24dp = 2130837611;
 			
 			// aapt resource value: 0x7f02006c
-			public const int ic_info_outline_white_48dp = 2130837612;
+			public const int ic_info_outline_black_24dp = 2130837612;
 			
 			// aapt resource value: 0x7f02006d
-			public const int ic_list_black_24dp = 2130837613;
+			public const int ic_info_outline_white_48dp = 2130837613;
 			
 			// aapt resource value: 0x7f02006e
-			public const int ic_mtrl_chip_checked_black = 2130837614;
+			public const int ic_list_black_24dp = 2130837614;
 			
 			// aapt resource value: 0x7f02006f
-			public const int ic_mtrl_chip_checked_circle = 2130837615;
+			public const int ic_mtrl_chip_checked_black = 2130837615;
 			
 			// aapt resource value: 0x7f020070
-			public const int ic_mtrl_chip_close_circle = 2130837616;
+			public const int ic_mtrl_chip_checked_circle = 2130837616;
 			
 			// aapt resource value: 0x7f020071
-			public const int ic_note_black_24dp = 2130837617;
+			public const int ic_mtrl_chip_close_circle = 2130837617;
 			
 			// aapt resource value: 0x7f020072
-			public const int ic_notifications_black_24dp = 2130837618;
+			public const int ic_note_black_24dp = 2130837618;
 			
 			// aapt resource value: 0x7f020073
-			public const int ic_settings_black_24dp = 2130837619;
+			public const int ic_notifications_black_24dp = 2130837619;
 			
 			// aapt resource value: 0x7f020074
-			public const int ic_sync_black_24dp = 2130837620;
+			public const int ic_save_black_24dp = 2130837620;
 			
 			// aapt resource value: 0x7f020075
-			public const int ic_warning_outline_white = 2130837621;
+			public const int ic_settings_black_24dp = 2130837621;
 			
 			// aapt resource value: 0x7f020076
-			public const int ic_warning_white_48dp = 2130837622;
+			public const int ic_sync_black_24dp = 2130837622;
 			
 			// aapt resource value: 0x7f020077
-			public const int item_count = 2130837623;
+			public const int ic_warning_outline_white = 2130837623;
 			
 			// aapt resource value: 0x7f020078
-			public const int logo = 2130837624;
+			public const int ic_warning_white_48dp = 2130837624;
 			
 			// aapt resource value: 0x7f020079
-			public const int mtrl_snackbar_background = 2130837625;
+			public const int item_count = 2130837625;
 			
 			// aapt resource value: 0x7f02007a
-			public const int mtrl_tabs_default_indicator = 2130837626;
+			public const int logo = 2130837626;
 			
 			// aapt resource value: 0x7f02007b
-			public const int nav_view_item_background = 2130837627;
+			public const int mtrl_snackbar_background = 2130837627;
 			
 			// aapt resource value: 0x7f02007c
-			public const int nav_view_item_textcolor = 2130837628;
+			public const int mtrl_tabs_default_indicator = 2130837628;
 			
 			// aapt resource value: 0x7f02007d
-			public const int navigation_empty_icon = 2130837629;
+			public const int nav_view_item_background = 2130837629;
 			
 			// aapt resource value: 0x7f02007e
-			public const int no_image = 2130837630;
+			public const int nav_view_item_icon = 2130837630;
 			
 			// aapt resource value: 0x7f02007f
-			public const int notification_action_background = 2130837631;
+			public const int nav_view_item_textcolor = 2130837631;
 			
 			// aapt resource value: 0x7f020080
-			public const int notification_bg = 2130837632;
+			public const int navigation_empty_icon = 2130837632;
 			
 			// aapt resource value: 0x7f020081
-			public const int notification_bg_low = 2130837633;
+			public const int no_image = 2130837633;
 			
 			// aapt resource value: 0x7f020082
-			public const int notification_bg_low_normal = 2130837634;
+			public const int notification_action_background = 2130837634;
 			
 			// aapt resource value: 0x7f020083
-			public const int notification_bg_low_pressed = 2130837635;
+			public const int notification_bg = 2130837635;
 			
 			// aapt resource value: 0x7f020084
-			public const int notification_bg_normal = 2130837636;
+			public const int notification_bg_low = 2130837636;
 			
 			// aapt resource value: 0x7f020085
-			public const int notification_bg_normal_pressed = 2130837637;
+			public const int notification_bg_low_normal = 2130837637;
 			
 			// aapt resource value: 0x7f020086
-			public const int notification_icon_background = 2130837638;
-			
-			// aapt resource value: 0x7f02008f
-			public const int notification_template_icon_bg = 2130837647;
-			
-			// aapt resource value: 0x7f020090
-			public const int notification_template_icon_low_bg = 2130837648;
+			public const int notification_bg_low_pressed = 2130837638;
 			
 			// aapt resource value: 0x7f020087
-			public const int notification_tile_bg = 2130837639;
+			public const int notification_bg_normal = 2130837639;
 			
 			// aapt resource value: 0x7f020088
-			public const int notify_panel_notification_icon_bg = 2130837640;
+			public const int notification_bg_normal_pressed = 2130837640;
 			
 			// aapt resource value: 0x7f020089
-			public const int splash = 2130837641;
+			public const int notification_icon_background = 2130837641;
+			
+			// aapt resource value: 0x7f020094
+			public const int notification_template_icon_bg = 2130837652;
+			
+			// aapt resource value: 0x7f020095
+			public const int notification_template_icon_low_bg = 2130837653;
 			
 			// aapt resource value: 0x7f02008a
-			public const int splash_centered = 2130837642;
+			public const int notification_tile_bg = 2130837642;
 			
 			// aapt resource value: 0x7f02008b
-			public const int tag = 2130837643;
+			public const int notify_panel_notification_icon_bg = 2130837643;
 			
 			// aapt resource value: 0x7f02008c
-			public const int toast_frame = 2130837644;
+			public const int spinner_item_textcolor = 2130837644;
 			
 			// aapt resource value: 0x7f02008d
-			public const int tooltip_frame_dark = 2130837645;
+			public const int spinner_item_textstyle = 2130837645;
 			
 			// aapt resource value: 0x7f02008e
-			public const int tooltip_frame_light = 2130837646;
+			public const int splash = 2130837646;
+			
+			// aapt resource value: 0x7f02008f
+			public const int splash_centered = 2130837647;
+			
+			// aapt resource value: 0x7f020090
+			public const int tag = 2130837648;
+			
+			// aapt resource value: 0x7f020091
+			public const int toast_frame = 2130837649;
+			
+			// aapt resource value: 0x7f020092
+			public const int tooltip_frame_dark = 2130837650;
+			
+			// aapt resource value: 0x7f020093
+			public const int tooltip_frame_light = 2130837651;
 			
 			static Drawable()
 			{
@@ -10117,11 +10291,20 @@ namespace MiraiNotes.Android
 		public partial class Style
 		{
 			
+			// aapt resource value: 0x7f0b01fb
+			public const int Actionbar_MenuTextStyle_Dark = 2131427835;
+			
+			// aapt resource value: 0x7f0b01fa
+			public const int Actionbar_MenuTextStyle_Light = 2131427834;
+			
 			// aapt resource value: 0x7f0b008d
 			public const int AlertDialog_AppCompat = 2131427469;
 			
 			// aapt resource value: 0x7f0b008e
 			public const int AlertDialog_AppCompat_Light = 2131427470;
+			
+			// aapt resource value: 0x7f0b01f9
+			public const int AlertDialogCustom = 2131427833;
 			
 			// aapt resource value: 0x7f0b008f
 			public const int Animation_AppCompat_Dialog = 2131427471;
@@ -10136,16 +10319,10 @@ namespace MiraiNotes.Android
 			public const int Animation_Design_BottomSheetDialog = 2131427682;
 			
 			// aapt resource value: 0x7f0b01f4
-			public const int AppTheme = 2131427828;
-			
-			// aapt resource value: 0x7f0b01f6
-			public const int AppTheme_AppBarOverlay = 2131427830;
+			public const int AppTheme_AppBarOverlay = 2131427828;
 			
 			// aapt resource value: 0x7f0b01f5
-			public const int AppTheme_NoActionBar = 2131427829;
-			
-			// aapt resource value: 0x7f0b01f7
-			public const int AppTheme_PopupOverlay = 2131427831;
+			public const int AppTheme_PopupOverlay = 2131427829;
 			
 			// aapt resource value: 0x7f0b0092
 			public const int Base_AlertDialog_AppCompat = 2131427474;
@@ -10720,8 +10897,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0b0003
 			public const int CardView_Light = 2131427331;
 			
-			// aapt resource value: 0x7f0b01fb
-			public const int Divider = 2131427835;
+			// aapt resource value: 0x7f0b01f7
+			public const int Divider = 2131427831;
 			
 			// aapt resource value: 0x7f0b0073
 			public const int Platform_AppCompat = 2131427443;
@@ -11212,14 +11389,104 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0b01b2
 			public const int Theme_MaterialComponents_NoActionBar_Bridge = 2131427762;
 			
-			// aapt resource value: 0x7f0b01f8
-			public const int Theme_MiraiNotes_Dark = 2131427832;
+			// aapt resource value: 0x7f0b01fc
+			public const int Theme_MiraiNotes_Dark = 2131427836;
 			
-			// aapt resource value: 0x7f0b01f9
-			public const int Theme_MiraiNotes_Light = 2131427833;
+			// aapt resource value: 0x7f0b0216
+			public const int Theme_MiraiNotes_Dark_DarkBlue = 2131427862;
 			
-			// aapt resource value: 0x7f0b01fa
-			public const int Theme_Splash = 2131427834;
+			// aapt resource value: 0x7f0b0208
+			public const int Theme_MiraiNotes_Dark_DarkCyan = 2131427848;
+			
+			// aapt resource value: 0x7f0b0210
+			public const int Theme_MiraiNotes_Dark_DarkGray = 2131427856;
+			
+			// aapt resource value: 0x7f0b020a
+			public const int Theme_MiraiNotes_Dark_DarkGreen = 2131427850;
+			
+			// aapt resource value: 0x7f0b020c
+			public const int Theme_MiraiNotes_Dark_DarkMagenta = 2131427852;
+			
+			// aapt resource value: 0x7f0b0204
+			public const int Theme_MiraiNotes_Dark_DarkOrange = 2131427844;
+			
+			// aapt resource value: 0x7f0b01fe
+			public const int Theme_MiraiNotes_Dark_LightBlue = 2131427838;
+			
+			// aapt resource value: 0x7f0b021a
+			public const int Theme_MiraiNotes_Dark_LightGrey = 2131427866;
+			
+			// aapt resource value: 0x7f0b0200
+			public const int Theme_MiraiNotes_Dark_LimeGreen = 2131427840;
+			
+			// aapt resource value: 0x7f0b020e
+			public const int Theme_MiraiNotes_Dark_Magenta = 2131427854;
+			
+			// aapt resource value: 0x7f0b0212
+			public const int Theme_MiraiNotes_Dark_Orange = 2131427858;
+			
+			// aapt resource value: 0x7f0b0202
+			public const int Theme_MiraiNotes_Dark_Pink = 2131427842;
+			
+			// aapt resource value: 0x7f0b0218
+			public const int Theme_MiraiNotes_Dark_Violet = 2131427864;
+			
+			// aapt resource value: 0x7f0b0206
+			public const int Theme_MiraiNotes_Dark_VividRed = 2131427846;
+			
+			// aapt resource value: 0x7f0b0214
+			public const int Theme_MiraiNotes_Dark_Yellow = 2131427860;
+			
+			// aapt resource value: 0x7f0b01fd
+			public const int Theme_MiraiNotes_Light = 2131427837;
+			
+			// aapt resource value: 0x7f0b0217
+			public const int Theme_MiraiNotes_Light_DarkBlue = 2131427863;
+			
+			// aapt resource value: 0x7f0b0209
+			public const int Theme_MiraiNotes_Light_DarkCyan = 2131427849;
+			
+			// aapt resource value: 0x7f0b0211
+			public const int Theme_MiraiNotes_Light_DarkGray = 2131427857;
+			
+			// aapt resource value: 0x7f0b020b
+			public const int Theme_MiraiNotes_Light_DarkGreen = 2131427851;
+			
+			// aapt resource value: 0x7f0b020d
+			public const int Theme_MiraiNotes_Light_DarkMagenta = 2131427853;
+			
+			// aapt resource value: 0x7f0b0205
+			public const int Theme_MiraiNotes_Light_DarkOrange = 2131427845;
+			
+			// aapt resource value: 0x7f0b01ff
+			public const int Theme_MiraiNotes_Light_LightBlue = 2131427839;
+			
+			// aapt resource value: 0x7f0b021b
+			public const int Theme_MiraiNotes_Light_LightGrey = 2131427867;
+			
+			// aapt resource value: 0x7f0b0201
+			public const int Theme_MiraiNotes_Light_LimeGreen = 2131427841;
+			
+			// aapt resource value: 0x7f0b020f
+			public const int Theme_MiraiNotes_Light_Magenta = 2131427855;
+			
+			// aapt resource value: 0x7f0b0213
+			public const int Theme_MiraiNotes_Light_Orange = 2131427859;
+			
+			// aapt resource value: 0x7f0b0203
+			public const int Theme_MiraiNotes_Light_Pink = 2131427843;
+			
+			// aapt resource value: 0x7f0b0219
+			public const int Theme_MiraiNotes_Light_Violet = 2131427865;
+			
+			// aapt resource value: 0x7f0b0207
+			public const int Theme_MiraiNotes_Light_VividRed = 2131427847;
+			
+			// aapt resource value: 0x7f0b0215
+			public const int Theme_MiraiNotes_Light_Yellow = 2131427861;
+			
+			// aapt resource value: 0x7f0b01f6
+			public const int Theme_Splash = 2131427830;
 			
 			// aapt resource value: 0x7f0b0107
 			public const int ThemeOverlay_AppCompat = 2131427591;
@@ -11278,8 +11545,8 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7f0b01be
 			public const int ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox_Dense = 2131427774;
 			
-			// aapt resource value: 0x7f0b01fc
-			public const int VerticalDivider = 2131427836;
+			// aapt resource value: 0x7f0b01f8
+			public const int VerticalDivider = 2131427832;
 			
 			// aapt resource value: 0x7f0b010e
 			public const int Widget_AppCompat_ActionBar = 2131427598;
@@ -12582,10 +12849,34 @@ namespace MiraiNotes.Android
 			public const int AppCompatTheme_windowNoTitle = 3;
 			
 			public static int[] AppTheme = new int[] {
-					2130772514};
+					2130772514,
+					2130772515,
+					2130772516,
+					2130772517,
+					2130772518,
+					2130772519,
+					2130772520};
+			
+			// aapt resource value: 1
+			public const int AppTheme_AccentColor = 1;
+			
+			// aapt resource value: 2
+			public const int AppTheme_AccentColorDark = 2;
+			
+			// aapt resource value: 3
+			public const int AppTheme_AccentColorLight = 3;
 			
 			// aapt resource value: 0
 			public const int AppTheme_AppBackground = 0;
+			
+			// aapt resource value: 4
+			public const int AppTheme_DividerColor = 4;
+			
+			// aapt resource value: 5
+			public const int AppTheme_IconColor = 5;
+			
+			// aapt resource value: 6
+			public const int AppTheme_TextInvertedColor = 6;
 			
 			public static int[] BottomAppBar = new int[] {
 					2130772238,

@@ -17,7 +17,7 @@
     <MvvmCross.Platforms.Android.Binding.Views.MvxListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="#aeaeae"
+        android:divider="?DividerColor"
         android:dividerHeight="1px"
         android:clickable="false"
         android:focusableInTouchMode="true"
@@ -34,14 +34,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add"
-            android:textColor="@android:color/holo_red_dark"
+            android:textColor="?AccentColor"
             android:background="?android:attr/selectableItemBackground"
             app:MvxBind="Click NewAccountCommand;"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            android:textColor="@android:color/holo_red_dark"
+            android:textColor="?AccentColor"
             android:background="?android:attr/selectableItemBackground"
             app:MvxBind="Click CloseCommand;"/>
     </LinearLayout>

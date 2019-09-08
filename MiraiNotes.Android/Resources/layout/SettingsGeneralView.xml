@@ -41,8 +41,6 @@
         </LinearLayout>
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/Divider"/>
         <!--Accent color-->
         <LinearLayout
@@ -80,9 +78,8 @@
         </LinearLayout>
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/Divider"/>
+
         <!--Tasklist and task default sort order-->
         <LinearLayout
             android:layout_width="match_parent"
@@ -138,8 +135,6 @@
         </LinearLayout>
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/Divider"/>
 
         <!--Others-->

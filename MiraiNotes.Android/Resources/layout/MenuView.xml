@@ -7,7 +7,9 @@
     android:layout_height="match_parent"
     android:layout_width="250dp"
     android:fitsSystemWindows="true"
-    app:headerLayout="@layout/drawerheader"
-    app:itemBackground="@drawable/nav_view_item_background"
-    app:itemTextColor="@drawable/nav_view_item_textcolor"/>
+    app:itemIconTint="@drawable/nav_view_item_icon"
+    app:headerLayout="@layout/drawerheader"/>
+
+    <!--app:itemBackground="@drawable/nav_view_item_background"
+    app:itemTextColor="@drawable/nav_view_item_textcolor"-->
 

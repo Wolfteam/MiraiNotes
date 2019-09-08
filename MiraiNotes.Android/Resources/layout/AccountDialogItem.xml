@@ -5,7 +5,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:padding="5dp">
     <refractored.controls.CircleImageView
         android:id="@+id/AccountImg"
         android:layout_width="64dp"
@@ -13,7 +14,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/no_image"
         app:civ_border_width="2dp"
-        app:civ_border_color="@android:color/white"
+        app:civ_border_color="?AccentColor"
         app:MvxBind="Bitmap PictureUrl, Converter=ImgPathToBitmap"/>
 
     <LinearLayout

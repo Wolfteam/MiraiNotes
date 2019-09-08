@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="@dimen/fab_margin"
+        android:textColor="@drawable/spinner_item_textcolor"
         app:MvxBind="Text Text" />
 </LinearLayout>
 

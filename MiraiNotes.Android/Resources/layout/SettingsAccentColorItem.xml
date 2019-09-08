@@ -4,9 +4,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/settings_accent_color"
     android:layout_height="@dimen/settings_accent_color"
-    android:tint="#0000"
+    android:tint="@color/White"
     app:MvxBind="BackgroundColor, Converter=NativeColor"/>
-<!--        android:clickable="false"
-        android:longClickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"-->
