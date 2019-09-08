@@ -23,7 +23,6 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IAppSettingsService _appSettings;
         private readonly IGoogleApiService _googleApiService;
         private readonly IUserCredentialService _userCredentialService;
 
@@ -72,13 +71,12 @@ namespace MiraiNotes.Android.ViewModels
             IAppSettingsService appSettings,
             IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
-            _appSettings = appSettings;
             _googleApiService = googleApiService;
             _userCredentialService = userCredentialService;
 
@@ -113,7 +111,8 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg)),
                 Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
                 Messenger.Subscribe<ShowTasksLoadingMsg>(msg => IsBusy = msg.Show),
-                Messenger.Subscribe<ShowProgressOverlayMsg>(msg => ShowProgressOverlay = msg.Show)
+                Messenger.Subscribe<ShowProgressOverlayMsg>(msg => ShowProgressOverlay = msg.Show),
+                Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder))
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -164,7 +163,7 @@ namespace MiraiNotes.Android.ViewModels
                 //TaskAutoSuggestBoxItems
                 //    .AddRange(_mapper.Map<IEnumerable<ItemModel>>(mainTasks.OrderBy(t => t.Title)));
 
-                SortTasks(_appSettings.DefaultTaskSortOrder);
+                SortTasks(AppSettings.DefaultTaskSortOrder);
             }
 
             //CurrentTaskList = taskList;

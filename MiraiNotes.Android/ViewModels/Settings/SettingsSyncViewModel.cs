@@ -14,10 +14,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
     public class SettingsSyncViewModel : BaseViewModel
     {
         #region Members
-        private readonly IAppSettingsService _appSettings;
         private readonly IDialogService _dialogService;
         #endregion
-
 
         #region Properties
         public List<ItemModel> SyncBgTaskIntervalTypes { get; } = new List<ItemModel>
@@ -51,10 +49,10 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
         public bool RunSyncBackgroundTaskAfterStart
         {
-            get => _appSettings.RunSyncBackgroundTaskAfterStart;
+            get => AppSettings.RunSyncBackgroundTaskAfterStart;
             set
             {
-                _appSettings.RunSyncBackgroundTaskAfterStart = value;
+                AppSettings.RunSyncBackgroundTaskAfterStart = value;
                 RaisePropertyChanged(() => RunSyncBackgroundTaskAfterStart);
             }
         }
@@ -63,23 +61,23 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             get
             {
-                var currentInterval = _appSettings.SyncBackgroundTaskInterval;
+                var currentInterval = AppSettings.SyncBackgroundTaskInterval;
                 return SyncBgTaskIntervalTypes.FirstOrDefault(s => s.ItemId == currentInterval.ToString());
             }
             set
             {
                 var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemId, true);
-                _appSettings.SyncBackgroundTaskInterval = selectedInterval;
+                AppSettings.SyncBackgroundTaskInterval = selectedInterval;
                 //_backgroundTaskManagerService.RegisterBackgroundTasks(BackgroundTaskType.SYNC, true);
             }
         }
 
         public bool RunFullSyncAfterSwitchingAccounts
         {
-            get => _appSettings.RunFullSyncAfterSwitchingAccounts;
+            get => AppSettings.RunFullSyncAfterSwitchingAccounts;
             set
             {
-                _appSettings.RunFullSyncAfterSwitchingAccounts = value;
+                AppSettings.RunFullSyncAfterSwitchingAccounts = value;
                 RaisePropertyChanged(() => RunFullSyncAfterSwitchingAccounts);
             }
         }
@@ -96,9 +94,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IMvxMessenger messenger,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
-            _appSettings = appSettings;
             _dialogService = dialogService;
 
             SetCommands();

@@ -26,7 +26,6 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IAppSettingsService _appSettings;
         private readonly IGoogleApiService _googleApiService;
         private readonly INotificationService _notificationService;
         private readonly IUserCredentialService _userCredentialService;
@@ -79,13 +78,12 @@ namespace MiraiNotes.Android.ViewModels
             IGoogleApiService googleApiService,
             INotificationService notificationService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
-            _appSettings = appSettings;
             _googleApiService = googleApiService;
             _notificationService = notificationService;
             _userCredentialService = userCredentialService;
@@ -112,8 +110,11 @@ namespace MiraiNotes.Android.ViewModels
         {
             SaveChangesCommand = new MvxAsyncCommand(SaveChanges);
 
-            CloseCommand = new MvxAsyncCommand(
-                async () => await _navigationService.Close(this));
+            CloseCommand = new MvxAsyncCommand(async () =>
+            {
+                Messenger.Publish(new HideKeyboardMsg(this));
+                await _navigationService.Close(this);
+            });
 
             DeleteTaskCommand = new MvxCommand(() => _dialogService.ShowDialog(
                 "Confirmation",

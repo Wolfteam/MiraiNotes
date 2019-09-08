@@ -1,4 +1,5 @@
 ﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
@@ -22,7 +23,6 @@ namespace MiraiNotes.Android.ViewModels.Settings
     {
         #region Members
         private readonly IMvxNavigationService _navigationService;
-        private readonly IAppSettingsService _appSettings;
         private readonly IDialogService _dialogService;
 
         private bool _isBackButtonVisible;
@@ -108,19 +108,17 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             get
             {
-                var currentSelectedTheme = _appSettings.AppTheme;
+                var currentSelectedTheme = AppSettings.AppTheme;
                 return AppThemes.First(theme => theme.ItemId == currentSelectedTheme.ToString());
-                //return _selectedAppTheme;
             }
             set
             {
                 var selectedTheme = (AppThemeType)Enum.Parse(typeof(AppThemeType), value.ItemId, true);
-                if (_appSettings.AppTheme == selectedTheme)
+                if (AppSettings.AppTheme == selectedTheme)
                     return;
-                _appSettings.AppTheme = selectedTheme;
+                AppSettings.AppTheme = selectedTheme;
                 RaisePropertyChanged(() => SelectedAppTheme);
-                //SetProperty(ref _selectedAppTheme, value);
-                //MiscellaneousUtils.ChangeCurrentTheme(selectedTheme, _appSettings.AppHexAccentColor);
+                Messenger.Publish(new AppThemeChangedMsg(this, selectedTheme, AppSettings.AppHexAccentColor));
             }
         }
 
@@ -128,22 +126,22 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             get
             {
-                var currentColor = _appSettings.AppHexAccentColor.ToColor();
+                var currentColor = AppSettings.AppHexAccentColor.ToColor();
                 var mvxColor = new MvxColor(currentColor.R, currentColor.G, currentColor.B, currentColor.A);
                 return AccentColors.First(color => color.ARGB == mvxColor.ARGB);
             }
             set
             {
                 var selectedColor = Color.FromArgb(value.ARGB).ToHexString();
-                if (_appSettings.AppHexAccentColor == selectedColor)
+                if (AppSettings.AppHexAccentColor == selectedColor)
                     return;
-                _appSettings.AppHexAccentColor = selectedColor;
-                //MiscellaneousUtils.ChangeCurrentTheme(_appSettings.AppTheme, _appSettings.AppHexAccentColor);
+                AppSettings.AppHexAccentColor = selectedColor;
+                Messenger.Publish(new AppThemeChangedMsg(this, AppSettings.AppTheme, selectedColor));
                 //AccentColorChanged = true;
                 //RaisePropertyChanged(() => SelectedAccentColor);
             }
         }
-
+        //TODO: USE THIS PROPERTY TO LET THE USER NOW THAT IT NEEDS TO RESTART THE APP ?
         //public bool AccentColorChanged
         //{
         //    get => _accentColorChanged;
@@ -154,16 +152,16 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             get
             {
-                var currentSelectedSortType = _appSettings.DefaultTaskListSortOrder;
+                var currentSelectedSortType = AppSettings.DefaultTaskListSortOrder;
                 _selectedTaskListSortOrder = TaskListSortTypes.FirstOrDefault(i => i.ItemId == currentSelectedSortType.ToString());
                 return _selectedTaskListSortOrder;
             }
             set
             {
                 var selectedSortType = (TaskListSortType)Enum.Parse(typeof(TaskListSortType), value.ItemId, true);
-                _appSettings.DefaultTaskListSortOrder = selectedSortType;
+                AppSettings.DefaultTaskListSortOrder = selectedSortType;
                 SetProperty(ref _selectedTaskListSortOrder, value);
-                //_messenger.Send(selectedSortType, $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}");
+                Messenger.Publish(new TaskListSortOrderChangedMsg(this, selectedSortType));
             }
         }
 
@@ -171,46 +169,47 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             get
             {
-                var currentSelectedSortType = _appSettings.DefaultTaskSortOrder;
+                var currentSelectedSortType = AppSettings.DefaultTaskSortOrder;
                 _selectedTaskSortOrder = TasksSortTypes.FirstOrDefault(i => i.ItemId == currentSelectedSortType.ToString());
                 return _selectedTaskSortOrder;
             }
             set
             {
                 var selectedSortType = (TaskSortType)Enum.Parse(typeof(TaskSortType), value.ItemId, true);
-                _appSettings.DefaultTaskSortOrder = selectedSortType;
+                AppSettings.DefaultTaskSortOrder = selectedSortType;
                 SetProperty(ref _selectedTaskSortOrder, value);
-                //_messenger.Send(selectedSortType, $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}");
+                Messenger.Publish(new TaskSortOrderChangedMsg(this, selectedSortType));
             }
         }
 
         public bool AskForPasswordWhenAppStarts
         {
-            get => _appSettings.AskForPasswordWhenAppStarts;
+            get => AppSettings.AskForPasswordWhenAppStarts;
             set
             {
-                _appSettings.AskForPasswordWhenAppStarts = value;
+                AppSettings.AskForPasswordWhenAppStarts = value;
                 RaisePropertyChanged(() => AskForPasswordWhenAppStarts);
                 //if (value)
                 //{
                 //    //_dispatcher.CheckBeginInvokeOnUi(async () =>
                 //    //{
                 //    //    bool isPasswordSaved = await _dialogService.ShowCustomDialog(CustomDialogType.PASSWORD_DIALOG);
-                //    //    _appSettings.AskForPasswordWhenAppStarts = isPasswordSaved;
+                //    //    AppSettings.AskForPasswordWhenAppStarts = isPasswordSaved;
                 //    //    RaisePropertyChanged(nameof(AskForPasswordWhenAppStarts));
                 //    //});
                 //}
                 //else
-                //    _appSettings.AskForPasswordWhenAppStarts = value;
+                //    AppSettings.AskForPasswordWhenAppStarts = value;
             }
         }
 
         public bool ShowCompletedTasks
         {
-            get => _appSettings.ShowCompletedTasks;
-            set => _appSettings.ShowCompletedTasks = value;
+            get => AppSettings.ShowCompletedTasks;
+            set => AppSettings.ShowCompletedTasks = value;
         }
 
+        //TODO: LANGUAGE
         #endregion
 
         #region Commands
@@ -225,10 +224,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
-            _appSettings = appSettings;
             _dialogService = dialogService;
 
             AccentColors = AppConstants.AppAccentColors

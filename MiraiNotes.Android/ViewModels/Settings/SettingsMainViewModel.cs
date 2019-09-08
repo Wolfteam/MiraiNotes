@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using MiraiNotes.Abstractions.Services;
 using MvvmCross.Commands;
 using MvvmCross.Localization;
 using MvvmCross.Navigation;
@@ -15,8 +16,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
         public SettingsMainViewModel(
             IMvxTextProvider textProvider,
             IMvxMessenger messenger,
-            IMvxNavigationService navigationService)
-            : base(textProvider, messenger)
+            IMvxNavigationService navigationService,
+            IAppSettingsService appSettings)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
 

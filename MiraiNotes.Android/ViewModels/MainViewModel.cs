@@ -21,15 +21,15 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IUserCredentialService _userCredentialService;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IAppSettingsService _appSettings;
         private readonly IMvxNavigationService _navigationService;
 
         private readonly MvxInteraction<bool> _showDrawer = new MvxInteraction<bool>();
+        private readonly MvxInteraction<AppThemeChangedMsg> _appThemeChanged = new MvxInteraction<AppThemeChangedMsg>();
+        private readonly MvxInteraction _hideKeyboard = new MvxInteraction();
         #endregion
 
 
-        public IMvxInteraction<bool> ShowDrawer
-            => _showDrawer;
+
 
         private string _language = "English";
         private MvxSubscriptionToken _cultureChangedToken;
@@ -42,14 +42,30 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _language, value);
         }
 
-        public static bool IsDarkTheme;
 
+        #region Interactors
+        public IMvxInteraction<bool> ShowDrawer
+            => _showDrawer;
+
+        public IMvxInteraction<AppThemeChangedMsg> AppThemeChanged
+            => _appThemeChanged;
+
+        public IMvxInteraction HideKeyboard
+            => _hideKeyboard;
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+
+        #region Commands
         public IMvxCommand ChangeLanguageCommand { get; private set; }
-        public IMvxCommand ChangeThemeCommand { get; private set; }
         public IMvxAsyncCommand OnSettingsSelectedCommand { get; private set; }
         public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
         public IMvxCommand LogoutCommand { get; private set; }
         public IMvxAsyncCommand InitViewCommand { get; private set; }
+        #endregion
 
         public MainViewModel(
             IMvxTextProvider textProvider,
@@ -59,12 +75,11 @@ namespace MiraiNotes.Android.ViewModels
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
             IMvxNavigationService navigationService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _userCredentialService = userCredentialService;
             _dialogService = dialogService;
             _dataService = dataService;
-            _appSettings = appSettings;
             _navigationService = navigationService;
             _cultureChangedToken = Messenger.Subscribe<CultureChangedMessage>(ChangeCurrentLanguage);
 
@@ -75,7 +90,6 @@ namespace MiraiNotes.Android.ViewModels
         private void SetCommands()
         {
             ChangeLanguageCommand = new MvxCommand(ChangeLanguage);
-            ChangeThemeCommand = new MvxCommand(ChangeTheme);
             OnSettingsSelectedCommand = new MvxAsyncCommand(
                 async () => await _navigationService.Navigate<SettingsMainViewModel>());
             OnAccountsSelectedCommand = new MvxAsyncCommand(OnAccountsSelected);
@@ -96,7 +110,9 @@ namespace MiraiNotes.Android.ViewModels
         {
             var tokens = new[]
             {
-                Messenger.Subscribe<ShowDrawerMsg>(msg => _showDrawer.Raise(msg.Show))
+                Messenger.Subscribe<ShowDrawerMsg>(msg => _showDrawer.Raise(msg.Show)),
+                Messenger.Subscribe<AppThemeChangedMsg>(msg => _appThemeChanged.Raise(msg)),
+                Messenger.Subscribe<HideKeyboardMsg>(_ => _hideKeyboard.Raise())
             };
 
             SubscriptionTokens.AddRange(tokens);
@@ -111,7 +127,7 @@ namespace MiraiNotes.Android.ViewModels
             //OpenPane(false);
             //ShowLoading(true, "Logging out... Please wait..");
             //BackgroundTasksManager.UnregisterBackgroundTask();
-            _appSettings.ResetAppSettings();
+            AppSettings.ResetAppSettings();
 
             await _dataService
                 .UserService
@@ -149,12 +165,6 @@ namespace MiraiNotes.Android.ViewModels
             var msg = new LanguageChangedMsg(this, lang);
             Language = lang == "es" ? "Español" : "English";
             Messenger.Publish(msg);
-        }
-
-        public void ChangeTheme()
-        {
-            Messenger.Publish(new ChangeThemeMsg(this, !IsDarkTheme));
-            IsDarkTheme = !IsDarkTheme;
         }
 
         public async void ChangeCurrentLanguage(CultureChangedMessage msg)

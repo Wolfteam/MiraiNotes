@@ -1,4 +1,5 @@
-﻿using MiraiNotes.Android.Common.Messages;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross.Commands;
@@ -71,8 +72,9 @@ namespace MiraiNotes.Android.ViewModels
         public GoogleUserViewModel(
             IMvxTextProvider textProvider,
             IMvxMessenger messenger,
+            IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _dialogService = dialogService;
 

@@ -26,7 +26,6 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IAppSettingsService _appSettings;
         private readonly IGoogleApiService _googleApiService;
         private readonly IUserCredentialService _userCredentialService;
 
@@ -75,13 +74,12 @@ namespace MiraiNotes.Android.ViewModels
             IAppSettingsService appSettings,
             IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
-            _appSettings = appSettings;
             _googleApiService = googleApiService;
             _navigationService = navigationService;
 
@@ -122,6 +120,11 @@ namespace MiraiNotes.Android.ViewModels
 
                     Messenger.Publish(new ShowTasksLoadingMsg(this, false));
                     Messenger.Publish(new ShowProgressOverlayMsg(this));
+                }),
+                Messenger.Subscribe<TaskListSortOrderChangedMsg>(msg =>
+                {
+                    SortTaskLists(msg.NewSortOrder);
+                    _onTaskListsLoaded.Raise();
                 })
             };
 
@@ -198,7 +201,7 @@ namespace MiraiNotes.Android.ViewModels
 
             TaskLists.AddRange(taskLists);
 
-            SortTaskLists(_appSettings.DefaultTaskListSortOrder);
+            SortTaskLists(AppSettings.DefaultTaskListSortOrder);
 
             _onTaskListsLoaded.Raise();
             //

@@ -9,26 +9,24 @@ namespace MiraiNotes.Android.ViewModels.Settings
     public class SettingsNotificationsViewModel : BaseViewModel
     {
         #region Members
-        private readonly IAppSettingsService _appSettings;
         private readonly IDialogService _dialogService;
         #endregion
-
 
         #region Properties
         public bool ShowToastNotificationAfterFullSync
         {
-            get => _appSettings.ShowToastNotificationAfterFullSync;
+            get => AppSettings.ShowToastNotificationAfterFullSync;
             set
             {
-                _appSettings.ShowToastNotificationAfterFullSync = value;
+                AppSettings.ShowToastNotificationAfterFullSync = value;
                 RaisePropertyChanged(() => ShowToastNotificationAfterFullSync);
             }
         }
 
         public bool ShowToastNotificationForCompletedTasks
         {
-            get => _appSettings.ShowToastNotificationForCompletedTasks;
-            set => _appSettings.ShowToastNotificationForCompletedTasks = value;
+            get => AppSettings.ShowToastNotificationForCompletedTasks;
+            set => AppSettings.ShowToastNotificationForCompletedTasks = value;
         }
         #endregion
 
@@ -42,9 +40,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IMvxMessenger messenger,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
-            _appSettings = appSettings;
             _dialogService = dialogService;
 
             SetCommands();

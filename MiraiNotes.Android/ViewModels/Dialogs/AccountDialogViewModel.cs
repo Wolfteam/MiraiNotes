@@ -28,7 +28,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
-        private readonly IAppSettingsService _appSettings;
         private readonly ISyncService _syncService;
         private readonly IGoogleApiService _googleApiService;
         private readonly IUserCredentialService _userCredentialService;
@@ -69,7 +68,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ISyncService syncService,
             IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
             _mapper = mapper;
@@ -77,7 +76,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             _dialogService = dialogService;
             _dataService = dataService;
             _networkService = networkService;
-            _appSettings = appSettings;
             _syncService = syncService;
             _googleApiService = googleApiService;
             _userCredentialService = userCredentialService;
@@ -465,7 +463,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 userInDbResponse.Result.Email);
 
             bool isNetworkAvailable = _networkService.IsInternetAvailable();
-            if (isNetworkAvailable && _appSettings.RunFullSyncAfterSwitchingAccounts)
+            if (isNetworkAvailable && AppSettings.RunFullSyncAfterSwitchingAccounts)
             {
                 var syncResults = new List<EmptyResponseDto>
                 {

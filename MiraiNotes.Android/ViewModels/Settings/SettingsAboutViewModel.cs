@@ -1,4 +1,5 @@
-﻿using MiraiNotes.Android.Common.Utils;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Utils;
 using MvvmCross.Localization;
 using MvvmCross.Plugin.Messenger;
 
@@ -11,8 +12,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
         public SettingsAboutViewModel(
             IMvxTextProvider textProvider,
-            IMvxMessenger messenger)
-            : base(textProvider, messenger)
+            IMvxMessenger messenger,
+            IAppSettingsService appSettings)
+            : base(textProvider, messenger, appSettings)
         {
         }
     }

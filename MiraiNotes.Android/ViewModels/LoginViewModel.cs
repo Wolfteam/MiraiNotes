@@ -24,7 +24,6 @@ namespace MiraiNotes.Android.ViewModels
     {
         private readonly IMvxNavigationService _navigationService;
         private readonly ILogger _logger;
-        private readonly IAppSettingsService _appSettings;
         private readonly ISyncService _syncService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleApiService _googleApiService;
@@ -66,11 +65,10 @@ namespace MiraiNotes.Android.ViewModels
             IGoogleApiService googleAuthService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
             _logger = logger;
-            _appSettings = appSettings;
             _syncService = syncService;
             _userCredentialService = userCredentialService;
             _googleApiService = googleAuthService;
@@ -289,12 +287,12 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             //TODO: REMOVE THIS WHEN THE LOGIN DIALOG AND SETTINGS ARE READY
-            if (_appSettings.AskForPasswordWhenAppStarts)
+            if (AppSettings.AskForPasswordWhenAppStarts)
             {
-                _appSettings.AskForPasswordWhenAppStarts = false;
+                AppSettings.AskForPasswordWhenAppStarts = false;
             }
 
-            if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
+            if (isUserLoggedIn && AppSettings.AskForPasswordWhenAppStarts)
             {
                 ShowLoading = false;
                 _dialogService.ShowLoginDialog(async password =>

@@ -17,7 +17,6 @@ namespace MiraiNotes.Android.ViewModels.Settings
     {
         #region Members
         private readonly IMvxNavigationService _navigationService;
-        private readonly IAppSettingsService _appSettings;
         private readonly IDialogService _dialogService;
 
         private string _currentPageText;
@@ -82,10 +81,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger)
+            : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
-            _appSettings = appSettings;
             _dialogService = dialogService;
 
             SetCommands();
