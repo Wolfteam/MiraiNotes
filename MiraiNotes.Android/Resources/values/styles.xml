@@ -1,41 +1,7 @@
 <resources>
-
-  <!-- Base application theme. -->
-  <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-    <!-- Customize your theme here. -->
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
-  </style>
-
-  <style name="AppTheme.NoActionBar">
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-  </style>
-
   <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
   <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
-  <!--AppThemes-->
-  <style name="Theme.MiraiNotes.Dark" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="AppBackground">@color/appBackgroundDark</item>
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
-  </style>
-
-  <style name="Theme.MiraiNotes.Light" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="AppBackground">@color/appBackgroundLight</item>
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
-  </style>
 
   <!--Splash-->
   <style name="Theme.Splash" parent="Theme.AppCompat.NoActionBar">
@@ -46,13 +12,423 @@
 
   <style name="Divider">
     <item name="android:layout_width">match_parent</item>
-    <item name="android:layout_height">1dp</item>
-    <item name="android:background">?android:attr/listDivider</item>
+    <item name="android:layout_height">@dimen/divider_height</item>
+    <item name="android:background">?DividerColor</item>
   </style>
 
   <style name="VerticalDivider">
     <item name="android:layout_width">1dp</item>
     <item name="android:layout_height">match_parent</item>
     <item name="android:background">?android:attr/listDivider</item>
+  </style>
+
+  <!--Dialogs-->
+  <style name="AlertDialogCustom" parent="android:Theme.Material.Light.Dialog.Alert">
+    <!--buttons color-->
+    <item name="colorAccent">?AccentColor</item>
+    <item name="colorPrimary">?AccentColorDark</item>
+
+    <!--title and message color-->
+    <item name="android:textColorPrimary">?AccentColor</item>
+    <!--dialog background-->
+    <item name="android:windowBackground">?AppBackground</item>
+  </style>
+
+<!--Menu option style-->
+  <style name="Actionbar.MenuTextStyle.Light" parent="ThemeOverlay.AppCompat.Light">
+    <item name="android:textColor">@color/Black</item>
+    <item name="android:textSize">18sp</item>
+    <item name="android:windowBackground">@color/AppBackgroundLight</item>
+    <item name="android:popupBackground">@color/AppBackgroundLight</item>
+
+    <!--<item name="android:colorBackground">@color/AppBackgroundLight</item>-->
+    <!--<item name="android:itemBackground">@color/AppBackgroundLight</item>-->
+  </style>
+
+  <style name="Actionbar.MenuTextStyle.Dark" parent="ThemeOverlay.AppCompat.Dark">
+    <item name="android:textColor">@color/Black</item>
+    <item name="android:textSize">18sp</item>
+    <item name="android:windowBackground">@color/AppBackgroundDark</item>
+    <item name="android:popupBackground">@color/AppBackgroundDark</item>
+
+    <!--<item name="android:colorBackground">@color/DarkBlueAccentColorDark</item>
+    <item name="android:background">@color/DarkBlueAccentColorDark</item>-->
+    <!--<item name="android:itemBackground">@color/AppBackgroundDark</item>-->
+  </style>
+
+  <!--AppThemes-->
+  <!--Base Themes-->
+  <style name="Theme.MiraiNotes.Dark" parent="Theme.AppCompat.Light">
+    <!--Since we are using a custom app bar, we must explicit set this values-->
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+
+    <!--The default background-->
+    <item name="android:windowBackground">@color/AppBackgroundDark</item>
+    <!--Default text colors-->
+    <item name="android:textColorPrimary">@color/White</item>
+    <item name="android:textColor">@color/White</item>
+
+    <!--Dialog background colors-->
+    <item name="colorBackgroundFloating">@color/AppBackgroundDark</item>
+    <item name="android:colorBackgroundFloating">@color/AppBackgroundDark</item>
+
+    <!--To change the text styling of options menu items</item>-->
+    <item name="android:itemTextAppearance">@style/Actionbar.MenuTextStyle.Dark</item>
+    <!--<item name="android:itemBackground">@color/AppBackgroundDark</item>-->
+
+
+    <item name="alertDialogTheme">@style/AlertDialogCustom</item>
+
+    <item name="AppBackground">@color/AppBackgroundDark</item>
+    <item name="DividerColor">@color/White</item>
+    <item name="IconColor">@color/White</item>
+    <item name="TextInvertedColor">@color/White</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light" parent="Theme.AppCompat.Light">
+    <!--Since we are using a custom app bar, we must explicit set this values-->
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+
+    <!--The default background-->
+    <item name="android:windowBackground">@color/AppBackgroundLight</item>
+
+    <!--Default text colors-->
+    <item name="android:textColorPrimary">@color/Black</item>
+    <item name="android:textColor">@color/Black</item>
+
+    <!--Dialog background colors-->
+    <item name="colorBackgroundFloating">@color/AppBackgroundLight</item>
+    <item name="android:colorBackgroundFloating">@color/AppBackgroundLight</item>
+
+    <!--To change the text styling of options menu items</item>-->
+    <item name="android:itemTextAppearance">@style/Actionbar.MenuTextStyle.Light</item>
+    <!--<item name="android:popupMenuStyle">@style/CustomPopupMenu.Light</item>-->
+    <!--<item name="android:itemBackground">@color/AppBackgroundLight</item>-->
+
+    <item name="alertDialogTheme">@style/AlertDialogCustom</item>
+
+    <item name="AppBackground">@color/AppBackgroundLight</item>
+    <item name="DividerColor">@color/Black</item>
+    <item name="IconColor">@color/Black</item>
+    <item name="TextInvertedColor">@color/Black</item>
+  </style>
+
+  <!--Accent themes-->
+
+  <!--LightBlue-->
+  <style name="Theme.MiraiNotes.Dark.LightBlue" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/LigthBlueAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/LigthBlueAccentColorDark</item>
+    <item name="colorPrimary">@color/LigthBlueAccentColorLight</item>
+
+    <item name="AccentColor">@color/LigthBlueAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/LigthBlueAccentColorDark</item>
+    <item name="AccentColorLight">@color/LigthBlueAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.LightBlue" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/LigthBlueAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/LigthBlueAccentColorDark</item>
+    <item name="colorPrimary">@color/LigthBlueAccentColorLight</item>
+
+    <item name="AccentColor">@color/LigthBlueAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/LigthBlueAccentColorDark</item>
+    <item name="AccentColorLight">@color/LigthBlueAccentColorLight</item>
+  </style>
+
+  <!--LimeGreen-->
+  <style name="Theme.MiraiNotes.Dark.LimeGreen" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/LimeGreenAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/LimeGreenAccentColorDark</item>
+    <item name="colorPrimary">@color/LimeGreenAccentColorLight</item>
+
+    <item name="AccentColor">@color/LimeGreenAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/LimeGreenAccentColorDark</item>
+    <item name="AccentColorLight">@color/LimeGreenAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.LimeGreen" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/LimeGreenAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/LimeGreenAccentColorDark</item>
+    <item name="colorPrimary">@color/LimeGreenAccentColorLight</item>
+
+    <item name="AccentColor">@color/LimeGreenAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/LimeGreenAccentColorDark</item>
+    <item name="AccentColorLight">@color/LimeGreenAccentColorLight</item>
+  </style>
+
+  <!--Pink-->
+  <style name="Theme.MiraiNotes.Dark.Pink" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/PinkAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/PinkAccentColorDark</item>
+    <item name="colorPrimary">@color/PinkAccentColorLight</item>
+
+    <item name="AccentColor">@color/PinkAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/PinkAccentColorDark</item>
+    <item name="AccentColorLight">@color/PinkAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.Pink" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/PinkAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/PinkAccentColorDark</item>
+    <item name="colorPrimary">@color/PinkAccentColorLight</item>
+
+    <item name="AccentColor">@color/PinkAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/PinkAccentColorDark</item>
+    <item name="AccentColorLight">@color/PinkAccentColorLight</item>
+  </style>
+
+  <!--DarkOrange-->
+  <style name="Theme.MiraiNotes.Dark.DarkOrange" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/DarkOrangeAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkOrangeAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkOrangeAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkOrangeAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkOrangeAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkOrangeAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.DarkOrange" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/DarkOrangeAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkOrangeAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkOrangeAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkOrangeAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkOrangeAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkOrangeAccentColorLight</item>
+  </style>
+
+  <!--VividRed-->
+  <style name="Theme.MiraiNotes.Dark.VividRed" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/VividRedAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/VividRedAccentColorDark</item>
+    <item name="colorPrimary">@color/VividRedAccentColorLight</item>
+
+    <item name="AccentColor">@color/VividRedAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/VividRedAccentColorDark</item>
+    <item name="AccentColorLight">@color/VividRedAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.VividRed" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/VividRedAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/VividRedAccentColorDark</item>
+    <item name="colorPrimary">@color/VividRedAccentColorLight</item>
+
+    <item name="AccentColor">@color/VividRedAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/VividRedAccentColorDark</item>
+    <item name="AccentColorLight">@color/VividRedAccentColorLight</item>
+  </style>
+
+  <!--DarkCyan-->
+  <style name="Theme.MiraiNotes.Dark.DarkCyan" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/DarkCyanAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkCyanAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkCyanAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkCyanAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkCyanAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkCyanAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.DarkCyan" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/DarkCyanAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkCyanAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkCyanAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkCyanAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkCyanAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkCyanAccentColorLight</item>
+  </style>
+
+  <!--DarkGreen-->
+  <style name="Theme.MiraiNotes.Dark.DarkGreen" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/DarkGreenAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkGreenAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkGreenAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkGreenAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkGreenAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkGreenAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.DarkGreen" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/DarkGreenAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkGreenAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkGreenAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkGreenAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkGreenAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkGreenAccentColorLight</item>
+  </style>
+
+  <!--DarkMagenta-->
+  <style name="Theme.MiraiNotes.Dark.DarkMagenta" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/DarkMagentaAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkMagentaAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkMagentaAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkMagentaAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkMagentaAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkMagentaAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.DarkMagenta" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/DarkMagentaAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkMagentaAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkMagentaAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkMagentaAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkMagentaAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkMagentaAccentColorLight</item>
+  </style>
+
+  <!--Magenta-->
+  <style name="Theme.MiraiNotes.Dark.Magenta" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/MagentaAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/MagentaAccentColorDark</item>
+    <item name="colorPrimary">@color/MagentaAccentColorLight</item>
+
+    <item name="AccentColor">@color/MagentaAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/MagentaAccentColorDark</item>
+    <item name="AccentColorLight">@color/MagentaAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.Magenta" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/MagentaAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/MagentaAccentColorDark</item>
+    <item name="colorPrimary">@color/MagentaAccentColorLight</item>
+
+    <item name="AccentColor">@color/MagentaAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/MagentaAccentColorDark</item>
+    <item name="AccentColorLight">@color/MagentaAccentColorLight</item>
+  </style>
+
+  <!--DarkGray-->
+  <style name="Theme.MiraiNotes.Dark.DarkGray" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/DarkGrayAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkGrayAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkGrayAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkGrayAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkGrayAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkGrayAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.DarkGray" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/DarkGrayAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkGrayAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkGrayAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkGrayAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkGrayAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkGrayAccentColorLight</item>
+  </style>
+
+  <!--Orange-->
+  <style name="Theme.MiraiNotes.Dark.Orange" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/OrangeAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/OrangeAccentColorDark</item>
+    <item name="colorPrimary">@color/OrangeAccentColorLight</item>
+
+    <item name="AccentColor">@color/OrangeAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/OrangeAccentColorDark</item>
+    <item name="AccentColorLight">@color/OrangeAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.Orange" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/OrangeAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/OrangeAccentColorDark</item>
+    <item name="colorPrimary">@color/OrangeAccentColorLight</item>
+
+    <item name="AccentColor">@color/OrangeAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/OrangeAccentColorDark</item>
+    <item name="AccentColorLight">@color/OrangeAccentColorLight</item>
+  </style>
+
+  <!--Yellow-->
+  <style name="Theme.MiraiNotes.Dark.Yellow" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/YellowAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/YellowAccentColorDark</item>
+    <item name="colorPrimary">@color/YellowAccentColorLight</item>
+
+    <item name="AccentColor">@color/YellowAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/YellowAccentColorDark</item>
+    <item name="AccentColorLight">@color/YellowAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.Yellow" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/YellowAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/YellowAccentColorDark</item>
+    <item name="colorPrimary">@color/YellowAccentColorLight</item>
+
+    <item name="AccentColor">@color/YellowAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/YellowAccentColorDark</item>
+    <item name="AccentColorLight">@color/YellowAccentColorLight</item>
+  </style>
+
+  <!--DarkBlue-->
+  <style name="Theme.MiraiNotes.Dark.DarkBlue" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/DarkBlueAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkBlueAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkBlueAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkBlueAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkBlueAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkBlueAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.DarkBlue" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/DarkBlueAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/DarkBlueAccentColorDark</item>
+    <item name="colorPrimary">@color/DarkBlueAccentColorLight</item>
+
+    <item name="AccentColor">@color/DarkBlueAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/DarkBlueAccentColorDark</item>
+    <item name="AccentColorLight">@color/DarkBlueAccentColorLight</item>
+  </style>
+
+  <!--Violet-->
+  <style name="Theme.MiraiNotes.Dark.Violet" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/VioletAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/VioletAccentColorDark</item>
+    <item name="colorPrimary">@color/VioletAccentColorLight</item>
+
+    <item name="AccentColor">@color/VioletAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/VioletAccentColorDark</item>
+    <item name="AccentColorLight">@color/VioletAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.Violet" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/VioletAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/VioletAccentColorDark</item>
+    <item name="colorPrimary">@color/VioletAccentColorLight</item>
+
+    <item name="AccentColor">@color/VioletAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/VioletAccentColorDark</item>
+    <item name="AccentColorLight">@color/VioletAccentColorLight</item>
+  </style>
+
+  <!--LightGrey-->
+  <style name="Theme.MiraiNotes.Dark.LightGrey" parent="@style/Theme.MiraiNotes.Dark">
+    <item name="colorAccent">@color/LightGreyAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/LightGreyAccentColorDark</item>
+    <item name="colorPrimary">@color/LightGreyAccentColorLight</item>
+
+    <item name="AccentColor">@color/LightGreyAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/LightGreyAccentColorDark</item>
+    <item name="AccentColorLight">@color/LightGreyAccentColorLight</item>
+  </style>
+
+  <style name="Theme.MiraiNotes.Light.LightGrey" parent="@style/Theme.MiraiNotes.Light">
+    <item name="colorAccent">@color/LightGreyAccentColorPrimary</item>
+    <item name="colorPrimaryDark">@color/LightGreyAccentColorDark</item>
+    <item name="colorPrimary">@color/LightGreyAccentColorLight</item>
+
+    <item name="AccentColor">@color/LightGreyAccentColorPrimary</item>
+    <item name="AccentColorDark">@color/LightGreyAccentColorDark</item>
+    <item name="AccentColorLight">@color/LightGreyAccentColorLight</item>
   </style>
 </resources>
