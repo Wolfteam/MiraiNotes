@@ -109,6 +109,9 @@ namespace MiraiNotes.Android.Views.Activities
                 case Resource.Id.Logout:
                     ViewModel.LogoutCommand.Execute(null);
                     break;
+                case Resource.Id.FullSync:
+                    ViewModel.SyncCommand.Execute();
+                    break;
                 default:
                     return false;
             }

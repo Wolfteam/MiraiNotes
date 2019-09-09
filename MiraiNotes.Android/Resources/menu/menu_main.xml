@@ -3,20 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools">
 
   <item
-    android:id="@+id/Accounts"
+    android:id="@+id/FullSync"
     android:orderInCategory="100"
+    android:title="Sync"
+    android:icon="@drawable/ic_sync_black_24dp"
+    app:showAsAction="ifRoom" />
+
+  <item
+    android:id="@+id/Accounts"
+    android:orderInCategory="101"
     android:title="Accounts"
+    android:icon="@drawable/ic_account_circle_black_24dp"
     app:showAsAction="never" />
 
-  <item 
+  <item
       android:id="@+id/Settings"
-      android:orderInCategory="101"
+      android:orderInCategory="102"
       android:title="@string/action_settings"
+      android:icon="@drawable/ic_settings_black_24dp"
       app:showAsAction="never" />
 
   <item
     android:id="@+id/Logout"
-    android:orderInCategory="101"
+    android:orderInCategory="103"
     android:title="Logout"
+    android:icon="@drawable/ic_arrow_back_black_24dp"
     app:showAsAction="never" />
 </menu>

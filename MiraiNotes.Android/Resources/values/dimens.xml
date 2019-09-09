@@ -15,5 +15,8 @@
   <dimen name="settings_margin">10dp</dimen>
   <dimen name="settings_font_size_header">20sp</dimen>
   <dimen name="settings_font_size_content">15sp</dimen>
+  <dimen name="font_size_big">20sp</dimen>
+  <dimen name="font_size_medium">18sp</dimen>
+  <dimen name="font_size_small">14sp</dimen>
   <dimen name="divider_height">1dp</dimen>
 </resources>

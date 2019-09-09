@@ -1,7 +1,10 @@
 ﻿using Android.OS;
+using Android.Support.V7.Widget;
 using Android.Views;
+using MiraiNotes.Android.Controls;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
+using System.Linq;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
@@ -22,6 +25,16 @@ namespace MiraiNotes.Android.Views.Fragments
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
             SetActionBarTitle("New Task", true);
+
+            //lines below are used to place the icon to the top, otherwise it will appear at the center
+            //of the edittext
+            var editText = view.FindViewById<AppCompatEditText>(Resource.Id.TaskNotes);
+            var innerDrawable = editText.GetCompoundDrawables().First();
+            var gravityDrawable = new TopGravityDrawable(innerDrawable);
+            innerDrawable.SetBounds(0, 0, innerDrawable.IntrinsicWidth, innerDrawable.IntrinsicHeight);
+            gravityDrawable.SetBounds(0, 0, innerDrawable.IntrinsicWidth, innerDrawable.IntrinsicHeight);
+            editText.SetCompoundDrawables(gravityDrawable, null, null, null);
+
             return view;
         }
 

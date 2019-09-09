@@ -1,6 +1,6 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
-using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared;
@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Settings
 {
@@ -23,23 +22,18 @@ namespace MiraiNotes.Android.ViewModels.Settings
     {
         #region Members
         private readonly IMvxNavigationService _navigationService;
-        private readonly IDialogService _dialogService;
 
-        private bool _isBackButtonVisible;
-        private string _currentPageText;
-        private bool _accentColorChanged;
-        private ItemModel _selectedAppTheme;
-        private MvxColor _selectedAccentColor;
         private ItemModel _selectedTaskListSortOrder;
         private ItemModel _selectedTaskSortOrder;
-        private readonly MvxInteraction<SettingsPageType> _onSettingItemSelected = new MvxInteraction<SettingsPageType>();
         private readonly MvxInteraction<MvxColor> _onAccentColorSelected = new MvxInteraction<MvxColor>();
         #endregion
 
-        #region Properties
+        #region Interactors
         public IMvxInteraction<MvxColor> OnAccentColorSelected
             => _onAccentColorSelected;
+        #endregion        
 
+        #region Properties
         public MvxObservableCollection<ItemModel> AppThemes => new MvxObservableCollection<ItemModel>
         {
             new ItemModel
@@ -189,17 +183,6 @@ namespace MiraiNotes.Android.ViewModels.Settings
             {
                 AppSettings.AskForPasswordWhenAppStarts = value;
                 RaisePropertyChanged(() => AskForPasswordWhenAppStarts);
-                //if (value)
-                //{
-                //    //_dispatcher.CheckBeginInvokeOnUi(async () =>
-                //    //{
-                //    //    bool isPasswordSaved = await _dialogService.ShowCustomDialog(CustomDialogType.PASSWORD_DIALOG);
-                //    //    AppSettings.AskForPasswordWhenAppStarts = isPasswordSaved;
-                //    //    RaisePropertyChanged(nameof(AskForPasswordWhenAppStarts));
-                //    //});
-                //}
-                //else
-                //    AppSettings.AskForPasswordWhenAppStarts = value;
             }
         }
 
@@ -214,20 +197,17 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
         #region Commands
         public IMvxCommand<MvxColor> AccentColorChangedCommand { get; private set; }
-        public IMvxCommand AskForPasswordWhenAppStartsCommand { get; private set; }
+        public IMvxAsyncCommand AskForPasswordWhenAppStartsCommand { get; private set; }
         #endregion
-
 
         public SettingsGeneralViewModel(
             IMvxTextProvider textProvider,
             IMvxMessenger messenger,
             IMvxNavigationService navigationService,
-            IAppSettingsService appSettings,
-            IDialogService dialogService)
+            IAppSettingsService appSettings)
             : base(textProvider, messenger, appSettings)
         {
             _navigationService = navigationService;
-            _dialogService = dialogService;
 
             AccentColors = AppConstants.AppAccentColors
                 .Select(hex => hex.ToColor())
@@ -241,12 +221,25 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             AccentColorChangedCommand = new MvxCommand<MvxColor>(color =>
             {
-                _dialogService.ShowWarningToast("Hiciste click en " + color.ARGB);
                 _onAccentColorSelected.Raise(color);
                 SelectedAccentColor = color;
             });
-            AskForPasswordWhenAppStartsCommand = new MvxCommand(
-                () => AskForPasswordWhenAppStarts = !AskForPasswordWhenAppStarts);
+            AskForPasswordWhenAppStartsCommand = new MvxAsyncCommand(async () =>
+            {
+                var prompt = !AskForPasswordWhenAppStarts;
+
+                if (prompt)
+                {
+                    var result = await _navigationService.Navigate<PasswordDialogViewModel, bool, bool>(false);
+                    AskForPasswordWhenAppStarts = result;
+                }
+                else
+                {
+                    AskForPasswordWhenAppStarts = prompt;
+                }
+
+                Messenger.Publish(new HideKeyboardMsg(this));
+            });
         }
     }
 }

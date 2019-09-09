@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
-using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
-using MiraiNotes.Android.Messages;
+using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
@@ -17,11 +12,14 @@ using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 using Serilog;
+using System;
+using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
+        #region Members
         private readonly IMvxNavigationService _navigationService;
         private readonly ILogger _logger;
         private readonly ISyncService _syncService;
@@ -33,6 +31,15 @@ namespace MiraiNotes.Android.ViewModels
         private bool _showLoading;
         private bool _showLoginButton = true;
 
+        private MvxInteraction<string> _loginRequest = new MvxInteraction<string>();
+        #endregion
+
+        #region Interactors
+        public IMvxInteraction<string> LoginRequest
+            => _loginRequest;
+        #endregion
+
+        #region Properties
         public bool ShowLoading
         {
             get => _showLoading;
@@ -49,10 +56,13 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _showLoginButton, value);
         }
 
+        #endregion
 
+        #region Commands
         public IMvxCommand LoginCommand { get; private set; }
         public IMvxCommand OnAuthCodeGrantedCommand { get; private set; }
         public IMvxCommand InitViewCommand { get; private set; }
+        #endregion
 
         public LoginViewModel(
             IMvxTextProvider textProvider,
@@ -88,7 +98,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             ShowLoading = true;
             var url = _googleApiService.GetAuthorizationUrl();
-            Messenger.Publish(new LoginRequestMsg(this, url));
+            _loginRequest.Raise(url);
         }
 
         public async Task OnCodeGranted(string approvalCode)
@@ -286,29 +296,18 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
-            //TODO: REMOVE THIS WHEN THE LOGIN DIALOG AND SETTINGS ARE READY
-            if (AppSettings.AskForPasswordWhenAppStarts)
-            {
-                AppSettings.AskForPasswordWhenAppStarts = false;
-            }
-
             if (isUserLoggedIn && AppSettings.AskForPasswordWhenAppStarts)
             {
                 ShowLoading = false;
-                _dialogService.ShowLoginDialog(async password =>
+                var passwordMatches = await _navigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
+                if (passwordMatches)
                 {
-                    var passwordMatches = await PasswordMatches(password);
-                    if (passwordMatches)
-                    {
-                        await _navigationService.Close(this);
-                        await _navigationService.Navigate<MainViewModel>();
-                    }
-                });
+                    await GoToMainPage();
+                }
             }
             else if (isUserLoggedIn)
             {
-                await _navigationService.Close(this);
-                await _navigationService.Navigate<MainViewModel>();
+                await GoToMainPage();
             }
             else
             {
@@ -316,15 +315,10 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        private async Task<bool> PasswordMatches(string pass)
+        private async Task GoToMainPage()
         {
-            var response = await _dataService.UserService.GetCurrentActiveUserAsync();
-            string currentPassword = _userCredentialService.GetUserCredential(
-                ResourceType.SETTINGS_PASSWORD_RESOURCE,
-                response.Result.Email);
-
-            return currentPassword == pass;
-            //            IsErrorVisible = true;
+            await _navigationService.Close(this);
+            await _navigationService.Navigate<MainViewModel>();
         }
     }
 }

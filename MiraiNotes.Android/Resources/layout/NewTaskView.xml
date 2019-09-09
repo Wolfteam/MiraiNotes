@@ -32,7 +32,7 @@
                     app:MvxBind="Visibility Visibility(ShowProgressBar)"/>
 
                 <TextView
-                    android:drawableStart="@drawable/ic_edit_black_24dp"
+                    android:drawableLeft="@drawable/ic_edit_black_24dp"
                     android:drawablePadding="16dp"
                     android:drawableTint="?IconColor"
                     android:layout_margin="12dp"
@@ -44,7 +44,7 @@
                     android:textStyle="bold"/>
 
                 <android.support.v7.widget.AppCompatEditText
-                    android:drawableStart="@drawable/ic_note_black_24dp"
+                    android:drawableLeft="@drawable/ic_note_black_24dp"
                     android:drawablePadding="16dp"
                     android:drawableTint="?IconColor"
                     android:layout_margin="12dp"
@@ -54,16 +54,19 @@
                     android:textColorHint="?TextInvertedColor"
                     android:inputType="textShortMessage"
                     android:background="@android:color/transparent"
-                    app:MvxBind="Text Task.Title"/>
-
+                    app:MvxBind="Text Task.Title; Error Errors['Title']"/>
+                    
                 <android.support.v7.widget.AppCompatEditText
-                    android:drawableStart="@drawable/ic_list_black_24dp"
+                    android:id="@+id/TaskNotes"
+                    android:drawableLeft="@drawable/ic_list_black_24dp"
                     android:drawablePadding="16dp"
                     android:drawableTint="?IconColor"
-                    android:layout_margin="12dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginBottom="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="100dp"
                     android:inputType="textMultiLine"
                     android:verticalScrollbarPosition="right"
                     android:elegantTextHeight="true"
@@ -71,7 +74,7 @@
                     android:hint="Notes"
                     android:textColorHint="?TextInvertedColor"
                     android:background="@android:color/transparent"
-                    app:MvxBind="Text Task.Notes"/>
+                    app:MvxBind="Text Task.Notes; Error Errors['Notes']"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

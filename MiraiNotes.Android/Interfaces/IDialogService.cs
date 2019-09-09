@@ -12,8 +12,6 @@ namespace MiraiNotes.Android.Interfaces
         void ShowSnackBar(string msg, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false);
         void ShowSnackBar(string msg, Action onClick, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false);
 
-        void ShowLoginDialog(Action<string> onOk = null, Action onCancel = null);
-
         void ShowDialog(
             string title,
             string msg,

@@ -73,18 +73,18 @@ namespace MiraiNotes.Android
 
             if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
             {
-                _dialogService.ShowLoginDialog(async password =>
-                {
-                    var result = await PasswordMatches(password);
-                    if (result)
-                    {
-                        await NavigationService.Navigate<MainViewModel>();
-                    }
-                    else
-                    {
-                        await NavigationService.Navigate<LoginViewModel>();
-                    }
-                });
+                //_dialogService.ShowLoginDialog(async password =>
+                //{
+                //    var result = await PasswordMatches(password);
+                //    if (result)
+                //    {
+                //        await NavigationService.Navigate<MainViewModel>();
+                //    }
+                //    else
+                //    {
+                //        await NavigationService.Navigate<LoginViewModel>();
+                //    }
+                //});
             }
             else if (isUserLoggedIn)
             {

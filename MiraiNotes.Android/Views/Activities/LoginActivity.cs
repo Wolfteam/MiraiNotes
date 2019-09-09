@@ -3,16 +3,17 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Preferences;
-using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments.Dialogs;
+using MvvmCross.Binding.BindingContext;
+using MvvmCross.ViewModels;
 using AndroidUri = Android.Net.Uri;
 
 namespace MiraiNotes.Android.Views.Activities
 {
     [Activity(
-        Label = "@string/app_name", 
-        NoHistory = true, 
+        Label = "@string/app_name",
+        NoHistory = true,
         LaunchMode = LaunchMode.SingleTask
     )]
     [IntentFilter(
@@ -25,11 +26,28 @@ namespace MiraiNotes.Android.Views.Activities
         public override int LayoutId =>
             Resource.Layout.Login;
 
+        private IMvxInteraction<string> _loginRequest;
+
+        public IMvxInteraction<string> LoginRequest
+        {
+            get => _loginRequest;
+            set
+            {
+                if (_loginRequest != null)
+                    _loginRequest.Requested -= (sender, args) => Login(args.Value);
+
+                _loginRequest = value;
+                _loginRequest.Requested += (sender, args) => Login(args.Value);
+            }
+        }
+
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            var loginMsg = ViewModel.Messenger.Subscribe<LoginRequestMsg>(msg => Login(msg.Url));
-            ViewModel.SubscriptionTokens.Add(loginMsg);
+            var set = this.CreateBindingSet<LoginActivity, LoginViewModel>();
+            set.Bind(this).For(v => v.LoginRequest).To(vm => vm.LoginRequest).OneWay();
+            set.Apply();
         }
 
         protected override void OnResume()

@@ -26,6 +26,7 @@ namespace MiraiNotes.Android.Views.Activities
         public override bool OnSupportNavigateUp()
         {
             OnBackPressed();
+            HideSoftKeyboard();
             return true;
         }
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Dto;
@@ -22,6 +23,7 @@ namespace MiraiNotes.Android.ViewModels
 {
     public class NewTaskViewModel : BaseViewModel<Tuple<TaskListItemViewModel, string>>
     {
+        #region Members
         private readonly IMvxNavigationService _navigationService;
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
@@ -37,6 +39,10 @@ namespace MiraiNotes.Android.ViewModels
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
         private TaskListItemViewModel _selectedTaskList;
 
+        private ObservableDictionary<string, string> _errors = new ObservableDictionary<string, string>();
+        #endregion
+
+        #region Properties
         public bool ShowProgressBar
         {
             get => _showProgressBar;
@@ -61,11 +67,20 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _selectedTaskList, value);
         }
 
+        public ObservableDictionary<string, string> Errors
+        {
+            get => _errors;
+            set => SetProperty(ref _errors, value);
+        }
+        #endregion
 
+
+        #region Commands
         public IMvxAsyncCommand SaveChangesCommand { get; private set; }
         public IMvxAsyncCommand CloseCommand { get; private set; }
         public IMvxAsyncCommand ChangeTaskStatusCommand { get; private set; }
         public IMvxCommand DeleteTaskCommand { get; private set; }
+        #endregion
 
         public NewTaskViewModel(
             IMvxTextProvider textProvider,
@@ -144,6 +159,8 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
+            TaskLists = _mapper.Map<MvxObservableCollection<TaskListItemViewModel>>(dbResponse.Result);
+
             SelectedTaskList = TaskLists
                 .FirstOrDefault(t => t.Id == _currentTaskList.Id);
             ShowProgressBar = false;
@@ -197,6 +214,12 @@ namespace MiraiNotes.Android.ViewModels
                     $"The selected task list and the current task list cant be null", string.Empty);
                 return;
             }
+
+            if (!Validate())
+            {
+                return;
+            }
+
 
             if (Task.RemindOn.HasValue)
             {
@@ -412,11 +435,11 @@ namespace MiraiNotes.Android.ViewModels
             task.UpdatedAt = response.Result.UpdatedAt;
 
             Messenger.Publish(new TaskStatusChangedMsg(
-                this, 
-                task.TaskID, 
-                task.ParentTask, 
-                task.CompletedOn, 
-                task.UpdatedAt, 
+                this,
+                task.TaskID,
+                task.ParentTask,
+                task.CompletedOn,
+                task.UpdatedAt,
                 task.Status));
 
 
@@ -510,8 +533,8 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task RemoveTaskNotificationDate(TaskNotificationDateType dateType)
         {
-            string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE 
-                ? "completition" 
+            string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE
+                ? "completition"
                 : "reminder";
 
             ShowProgressBar = true;
@@ -647,6 +670,21 @@ namespace MiraiNotes.Android.ViewModels
                        .ToList() ??
                    Enumerable.Empty<TaskItemViewModel>()
                        .ToList();
+        }
+
+        private bool Validate()
+        {
+            if (string.IsNullOrEmpty(Task.Title))
+            {
+                Errors.Add("Title", "Title is required");
+            }
+
+            if (string.IsNullOrEmpty(Task.Notes))
+            {
+                Errors.Add("Notes", "Notes is required");
+            }
+
+            return false;
         }
     }
 }

@@ -24,7 +24,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
+            android:background="?AccentColor"
             android:text="Login"
             android:textSize="22dp"
             app:MvxBind="Click LoginCommand; Visibility Visibility(ShowLoginButton)"/>
@@ -35,47 +35,4 @@
         android:layout_height="200dp"
         android:layout_centerInParent="true"
         app:MvxBind="Visibility Visibility(ShowLoading)"/>
-    <!--
-    <com.google.android.gms.common.SignInButton
-            android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="30dp"
-            android:layout_height="wrap_content"
-            app:MvxBind="Click LoginCommand; Clickable ShowLoginButton"/>-->
-    <!--<RelativeLayout android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_below="@id/GoogleSignUp"-->
-    <!--android:id="@+id/relativeLayout1"-->
-    <!--android:layout_marginLeft="20dp">-->
-    <!--<TextView android:text="Name : "-->
-    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/textView1"/>-->
-    <!--<TextView android:textAppearance="?android:attr/textAppearanceMedium"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_toRightOf="@+id/textView1"-->
-    <!--android:id="@+id/TxtName"-->
-    <!--android:layout_marginLeft="10dp"/>-->
-    <!--<Button android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Login"-->
-    <!--android:id="@+id/loginButton"/>-->
-    <!--</RelativeLayout>-->
-    <!--<RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"-->
-    <!--android:layout_below="@+id/relativeLayout1" android:id="@+id/relativeLayout2"-->
-    <!--android:layout_marginLeft="20dp" android:layout_marginTop="10dp">-->
-    <!--<TextView android:text="Gender : " android:textAppearance="?android:attr/textAppearanceMedium"-->
-    <!--android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/textView2"/>-->
-    <!--<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content" android:layout_toRightOf="@+id/textView2"-->
-    <!--android:id="@+id/TxtGender"/>-->
-    <!--</RelativeLayout>-->
-    <!--<ImageView android:src="@android:drawable/ic_menu_gallery" android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content" android:layout_below="@id/relativeLayout2"-->
-    <!--android:id="@+id/ImgProfile" android:layout_centerInParent="true" android:layout_marginTop="50dp"/>-->
-
 </RelativeLayout>

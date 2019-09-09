@@ -65,6 +65,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
         public IMvxCommand LogoutCommand { get; private set; }
         public IMvxAsyncCommand InitViewCommand { get; private set; }
+        public IMvxCommand SyncCommand { get; private set; }
         #endregion
 
         public MainViewModel(
@@ -104,6 +105,8 @@ namespace MiraiNotes.Android.ViewModels
             });
             InitViewCommand = new MvxAsyncCommand(
                 async () => await _navigationService.Navigate<MenuViewModel>());
+
+            SyncCommand = new MvxCommand(() => _dialogService.ShowWarningToast("sync is not implemented"));
         }
 
         private void RegisterMessages()
