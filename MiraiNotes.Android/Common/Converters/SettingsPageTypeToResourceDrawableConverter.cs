@@ -3,7 +3,7 @@ using MvvmCross.Converters;
 using System;
 using System.Globalization;
 
-namespace MiraiNotes.Android.Converters
+namespace MiraiNotes.Android.Common.Converters
 {
     public class SettingsPageTypeToResourceDrawableConverter : MvxValueConverter<SettingsPageType, int>
     {

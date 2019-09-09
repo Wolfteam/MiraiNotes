@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace MiraiNotes.Android.Converters
+namespace MiraiNotes.Android.Common.Converters
 {
     public class InverseBooleanConverter : MvxValueConverter<bool, bool>
     {
