@@ -10,5 +10,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
         app:titleTextColor="@android:color/black"
-		app:layout_scrollFlags="scroll|enterAlways"/>
+		app:layout_scrollFlags="scroll|enterAlways"
+        app:MvxBind="Title Title"/>
 </android.support.design.widget.AppBarLayout>

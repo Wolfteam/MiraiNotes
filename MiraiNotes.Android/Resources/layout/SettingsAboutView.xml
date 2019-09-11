@@ -38,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later."
-            android:textSize="@dimen/settings_font_size_content"/>
+            android:textSize="@dimen/settings_font_size_content"
+            app:MvxBind="Text ['AboutSummary']"/>
 
         <View
             android:layout_width="match_parent"
@@ -52,13 +53,15 @@
             android:layout_height="wrap_content"
             android:text="Donations"
             android:textStyle="bold"
-            android:textSize="@dimen/settings_font_size_header"/>
+            android:textSize="@dimen/settings_font_size_header"
+            app:MvxBind="Text ['Donations']"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email."
-            android:textSize="@dimen/settings_font_size_content"/>
+            android:textSize="@dimen/settings_font_size_content"
+            app:MvxBind="Text ['AboutDonations']"/>
 
         <View
             android:layout_width="match_parent"
@@ -72,13 +75,15 @@
             android:layout_height="wrap_content"
             android:text="Support"
             android:textStyle="bold"
-            android:textSize="@dimen/settings_font_size_header"/>
+            android:textSize="@dimen/settings_font_size_header"
+            app:MvxBind="Text ['Support']"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
-            android:textSize="@dimen/settings_font_size_content"/>
+            android:textSize="@dimen/settings_font_size_content"
+            app:MvxBind="Text ['AboutSupport']"/>
 
         <TextView
             android:id="@+id/GitHubLink"

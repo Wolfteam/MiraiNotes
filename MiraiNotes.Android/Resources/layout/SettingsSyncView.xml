@@ -20,14 +20,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Default synchronization interval"
-                android:textSize="@dimen/settings_font_size_content"/>
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text [DefaultSyncInterval]"/>
 
             <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:spinnerMode="dialog"
                 android:gravity="center"
-                android:tooltipText="Select a sync interval"
                 app:MvxBind="ItemsSource SyncBgTaskIntervalTypes; SelectedItem CurrentSyncBackgroundTaskInterval"
                 app:MvxItemTemplate="@layout/defaultspinneritem"
                 app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
@@ -48,7 +48,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="Run a full sync when the app starts"
-                android:textSize="@dimen/settings_font_size_content"/>
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['RunFullSyncWhenAppStarts']"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:layout_width="wrap_content"
@@ -74,7 +75,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="Run a full sync after switching accounts"
-                android:textSize="@dimen/settings_font_size_content"/>
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['RunFullSyncAfterSwitchingAccounts']"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:layout_width="wrap_content"

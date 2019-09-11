@@ -54,7 +54,7 @@
                     android:textColorHint="?TextInvertedColor"
                     android:inputType="textShortMessage"
                     android:background="@android:color/transparent"
-                    app:MvxBind="Text Task.Title; Error Errors['Title']"/>
+                    app:MvxBind="Text Task.Title; Error Errors['Title']; Hint [Title]"/>
                     
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/TaskNotes"
@@ -74,7 +74,7 @@
                     android:hint="Notes"
                     android:textColorHint="?TextInvertedColor"
                     android:background="@android:color/transparent"
-                    app:MvxBind="Text Task.Notes; Error Errors['Notes']"/>
+                    app:MvxBind="Text Task.Notes; Error Errors['Notes']; Hint [Notes]"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
