@@ -50,6 +50,13 @@ namespace MiraiNotes.UWP.Services
             get => (bool)(_settings[nameof(AskForPasswordWhenAppStarts)] ?? false);
             set => _settings[nameof(AskForPasswordWhenAppStarts)] = value;
         }
+
+        //TODO: SUPPORT MULTIPLE LANG
+        public AppLanguageType AppLanguage
+        {
+            get => AppLanguageType.English;
+            set => _settings[nameof(AppLanguage)] = (int)value;
+        }
         #endregion
 
 

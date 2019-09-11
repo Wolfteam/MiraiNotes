@@ -24,7 +24,6 @@ namespace MiraiNotes.Android.Services
             set => SetInt(nameof(AppTheme), (int) value);
         }
 
-        //TODO: CHECK THE SYSTEM ACCENT COLOR?
         public string AppHexAccentColor
         {
             get => GetString(nameof(AppHexAccentColor)) ?? AppConstants.AppAccentColors.First();
@@ -55,6 +54,11 @@ namespace MiraiNotes.Android.Services
             set => SetBoolean(nameof(AskForPasswordWhenAppStarts), value);
         }
 
+        public AppLanguageType AppLanguage
+        {
+            get => (AppLanguageType)GetInt(nameof(AppLanguage));
+            set => SetInt(nameof(AppLanguage), (int)value);
+        }
         #endregion
 
         #region Synchronization

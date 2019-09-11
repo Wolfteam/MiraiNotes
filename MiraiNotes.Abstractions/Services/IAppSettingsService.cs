@@ -27,5 +27,7 @@ namespace MiraiNotes.Abstractions.Services
         void ResetAppSettings();
 
         bool RunFullSyncAfterSwitchingAccounts { get; set; }
+
+        AppLanguageType AppLanguage { get; set; }
     }
 }
