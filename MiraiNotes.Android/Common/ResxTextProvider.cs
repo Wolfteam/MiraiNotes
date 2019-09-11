@@ -1,4 +1,5 @@
-﻿using MvvmCross;
+﻿using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Core.Enums;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.Plugin.ResxLocalization;
 using System.Globalization;
@@ -6,33 +7,27 @@ using System.Resources;
 
 namespace MiraiNotes.Android
 {
-    public class ResxTextProvider : MvxResxTextProvider
+    public class ResxTextProvider : MvxResxTextProvider, ITextProvider
     {
-        private readonly ResourceManager _resourceManager;
-        private readonly MvxSubscriptionToken _token;
-        IMvxMessenger messenger;
+        private readonly IMvxMessenger _messenger;
 
-        public ResxTextProvider(ResourceManager resourceManager) : base(resourceManager)
+        public ResxTextProvider(
+            ResourceManager resourceManager,
+            IMvxMessenger messenger)
+            : base(resourceManager)
         {
-            _resourceManager = resourceManager;
-
-            messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
-            if (messenger != null)
-            {
-                _token = messenger.Subscribe<LanguageChangedMsg>(OnlanguageChange);
-            }
+            _messenger = messenger;
         }
 
-        private void OnlanguageChange(LanguageChangedMsg msg)
+        public void SetLanguage(AppLanguageType appLanguage)
         {
-            //Settings.ApplicationLanguage = code;
-            //Strings.Culture = new CultureInfo(code);
-            //CultureInfo.DefaultThreadCurrentUICulture = Strings.Culture;
-            //((MvxResxTextProvider)textProvider).CurrentLanguage = Strings.Culture;
+            string lang = appLanguage == AppLanguageType.English
+                ? "en"
+                : "es";
 
-            //let all ViewModels that are active know the culture changed
-            CurrentLanguage = new CultureInfo(msg.Language);
-            messenger.Publish(new CultureChangedMessage(this));
+            CurrentLanguage = new CultureInfo(lang);
+            //let all ViewModels that are active know that the culture has changed
+            _messenger.Publish(new AppLanguageChangedMessage(this, appLanguage));
         }
     }
 }

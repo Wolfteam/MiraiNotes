@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using Android.App;
+﻿using Android.App;
 using AutoMapper;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.GoogleApi;
@@ -10,17 +7,22 @@ using MiraiNotes.Android.Common;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Services;
 using MiraiNotes.Android.ViewModels;
+using MiraiNotes.Android.ViewModels.Dialogs;
+using MiraiNotes.Android.ViewModels.Settings;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Services.Data;
 using MvvmCross;
 using MvvmCross.IoC;
-using MvvmCross.Localization;
+using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 using Refit;
 using Serilog;
 using Serilog.Core;
 using Serilog.Filters;
+using System;
+using System.IO;
+using System.Net.Http;
 
 namespace MiraiNotes.Android
 {
@@ -35,8 +37,9 @@ namespace MiraiNotes.Android
                 .AsInterfaces()
                 .RegisterAsLazySingleton();
 
-            Mvx.IoCProvider.RegisterSingleton<IMvxTextProvider>(
-                new ResxTextProvider(Localization.Resource.ResourceManager));
+            Mvx.IoCProvider.RegisterSingleton<ITextProvider>(
+                new ResxTextProvider(Localization.Resource.ResourceManager,
+                Mvx.IoCProvider.Resolve<IMvxMessenger>()));
 
             var logger = SetupLogging();
             Mvx.IoCProvider.RegisterType(() => logger);
@@ -114,6 +117,96 @@ namespace MiraiNotes.Android
                         Matching.FromSource($"{typeof(UserDataService).Namespace}.{nameof(UserDataService)}"))
                     .WriteTo.File(
                         Path.Combine(externalFolder, "Logs", "mirai_notes_user_data_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(AccountDialogViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_account_dialog_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(PasswordDialogViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_password_dialog_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(PasswordDialogViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_password_dialog_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(SettingsMainViewModel).Namespace}.{nameof(SettingsMainViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_settings_main_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(GoogleUserViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_google_user_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(LoginViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_login_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(MainViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_main_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(MenuViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_menu_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(NewTaskViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_newtask_vm_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(TasksViewModel)}"))
+                    .WriteTo.File(
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_tasks_vm_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
