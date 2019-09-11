@@ -112,11 +112,11 @@
     <Compile Include="Common\Messages\AccountChangeRequestMsg.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
     <Compile Include="Common\Messages\AppThemeChangedMsg.cs" />
-    <Compile Include="Common\Messages\CultureChangedMessage.cs" />
+    <Compile Include="Common\Messages\AppLanguageChangedMessage.cs" />
     <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
     <Compile Include="Common\Messages\HideKeyboardMsg.cs" />
-    <Compile Include="Common\Messages\LanguageChangedMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
+    <Compile Include="Common\Messages\SettingsTitleChanged.cs" />
     <Compile Include="Common\Messages\ShowDrawerMsg.cs" />
     <Compile Include="Common\Messages\ShowProgressOverlayMsg.cs" />
     <Compile Include="Common\Messages\ShowTasksLoadingMsg.cs" />
@@ -139,9 +139,9 @@
     <Compile Include="Common\Converters\SettingsPageTypeToResourceDrawableConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
     <Compile Include="Common\Extensions\ObservableDictionary.cs" />
+    <Compile Include="Interfaces\ITextProvider.cs" />
     <Compile Include="Listeners\ClickListener.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
-    <Compile Include="Models\LoginDialogResult.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
@@ -200,12 +200,6 @@
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\activity_main.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\content_main.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
     <AndroidResource Include="Resources\values\colors.xml" />
     <AndroidResource Include="Resources\values\dimens.xml" />
     <AndroidResource Include="Resources\values\ic_launcher_background.xml" />
@@ -294,12 +288,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\" />
     <Folder Include="Resources\xml\" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\layout\task_item.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\tag.axml">
@@ -328,6 +318,7 @@
     <EmbeddedResource Include="Localization\Resource.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
