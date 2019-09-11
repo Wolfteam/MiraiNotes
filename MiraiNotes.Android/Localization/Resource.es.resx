@@ -117,15 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Welcome" xml:space="preserve">
-    <value>Bienvenido a mi app</value>
-  </data>
-  <data name="Testing" xml:space="preserve">
-    <value>Probando x2</value>
-  </data>
-  <data name="Change_Theme" xml:space="preserve">
-    <value>Cambiar el tema</value>
-  </data>
   <data name="General" xml:space="preserve">
     <value>General</value>
   </data>
@@ -140,5 +131,233 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Ajustes</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>Ligero</value>
+  </data>
+  <data name="SortByNameAsc" xml:space="preserve">
+    <value>Por nombre asc</value>
+  </data>
+  <data name="SortByNameDesc" xml:space="preserve">
+    <value>Por nombre desc</value>
+  </data>
+  <data name="SortByUpdatedDateAsc" xml:space="preserve">
+    <value>Por fecha de actualización asc</value>
+  </data>
+  <data name="SortByUpdatedDateDesc" xml:space="preserve">
+    <value>Por fecha de actualización desc</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>Inglés</value>
+  </data>
+  <data name="Spanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="SettingsGeneral" xml:space="preserve">
+    <value>Modo de ordenamiento predeterminado, temas, etc.</value>
+  </data>
+  <data name="SettingsSync" xml:space="preserve">
+    <value>Intervalos de tareas en segundo plano.</value>
+  </data>
+  <data name="SettingsNotif" xml:space="preserve">
+    <value>Notificaciones toast</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>Github repo, información de contacto, donaciones.</value>
+  </data>
+  <data name="Never" xml:space="preserve">
+    <value>Nunca</value>
+  </data>
+  <data name="Sync12" xml:space="preserve">
+    <value>Cada 12 horas</value>
+  </data>
+  <data name="Sync6" xml:space="preserve">
+    <value>Cada 6 horas</value>
+  </data>
+  <data name="Sync3" xml:space="preserve">
+    <value>Cada 3 horas</value>
+  </data>
+  <data name="Sync24" xml:space="preserve">
+    <value>Cada 24 horas</value>
+  </data>
+  <data name="AppTheme" xml:space="preserve">
+    <value>Temas</value>
+  </data>
+  <data name="ChooseAppTheme" xml:space="preserve">
+    <value>Escoja un tema</value>
+  </data>
+  <data name="AccentColor" xml:space="preserve">
+    <value>Color de Acento</value>
+  </data>
+  <data name="ChooseAccentColor" xml:space="preserve">
+    <value>Escoja un color de acento</value>
+  </data>
+  <data name="TaskListAndTasks" xml:space="preserve">
+    <value>Lista de tareas y Tareas</value>
+  </data>
+  <data name="DefaultTasklistSortOrder" xml:space="preserve">
+    <value>Modo de ordenamiento por defecto de las listas de tareas</value>
+  </data>
+  <data name="DefaultTaskSortOrder" xml:space="preserve">
+    <value>Modo de ordenamiento por defecto de las tareas</value>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>Otros</value>
+  </data>
+  <data name="ChooseAppLanguage" xml:space="preserve">
+    <value>Escoja un idioma para la aplicación</value>
+  </data>
+  <data name="AskForPassword" xml:space="preserve">
+    <value>Solicitar una contraseña al iniciar la aplicación</value>
+  </data>
+  <data name="AboutSummary" xml:space="preserve">
+    <value>Esta aplicación utiliza Google Tasks para obtener / actualizar sus listas de tareas y tareas, también le permite interactuar con ellas sin conexión y sincronizarlas más tarde.</value>
+  </data>
+  <data name="AboutDonations" xml:space="preserve">
+    <value>Espero que esté disfrutando de esta aplicación, si desea comprarme un café / cerveza, ¡solo envíeme un correo electrónico!</value>
+  </data>
+  <data name="AboutSupport" xml:space="preserve">
+    <value>Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:</value>
+  </data>
+  <data name="Donations" xml:space="preserve">
+    <value>Donaciones</value>
+  </data>
+  <data name="Support" xml:space="preserve">
+    <value>Soporte</value>
+  </data>
+  <data name="ShowNotifAfterFullSync" xml:space="preserve">
+    <value>Mostrar una notificación después de una sincronización</value>
+  </data>
+  <data name="DefaultSyncInterval" xml:space="preserve">
+    <value>Intervalo de sincronización por defecto</value>
+  </data>
+  <data name="RunFullSyncWhenAppStarts" xml:space="preserve">
+    <value>Ejecutar una sincronización completa cuando la aplicación inicia</value>
+  </data>
+  <data name="RunFullSyncAfterSwitchingAccounts" xml:space="preserve">
+    <value>Ejecutar una sincronización completa después de cambiar de cuenta</value>
+  </data>
+  <data name="NewTaskList" xml:space="preserve">
+    <value>Nueva Lista de Tareas</value>
+  </data>
+  <data name="NewTask" xml:space="preserve">
+    <value>Nueva Tarea</value>
+  </data>
+  <data name="TypeYourPassword" xml:space="preserve">
+    <value>Introduce tu contraseña</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notas</value>
+  </data>
+  <data name="Accounts" xml:space="preserve">
+    <value>Cuentas</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Agregar</value>
+  </data>
+  <data name="UnknownErrorOccurred" xml:space="preserve">
+    <value>Un error inesperado ha ocurrido</value>
+  </data>
+  <data name="NetworkNotAvailable" xml:space="preserve">
+    <value>La red no esta disponible</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Usuario no encontrado</value>
+  </data>
+  <data name="DatabaseUnknownError" xml:space="preserve">
+    <value>Un error inesperado ha ocurrido al intentar consultar la base de datos</value>
+  </data>
+  <data name="DefaultAccountCantBeDeleted" xml:space="preserve">
+    <value>No puedes borrar la cuenta por defecto</value>
+  </data>
+  <data name="SyncUnknownError" xml:space="preserve">
+    <value>Un error inesperado de sincronización ha ocurrido</value>
+  </data>
+  <data name="AutomaticSyncWasPerformed" xml:space="preserve">
+    <value>Sincronización automática fue completada exitosamente</value>
+  </data>
+  <data name="NetworkNotAvailableForSync" xml:space="preserve">
+    <value>La red no esta disponible, la sincronización automática no será ejecutada</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Borrar</value>
+  </data>
+  <data name="DeleteThisAccount" xml:space="preserve">
+    <value>¿ Estás seguro que deseas borrar esta cuenta ?</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Si</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="UnnistalledAppWithoutSigningOut" xml:space="preserve">
+    <value>¿ Desinstalaste la app sin cerrar sesión ? Cerrando sesión...</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmación</value>
+  </data>
+  <data name="WannaLogOut" xml:space="preserve">
+    <value>¿ Estás seguro que deseas cerrar sesión ?</value>
+  </data>
+  <data name="DeleteTask" xml:space="preserve">
+    <value>¿ Estás seguro que quieres borrar esta tarea ?</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Bienvenido a Mirai Notes</value>
+  </data>
+  <data name="InvalidTaskRemindOn" xml:space="preserve">
+    <value>La fecha de recordatorio debe ser al menos 2 minutos mayor a la fecha actual</value>
+  </data>
+  <data name="MoveTaskConfirmation" xml:space="preserve">
+    <value>Ya que estas moviendo una tarea existente a una lista de tareas diferente, cualquier cambio hecho aquí y que no haya sido salvado se perderá. ¿ Estás seguro que deseas continuar ?</value>
+  </data>
+  <data name="TaskWasCreated" xml:space="preserve">
+    <value>La tarea fue creada exitosamente dentro de {0}</value>
+  </data>
+  <data name="MarkTaskAsConfirmation" xml:space="preserve">
+    <value>¿ Marcar {0} como {1} ?</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completada</value>
+  </data>
+  <data name="Incompleted" xml:space="preserve">
+    <value>Incompleta</value>
+  </data>
+  <data name="TaskStatusChanged" xml:space="preserve">
+    <value>{0} fue marcada como {1}</value>
+  </data>
+  <data name="TaskWasMoved" xml:space="preserve">
+    <value>La tarea fue movida exitosamente desde: {0} hacia: {1}</value>
+  </data>
+  <data name="Completition" xml:space="preserve">
+    <value>Completación</value>
+  </data>
+  <data name="Reminder" xml:space="preserve">
+    <value>Recordatorio</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Guardar cambios</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Descartar cambios</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Tareas</value>
+  </data>
+  <data name="UpdateTask" xml:space="preserve">
+    <value>Editar Tarea</value>
   </data>
 </root>
