@@ -99,7 +99,11 @@ namespace MiraiNotes.Android.ViewModels
             {
                 Messenger.Subscribe<ShowDrawerMsg>(msg => _showDrawer.Raise(msg.Show)),
                 Messenger.Subscribe<AppThemeChangedMsg>(msg => _appThemeChanged.Raise(msg)),
-                Messenger.Subscribe<AppLanguageChangedMessage>(msg => _appLanguageChanged.Raise()),
+                Messenger.Subscribe<AppLanguageChangedMessage>(msg => 
+                {
+                    if (msg.RestartActivity)
+                        _appLanguageChanged.Raise();
+                }),
                 Messenger.Subscribe<HideKeyboardMsg>(_ => _hideKeyboard.Raise())
             };
 

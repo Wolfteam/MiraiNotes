@@ -5,6 +5,6 @@ namespace MiraiNotes.Android.Interfaces
 {
     public interface ITextProvider : IMvxTextProvider
     {
-        void SetLanguage(AppLanguageType appLanguage);
+        void SetLanguage(AppLanguageType appLanguage, bool restartActivity = true);
     }
 }

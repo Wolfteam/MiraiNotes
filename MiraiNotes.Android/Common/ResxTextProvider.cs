@@ -19,7 +19,7 @@ namespace MiraiNotes.Android
             _messenger = messenger;
         }
 
-        public void SetLanguage(AppLanguageType appLanguage)
+        public void SetLanguage(AppLanguageType appLanguage, bool restartActivity = true)
         {
             string lang = appLanguage == AppLanguageType.English
                 ? "en"
@@ -27,7 +27,7 @@ namespace MiraiNotes.Android
 
             CurrentLanguage = new CultureInfo(lang);
             //let all ViewModels that are active know that the culture has changed
-            _messenger.Publish(new AppLanguageChangedMessage(this, appLanguage));
+            _messenger.Publish(new AppLanguageChangedMessage(this, appLanguage, restartActivity));
         }
     }
 }

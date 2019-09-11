@@ -81,6 +81,8 @@ namespace MiraiNotes.Android.ViewModels
             _dataService = dataService;
             _dialogService = dialogService;
             SetCommands();
+
+            TextProvider.SetLanguage(AppSettings.AppLanguage, false);
         }
 
         public void SetCommands()
@@ -266,8 +268,6 @@ namespace MiraiNotes.Android.ViewModels
 
         public async Task InitView()
         {
-            TextProvider.SetLanguage(AppSettings.AppLanguage);
-
             ShowLoading = true;
             var response = await _dataService
                 .UserService

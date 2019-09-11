@@ -6,9 +6,14 @@ namespace MiraiNotes.Android
     public class AppLanguageChangedMessage : MvxMessage
     {
         public AppLanguageType NewLanguage { get; }
-        public AppLanguageChangedMessage(object sender, AppLanguageType appLanguage) : base(sender)
+        public bool RestartActivity { get;}
+        public AppLanguageChangedMessage(
+            object sender, 
+            AppLanguageType appLanguage,
+            bool restartActivity) : base(sender)
         {
             NewLanguage = appLanguage;
+            RestartActivity = restartActivity;
         }
     }
 }
