@@ -13,6 +13,7 @@ using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,26 +23,31 @@ namespace MiraiNotes.Android.ViewModels
 {
     public class MenuViewModel : BaseViewModel
     {
-        private readonly IMvxNavigationService _navigationService;
+        #region Members
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
         private readonly IGoogleApiService _googleApiService;
         private readonly IUserCredentialService _userCredentialService;
 
-
         private string _currentUserName;
         private string _currentUserEmail;
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
-
-
         private readonly MvxInteraction<string> _onUserProfileImgLoaded = new MvxInteraction<string>();
         private readonly MvxInteraction _onTaskListsLoaded = new MvxInteraction();
+        #endregion
 
+
+
+        #region Interactors
         // need to expose it as a public property for binding (only IMvxInteraction is needed in the view)
-        public IMvxInteraction<string> OnUserProfileImgLoaded => _onUserProfileImgLoaded;
-        public IMvxInteraction OnTaskListsLoaded => _onTaskListsLoaded;
+        public IMvxInteraction<string> OnUserProfileImgLoaded
+            => _onUserProfileImgLoaded;
+        public IMvxInteraction OnTaskListsLoaded
+            => _onTaskListsLoaded;
+        #endregion
 
+        #region Properties
         public string CurrentUserName
         {
             get => _currentUserName;
@@ -54,19 +60,21 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _currentUserEmail, value);
         }
 
-
         public MvxObservableCollection<TaskListItemViewModel> TaskLists
         {
             get => _taskLists;
             set => SetProperty(ref _taskLists, value);
         }
+        #endregion
 
-
+        #region Commands
         public IMvxAsyncCommand<int> OnTaskListSelectedCommand { get; private set; }
+        #endregion
 
         public MenuViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
             IMvxNavigationService navigationService,
             IMapper mapper,
             IDialogService dialogService,
@@ -74,14 +82,13 @@ namespace MiraiNotes.Android.ViewModels
             IAppSettingsService appSettings,
             IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<MenuViewModel>(), navigationService, appSettings)
         {
             _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
             _googleApiService = googleApiService;
-            _navigationService = navigationService;
 
             SetCommands();
             RegisterMessages();
@@ -137,7 +144,10 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!userResponse.Succeed)
             {
-                _dialogService.ShowErrorToast($"Current user couldn't be loaded. {userResponse.Message}");
+                Logger.Error(
+                    $"{nameof(LoadProfileInfo)}: Current active user couldnt be loaded. " +
+                    $"Error = {userResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -185,8 +195,10 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!dbResponse.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"An unknown error occurred while trying to retrieve all the task lists from the db. Error = {dbResponse.Message}");
+                Logger.Error(
+                    $"{nameof(InitView)}: An unknown error occurred while trying to retrieve all " +
+                    $"the task lists from the db. Error = {dbResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -252,7 +264,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             var taskList = TaskLists[position];
             await Task.Delay(300);
-            await _navigationService.Navigate<TasksViewModel, TaskListItemViewModel>(taskList);
+            await NavigationService.Navigate<TasksViewModel, TaskListItemViewModel>(taskList);
         }
     }
 }

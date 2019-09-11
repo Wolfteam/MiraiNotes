@@ -3,8 +3,9 @@ using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
+using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using Serilog;
 
 namespace MiraiNotes.Android.ViewModels
 {
@@ -70,11 +71,13 @@ namespace MiraiNotes.Android.ViewModels
         #endregion
 
         public GoogleUserViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
+            IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings)
         {
             _dialogService = dialogService;
 
@@ -87,10 +90,10 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Publish(new AccountChangeRequestMsg(this, false, true, this)));
             DeleteAccountCommand = new MvxCommand(() =>
                 _dialogService.ShowDialog(
-                    $"Delete {Fullname} ?",
-                    "Are you sure you wanna delete this account ?",
-                    "Yes",
-                    "No",
+                    $"{GetText("Delete")} {Fullname}",
+                    GetText("DeleteThisAccount"),
+                    GetText("Yes"),
+                    GetText("No"),
                     () => Messenger.Publish(new AccountChangeRequestMsg(this, true, false, this))
                 )
             );

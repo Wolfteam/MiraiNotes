@@ -6,9 +6,9 @@ using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using Serilog;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +19,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         #region Members
         private readonly IUserCredentialService _credentialService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IMvxNavigationService _navigationService;
         private readonly IDialogService _dialogService;
         private readonly IValidator _validator;
 
@@ -68,25 +67,24 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         }
         #endregion
 
-
         #region Commands
         public IMvxAsyncCommand SaveChangesCommand { get; private set; }
         public IMvxAsyncCommand CloseCommand { get; private set; }
         #endregion
 
         public PasswordDialogViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
             IAppSettingsService appSettings,
             IMvxNavigationService navigationService,
             IDialogService dialogService,
             IUserCredentialService userCredentialService,
             IMiraiNotesDataService dataService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<PasswordDialogViewModel>(), navigationService, appSettings)
         {
             _credentialService = userCredentialService;
             _dataService = dataService;
-            _navigationService = navigationService;
             _dialogService = dialogService;
             _validator = new PasswordDialogViewModelValidator();
             SetComamnds();
@@ -101,6 +99,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             await base.Initialize();
 
+            Logger.Information($"{nameof(Initialize)}: Starting this vm with PromptForPassword = {PromptForPassword}");
             if (!PromptForPassword)
                 return;
 
@@ -114,7 +113,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             SaveChangesCommand = new MvxAsyncCommand(SaveChanges);
             CloseCommand = new MvxAsyncCommand(async () =>
-                await _navigationService.Close(this, false));
+                await NavigationService.Close(this, false));
         }
 
         private async Task SaveChanges()
@@ -129,7 +128,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 await SavePassword();
             }
 
-            await _navigationService.Close(this, true);
+            await NavigationService.Close(this, true);
         }
 
         private async Task SavePassword()
@@ -138,7 +137,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             if (!response.Succeed || response.Result is null)
             {
                 AppSettings.AskForPasswordWhenAppStarts = false;
-                _dialogService.ShowSnackBar("Could not retrieve the current active user");
+                Logger.Error(
+                    $"{nameof(SavePassword)}: Couldnt retrieve current active user. " +
+                    $"Error = {response.Message}");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                 return;
             }
 

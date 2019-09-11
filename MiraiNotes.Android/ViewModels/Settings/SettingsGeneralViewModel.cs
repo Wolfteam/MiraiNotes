@@ -1,16 +1,17 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Utils;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.UI;
 using MvvmCross.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,8 +22,6 @@ namespace MiraiNotes.Android.ViewModels.Settings
     public class SettingsGeneralViewModel : BaseViewModel
     {
         #region Members
-        private readonly IMvxNavigationService _navigationService;
-
         private ItemModel _selectedTaskListSortOrder;
         private ItemModel _selectedTaskSortOrder;
         private readonly MvxInteraction<MvxColor> _onAccentColorSelected = new MvxInteraction<MvxColor>();
@@ -39,12 +38,12 @@ namespace MiraiNotes.Android.ViewModels.Settings
             new ItemModel
             {
                 ItemId = AppThemeType.DARK.ToString(),
-                Text = "Dark"
+                Text = GetText("Dark")
             },
             new ItemModel
             {
                 ItemId = AppThemeType.LIGHT.ToString(),
-                Text = "Light"
+                Text = GetText("Light")
             }
         };
 
@@ -55,22 +54,22 @@ namespace MiraiNotes.Android.ViewModels.Settings
             new ItemModel
             {
                 ItemId = TaskListSortType.BY_NAME_ASC.ToString(),
-                Text = "By name asc"
+                Text = GetText("SortByNameAsc")
             },
             new ItemModel
             {
                 ItemId = TaskListSortType.BY_NAME_DESC.ToString(),
-                Text = "By name desc"
+                Text = GetText("SortByNameDesc")
             },
             new ItemModel
             {
                 ItemId = TaskListSortType.BY_UPDATED_DATE_ASC.ToString(),
-                Text = "By updated date asc"
+                Text = GetText("SortByUpdatedDateAsc")
             },
             new ItemModel
             {
                 ItemId = TaskListSortType.BY_UPDATED_DATE_DESC.ToString(),
-                Text = "By updated date desc"
+                Text = GetText("SortByUpdatedDateDesc")
             }
         };
 
@@ -79,23 +78,37 @@ namespace MiraiNotes.Android.ViewModels.Settings
             new ItemModel
             {
                 ItemId = TaskSortType.BY_NAME_ASC.ToString(),
-                Text = "By name asc"
+                Text = GetText("SortByNameAsc")
             },
             new ItemModel
             {
                 ItemId = TaskSortType.BY_NAME_DESC.ToString(),
-                Text = "By name desc"
+                Text = GetText("SortByNameDesc")
             },
             new ItemModel
             {
                 ItemId = TaskSortType.BY_UPDATED_DATE_ASC.ToString(),
-                Text = "By updated date asc"
+                Text = GetText("SortByUpdatedDateAsc")
             },
             new ItemModel
             {
                 ItemId = TaskSortType.BY_UPDATED_DATE_DESC.ToString(),
-                Text = "By updated date desc"
+                Text = GetText("SortByUpdatedDateDesc")
             }
+        };
+
+        public List<ItemModel> AppLanguges => new List<ItemModel>
+        {
+            new ItemModel
+            {
+                ItemId = AppLanguageType.English.ToString(),
+                Text = GetText("English")
+            },
+            new ItemModel
+            {
+                ItemId = AppLanguageType.Spanish.ToString(),
+                Text = GetText("Spanish")
+            },
         };
 
         public ItemModel SelectedAppTheme
@@ -186,13 +199,28 @@ namespace MiraiNotes.Android.ViewModels.Settings
             }
         }
 
+        public ItemModel SelectedAppLanguage
+        {
+            get
+            {
+                var currentAppLangue = AppSettings.AppLanguage;
+                return AppLanguges.First(l => l.ItemId == currentAppLangue.ToString());
+            }
+            set
+            {
+                var selectedLanguage = (AppLanguageType)Enum.Parse(typeof(AppLanguageType), value.ItemId, true);
+                if (AppSettings.AppLanguage == selectedLanguage)
+                    return;
+                AppSettings.AppLanguage = selectedLanguage;
+                TextProvider.SetLanguage(selectedLanguage);
+            }
+        }
+
         public bool ShowCompletedTasks
         {
             get => AppSettings.ShowCompletedTasks;
             set => AppSettings.ShowCompletedTasks = value;
         }
-
-        //TODO: LANGUAGE
         #endregion
 
         #region Commands
@@ -201,14 +229,13 @@ namespace MiraiNotes.Android.ViewModels.Settings
         #endregion
 
         public SettingsGeneralViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
             IMvxNavigationService navigationService,
+            ILogger logger,
             IAppSettingsService appSettings)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
-            _navigationService = navigationService;
-
             AccentColors = AppConstants.AppAccentColors
                 .Select(hex => hex.ToColor())
                 .Select(color => new MvxColor(color.R, color.G, color.B, color.A))
@@ -230,7 +257,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
                 if (prompt)
                 {
-                    var result = await _navigationService.Navigate<PasswordDialogViewModel, bool, bool>(false);
+                    var result = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(false);
                     AskForPasswordWhenAppStarts = result;
                 }
                 else

@@ -3,8 +3,9 @@ using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
+using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,32 +19,32 @@ namespace MiraiNotes.Android.ViewModels.Settings
         #endregion
 
         #region Properties
-        public List<ItemModel> SyncBgTaskIntervalTypes { get; } = new List<ItemModel>
+        public List<ItemModel> SyncBgTaskIntervalTypes => new List<ItemModel>
         {
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.NEVER.ToString(),
-                Text = "Never"
+                Text = GetText("Never")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_3_HOURS.ToString(),
-                Text = "Each 3 hours"
+                Text = GetText("Sync3")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_6_HOURS.ToString(),
-                Text = "Each 6 hours"
+                Text = GetText("Sync6")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_12_HOURS.ToString(),
-                Text = "Each 12 hours"
+                Text = GetText("Sync12")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_24_HOURS.ToString(),
-                Text = "Each 24 hours"
+                Text = GetText("Sync24")
             }
         };
 
@@ -68,6 +69,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
             {
                 var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemId, true);
                 AppSettings.SyncBackgroundTaskInterval = selectedInterval;
+                //TODO: REGISTER BG TASK ?
                 //_backgroundTaskManagerService.RegisterBackgroundTasks(BackgroundTaskType.SYNC, true);
             }
         }
@@ -90,11 +92,13 @@ namespace MiraiNotes.Android.ViewModels.Settings
         #endregion
 
         public SettingsSyncViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
+            IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
             _dialogService = dialogService;
 

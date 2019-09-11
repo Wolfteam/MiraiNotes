@@ -1,12 +1,13 @@
 ﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,9 +17,6 @@ namespace MiraiNotes.Android.ViewModels.Settings
     public class SettingsHomeViewModel : BaseViewModel
     {
         #region Members
-        private readonly IMvxNavigationService _navigationService;
-        private readonly IDialogService _dialogService;
-
         private string _currentPageText;
         private readonly MvxInteraction<SettingsPageType> _onSettingItemSelected = new MvxInteraction<SettingsPageType>();
         #endregion
@@ -27,66 +25,61 @@ namespace MiraiNotes.Android.ViewModels.Settings
         public IMvxInteraction<SettingsPageType> OnSettingItemSelected
             => _onSettingItemSelected;
 
-
         public string CurrentPageText
         {
             get => _currentPageText;
             set => SetProperty(ref _currentPageText, value);
         }
 
-        public List<SettingsPageItem> SettingsPages { get; } = new List<SettingsPageItem>
+        public List<SettingsPageItem> SettingsPages => new List<SettingsPageItem>
         {
             new SettingsPageItem
             {
-                Content = "Default sort order, themes, etc.",
-                Header = "General",
+                Content = GetText("SettingsGeneral"),
+                Header =  GetText("General"),
                 PageType = SettingsPageType.GENERAL
             },
             new SettingsPageItem
             {
-                Content = "Background tasks intervals.",
-                Header = "Synchronization",
+                Content = GetText("SettingsSync"),
+                Header = GetText("Synchronization"),
                 PageType = SettingsPageType.SYNCHRONIZATION
             },
             new SettingsPageItem
             {
-                Content = "Toast notifications.",
-                Header = "Notifications",
+                Content = GetText("SettingsNotif"),
+                Header = GetText("Notifications"),
                 PageType = SettingsPageType.NOTIFICATIONS
             },
             new SettingsPageItem
             {
-                Content = "Github repo, contact information, donations.",
-                Header = "About",
+                Content = GetText("SettingsAbout"),
+                Header = GetText("About"),
                 PageType = SettingsPageType.ABOUT
             }
         };
+        #endregion
 
-        //public bool IsBackButtonVisible
-        //{
-        //    get => _isBackButtonVisible;
-        //    set => Set(ref _isBackButtonVisible, value);
-        //}
-
-
+        #region Commands
+        public IMvxAsyncCommand<SettingsPageItem> SettingItemSelectedCommand { get; private set; }
 
         #endregion
 
-        public IMvxAsyncCommand<SettingsPageItem> SettingItemSelectedCommand { get; private set; }
-
-
         public SettingsHomeViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
             IMvxNavigationService navigationService,
-            IAppSettingsService appSettings,
-            IDialogService dialogService)
-            : base(textProvider, messenger, appSettings)
+            ILogger logger,
+            IAppSettingsService appSettings)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService,appSettings)
         {
-            _navigationService = navigationService;
-            _dialogService = dialogService;
-
             SetCommands();
+        }
+
+        public override void ViewAppeared()
+        {
+            Messenger.Publish(new SettingsTitleChanged(this, GetText("Settings")));
+            base.ViewAppeared();
         }
 
         private void SetCommands()
@@ -96,24 +89,33 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
         private async Task NavigateTo(SettingsPageItem page)
         {
+            string title;
+            Type to;
             switch (page.PageType)
             {
                 case SettingsPageType.GENERAL:
-                    await _navigationService.Navigate<SettingsGeneralViewModel>();
+                    title = GetText("General");
+                    to = typeof(SettingsGeneralViewModel);
                     break;
                 case SettingsPageType.SYNCHRONIZATION:
-                    await _navigationService.Navigate<SettingsSyncViewModel>();
+                    title = GetText("Synchronization");
+                    to = typeof(SettingsSyncViewModel);
                     break;
                 case SettingsPageType.NOTIFICATIONS:
-                    await _navigationService.Navigate<SettingsNotificationsViewModel>();
+                    title = GetText("Notifications");
+                    to = typeof(SettingsNotificationsViewModel);
                     break;
                 case SettingsPageType.ABOUT:
-                    await _navigationService.Navigate<SettingsAboutViewModel>();
+                    title = GetText("About");
+                    to = typeof(SettingsAboutViewModel);
                     break;
                 case SettingsPageType.HOME:
                 default:
+                    Logger.Warning($"{nameof(NavigateTo)}: Trying to navigate to a page that shoulnt be navigated to. Page = {page.PageType}");
                     throw new ArgumentOutOfRangeException(nameof(page.PageType), page, "Invalid settings page");
             }
+            Messenger.Publish(new SettingsTitleChanged(this, title));
+            await NavigationService.Navigate(to);
         }
     }
 }

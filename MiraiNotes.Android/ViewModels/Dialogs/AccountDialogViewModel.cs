@@ -8,7 +8,6 @@ using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
@@ -22,9 +21,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 {
     public class AccountDialogViewModel : BaseViewModel
     {
-        private readonly IMvxNavigationService _navigationService;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
@@ -56,7 +53,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public IMvxAsyncCommand<string> OnAuthCodeGrantedCommand { get; private set; }
 
         public AccountDialogViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
             IMvxNavigationService navigationService,
             IMapper mapper,
@@ -68,11 +65,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ISyncService syncService,
             IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<AccountDialogViewModel>(), navigationService, appSettings)
         {
-            _navigationService = navigationService;
             _mapper = mapper;
-            _logger = logger.ForContext<AccountDialogViewModel>();
             _dialogService = dialogService;
             _dataService = dataService;
             _networkService = networkService;
@@ -95,7 +90,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private void SetCommands()
         {
             NewAccountCommand = new MvxCommand(AddAccountRequest);
-            CloseCommand = new MvxAsyncCommand(async () => await _navigationService.Close(this));
+            CloseCommand = new MvxAsyncCommand(async () => await NavigationService.Close(this));
             OnAuthCodeGrantedCommand = new MvxAsyncCommand<string>(OnCodeGranted);
         }
 
@@ -103,7 +98,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             var tokens = new[]
             {
-                Messenger.Subscribe<AccountChangeRequestMsg>(async (msg) => 
+                Messenger.Subscribe<AccountChangeRequestMsg>(async (msg) =>
                 {
                     if (msg.DeleteAccount)
                         await DeleteAccount(msg.Account);
@@ -111,7 +106,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                         await ChangeActiveAccount(msg.Account.Id);
                 })
             };
-
             SubscriptionTokens.AddRange(tokens);
         }
 
@@ -122,8 +116,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (!dbResponse.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"An unknown error occurred while trying to retrieve all the task lists from the db. Error = {dbResponse.Message}");
+                Logger.Error(
+                    $"{nameof(InitView)}: An error occurred while trying to get all the user accounts. " +
+                    $"Error = {dbResponse.Message}");
+                _dialogService.ShowErrorToast($"{GetText("UnknownErrorOccurred")}.");
                 return;
             }
 
@@ -136,12 +132,11 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             if (!_networkService.IsInternetAvailable())
             {
-                _dialogService.ShowSnackBar("Network is not available", string.Empty);
+                _dialogService.ShowSnackBar(GetText("NetworkNotAvailable"));
                 return;
             }
             var url = _googleApiService.GetAuthorizationUrl();
             _onAddAccountRequest.Raise(url);
-            //await _navigationService.Close(this);
         }
 
         private async Task OnCodeGranted(string code)
@@ -158,7 +153,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     //user canceled auth..
                     if (string.IsNullOrEmpty(response.Message))
                         return;
-                    _logger.Error(
+                    Logger.Error(
                         $"{nameof(OnCodeGranted)}: The token response failed. {response.Message}");
                     _dialogService.ShowSnackBar(response.Message);
                     return;
@@ -205,9 +200,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     ResourceType.LOGGED_USER_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     currentUser);
-                _logger.Error(ex, 
+                Logger.Error(ex,
                     $"{nameof(OnCodeGranted)}: An unknown error occurred while signing in the app");
-                _dialogService.ShowSnackBar($"An unknown error occurred. Ex = {ex.Message}");
+                _dialogService.ShowSnackBar($"{GetText("UnknownErrorOccurred")}. Error = {ex.Message}");
             }
             finally
             {
@@ -219,13 +214,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         private async Task<GoogleUserViewModel> SignIn()
         {
-            _logger.Information(
+            Logger.Information(
                 $"{nameof(SignIn)}: Sign in the app started. Trying to get the user info from google");
 
             var userResponse = await _googleApiService.GetUser();
             if (!userResponse.Succeed)
             {
-                _dialogService.ShowSnackBar("User info not found");
+                Logger.Error($"{nameof(SignIn)}: Couldnt get the google user. Error = {userResponse.Message}");
+                _dialogService.ShowSnackBar(GetText("UserNotFound"));
                 return null;
             }
 
@@ -237,7 +233,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (!userExistsResponse.Succeed)
             {
-                _dialogService.ShowSnackBar("Couldnt check if user already exists in the db");
+                Logger.Error(
+                    $"{nameof(SignIn)}: Couldnt check if userId = {user.ID} exists in db. " +
+                    $"Error = {userExistsResponse.Message}");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                 return null;
             }
 
@@ -253,7 +252,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ResponseDto<GoogleUser> userSaveResponse;
             if (!response.Result)
             {
-                _logger.Information($"{nameof(SignIn)}: User doesnt exist in db. Creating a new one...");
+                Logger.Information($"{nameof(SignIn)}: User doesnt exist in db. Creating a new one...");
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser
                 {
                     Email = user.Email,
@@ -266,14 +265,15 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             }
             else
             {
-                _logger.Information($"{nameof(SignIn)}: User exist in db. Updating it...");
+                Logger.Information($"{nameof(SignIn)}: User exist in db. Updating it...");
                 var userInDbResponse = await _dataService
                     .UserService
                     .FirstOrDefaultAsNoTrackingAsync(u => u.GoogleUserID == user.ID);
 
                 if (!userInDbResponse.Succeed)
                 {
-                    _dialogService.ShowSnackBar(userInDbResponse.Message);
+                    Logger.Error($"{nameof(SignIn)}: Couldnt retrieve user in db. Error = {userInDbResponse.Message}");
+                    _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                     return null;
                 }
 
@@ -290,30 +290,34 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (!userSaveResponse.Succeed)
             {
-                _dialogService.ShowSnackBar(
-                    $"The user could not be saved / updated into the db. Error = {userSaveResponse.Message}");
+                Logger.Error($"{nameof(SignIn)}: Couldnt save / update user in db. Error = {userSaveResponse.Message}");
+                _dialogService.ShowSnackBar($"{GetText("DatabaseUnknownError")}.");
                 return null;
             }
 
-            _logger.Information(
-                $"{nameof(SignIn)}: trying to get all the task lists that are remote...");
+            Logger.Information(
+                $"{nameof(SignIn)}: Trying to get all the task lists that are remote...");
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
             if (!syncResult.Succeed)
             {
-                _dialogService.ShowSnackBar(syncResult.Message);
+                Logger.Error($"{nameof(SignIn)}: Couldnt sync down tasklists. Error = {syncResult.Message}");
+                _dialogService.ShowSnackBar(GetText("SyncUnknownError"));
                 return null;
             }
 
-            _logger.Information(
+            Logger.Information(
                 $"{nameof(SignIn)}: Trying to get all the tasks that are remote...");
             syncResult = await _syncService.SyncDownTasksAsync(false);
 
             if (!syncResult.Succeed)
             {
-                _dialogService.ShowSnackBar(syncResult.Message);
+                Logger.Error($"{nameof(SignIn)}: Couldnt sync down tasks. Error = {syncResult.Message}");
+                _dialogService.ShowSnackBar(GetText("SyncUnknownError"));
                 return null;
             }
+
+            Logger.Information($"{nameof(SignIn)}: Saving user credentials...");
 
             _userCredentialService.UpdateUserCredential(
                 ResourceType.LOGGED_USER_RESOURCE,
@@ -340,7 +344,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         private async Task DeleteAccount(GoogleUserViewModel account)
         {
-            _logger.Information(
+            Logger.Information(
                 $"{nameof(DeleteAccount)}: Deleting user = {account.Email}...");
 
             var userInDbResponse = await _dataService
@@ -349,7 +353,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (!userInDbResponse.Succeed)
             {
-                _dialogService.ShowSnackBar(userInDbResponse.Message);
+                Logger.Error(
+                    $"{nameof(DeleteAccount)}: An error occurred wilhe trying to get account = {account.Email}..." +
+                    $"Error = {userInDbResponse.Message}");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -357,13 +364,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (user.IsActive && Accounts.Count == 1)
             {
-                _dialogService.ShowSnackBar("You can not delete the default account");
+                Logger.Warning($"{nameof(DeleteAccount)}: Default account cannot be deleted");
+                _dialogService.ShowSnackBar(GetText("DefaultAccountCantBeDeleted"));
                 return;
             }
 
             if (user.IsActive)
             {
-                _logger.Information(
+                Logger.Information(
                     $"{nameof(DeleteAccount)}: User = {account.Email} " +
                     $"is active, setting the active flag to another user");
 
@@ -380,7 +388,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 var defaultAccount = Accounts[nextIndex];
 
-                _logger.Information(
+                Logger.Information(
                     $"{nameof(DeleteAccount)}: User = {defaultAccount.Email} will be marked as active");
 
                 var response = await _dataService
@@ -389,8 +397,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 if (!response.Succeed)
                 {
-                    _dialogService.ShowSnackBar(
-                        $"Couldnt set {defaultAccount.Email} as default. Error = {response.Message}");
+                    Logger.Error(
+                        $"{nameof(DeleteAccount)}: Couldnt set {defaultAccount.Email} " +
+                        $"as default. Error = {response.Message}");
+                    _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                     return;
                 }
 
@@ -403,6 +413,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     defaultAccount.Email);
                 Messenger.Publish(new ActiveAccountChangedMsg(this));
             }
+            Logger.Information($"{nameof(DeleteAccount)}: Updating credentials...");
 
             _userCredentialService.DeleteUserCredential(
                 ResourceType.REFRESH_TOKEN_RESOURCE,
@@ -415,11 +426,15 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             var deleteResponse = await _dataService.UserService.RemoveAsync(account.Id);
             if (deleteResponse.Succeed)
             {
+                Logger.Information($"{nameof(DeleteAccount)}: User was succesfully deleted");
                 Accounts.Remove(account);
             }
             else
             {
-                _dialogService.ShowSnackBar(deleteResponse.Message);
+                Logger.Error(
+                    $"{nameof(DeleteAccount)}: User couldnt be deleted from db. " +
+                    $"Error = {deleteResponse.Message}");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
             }
 
             SetCanBeDeleted();
@@ -427,7 +442,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         private async Task ChangeActiveAccount(int id)
         {
-            _logger.Information(
+            Logger.Information(
                 $"{nameof(ChangeActiveAccount)}: Changing current active user to userId = {id}");
             var userInDbResponse = await _dataService
                 .UserService
@@ -435,7 +450,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (!userInDbResponse.Succeed)
             {
-                _dialogService.ShowSnackBar(userInDbResponse.Message);
+                Logger.Error(
+                    $"{nameof(ChangeActiveAccount)}: Couldnt get the userId = {id} from db." +
+                    $"Error = {userInDbResponse.Message}");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -451,8 +469,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (!userSaveResponse.Succeed)
             {
-                _dialogService.ShowSnackBar(
-                    $"The user could not be saved / updated into the db. Error = {userSaveResponse.Message}");
+                Logger.Error(
+                    $"{nameof(ChangeActiveAccount)}: UserId = {id}  couldnt be saved / updated." +
+                    $"Error = {userSaveResponse.Message}");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -475,22 +495,24 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 string message = syncResults.Any(r => !r.Succeed)
                     ? string.Join($".{Environment.NewLine}", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct())
-                    : "A automatic full sync was successfully performed.";
+                    : GetText("AutomaticSyncWasPerformed");
 
                 if (string.IsNullOrEmpty(message))
-                    message = "An unknown error occurred while trying to perform the sync operation.";
+                {
+                    Logger.Error("An unknown sync error occurred");
+                    message = GetText("SyncUnknownError");
+                }
 
                 _dialogService.ShowSnackBar(message);
             }
             else if (!isNetworkAvailable)
             {
-                _dialogService.ShowSnackBar(
-                    "Internet is not available, a full sync will not be performed");
+                _dialogService.ShowSnackBar(GetText("NetworkNotAvailableForSync"));
             }
             ChangeIsActiveStatus(false, id);
             Messenger.Publish(new ShowDrawerMsg(this, false));
             Messenger.Publish(new ActiveAccountChangedMsg(this));
-            await _navigationService.Close(this);
+            await NavigationService.Close(this);
         }
 
         private void ChangeIsActiveStatus(bool isActive, int? exceptId = null)

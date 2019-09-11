@@ -10,10 +10,10 @@ using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,13 +24,10 @@ namespace MiraiNotes.Android.ViewModels
     public class NewTaskViewModel : BaseViewModel<Tuple<TaskListItemViewModel, string>>
     {
         #region Members
-        private readonly IMvxNavigationService _navigationService;
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IGoogleApiService _googleApiService;
         private readonly INotificationService _notificationService;
-        private readonly IUserCredentialService _userCredentialService;
 
         private TaskListItemViewModel _currentTaskList;
         private string _selectedTaskId;
@@ -83,25 +80,21 @@ namespace MiraiNotes.Android.ViewModels
         #endregion
 
         public NewTaskViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
             IMvxNavigationService navigationService,
             IMapper mapper,
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            IGoogleApiService googleApiService,
-            INotificationService notificationService,
-            IUserCredentialService userCredentialService)
-            : base(textProvider, messenger, appSettings)
+            INotificationService notificationService)
+            : base(textProvider, messenger, logger.ForContext<NewTaskViewModel>(), navigationService, appSettings)
         {
-            _navigationService = navigationService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
-            _googleApiService = googleApiService;
             _notificationService = notificationService;
-            _userCredentialService = userCredentialService;
 
             SetCommands();
         }
@@ -121,6 +114,15 @@ namespace MiraiNotes.Android.ViewModels
             await InitView(_selectedTaskId);
         }
 
+        public override void ViewAppeared()
+        {
+            Title = string.IsNullOrEmpty(_selectedTaskId)
+                ? GetText("NewTask")
+                : GetText("UpdateTask");
+
+            base.ViewAppeared();
+        }
+
         private void SetCommands()
         {
             SaveChangesCommand = new MvxAsyncCommand(SaveChanges);
@@ -128,14 +130,14 @@ namespace MiraiNotes.Android.ViewModels
             CloseCommand = new MvxAsyncCommand(async () =>
             {
                 Messenger.Publish(new HideKeyboardMsg(this));
-                await _navigationService.Close(this);
+                await NavigationService.Close(this);
             });
 
             DeleteTaskCommand = new MvxCommand(() => _dialogService.ShowDialog(
-                "Confirmation",
-                "Are you sure you wanna delete this task?",
-                "Yes",
-                "No",
+                GetText("Confirmation"),
+                GetText("DeleteTask"),
+                GetText("Yes"),
+                GetText("No"),
                 async () => await DeleteTask())
             );
         }
@@ -154,8 +156,10 @@ namespace MiraiNotes.Android.ViewModels
             if (!dbResponse.Succeed)
             {
                 ShowProgressBar = false;
-                _dialogService.ShowErrorToast(
-                    $"An error occurred while trying to retrieve all the task lists. Error = {dbResponse.Message}");
+                Logger.Error(
+                    $"{nameof(LoadTaskLists)}: An error occurred while trying to retrieve all the task lists. " +
+                    $"Error = {dbResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -190,8 +194,11 @@ namespace MiraiNotes.Android.ViewModels
                 if (!ta.Succeed || !sts.Succeed)
                 {
                     ShowProgressBar = false;
-                    _dialogService.ShowErrorToast(
-                        $"An unexpected error occurred. Error = {ta.Message} {sts.Message}");
+
+                    Logger.Error(
+                        $"{nameof(InitView)}: An error occurred while trying to retrieve taskId = {taskId}. " +
+                        $"Error = {ta.Message} {sts.Message}");
+                    _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                     return;
                 }
 
@@ -209,26 +216,19 @@ namespace MiraiNotes.Android.ViewModels
 
             if (SelectedTaskList?.Id == null || _currentTaskList?.Id == null)
             {
-                _dialogService.ShowSnackBar(
-                    $"An error occurred while trying to {(isNewTask ? "save" : "update")} the task." +
-                    $"The selected task list and the current task list cant be null", string.Empty);
+                Logger.Error(
+                    $"{nameof(SaveChanges)}: An error occurred while trying to { (isNewTask ? "save" : "update")} " +
+                    $"this task. The selected task list and the current task list cant be null");
+                _dialogService.ShowErrorToast(GetText("UnknownErrorOccurred"));
                 return;
             }
-
-            if (!Validate())
-            {
-                return;
-            }
-
 
             if (Task.RemindOn.HasValue)
             {
                 var minutesDiff = (Task.RemindOn.Value - DateTimeOffset.Now).TotalMinutes;
                 if (minutesDiff < 2)
                 {
-                    _dialogService.ShowSnackBar(
-                        "The date of the reminder must be at least 2 mins above the current time.",
-                        string.Empty);
+                    _dialogService.ShowSnackBar(GetText("InvalidTaskRemindOn"));
                     return;
                 }
             }
@@ -242,10 +242,10 @@ namespace MiraiNotes.Android.ViewModels
             if (moveToDifferentTaskList && !isNewTask)
             {
                 _dialogService.ShowDialog(
-                    "Confirm",
-                    "Since you are moving an existing task to a different task list, any change made here will be lost. Do you want to continue ?",
-                    "Yes",
-                    "No",
+                    GetText("Confirmation"),
+                    GetText("MoveTaskConfirmation"),
+                    GetText("Yes"),
+                    GetText("No"),
                     async () => await MoveCurrentTask());
                 return;
             }
@@ -266,8 +266,10 @@ namespace MiraiNotes.Android.ViewModels
                 if (!dbResponse.Succeed || dbResponse.Result == null)
                 {
                     ShowProgressBar = false;
-                    _dialogService.ShowErrorToast(
-                        $"Couldn't find the task to update from db. Error = {dbResponse.Message}");
+                    Logger.Error(
+                        $"{nameof(SaveChanges)}: Couldnt find the task to update. TaskId ={Task.TaskID}. " +
+                        $"Error = {dbResponse.Message}");
+                    _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                     return;
                 }
 
@@ -319,9 +321,10 @@ namespace MiraiNotes.Android.ViewModels
                 if (!response.Succeed)
                 {
                     ShowProgressBar = false;
-                    _dialogService.ShowErrorToast(
-                        $"An error occurred while trying to seve the task into {SelectedTaskList.Title}." +
-                        $"Error = {response.Message}.");
+                    Logger.Error(
+                        $"{nameof(SaveChanges)}: An error occurred while trying to seve the task into {SelectedTaskList.Title}." +
+                        $"Error = {response.Message}");
+                    _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                     return;
                 }
 
@@ -333,9 +336,7 @@ namespace MiraiNotes.Android.ViewModels
                     moveToDifferentTaskList,
                     Enumerable.Empty<TaskItemViewModel>().ToList());
 
-                _dialogService.ShowSnackBar(
-                    $"The task was sucessfully created into {SelectedTaskList.Title}",
-                    string.Empty);
+                _dialogService.ShowSnackBar(GetText("TaskWasCreated", SelectedTaskList.Title));
 
                 //TODO: I SHOULD DO SOMETHING HERE WHEN MOVING THE TASK
                 await CloseCommand.ExecuteAsync();
@@ -359,9 +360,10 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!response.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"An error occurred while trying to {(isNewTask ? "save" : "update")} the task." +
-                    $"Error: {response.Message}.");
+                Logger.Error(
+                    $"{nameof(SaveChanges)}: An error occurred while trying to {(isNewTask ? "save" : "update")} the task." +
+                    $"Error = {response.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -399,20 +401,21 @@ namespace MiraiNotes.Android.ViewModels
         private void PromptTaskStatusChange(TaskItemViewModel task, GoogleTaskStatus newStatus)
         {
             string statusMessage =
-                $"{(newStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
+                $"{(newStatus == GoogleTaskStatus.COMPLETED ? GetText("Completed") : GetText("Incompleted"))}";
+
 
             _dialogService.ShowDialog(
-                "Confirmation",
-                $"Mark {task.Title} as {statusMessage}?",
-                "Yes",
-                "No",
+                GetText("Confirmation"),
+                GetText("MarkTaskAsConfirmation", task.Title, statusMessage),
+                GetText("Yes"),
+                GetText("No"),
                 async () => await ChangeTaskStatus(task, newStatus));
         }
 
         private async Task ChangeTaskStatus(TaskItemViewModel task, GoogleTaskStatus newStatus)
         {
             string statusMessage =
-                $"{(newStatus == GoogleTaskStatus.COMPLETED ? "completed" : "incompleted")}";
+                $"{(newStatus == GoogleTaskStatus.COMPLETED ? GetText("Completed") : GetText("Incompleted"))}";
 
             ShowProgressBar = true;
 
@@ -424,9 +427,10 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!response.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"An error occurred while trying to mark {task.Title} as {statusMessage}. " +
-                    $"Error = {response.Message}.");
+                Logger.Error(
+                    $"{nameof(ChangeTaskStatus)}: An error occurred while trying to mark {task.Title} as {statusMessage}." +
+                    $"Error = {response.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -442,10 +446,7 @@ namespace MiraiNotes.Android.ViewModels
                 task.UpdatedAt,
                 task.Status));
 
-
-            _dialogService.ShowSnackBar(
-                $"{task.Title} was marked as {statusMessage}.",
-                string.Empty);
+            _dialogService.ShowSnackBar(GetText("TaskStatusChanged", task.Title, statusMessage));
         }
 
         private async Task DeleteTask()
@@ -460,13 +461,15 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!deleteResponse.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"Couldn't delete the selected task. Error = {deleteResponse.Message}.");
+                Logger.Error(
+                    $"{nameof(DeleteTask)}: Couldn't delete the selected task." +
+                    $"Error = {deleteResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
             Messenger.Publish(new TaskDeletedMsg(this, Task.TaskID, Task.ParentTask));
-            await _navigationService.Close(this);
+            await NavigationService.Close(this);
         }
 
         private async Task MoveCurrentTask()
@@ -480,9 +483,11 @@ namespace MiraiNotes.Android.ViewModels
             if (!moveResponse.Succeed)
             {
                 ShowProgressBar = false;
-                _dialogService.ShowErrorToast(
-                    $"An error occurred while trying to move the selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}." +
-                    $"Error: {moveResponse.Message}.");
+                Logger.Error(
+                    $"{nameof(MoveCurrentTask)}: An error occurred while trying to move the " +
+                    $"selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}." +
+                    $"Error = {moveResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -496,9 +501,7 @@ namespace MiraiNotes.Android.ViewModels
 
             await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
 
-            _dialogService.ShowSnackBar(
-                $"Task successfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}",
-                string.Empty);
+            _dialogService.ShowSnackBar(GetText("TaskWasMoved", _currentTaskList.Title, SelectedTaskList.Title));
 
             //TODO: SHOULD I DO SOMETHING HERE WHEN MOVING THE TASK ?
             await CloseCommand.ExecuteAsync();
@@ -521,8 +524,10 @@ namespace MiraiNotes.Android.ViewModels
             ShowProgressBar = false;
             if (!deleteResponse.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"Couldn't delete the selected sub task. Error = {deleteResponse.Message}");
+                Logger.Error(
+                    $"{nameof(DeleteSubTask)}: An error occurred while trying to delete the selected sub task" +
+                    $"Error = {deleteResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -534,8 +539,8 @@ namespace MiraiNotes.Android.ViewModels
         private async Task RemoveTaskNotificationDate(TaskNotificationDateType dateType)
         {
             string message = dateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE
-                ? "completition"
-                : "reminder";
+                ? GetText("Completition")
+                : GetText("Reminder");
 
             ShowProgressBar = true;
             try
@@ -548,8 +553,10 @@ namespace MiraiNotes.Android.ViewModels
 
                     if (!response.Succeed)
                     {
-                        _dialogService.ShowErrorToast(
-                            $"Could not remove the {message} date of {Task.Title}");
+                        Logger.Error(
+                            $"{nameof(RemoveTaskNotificationDate)}: Could not remove the {message} date of {Task.Title}" +
+                            $"Error = {response.Message}");
+                        _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                         return;
                     }
 
@@ -670,21 +677,6 @@ namespace MiraiNotes.Android.ViewModels
                        .ToList() ??
                    Enumerable.Empty<TaskItemViewModel>()
                        .ToList();
-        }
-
-        private bool Validate()
-        {
-            if (string.IsNullOrEmpty(Task.Title))
-            {
-                Errors.Add("Title", "Title is required");
-            }
-
-            if (string.IsNullOrEmpty(Task.Notes))
-            {
-                Errors.Add("Notes", "Notes is required");
-            }
-
-            return false;
         }
     }
 }

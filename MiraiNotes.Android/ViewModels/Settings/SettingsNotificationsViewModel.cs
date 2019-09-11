@@ -1,8 +1,9 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
+using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using Serilog;
 
 namespace MiraiNotes.Android.ViewModels.Settings
 {
@@ -36,11 +37,13 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
 
         public SettingsNotificationsViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
+            IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
             IDialogService dialogService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
             _dialogService = dialogService;
 

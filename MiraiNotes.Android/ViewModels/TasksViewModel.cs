@@ -6,10 +6,10 @@ using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace MiraiNotes.Android.ViewModels
 {
     public class TasksViewModel : BaseViewModel<TaskListItemViewModel>
     {
-        private readonly IMvxNavigationService _navigationService;
+        #region Members
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
@@ -31,7 +31,9 @@ namespace MiraiNotes.Android.ViewModels
         private bool _isBusy;
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
         private bool _showProgressOverlay;
+        #endregion
 
+        #region Properties
         public MvxObservableCollection<TaskItemViewModel> Tasks
         {
             get => _tasks;
@@ -55,15 +57,19 @@ namespace MiraiNotes.Android.ViewModels
             get => _showProgressOverlay;
             set => SetProperty(ref _showProgressOverlay, value);
         }
+        #endregion
 
+        #region Commands
         public IMvxAsyncCommand<TaskItemViewModel> TaskSelectedCommand { get; private set; }
         public IMvxAsyncCommand RefreshTasksCommand { get; private set; }
         public IMvxCommand AddNewTaskListCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskCommand { get; private set; }
+        #endregion
 
         public TasksViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
+            ILogger logger,
             IMvxNavigationService navigationService,
             IMapper mapper,
             IDialogService dialogService,
@@ -71,9 +77,8 @@ namespace MiraiNotes.Android.ViewModels
             IAppSettingsService appSettings,
             IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<TasksViewModel>(), navigationService, appSettings)
         {
-            _navigationService = navigationService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
@@ -94,6 +99,12 @@ namespace MiraiNotes.Android.ViewModels
             await base.Initialize();
 
             await InitView(_currentTaskList);
+        }
+
+        public override void ViewAppeared()
+        {
+            Title = GetText("Tasks");
+            base.ViewAppeared();
         }
 
         private void SetCommands()
@@ -139,8 +150,10 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!dbResponse.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"An unknown error occurred while trying to retrieve all the tasks from db. Error = {dbResponse.Message}");
+                Logger.Error(
+                    $"{nameof(InitView)}: An unknown error occurred while trying to retrieve all the tasks from db." +
+                    $"Error = {dbResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 IsBusy = false;
                 return;
             }
@@ -183,7 +196,7 @@ namespace MiraiNotes.Android.ViewModels
         }
 
         public async Task OnTaskSelected(string taskId)
-            => await _navigationService.Navigate<NewTaskViewModel, Tuple<TaskListItemViewModel, string>>(
+            => await NavigationService.Navigate<NewTaskViewModel, Tuple<TaskListItemViewModel, string>>(
                 new Tuple<TaskListItemViewModel, string>(_currentTaskList, taskId));
 
         public async Task OnTaskSaved(TaskSavedMsg msg)
@@ -199,7 +212,11 @@ namespace MiraiNotes.Android.ViewModels
                 string errorMsg = dbResponse.Result == null
                     ? "Could not find the saved task in db"
                     : $"An unknown error occurred. Error = {dbResponse.Message}";
-                _dialogService.ShowErrorToast(errorMsg);
+
+                Logger.Error(
+                    $"{nameof(OnTaskSaved)}: {errorMsg}." +
+                    $"Error = {dbResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
 
@@ -216,8 +233,10 @@ namespace MiraiNotes.Android.ViewModels
                 if (!stsResponse.Succeed)
                 {
                     IsBusy = false;
-                    _dialogService.ShowErrorToast(
-                        $"An unknown error occurred. Error = {dbResponse.Message}");
+                    Logger.Error(
+                        $"{nameof(OnTaskSaved)}: An error occurred while trying to retrieve sub tasks" +
+                        $"Error = {stsResponse.Message}");
+                    _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                     return;
                 }
 

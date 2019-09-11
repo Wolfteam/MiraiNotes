@@ -20,8 +20,6 @@ namespace MiraiNotes.Android.ViewModels
     public class LoginViewModel : BaseViewModel
     {
         #region Members
-        private readonly IMvxNavigationService _navigationService;
-        private readonly ILogger _logger;
         private readonly ISyncService _syncService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IGoogleApiService _googleApiService;
@@ -65,7 +63,7 @@ namespace MiraiNotes.Android.ViewModels
         #endregion
 
         public LoginViewModel(
-            IMvxTextProvider textProvider,
+            ITextProvider textProvider,
             IMvxMessenger messenger,
             IMvxNavigationService navigationService,
             ILogger logger,
@@ -75,10 +73,8 @@ namespace MiraiNotes.Android.ViewModels
             IGoogleApiService googleAuthService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService)
-            : base(textProvider, messenger, appSettings)
+            : base(textProvider, messenger, logger.ForContext<LoginViewModel>(), navigationService, appSettings)
         {
-            _navigationService = navigationService;
-            _logger = logger;
             _syncService = syncService;
             _userCredentialService = userCredentialService;
             _googleApiService = googleAuthService;
@@ -111,7 +107,7 @@ namespace MiraiNotes.Android.ViewModels
 
                 if (!response.Succeed)
                 {
-                    _logger.Error($"{nameof(OnCodeGranted)}: The token response failed. {response.Message}");
+                    Logger.Error($"{nameof(OnCodeGranted)}: The token response failed. {response.Message}");
                     throw new Exception(response.Message);
                 }
 
@@ -150,7 +146,7 @@ namespace MiraiNotes.Android.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error(ex,
+                Logger.Error(ex,
                     $"{nameof(OnCodeGranted)}: An unknown error occurred while signing in the app");
                 _userCredentialService.DeleteUserCredential(
                     ResourceType.ALL,
@@ -161,13 +157,14 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task<bool> SignIn()
         {
-            _logger.Information(
-                $"{nameof(SignIn)}: Sign in the app started. Trying to get the user info from google");
+            Logger.Information(
+                $"{nameof(SignIn)}: Trying to get the user info from google");
 
             var userResponse = await _googleApiService.GetUser();
             if (!userResponse.Succeed)
             {
-                _dialogService.ShowErrorToast("User info not found");
+                Logger.Error($"{nameof(SignIn)}: Couldnt get the google user. Error = {userResponse.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return false;
             }
 
@@ -181,7 +178,7 @@ namespace MiraiNotes.Android.ViewModels
             ResponseDto<GoogleUser> userSaved;
             if (!response.Result)
             {
-                _logger.Information($"{nameof(SignIn)}: User doesnt exist in db. Creating a new one...");
+                Logger.Information($"{nameof(SignIn)}: User doesnt exist in db. Creating a new one...");
                 userSaved = await _dataService.UserService.AddAsync(new GoogleUser
                 {
                     Email = user.Email,
@@ -194,7 +191,7 @@ namespace MiraiNotes.Android.ViewModels
             }
             else
             {
-                _logger.Information($"{nameof(SignIn)}: User exist in db. Updating it...");
+                Logger.Information($"{nameof(SignIn)}: User exist in db. Updating it...");
                 var userInDbResponse = await _dataService
                     .UserService
                     .FirstOrDefaultAsNoTrackingAsync(u => u.GoogleUserID == user.ID);
@@ -218,26 +215,28 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!userSaved.Succeed)
             {
-                _dialogService.ShowErrorToast(
-                    $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
+                Logger.Error($"The user could not be saved / updated into the db. Error = {userSaved.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return false;
             }
 
-            _logger.Information($"{nameof(SignIn)}: Trying to get all the task lists that are remote...");
+            Logger.Information($"{nameof(SignIn)}: Trying to get all the task lists that are remote...");
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
             if (!syncResult.Succeed)
             {
-                _dialogService.ShowErrorToast(syncResult.Message);
+                Logger.Error($"{nameof(SignIn)}: Couldnt sync down tasklists. Error = {syncResult.Message}");
+                _dialogService.ShowErrorToast(GetText("SyncUnknownError"));
                 return false;
             }
 
-            _logger.Information($"{nameof(SignIn)}: Trying to get all the tasks that are remote...");
+            Logger.Information($"{nameof(SignIn)}: Trying to get all the tasks that are remote...");
             syncResult = await _syncService.SyncDownTasksAsync(false);
 
             if (!syncResult.Succeed)
             {
-                _dialogService.ShowErrorToast(syncResult.Message);
+                Logger.Error($"{nameof(SignIn)}: Couldnt sync down tasks. Error = {syncResult.Message}");
+                _dialogService.ShowErrorToast(GetText("SyncUnknownError"));
                 return false;
             }
 
@@ -260,13 +259,15 @@ namespace MiraiNotes.Android.ViewModels
             await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
 
             //if you came this far, that means everything is ok!
-            await _navigationService.Close(this);
-            await _navigationService.Navigate<MainViewModel>();
+            await NavigationService.Close(this);
+            await NavigationService.Navigate<MainViewModel>();
             return true;
         }
 
         public async Task InitView()
         {
+            TextProvider.SetLanguage(AppSettings.AppLanguage);
+
             ShowLoading = true;
             var response = await _dataService
                 .UserService
@@ -279,27 +280,28 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!response.Succeed || isUserLoggedIn && response.Result is null)
             {
-                var errorMsg = string.IsNullOrEmpty(response.Message)
-                    ? $"Did you uninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
-                    : response.Message;
                 ShowLoading = false;
-                _dialogService.ShowWarningToast(
-                    $"Couldn't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
+
+                var errorMsg = string.IsNullOrEmpty(response.Message)
+                    ? GetText("UnnistalledAppWithoutSigningOut")
+                    : response.Message;
+                Logger.Warning(
+                    $"{nameof(InitView)}:  Couldnt get a user in the db = {response.Succeed}." +
+                    "Or isUserLoggedIn and no user exists in db" +
+                    $"{Environment.NewLine}Error = {errorMsg}");
+
+                _dialogService.ShowWarningToast(GetText("UnnistalledAppWithoutSigningOut"));
 
                 _userCredentialService.DeleteUserCredential(
                     ResourceType.ALL,
                     _userCredentialService.DefaultUsername);
-
-                _logger.Warning(
-                    $"{nameof(InitView)}: Couldnt get a user in the db = {response.Succeed} " +
-                    $"or isUserLoggedIn and no user exists in db. {errorMsg}");
                 return;
             }
 
             if (isUserLoggedIn && AppSettings.AskForPasswordWhenAppStarts)
             {
                 ShowLoading = false;
-                var passwordMatches = await _navigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
+                var passwordMatches = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
                 if (passwordMatches)
                 {
                     await GoToMainPage();
@@ -317,8 +319,8 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task GoToMainPage()
         {
-            await _navigationService.Close(this);
-            await _navigationService.Navigate<MainViewModel>();
+            await NavigationService.Close(this);
+            await NavigationService.Navigate<MainViewModel>();
         }
     }
 }
