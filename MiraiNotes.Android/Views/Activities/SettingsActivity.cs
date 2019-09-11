@@ -39,7 +39,7 @@ namespace MiraiNotes.Android.Views.Activities
             if (savedInstanceState == null)
                 ViewModel.InitViewCommand.Execute();
 
-            SetActionBar("Settings", true);
+            SetActionBar(true);
         }
 
         //public override bool OnOptionsItemSelected(IMenuItem item)

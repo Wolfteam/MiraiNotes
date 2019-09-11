@@ -75,14 +75,14 @@ namespace MiraiNotes.Android.Views.Fragments
                 _drawerToggle.SyncState();
         }
 
-        public void SetActionBarTitle(string title, bool isBackEnabled)
+        public void SetActionBarTitle(bool isBackEnabled)
         {
             _drawerToggle.DrawerIndicatorEnabled = !isBackEnabled;
             _drawerToggle.ToolbarNavigationClickListener = new ClickListener((v) =>
             {
                 ParentActivity.OnSupportNavigateUp();
             });
-            ParentActivity.SupportActionBar.Title = title;
+            //ParentActivity.SupportActionBar.Title = title;
             ParentActivity.SupportActionBar.SetDisplayHomeAsUpEnabled(isBackEnabled);
             ParentActivity.SupportActionBar.SetHomeButtonEnabled(isBackEnabled);
         }

@@ -149,10 +149,10 @@ namespace MiraiNotes.Android.Views.Fragments
                 _previousMenuItem = menuItem;
             }
 
-            var subMenu = menu.AddSubMenu(1, 100, 100, "Others");
-            subMenu.Add(1, Resource.Id.Accounts, 101, "Accounts").SetIcon(Resource.Drawable.ic_account_circle_black_24dp);
-            subMenu.Add(1, Resource.Id.Settings, 102, "Settings").SetIcon(Resource.Drawable.ic_settings_black_24dp);
-            subMenu.Add(1, Resource.Id.Logout, 103, "Logout").SetIcon(Resource.Drawable.ic_arrow_back_black_24dp);
+            var subMenu = menu.AddSubMenu(1, 100, 100, ViewModel.GetText("Others"));
+            subMenu.Add(1, Resource.Id.Accounts, 101, ViewModel.GetText("Accounts")).SetIcon(Resource.Drawable.ic_account_circle_black_24dp);
+            subMenu.Add(1, Resource.Id.Settings, 102, ViewModel.GetText("Settings")).SetIcon(Resource.Drawable.ic_settings_black_24dp);
+            subMenu.Add(1, Resource.Id.Logout, 103, ViewModel.GetText("Logout")).SetIcon(Resource.Drawable.ic_arrow_back_black_24dp);
 
             for (int i = 0, count = _navView.ChildCount; i < count; i++)
             {

@@ -24,7 +24,7 @@ namespace MiraiNotes.Android.Views.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
-            SetActionBarTitle("New Task", true);
+            SetActionBarTitle(true);
 
             //lines below are used to place the icon to the top, otherwise it will appear at the center
             //of the edittext
@@ -43,6 +43,20 @@ namespace MiraiNotes.Android.Views.Fragments
             //we hide the main options
             menu.Clear();
             inflater.Inflate(Resource.Menu.menu_new_task, menu);
+        }
+
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            var saveOption = menu.FindItem(Resource.Id.SaveTask);
+            saveOption?.SetTitle(ViewModel.GetText("SaveChanges"));
+
+            var discardOption = menu.FindItem(Resource.Id.DiscardChanges);
+            discardOption?.SetTitle(ViewModel.GetText("DiscardChanges"));
+
+            var deleteOption = menu.FindItem(Resource.Id.DeleteTask);
+            deleteOption?.SetTitle(ViewModel.GetText("Delete"));
+
+            base.OnPrepareOptionsMenu(menu);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

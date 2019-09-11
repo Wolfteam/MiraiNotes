@@ -59,7 +59,7 @@ namespace MiraiNotes.Android.Views.Fragments
             _newTaskFab.Click += (sender, args)
                 => CloseFabMenu();
 
-            ParentActivity.SupportActionBar.Title = "Tasks";
+            //ParentActivity.SupportActionBar.Title = ViewModel.GetText("Tasks");
 
             return view;
         }

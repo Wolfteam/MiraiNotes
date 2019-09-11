@@ -22,7 +22,7 @@ namespace MiraiNotes.Android.Views.Activities
         private IMvxInteraction<bool> _showDrawerRequest;
         private IMvxInteraction<AppThemeChangedMsg> _changeThemeRequest;
         private IMvxInteraction _hideKeyboardRequest;
-
+        private IMvxInteraction _changeLanguageRequest;
         public IMvxInteraction<bool> ShowDrawerRequest
         {
             get => _showDrawerRequest;
@@ -52,6 +52,21 @@ namespace MiraiNotes.Android.Views.Activities
                         => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.RestartActivity);
             }
         }
+        public IMvxInteraction ChangeLanguageRequest
+        {
+            get => _changeLanguageRequest;
+            set
+            {
+                if (_changeLanguageRequest != null)
+                    _changeLanguageRequest.Requested -= (sender, args)
+                        => RestartActivity();
+
+                _changeLanguageRequest = value;
+                _changeLanguageRequest.Requested += (sender, args)
+                        => RestartActivity();
+            }
+        }
+
 
         public IMvxInteraction HideKeyboardRequest
         {
@@ -82,6 +97,7 @@ namespace MiraiNotes.Android.Views.Activities
             var set = this.CreateBindingSet<MainActivity, MainViewModel>();
             set.Bind(this).For(v => v.ShowDrawerRequest).To(vm => vm.ShowDrawer).OneWay();
             set.Bind(this).For(v => v.ChangeThemeRequest).To(vm => vm.AppThemeChanged).OneWay();
+            set.Bind(this).For(v => v.ChangeLanguageRequest).To(vm => vm.AppLanguageChanged).OneWay();
             set.Bind(this).For(v => v.HideKeyboardRequest).To(vm => vm.HideKeyboard).OneWay();
             set.Apply();
 
@@ -92,6 +108,23 @@ namespace MiraiNotes.Android.Views.Activities
         {
             MenuInflater.Inflate(Resource.Menu.menu_main, menu);
             return true;
+        }
+
+        public override bool OnPrepareOptionsMenu(IMenu menu)
+        {
+            var accountsOption = menu.FindItem(Resource.Id.Accounts);
+            accountsOption?.SetTitle(ViewModel.GetText("Accounts"));
+
+            var settingsOption = menu.FindItem(Resource.Id.Settings);
+            settingsOption?.SetTitle(ViewModel.GetText("Settings"));
+
+            var logoutOption = menu.FindItem(Resource.Id.Logout);
+            logoutOption?.SetTitle(ViewModel.GetText("Logout"));
+
+            var fullSyncOption = menu.FindItem(Resource.Id.FullSync);
+            fullSyncOption?.SetTitle(ViewModel.GetText("Synchronization"));
+
+            return base.OnPrepareOptionsMenu(menu);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

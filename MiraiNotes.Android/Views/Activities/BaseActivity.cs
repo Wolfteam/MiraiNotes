@@ -30,7 +30,7 @@ namespace MiraiNotes.Android.Views.Activities
             return true;
         }
 
-        public void SetActionBar(string title, bool isBackEnabled)
+        public void SetActionBar(bool isBackEnabled)
         {
             var toolbar = FindViewById<Toolbar>(Resource.Id.AppToolbar);
             if (toolbar != null)
@@ -38,7 +38,7 @@ namespace MiraiNotes.Android.Views.Activities
                 toolbar.ShowOverflowMenu();
                 toolbar.ShowContextMenu();
                 SetSupportActionBar(toolbar);
-                SupportActionBar.Title = title;
+                //SupportActionBar.Title = title;
                 SupportActionBar.SetDisplayHomeAsUpEnabled(isBackEnabled);
             }
         }
@@ -154,6 +154,11 @@ namespace MiraiNotes.Android.Views.Activities
             if (!restartActivity)
                 return;
 
+            RestartActivity();
+        }
+
+        public void RestartActivity()
+        {
             var intent = new Intent(this, typeof(MainActivity));
             intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
             Finish();
