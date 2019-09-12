@@ -466,6 +466,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        public static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reminder.
         /// </summary>
         public static string Reminder {
@@ -669,6 +678,15 @@ namespace MiraiNotes.Android.Localization {
         public static string TaskListAndTasks {
             get {
                 return ResourceManager.GetString("TaskListAndTasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task list was succesfully created.
+        /// </summary>
+        public static string TaskListWasCreated {
+            get {
+                return ResourceManager.GetString("TaskListWasCreated", resourceCulture);
             }
         }
         

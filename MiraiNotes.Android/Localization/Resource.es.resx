@@ -360,4 +360,10 @@
   <data name="UpdateTask" xml:space="preserve">
     <value>Editar Tarea</value>
   </data>
+  <data name="Password" xml:space="preserve">
+    <value>Contrase</value>
+  </data>
+  <data name="TaskListWasCreated" xml:space="preserve">
+    <value>Lista de tareas creada exitosamente</value>
+  </data>
 </root>

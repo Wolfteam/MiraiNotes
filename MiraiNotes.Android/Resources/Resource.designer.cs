@@ -10018,10 +10018,13 @@ namespace MiraiNotes.Android
 			public const int TaskItem = 2130968659;
 			
 			// aapt resource value: 0x7f040054
-			public const int TasksView = 2130968660;
+			public const int TaskListDialog = 2130968660;
 			
 			// aapt resource value: 0x7f040055
-			public const int toast_layout = 2130968661;
+			public const int TasksView = 2130968661;
+			
+			// aapt resource value: 0x7f040056
+			public const int toast_layout = 2130968662;
 			
 			static Layout()
 			{
