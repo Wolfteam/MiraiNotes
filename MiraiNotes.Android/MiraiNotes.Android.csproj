@@ -116,6 +116,7 @@
     <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
     <Compile Include="Common\Messages\HideKeyboardMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
+    <Compile Include="Common\Messages\RefreshNumberOfTasksMsg.cs" />
     <Compile Include="Common\Messages\SettingsTitleChanged.cs" />
     <Compile Include="Common\Messages\ShowDrawerMsg.cs" />
     <Compile Include="Common\Messages\ShowProgressOverlayMsg.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Common\Messages\TaskDeletedMsg.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Common\Messages\TaskListSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskListSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskSortOrderChangedMsg.cs" />
@@ -131,7 +133,9 @@
     <Compile Include="Common\Utils\AndroidUtils.cs" />
     <Compile Include="Common\Utils\MiscellaneousUtils.cs" />
     <Compile Include="Common\Utils\MoveUpwardBehavior.cs" />
+    <Compile Include="Common\Extensions\ValidationExtensions.cs" />
     <Compile Include="Common\Validators\PasswordDialogViewModelValidator.cs" />
+    <Compile Include="Common\Validators\TaskListDialogViewModelValidator.cs" />
     <Compile Include="Controls\TopGravityDrawable.cs" />
     <Compile Include="Common\Converters\ImgPathToBitmapConverter.cs" />
     <Compile Include="Common\Converters\IntToBooleanConverter.cs" />
@@ -144,6 +148,7 @@
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\TaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsAboutViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsGeneralViewModel.cs" />
@@ -154,6 +159,7 @@
     <Compile Include="Views\Activities\BaseActivity.cs" />
     <Compile Include="Views\Activities\SettingsActivity.cs" />
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\BaseDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\PasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
     <Compile Include="Interfaces\IDialogService.cs" />
@@ -185,6 +191,7 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Views\Fragments\BaseFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\TaskListDialogFragment.cs" />
     <Compile Include="Views\Fragments\MenuFragmet.cs" />
     <Compile Include="Views\Fragments\NewTaskFragment.cs" />
     <Compile Include="Views\Fragments\Settings\SettingsAboutFragment.cs" />
@@ -590,6 +597,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\rectangle_blue_border_background.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\TaskListDialog.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

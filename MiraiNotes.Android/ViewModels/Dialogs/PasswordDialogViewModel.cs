@@ -2,6 +2,7 @@
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
@@ -155,13 +156,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         private void Validate()
         {
-            var validationResult = _validator.Validate(this);
-            var dictionary = validationResult.Errors
-                .GroupBy(k => k.PropertyName)
-                .ToDictionary(k => k.Key, v => v.First().ErrorMessage);
             Errors.Clear();
-            Errors.AddRange(dictionary);
-
+            var validationResult = _validator.Validate(this);
+            Errors.AddRange(validationResult.ToDictionary());
             RaisePropertyChanged(() => IsSaveButtonEnabled);
         }
     }

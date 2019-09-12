@@ -24,6 +24,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
         private IMvxInteraction<string> _onUserImgLoadedRequest;
         private IMvxInteraction _onTaskListsLoadedRequest;
+        private IMvxInteraction<int> _onRefreshNumberOfTasksRequest;
 
         public IMvxInteraction<string> OnUserImgLoadedRequest
         {
@@ -51,6 +52,21 @@ namespace MiraiNotes.Android.Views.Fragments
             }
         }
 
+        public IMvxInteraction<int> OnRefreshNumberOfTasksRequest
+        {
+            get => _onRefreshNumberOfTasksRequest;
+            set
+            {
+                if (_onRefreshNumberOfTasksRequest != null)
+                    _onRefreshNumberOfTasksRequest.Requested -= (sender, args)
+                        => SetNumberOfTasksView(args.Value);
+
+                _onRefreshNumberOfTasksRequest = value;
+                _onRefreshNumberOfTasksRequest.Requested += (sender, args)
+                    => SetNumberOfTasksView(args.Value);
+            }
+        }
+
         public MainActivity MainActivity
             => (MainActivity)Activity;
 
@@ -69,6 +85,7 @@ namespace MiraiNotes.Android.Views.Fragments
             var set = this.CreateBindingSet<MenuFragmet, MenuViewModel>();
             set.Bind(this).For(v => v.OnUserImgLoadedRequest).To(viewModel => viewModel.OnUserProfileImgLoaded).OneWay();
             set.Bind(this).For(v => v.OnTaskListsLoadedRequest).To(viewModel => viewModel.OnTaskListsLoaded).OneWay();
+            set.Bind(this).For(v => v.OnRefreshNumberOfTasksRequest).To(viewModel => viewModel.RefreshNumberOfTasks).OneWay();
             set.Apply();
 
             return view;
@@ -126,16 +143,12 @@ namespace MiraiNotes.Android.Views.Fragments
         {
             _navView.Menu.Clear();
             var menu = _navView.Menu;
+            int selectedTaskListPosition = 0;
 
             for (int i = 0; i < ViewModel.TaskLists.Count; i++)
             {
-                var numberOfTaskView = LayoutInflater.Inflate(Resource.Layout.NumberOfTasks, null);
-                var textView = numberOfTaskView.FindViewById<TextView>(Resource.Id.NumberOfTasksBadge);
                 var taskList = ViewModel.TaskLists[i];
-                textView.Text = $"{taskList.NumberOfTasks}".PadLeft(2, '0');
-                //var rightIcon = new TextView(Activity);
-                //rightIcon.Text = $"{ViewModel.TaskLists[i].NumberOfTasks}";
-                //rightIcon.SetCompoundDrawablesWithIntrinsicBounds(0, 0, Resource.Drawable.ic_edit_black_24dp, 0);
+                var numberOfTaskView = GetNumberOfTasksView(taskList);
 
                 var menuItem = menu
                     .Add(0, i, i, taskList.Title)
@@ -143,10 +156,12 @@ namespace MiraiNotes.Android.Views.Fragments
                     .SetChecked(false)
                     .SetActionView(numberOfTaskView);
 
-                if (i != 0)
-                    continue;
-                menuItem.SetChecked(true).SetCheckable(true);
-                _previousMenuItem = menuItem;
+                if (taskList.Id == ViewModel.SelectedTaskList.Id)
+                {
+                    menuItem.SetChecked(true).SetCheckable(true);
+                    _previousMenuItem = menuItem;
+                    selectedTaskListPosition = i;
+                }
             }
 
             var subMenu = menu.AddSubMenu(1, 100, 100, ViewModel.GetText("Others"));
@@ -165,7 +180,27 @@ namespace MiraiNotes.Android.Views.Fragments
                 wrapped.NotifyDataSetChanged();
             }
             if (ViewModel.TaskLists.Any())
-                ViewModel.OnTaskListSelectedCommand.Execute(0);
+                ViewModel.OnTaskListSelectedCommand.Execute(selectedTaskListPosition);
+        }
+
+        private void SetNumberOfTasksView(int position)
+        {
+            var taskList = ViewModel.TaskLists[position];
+            var numberOfTaskView = GetNumberOfTasksView(taskList);
+            var menuItem = _navView.Menu.FindItem(position);
+            if (menuItem == null)
+                return;
+
+            menuItem.SetActionView(numberOfTaskView);
+        }
+
+        private View GetNumberOfTasksView(TaskListItemViewModel taskList)
+        {
+            var numberOfTaskView = LayoutInflater.Inflate(Resource.Layout.NumberOfTasks, null);
+            var textView = numberOfTaskView.FindViewById<TextView>(Resource.Id.NumberOfTasksBadge);
+            textView.Text = $"{taskList.NumberOfTasks}".PadLeft(2, '0');
+
+            return numberOfTaskView;
         }
     }
 }

@@ -4,12 +4,10 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
-using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
@@ -27,14 +25,13 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IGoogleApiService _googleApiService;
-        private readonly IUserCredentialService _userCredentialService;
 
         private string _currentUserName;
         private string _currentUserEmail;
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
         private readonly MvxInteraction<string> _onUserProfileImgLoaded = new MvxInteraction<string>();
         private readonly MvxInteraction _onTaskListsLoaded = new MvxInteraction();
+        private readonly MvxInteraction<int> _refreshNumberOfTasks = new MvxInteraction<int>();
         #endregion
 
 
@@ -45,6 +42,8 @@ namespace MiraiNotes.Android.ViewModels
             => _onUserProfileImgLoaded;
         public IMvxInteraction OnTaskListsLoaded
             => _onTaskListsLoaded;
+        public IMvxInteraction<int> RefreshNumberOfTasks
+            => _refreshNumberOfTasks;
         #endregion
 
         #region Properties
@@ -65,6 +64,8 @@ namespace MiraiNotes.Android.ViewModels
             get => _taskLists;
             set => SetProperty(ref _taskLists, value);
         }
+
+        public TaskListItemViewModel SelectedTaskList { get; private set; }
         #endregion
 
         #region Commands
@@ -79,16 +80,12 @@ namespace MiraiNotes.Android.ViewModels
             IMapper mapper,
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
-            IAppSettingsService appSettings,
-            IGoogleApiService googleApiService,
-            IUserCredentialService userCredentialService)
+            IAppSettingsService appSettings)
             : base(textProvider, messenger, logger.ForContext<MenuViewModel>(), navigationService, appSettings)
         {
-            _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
-            _googleApiService = googleApiService;
 
             SetCommands();
             RegisterMessages();
@@ -104,7 +101,7 @@ namespace MiraiNotes.Android.ViewModels
 
             await InitView();
             Messenger.Publish(new ShowTasksLoadingMsg(this, false));
-            Messenger.Publish(new ShowProgressOverlayMsg(this));
+            Messenger.Publish(new ShowProgressOverlayMsg(this, false));
         }
 
         private void SetCommands()
@@ -132,6 +129,22 @@ namespace MiraiNotes.Android.ViewModels
                 {
                     SortTaskLists(msg.NewSortOrder);
                     _onTaskListsLoaded.Raise();
+                }),
+                Messenger.Subscribe<TaskListSavedMsg>(msg => 
+                {
+                    TaskLists.Add(msg.TaskList);
+                    SelectedTaskList = msg.TaskList;
+                    _onTaskListsLoaded.Raise();
+                }),
+                Messenger.Subscribe<RefreshNumberOfTasksMsg>(msg => 
+                {
+                    if (msg.WasAdded)
+                        SelectedTaskList.NumberOfTasks +=1;
+                    else
+                        SelectedTaskList.NumberOfTasks -=1;
+
+                    int position = TaskLists.IndexOf(SelectedTaskList);
+                    _refreshNumberOfTasks.Raise(position);
                 })
             };
 
@@ -215,6 +228,8 @@ namespace MiraiNotes.Android.ViewModels
 
             SortTaskLists(AppSettings.DefaultTaskListSortOrder);
 
+            SelectedTaskList = TaskLists.FirstOrDefault();
+
             _onTaskListsLoaded.Raise();
             //
             //            TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
@@ -263,8 +278,13 @@ namespace MiraiNotes.Android.ViewModels
         private async Task OnTaskListSelected(int position)
         {
             var taskList = TaskLists[position];
-            await Task.Delay(300);
-            await NavigationService.Navigate<TasksViewModel, TaskListItemViewModel>(taskList);
+            SelectedTaskList = taskList;
+            var tasks = new List<Task>
+            {
+                Task.Delay(300),
+                NavigationService.Navigate<TasksViewModel, TaskListItemViewModel>(taskList)
+            };
+            await Task.WhenAll(tasks);
         }
     }
 }

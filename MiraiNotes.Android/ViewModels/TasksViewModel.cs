@@ -3,6 +3,7 @@ using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
@@ -62,7 +63,7 @@ namespace MiraiNotes.Android.ViewModels
         #region Commands
         public IMvxAsyncCommand<TaskItemViewModel> TaskSelectedCommand { get; private set; }
         public IMvxAsyncCommand RefreshTasksCommand { get; private set; }
-        public IMvxCommand AddNewTaskListCommand { get; private set; }
+        public IMvxAsyncCommand AddNewTaskListCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskCommand { get; private set; }
         #endregion
 
@@ -111,7 +112,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.TaskID));
             RefreshTasksCommand = new MvxAsyncCommand(Refresh);
-            AddNewTaskListCommand = new MvxCommand(() => _dialogService.ShowSnackBar("not implemented", string.Empty));
+            AddNewTaskListCommand = new MvxAsyncCommand(() => NavigationService.Navigate<TaskListDialogViewModel>());
             AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
         }
 
@@ -201,6 +202,8 @@ namespace MiraiNotes.Android.ViewModels
 
         public async Task OnTaskSaved(TaskSavedMsg msg)
         {
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, true));
+
             IsBusy = true;
             var dbResponse = await _dataService
                 .TaskService
@@ -308,6 +311,7 @@ namespace MiraiNotes.Android.ViewModels
 
         public void OnTaskDeleted(TaskDeletedMsg msg)
         {
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, false));
             if (!msg.HasParentTask)
             {
                 Tasks.RemoveAll(t => t.TaskID == msg.TaskId);
