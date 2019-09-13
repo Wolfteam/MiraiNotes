@@ -1,9 +1,11 @@
 ﻿using Android.App;
 using AutoMapper;
+using FluentValidation;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.GoogleApi;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common;
+using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Services;
 using MiraiNotes.Android.ViewModels;
@@ -76,6 +78,11 @@ namespace MiraiNotes.Android
                 AppConstants.RedirectUrl)
             );
 
+            AssemblyScanner
+                .FindValidatorsInAssembly(typeof(PasswordDialogViewModelValidator).Assembly)
+                .ForEach(scanResult => Mvx.IoCProvider.RegisterType(scanResult.InterfaceType, scanResult.ValidatorType));
+            Mvx.IoCProvider.RegisterType<IValidatorFactory, ValidatorFactory>();
+
             //since im using automapper to resolve this one, i need to explicit register it
             Mvx.IoCProvider.RegisterType<GoogleUserViewModel>();
 
@@ -141,9 +148,9 @@ namespace MiraiNotes.Android
                         shared: true))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(PasswordDialogViewModel)}"))
+                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(TaskListDialogViewModel)}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_password_dialog_vm_.log"),
+                        Path.Combine(externalFolder, "Logs", "mirai_notes_tasklists_dialog_vm_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,

@@ -1,36 +1,37 @@
 ﻿using FluentValidation;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.ViewModels.Dialogs;
 
 namespace MiraiNotes.Android.Common.Validators
 {
     public class PasswordDialogViewModelValidator : AbstractValidator<PasswordDialogViewModel>
     {
-        public PasswordDialogViewModelValidator()
+        public PasswordDialogViewModelValidator(ITextProvider textProvider)
         {
             When(vm => vm.PromptForPassword, () =>
             {
                 RuleFor(vm => vm.Password)
                     .NotEmpty()
-                    .WithMessage("Password cannot be empty")
+                    .WithMessage(textProvider.Get("PasswordCantBeEmpty"))
                     .Equal(vm => vm.CurrentPassword)
-                    .WithMessage("Password is incorrect");
+                    .WithMessage(textProvider.Get("PasswordCantBeEmpty"));
             }).Otherwise(() =>
             {
                 RuleFor(vm => vm.Password)
                     .NotEmpty()
-                    .WithMessage("Password cannot be empty")
+                    .WithMessage(textProvider.Get("PasswordCantBeEmpty"))
                     .MaximumLength(10)
-                    .WithMessage("Password max length is 10")
+                    .WithMessage(textProvider.Get("PasswordMaxLength", "10"))
                     .Equal(vm => vm.ConfirmPassword)
-                    .WithMessage("Password does not match");
+                    .WithMessage(textProvider.Get("PasswordDoesntMatch"));
 
                 RuleFor(vm => vm.ConfirmPassword)
                     .NotEmpty()
-                    .WithMessage("Confirm password cannot be empty")
+                    .WithMessage(textProvider.Get("ConfirmPasswordCantBeEmpty"))
                     .MaximumLength(10)
-                    .WithMessage("Confirm password max length is 10")
+                    .WithMessage(textProvider.Get("ConfirmPasswordMaxLength", "10"))
                     .Equal(vm => vm.Password)
-                    .WithMessage("Confirm password does not match");
+                    .WithMessage(textProvider.Get("ConfirmPasswordDoesntMatch"));
             });
         }
     }

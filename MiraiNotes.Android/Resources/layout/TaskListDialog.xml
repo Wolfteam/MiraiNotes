@@ -43,7 +43,7 @@
             android:text="Add"
             android:textColor="?AccentColor"
             android:background="?android:attr/selectableItemBackground"
-            app:MvxBind="Click AddTaskListCommand; Enabled IsSaveButtonEnabled; Text [Add]"/>
+            app:MvxBind="Click AddTaskListCommand; Visibility Visibility(IsSaveButtonEnabled); Text [Add]"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

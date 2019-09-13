@@ -346,4 +346,34 @@
   <data name="TaskListWasCreated" xml:space="preserve">
     <value>Task list was succesfully created</value>
   </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>Title cannot be empty</value>
+  </data>
+  <data name="TitleMaxLength" xml:space="preserve">
+    <value>Title cannot have more than {0} characters</value>
+  </data>
+  <data name="PasswordCantBeEmpty" xml:space="preserve">
+    <value>Password cannot be empty</value>
+  </data>
+  <data name="PasswordIncorrect" xml:space="preserve">
+    <value>Password is incorrect</value>
+  </data>
+  <data name="ConfirmPasswordCantBeEmpty" xml:space="preserve">
+    <value>Confirm password cannot be empty</value>
+  </data>
+  <data name="ConfirmPasswordMaxLength" xml:space="preserve">
+    <value>Confirm password max length is {0}</value>
+  </data>
+  <data name="PasswordMaxLength" xml:space="preserve">
+    <value>Password cannot have more than {0} characters</value>
+  </data>
+  <data name="PasswordDoesntMatch" xml:space="preserve">
+    <value>Password does not match</value>
+  </data>
+  <data name="ConfirmPasswordDoesntMatch" xml:space="preserve">
+    <value>Confirm password does not match</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

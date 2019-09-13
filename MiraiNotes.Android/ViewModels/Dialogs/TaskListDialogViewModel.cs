@@ -5,7 +5,6 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
-using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
@@ -65,13 +64,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IAppSettingsService appSettings,
             IMiraiNotesDataService dataService,
             IDialogService dialogService,
-            IMapper mapper)
+            IMapper mapper,
+            IValidatorFactory validatorFactory)
             : base(textProvider, messenger, logger.ForContext<TaskListDialogViewModel>(), navigationService, appSettings)
         {
             _dataService = dataService;
             _dialogService = dialogService;
             _mapper = mapper;
-            _validator = new TaskListDialogViewModelValidator();
+            _validator = validatorFactory.GetValidator<TaskListDialogViewModel>();
 
             SetCommands();
         }

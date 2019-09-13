@@ -3,7 +3,6 @@ using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Utils;
-using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
@@ -81,13 +80,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IMvxNavigationService navigationService,
             IDialogService dialogService,
             IUserCredentialService userCredentialService,
-            IMiraiNotesDataService dataService)
+            IMiraiNotesDataService dataService,
+            IValidatorFactory validatorFactory)
             : base(textProvider, messenger, logger.ForContext<PasswordDialogViewModel>(), navigationService, appSettings)
         {
             _credentialService = userCredentialService;
             _dataService = dataService;
             _dialogService = dialogService;
-            _validator = new PasswordDialogViewModelValidator();
+            _validator = validatorFactory.GetValidator<PasswordDialogViewModel>();
             SetComamnds();
         }
 

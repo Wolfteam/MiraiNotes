@@ -187,6 +187,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        public static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Completed.
         /// </summary>
         public static string Completed {
@@ -210,6 +219,33 @@ namespace MiraiNotes.Android.Localization {
         public static string Confirmation {
             get {
                 return ResourceManager.GetString("Confirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm password cannot be empty.
+        /// </summary>
+        public static string ConfirmPasswordCantBeEmpty {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordCantBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm password does not match.
+        /// </summary>
+        public static string ConfirmPasswordDoesntMatch {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordDoesntMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm password max length is {0}.
+        /// </summary>
+        public static string ConfirmPasswordMaxLength {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordMaxLength", resourceCulture);
             }
         }
         
@@ -475,6 +511,42 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password cannot be empty.
+        /// </summary>
+        public static string PasswordCantBeEmpty {
+            get {
+                return ResourceManager.GetString("PasswordCantBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password does not match.
+        /// </summary>
+        public static string PasswordDoesntMatch {
+            get {
+                return ResourceManager.GetString("PasswordDoesntMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password is incorrect.
+        /// </summary>
+        public static string PasswordIncorrect {
+            get {
+                return ResourceManager.GetString("PasswordIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password cannot have more than {0} characters.
+        /// </summary>
+        public static string PasswordMaxLength {
+            get {
+                return ResourceManager.GetString("PasswordMaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reminder.
         /// </summary>
         public static string Reminder {
@@ -732,6 +804,24 @@ namespace MiraiNotes.Android.Localization {
         public static string Title {
             get {
                 return ResourceManager.GetString("Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Title cannot be empty.
+        /// </summary>
+        public static string TitleCannotBeEmpty {
+            get {
+                return ResourceManager.GetString("TitleCannotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Title cannot have more than {0} characters.
+        /// </summary>
+        public static string TitleMaxLength {
+            get {
+                return ResourceManager.GetString("TitleMaxLength", resourceCulture);
             }
         }
         

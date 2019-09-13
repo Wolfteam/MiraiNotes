@@ -146,6 +146,7 @@
     <Compile Include="Interfaces\ITextProvider.cs" />
     <Compile Include="Listeners\ClickListener.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
+    <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskListDialogViewModel.cs" />

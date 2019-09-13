@@ -19,6 +19,16 @@ namespace MiraiNotes.Android
             _messenger = messenger;
         }
 
+        public string Get(string key)
+        {
+            return GetText(string.Empty, string.Empty, key);
+        }
+
+        public string Get(string key, params string[] formatArgs)
+        {
+            return GetText(string.Empty, string.Empty, key, formatArgs);
+        }
+
         public void SetLanguage(AppLanguageType appLanguage, bool restartActivity = true)
         {
             string lang = appLanguage == AppLanguageType.English

@@ -366,4 +366,34 @@
   <data name="TaskListWasCreated" xml:space="preserve">
     <value>Lista de tareas creada exitosamente</value>
   </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>El título no puede estar vacío</value>
+  </data>
+  <data name="TitleMaxLength" xml:space="preserve">
+    <value>El título no puede contener mas de {0} caracteres</value>
+  </data>
+  <data name="PasswordCantBeEmpty" xml:space="preserve">
+    <value>La contraseña no puede estar vacía</value>
+  </data>
+  <data name="PasswordIncorrect" xml:space="preserve">
+    <value>La contraseña es incorrecta</value>
+  </data>
+  <data name="ConfirmPasswordCantBeEmpty" xml:space="preserve">
+    <value>La contraseña de confirmación no puede estar vacía</value>
+  </data>
+  <data name="ConfirmPasswordMaxLength" xml:space="preserve">
+    <value>La contraseña de confirmación no puede tener mas de {0} caracteres</value>
+  </data>
+  <data name="PasswordMaxLength" xml:space="preserve">
+    <value>La contraseña no puede tener mas de {0} caracteres</value>
+  </data>
+  <data name="PasswordDoesntMatch" xml:space="preserve">
+    <value>La contraseña no coincide</value>
+  </data>
+  <data name="ConfirmPasswordDoesntMatch" xml:space="preserve">
+    <value>La contraseña de confirmación no coincide</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
 </root>
