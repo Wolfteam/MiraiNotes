@@ -1,6 +1,6 @@
-﻿using MiraiNotes.UWP.Models;
+﻿using MiraiNotes.Core.Enums;
 
-namespace MiraiNotes.UWP.Interfaces
+namespace MiraiNotes.Abstractions.Services
 {
     public interface IBackgroundTaskManagerService
     {

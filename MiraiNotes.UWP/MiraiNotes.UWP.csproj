@@ -132,7 +132,6 @@
     <Compile Include="Helpers\MappingProfile.cs" />
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Interfaces\IApplicationSettingsServiceBase.cs" />
-    <Compile Include="Interfaces\IBackgroundTaskManagerService.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
     <Compile Include="Interfaces\IDispatcherHelper.cs" />
     <Compile Include="Interfaces\IGoogleApiService.cs" />
@@ -142,7 +141,6 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\BackgroundTaskType.cs" />
     <Compile Include="Models\CustomDialogType.cs" />
     <Compile Include="Models\MessageType.cs" />
     <Compile Include="Models\ToastActionType.cs" />

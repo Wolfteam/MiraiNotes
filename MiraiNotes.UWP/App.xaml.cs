@@ -1,4 +1,5 @@
-﻿using MiraiNotes.UWP.BackgroundTasks;
+﻿using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;

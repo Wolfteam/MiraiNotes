@@ -1,9 +1,8 @@
-﻿using MiraiNotes.UWP.BackgroundTasks;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Helpers;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
 using System;
-using MiraiNotes.Abstractions.Services;
 
 namespace MiraiNotes.UWP.Services
 {

@@ -1,4 +1,4 @@
-﻿namespace MiraiNotes.UWP.Models
+﻿namespace MiraiNotes.Core.Enums
 {
     public enum BackgroundTaskType
     {
