@@ -23,6 +23,8 @@ namespace MiraiNotes.Android.Views.Activities
         private IMvxInteraction<AppThemeChangedMsg> _changeThemeRequest;
         private IMvxInteraction _hideKeyboardRequest;
         private IMvxInteraction _changeLanguageRequest;
+        private bool _lockDrawerRequest;
+
         public IMvxInteraction<bool> ShowDrawerRequest
         {
             get => _showDrawerRequest;
@@ -37,7 +39,6 @@ namespace MiraiNotes.Android.Views.Activities
                         => ShowDrawer(args.Value);
             }
         }
-
         public IMvxInteraction<AppThemeChangedMsg> ChangeThemeRequest
         {
             get => _changeThemeRequest;
@@ -66,8 +67,6 @@ namespace MiraiNotes.Android.Views.Activities
                         => RestartActivity();
             }
         }
-
-
         public IMvxInteraction HideKeyboardRequest
         {
             get => _hideKeyboardRequest;
@@ -87,6 +86,15 @@ namespace MiraiNotes.Android.Views.Activities
         public DrawerLayout DrawerLayout { get; private set; }
         public override int LayoutId
             => Resource.Layout.Main;
+        public bool LockDrawerRequest
+        {
+            get => _lockDrawerRequest;
+            set
+            {
+                _lockDrawerRequest = value;
+                LockDrawer(_lockDrawerRequest);
+            }
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -99,6 +107,7 @@ namespace MiraiNotes.Android.Views.Activities
             set.Bind(this).For(v => v.ChangeThemeRequest).To(vm => vm.AppThemeChanged).OneWay();
             set.Bind(this).For(v => v.ChangeLanguageRequest).To(vm => vm.AppLanguageChanged).OneWay();
             set.Bind(this).For(v => v.HideKeyboardRequest).To(vm => vm.HideKeyboard).OneWay();
+            set.Bind(this).For(v => v.LockDrawerRequest).To(vm => vm.ShowProgressOverlay).OneWay();
             set.Apply();
 
             ViewModel.InitViewCommand.Execute();
@@ -175,6 +184,14 @@ namespace MiraiNotes.Android.Views.Activities
                 DrawerLayout.OpenDrawer((int)GravityFlags.Start);
             else
                 DrawerLayout.CloseDrawers();
+        }
+
+        public void LockDrawer(bool lockDrawer)
+        {
+            if (lockDrawer)
+                DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
+            else
+                DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
         }
     }
 }

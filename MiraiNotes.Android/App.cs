@@ -4,6 +4,7 @@ using FluentValidation;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.GoogleApi;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Background;
 using MiraiNotes.Android.Common;
 using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
@@ -65,6 +66,7 @@ namespace MiraiNotes.Android
 
             var client = new HttpClient(
                 new AuthenticatedHttpClientHandler(
+                    Mvx.IoCProvider.Resolve<ILogger>().ForContext<AuthenticatedHttpClientHandler>(),
                     () => Mvx.IoCProvider.Resolve<IGoogleApiService>(),
                     () => Mvx.IoCProvider.Resolve<IUserCredentialService>()))
             {
@@ -101,130 +103,136 @@ namespace MiraiNotes.Android
             const string fileOutputTemplate =
                 "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
             var externalFolder = Application.Context.GetExternalFilesDir(null).AbsolutePath;
-            //            var path = Path.Combine(externalFolder, "log.txt");
+            var basePath = Path.Combine(externalFolder, "Logs");
 
+            //for some reason, .log format doesnt work.. but no problem
+            //i can use .txt or .json
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                        Matching.FromSource($"{typeof(TaskListDataService).Namespace}.{nameof(TaskListDataService)}"))
+                        Matching.FromSource($"{typeof(TaskListDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_tasklist_data_service_.log"),
+                        Path.Combine(basePath, "mirai_notes_tasklist_data_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                        Matching.FromSource($"{typeof(TaskDataService).Namespace}.{nameof(TaskDataService)}"))
+                        Matching.FromSource($"{typeof(TaskDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_task_data_service_.log"),
+                        Path.Combine(basePath, "mirai_notes_task_data_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                        Matching.FromSource($"{typeof(UserDataService).Namespace}.{nameof(UserDataService)}"))
+                        Matching.FromSource($"{typeof(UserDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_user_data_service_.log"),
+                        Path.Combine(basePath, "mirai_notes_user_data_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(AccountDialogViewModel)}"))
+                            Matching.FromSource($"{typeof(AccountDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_account_dialog_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_account_dialog_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(PasswordDialogViewModel)}"))
+                            Matching.FromSource($"{typeof(PasswordDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_password_dialog_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_password_dialog_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(AccountDialogViewModel).Namespace}.{nameof(TaskListDialogViewModel)}"))
+                            Matching.FromSource($"{typeof(TaskListDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_tasklists_dialog_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_tasklists_dialog_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(SettingsMainViewModel).Namespace}.{nameof(SettingsMainViewModel)}"))
+                            Matching.FromSource($"{typeof(SettingsMainViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_settings_main_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_settings_main_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(GoogleUserViewModel)}"))
+                            Matching.FromSource($"{typeof(GoogleUserViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_google_user_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_google_user_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(LoginViewModel)}"))
+                            Matching.FromSource($"{typeof(LoginViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_login_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_login_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(MainViewModel)}"))
+                            Matching.FromSource($"{typeof(MainViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_main_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_main_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(MenuViewModel)}"))
+                            Matching.FromSource($"{typeof(MenuViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_menu_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_menu_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(NewTaskViewModel)}"))
+                            Matching.FromSource($"{typeof(NewTaskViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_newtask_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_newtask_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(MainViewModel).Namespace}.{nameof(TasksViewModel)}"))
+                            Matching.FromSource($"{typeof(TasksViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(externalFolder, "Logs", "mirai_notes_tasks_vm_.log"),
+                        Path.Combine(basePath, "mirai_notes_tasks_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(AuthenticatedHttpClientHandler).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_auth_http_handler_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(SyncBackgroundTask).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_bg_sync_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
                 .WriteTo.AndroidLog()
                     .Enrich.WithProperty(Constants.SourceContextPropertyName, "MiraiSoft") //Sets the Tag field.
                 .CreateLogger();
+
             Log.Logger = logger;
             return logger;
         }

@@ -25,6 +25,8 @@ namespace MiraiNotes.Android.ViewModels
         private readonly MvxInteraction<AppThemeChangedMsg> _appThemeChanged = new MvxInteraction<AppThemeChangedMsg>();
         private readonly MvxInteraction _appLanguageChanged = new MvxInteraction();
         private readonly MvxInteraction _hideKeyboard = new MvxInteraction();
+
+        private bool _showProgressOverlay;
         #endregion
 
         #region Interactors
@@ -42,7 +44,11 @@ namespace MiraiNotes.Android.ViewModels
         #endregion
 
         #region Properties
-
+        public bool ShowProgressOverlay
+        {
+            get => _showProgressOverlay;
+            set => SetProperty(ref _showProgressOverlay, value);
+        }
         #endregion
 
 
@@ -107,7 +113,11 @@ namespace MiraiNotes.Android.ViewModels
                     if (msg.RestartActivity)
                         _appLanguageChanged.Raise();
                 }),
-                Messenger.Subscribe<HideKeyboardMsg>(_ => _hideKeyboard.Raise())
+                Messenger.Subscribe<HideKeyboardMsg>(_ => _hideKeyboard.Raise()),
+                Messenger.Subscribe<ShowProgressOverlayMsg>(msg =>
+                {
+                    ShowProgressOverlay = msg.Show;
+                })
             };
 
             SubscriptionTokens.AddRange(tokens);

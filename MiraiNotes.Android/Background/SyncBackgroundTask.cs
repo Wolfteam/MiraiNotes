@@ -57,9 +57,12 @@ namespace MiraiNotes.Android.Background
             {
                 try
                 {
-                    new App().Initialize();
-
                     bool startedManually = _parentBgTask == null;
+                    if (!AndroidUtils.IsAppInForeground())
+                    {
+                        new App().Initialize();
+                    }
+
                     var syncService = Mvx.IoCProvider.Resolve<ISyncService>();
                     var logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<SyncBackgroundTask>();
                     var textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();

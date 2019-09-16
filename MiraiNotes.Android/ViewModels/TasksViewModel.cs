@@ -31,7 +31,6 @@ namespace MiraiNotes.Android.ViewModels
         private MvxObservableCollection<TaskItemViewModel> _tasks = new MvxObservableCollection<TaskItemViewModel>();
         private bool _isBusy;
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
-        private bool _showProgressOverlay;
         #endregion
 
         #region Properties
@@ -51,12 +50,6 @@ namespace MiraiNotes.Android.ViewModels
         {
             get => _currentTasksSortOrder;
             set => SetProperty(ref _currentTasksSortOrder, value);
-        }
-
-        public bool ShowProgressOverlay
-        {
-            get => _showProgressOverlay;
-            set => SetProperty(ref _showProgressOverlay, value);
         }
         #endregion
 
@@ -123,7 +116,6 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg)),
                 Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
                 Messenger.Subscribe<ShowTasksLoadingMsg>(msg => IsBusy = msg.Show),
-                Messenger.Subscribe<ShowProgressOverlayMsg>(msg => ShowProgressOverlay = msg.Show),
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder))
             };
 

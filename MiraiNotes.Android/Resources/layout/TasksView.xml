@@ -29,8 +29,6 @@
         </MvxSwipeRefreshLayout>
     </RelativeLayout>
 
-    <include
-        layout="@layout/progressoverlay"/>
     <View
         android:id="@+id/FabBgLayout"
         android:layout_width="match_parent"
