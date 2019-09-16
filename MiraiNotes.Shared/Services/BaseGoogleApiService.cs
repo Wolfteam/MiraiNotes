@@ -92,6 +92,7 @@ namespace MiraiNotes.Shared.Services
                     GrantType = GoogleRefreshGrantType,
                     RefreshToken = refreshToken
                 });
+                tokenResponse.RefreshToken = refreshToken;
 
                 response.Succeed = true;
                 response.Result = tokenResponse;

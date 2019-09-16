@@ -13,6 +13,8 @@ namespace MiraiNotes.Core.Dto.Google.Responses
         [JsonProperty(PropertyName = "access_token")]
         public string AccessToken { get; set; }
 
+        //If you are renewing a token using the refresh
+        //token, then you need to manually set this one
         [JsonProperty(PropertyName = "refresh_token")]
         public string RefreshToken { get; set; }
 

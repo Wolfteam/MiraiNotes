@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -7,18 +8,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Enums;
+using Serilog;
 
 namespace MiraiNotes.Shared.Helpers
 {
     public class AuthenticatedHttpClientHandler : HttpClientHandler
     {
+        private readonly ILogger _logger;
         private readonly Func<IGoogleApiService> _getGoogleAuthService;
         private readonly Func<IUserCredentialService> _getUserCredentialService;
 
         public AuthenticatedHttpClientHandler(
+            ILogger logger,
             Func<IGoogleApiService> getGoogleAuthService,
             Func<IUserCredentialService> getUserCredentialService)
         {
+            _logger = logger;
             _getGoogleAuthService = getGoogleAuthService;
             _getUserCredentialService = getUserCredentialService;
         }
@@ -32,6 +37,8 @@ namespace MiraiNotes.Shared.Helpers
             var auth = request.Headers.Authorization;
             if (auth is null)
             {
+                _logger.Warning(
+                    $"{nameof(SendAsync)}: This request doesnt have a auth header, it will be sent as it is");
                 return await base.SendAsync(request, cancellationToken);
             }
 
@@ -41,6 +48,8 @@ namespace MiraiNotes.Shared.Helpers
             var currentLoggedUsername = userCredentialService.GetCurrentLoggedUsername();
             if (string.IsNullOrEmpty(currentLoggedUsername))
             {
+                _logger.Error(
+                    $"{nameof(SendAsync)}: Couldnt find the current logged user");
                 throw new NullReferenceException(
                     $"Username cannot be null while trying to authenticate using {auth.Scheme}");
             }
@@ -51,6 +60,8 @@ namespace MiraiNotes.Shared.Helpers
 
             if (string.IsNullOrEmpty(token))
             {
+                _logger.Error(
+                    $"{nameof(SendAsync)}: Couldnt find a token for user = {currentLoggedUsername}");
                 throw new NullReferenceException(
                     $"A token should be set before trying to to authenticate using {auth.Scheme}");
             }
@@ -66,11 +77,17 @@ namespace MiraiNotes.Shared.Helpers
 
             try
             {
+                _logger.Information(
+                    $"{nameof(SendAsync)}: Response indicates unathorized, trying to " +
+                    $"get a new access token for user = {currentLoggedUsername}");
+
                 var refreshToken = userCredentialService.GetUserCredential(
                     ResourceType.REFRESH_TOKEN_RESOURCE,
                     currentLoggedUsername);
                 if (string.IsNullOrEmpty(refreshToken))
                 {
+                    _logger.Error(
+                       $"{nameof(SendAsync)}: Couldnt find a refresh token for user = {currentLoggedUsername}");
                     throw new NullReferenceException(
                         $"A refresh token should be available before trying to to authenticate using {auth.Scheme}");
                 }
@@ -79,19 +96,19 @@ namespace MiraiNotes.Shared.Helpers
                 var tokenResponse = await googleAuthService.GetNewTokenAsync(refreshToken);
                 if (!tokenResponse.Succeed)
                 {
-                    //                    await _dialogService.ShowMessageDialogAsync(
-                    //                        "Error",
-                    //                        "Could't get a new token. Did you remove access to our app :C?");
-                    return response;
+                    _logger.Error(
+                        $"{nameof(SendAsync)}: Couldnt get a new token for user = {currentLoggedUsername}. " +
+                        $"Error = {tokenResponse.Message}");
+                    throw new Exception(tokenResponse.Message);
                 }
 
                 var newToken = tokenResponse.Result;
                 // we're now logged in again.
-
-                // Clone the request
-                clonedRequest = await CloneRequest(request);
-
                 // Save the user to the app settings
+
+                _logger.Information(
+                    $"{nameof(SendAsync)}: Saving the new token and refresh token for user = {currentLoggedUsername}");
+
                 userCredentialService.UpdateUserCredential(
                     ResourceType.REFRESH_TOKEN_RESOURCE,
                     currentLoggedUsername,
@@ -103,18 +120,22 @@ namespace MiraiNotes.Shared.Helpers
                     false,
                     newToken.AccessToken);
 
+                // Clone the request
+                clonedRequest = await CloneRequest(request);
+
                 // Set the authentication header
                 clonedRequest.Headers.Authorization = new AuthenticationHeaderValue(auth.Scheme, newToken.AccessToken);
                 // Resend the request
-                using (var r = await base.SendAsync(clonedRequest, cancellationToken))
-                {
-                    response = r;
-                }
+                response = await base.SendAsync(clonedRequest, cancellationToken);
             }
             catch (InvalidOperationException)
             {
                 // user cancelled auth, so lets return the original response
                 return response;
+            }
+            catch (Exception e)
+            {
+                Debugger.Break();
             }
 
             return response;
