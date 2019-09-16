@@ -396,4 +396,22 @@
   <data name="Close" xml:space="preserve">
     <value>Cerrar</value>
   </data>
+  <data name="SyncAutoCompleted" xml:space="preserve">
+    <value>Una sincronización automática ha sido completada exitosamente </value>
+  </data>
+  <data name="Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="SyncManualCompleted" xml:space="preserve">
+    <value>Una sincronización manual ha sido completada exitosamente </value>
+  </data>
+  <data name="SyncResults" xml:space="preserve">
+    <value>Resultados de la sincronización</value>
+  </data>
+  <data name="JobWasScheduled" xml:space="preserve">
+    <value>La tarea en segundo plano ha sido programada exitosamente</value>
+  </data>
+  <data name="JobCouldntBeScheduled" xml:space="preserve">
+    <value>La tarea en segundo plano no pudo ser programada</value>
+  </data>
 </root>

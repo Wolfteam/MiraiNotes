@@ -77,7 +77,7 @@ namespace MiraiNotes.Android.Views.Fragments
             var view = this.BindingInflate(Resource.Layout.MenuView, null);
             _navView = view.FindViewById<NavigationView>(Resource.Id.AppNavView);
             _navView.SetNavigationItemSelectedListener(this);
-
+            
             var headerLayout = _navView.GetHeaderView(0);
             var circleImg = headerLayout.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
             circleImg.Click += (sender, ar) => MainActivity.ViewModel.OnAccountsSelectedCommand.Execute();

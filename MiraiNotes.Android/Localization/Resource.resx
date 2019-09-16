@@ -376,4 +376,22 @@
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="SyncAutoCompleted" xml:space="preserve">
+    <value>A automatic full sync was successfully performed</value>
+  </data>
+  <data name="Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="SyncManualCompleted" xml:space="preserve">
+    <value>A manual full sync was successfully performed</value>
+  </data>
+  <data name="SyncResults" xml:space="preserve">
+    <value>Sync results</value>
+  </data>
+  <data name="JobWasScheduled" xml:space="preserve">
+    <value>Background task was successfully scheduled</value>
+  </data>
+  <data name="JobCouldntBeScheduled" xml:space="preserve">
+    <value>Background task could not be scheduled</value>
+  </data>
 </root>

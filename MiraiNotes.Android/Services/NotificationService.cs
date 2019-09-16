@@ -146,7 +146,7 @@ namespace MiraiNotes.Android.Services
             }
             var notif = builder.Build();
 
-            NotifManager.Notify(0, notif);
+            NotifManager.Notify(notification.Id, notif);
         }
 
         private Intent CreateSchedulerIntent(int id)

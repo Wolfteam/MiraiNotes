@@ -25,7 +25,7 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-
+        private readonly IBackgroundTaskManagerService _backgroundTaskManager;
         private string _currentUserName;
         private string _currentUserEmail;
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
@@ -33,8 +33,6 @@ namespace MiraiNotes.Android.ViewModels
         private readonly MvxInteraction _onTaskListsLoaded = new MvxInteraction();
         private readonly MvxInteraction<int> _refreshNumberOfTasks = new MvxInteraction<int>();
         #endregion
-
-
 
         #region Interactors
         // need to expose it as a public property for binding (only IMvxInteraction is needed in the view)
@@ -80,12 +78,14 @@ namespace MiraiNotes.Android.ViewModels
             IMapper mapper,
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            IBackgroundTaskManagerService backgroundTaskManager)
             : base(textProvider, messenger, logger.ForContext<MenuViewModel>(), navigationService, appSettings)
         {
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
+            _backgroundTaskManager = backgroundTaskManager;
 
             SetCommands();
             RegisterMessages();
@@ -120,23 +120,23 @@ namespace MiraiNotes.Android.ViewModels
 
                     await LoadProfileInfo();
 
-                    await InitView();
+                    await InitView(true);
 
                     Messenger.Publish(new ShowTasksLoadingMsg(this, false));
-                    Messenger.Publish(new ShowProgressOverlayMsg(this));
+                    Messenger.Publish(new ShowProgressOverlayMsg(this, false));
                 }),
                 Messenger.Subscribe<TaskListSortOrderChangedMsg>(msg =>
                 {
                     SortTaskLists(msg.NewSortOrder);
                     _onTaskListsLoaded.Raise();
                 }),
-                Messenger.Subscribe<TaskListSavedMsg>(msg => 
+                Messenger.Subscribe<TaskListSavedMsg>(msg =>
                 {
                     TaskLists.Add(msg.TaskList);
                     SelectedTaskList = msg.TaskList;
                     _onTaskListsLoaded.Raise();
                 }),
-                Messenger.Subscribe<RefreshNumberOfTasksMsg>(msg => 
+                Messenger.Subscribe<RefreshNumberOfTasksMsg>(msg =>
                 {
                     if (msg.WasAdded)
                         SelectedTaskList.NumberOfTasks +=1;
@@ -145,6 +145,10 @@ namespace MiraiNotes.Android.ViewModels
 
                     int position = TaskLists.IndexOf(SelectedTaskList);
                     _refreshNumberOfTasks.Raise(position);
+                }),
+                Messenger.Subscribe<OnFullSyncMsg>(async msg =>
+                {
+                    await InitView(true);
                 })
             };
 
@@ -172,15 +176,14 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task InitView(bool onFullSync = false)
         {
-            string selectedTaskListID;
+            string selectedTaskListID = SelectedTaskList?.Id;
 
-            //if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
-            //{
-            //    _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC);
-            //    return;
-            //}
-
-
+            if (!onFullSync && AppSettings.RunSyncBackgroundTaskAfterStart)
+            {
+                _dialogService.ShowSnackBar("Running a full sync...");
+                _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC);
+                return;
+            }
 
             //If we have something in the init details, lets select that task list
             //            if (!onFullSync &&
@@ -228,7 +231,9 @@ namespace MiraiNotes.Android.ViewModels
 
             SortTaskLists(AppSettings.DefaultTaskListSortOrder);
 
-            SelectedTaskList = TaskLists.FirstOrDefault();
+            SelectedTaskList = TaskLists.Any(tl => tl.Id == selectedTaskListID)
+                ? TaskLists.First(tl => tl.Id == selectedTaskListID)
+                : TaskLists.FirstOrDefault();
 
             _onTaskListsLoaded.Raise();
             //

@@ -15,7 +15,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
     public class SettingsSyncViewModel : BaseViewModel
     {
         #region Members
-        private readonly IDialogService _dialogService;
+        private readonly IBackgroundTaskManagerService _backgroundTaskManager;
         #endregion
 
         #region Properties
@@ -69,8 +69,11 @@ namespace MiraiNotes.Android.ViewModels.Settings
             {
                 var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemId, true);
                 AppSettings.SyncBackgroundTaskInterval = selectedInterval;
-                //TODO: REGISTER BG TASK ?
-                //_backgroundTaskManagerService.RegisterBackgroundTasks(BackgroundTaskType.SYNC, true);
+
+                if (selectedInterval == SyncBgTaskIntervals.NEVER)
+                    _backgroundTaskManager.UnregisterBackgroundTasks(BackgroundTaskType.SYNC);
+                else
+                    _backgroundTaskManager.RegisterBackgroundTasks(BackgroundTaskType.SYNC);
             }
         }
 
@@ -97,11 +100,10 @@ namespace MiraiNotes.Android.ViewModels.Settings
             ILogger logger,
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
-            IDialogService dialogService)
+            IBackgroundTaskManagerService backgroundTaskManager)
             : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
-            _dialogService = dialogService;
-
+            _backgroundTaskManager = backgroundTaskManager;
             SetCommands();
         }
 

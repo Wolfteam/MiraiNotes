@@ -20,7 +20,7 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IUserCredentialService _userCredentialService;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-
+        private readonly IBackgroundTaskManagerService _backgroundTaskManager;
         private readonly MvxInteraction<bool> _showDrawer = new MvxInteraction<bool>();
         private readonly MvxInteraction<AppThemeChangedMsg> _appThemeChanged = new MvxInteraction<AppThemeChangedMsg>();
         private readonly MvxInteraction _appLanguageChanged = new MvxInteraction();
@@ -62,12 +62,14 @@ namespace MiraiNotes.Android.ViewModels
             IDialogService dialogService,
             IUserCredentialService userCredentialService,
             IMiraiNotesDataService dataService,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            IBackgroundTaskManagerService backgroundTaskManager)
             : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings)
         {
             _userCredentialService = userCredentialService;
             _dialogService = dialogService;
             _dataService = dataService;
+            _backgroundTaskManager = backgroundTaskManager;
 
             SetCommands();
             RegisterMessages();
@@ -90,7 +92,8 @@ namespace MiraiNotes.Android.ViewModels
             InitViewCommand = new MvxAsyncCommand(
                 async () => await NavigationService.Navigate<MenuViewModel>());
 
-            SyncCommand = new MvxCommand(() => _dialogService.ShowWarningToast("sync is not implemented"));
+            SyncCommand = new MvxCommand(
+                () => _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC));
         }
 
         private void RegisterMessages()
@@ -112,13 +115,12 @@ namespace MiraiNotes.Android.ViewModels
 
         public async Task Logout()
         {
-            //TODO: DELETE ALL !!
             //delete all from the db
             //delete user settings
             //delete all view models
-            //OpenPane(false);
-            //ShowLoading(true, "Logging out... Please wait..");
-            //BackgroundTasksManager.UnregisterBackgroundTask();
+            Messenger.Publish(new ShowProgressOverlayMsg(this));
+
+            _backgroundTaskManager.UnregisterBackgroundTasks(BackgroundTaskType.ANY);
             AppSettings.ResetAppSettings();
 
             await _dataService
@@ -130,6 +132,8 @@ namespace MiraiNotes.Android.ViewModels
                 currentLoggedUsername = _userCredentialService.DefaultUsername;
 
             _userCredentialService.DeleteUserCredential(ResourceType.ALL, currentLoggedUsername);
+
+            Messenger.Publish(new ShowProgressOverlayMsg(this, false));
 
             await NavigationService.Close(this);
             await NavigationService.Navigate<LoginViewModel>();

@@ -108,6 +108,7 @@
     <Compile Include="Adapters\AccountsDialogAdapter.cs" />
     <Compile Include="App.cs" />
     <Compile Include="Background\NotificationSchedulerReceiver.cs" />
+    <Compile Include="Background\SyncBackgroundTask.cs" />
     <Compile Include="Common\MappingProfile.cs" />
     <Compile Include="Common\Messages\AccountChangeRequestMsg.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
     <Compile Include="Common\Messages\HideKeyboardMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
+    <Compile Include="Common\Messages\OnFullSyncMsg.cs" />
     <Compile Include="Common\Messages\RefreshNumberOfTasksMsg.cs" />
     <Compile Include="Common\Messages\SettingsTitleChanged.cs" />
     <Compile Include="Common\Messages\ShowDrawerMsg.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Interfaces\ITextProvider.cs" />
     <Compile Include="Listeners\ClickListener.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
+    <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
@@ -583,21 +586,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\ic_save_black_24dp.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\drawable\desc_field_selector.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\drawable\rectangle_black_border_background.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\drawable\rectangle_blue_border_background.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

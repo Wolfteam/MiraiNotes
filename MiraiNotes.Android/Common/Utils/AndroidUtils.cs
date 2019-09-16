@@ -1,5 +1,7 @@
-﻿using Android.Views;
+﻿using Android.App;
+using Android.Views;
 using MiraiNotes.Android.Listeners;
+using static Android.App.ActivityManager;
 
 namespace MiraiNotes.Android.Common.Utils
 {
@@ -20,6 +22,13 @@ namespace MiraiNotes.Android.Common.Utils
                 {
                     view.Visibility = (ViewStates)toVisibility;
                 }));
+        }
+
+        public static bool IsAppInForeground()
+        {
+            var myProcess = new RunningAppProcessInfo();
+            GetMyMemoryState(myProcess);
+            return myProcess.Importance == Importance.Foreground;
         }
     }
 }

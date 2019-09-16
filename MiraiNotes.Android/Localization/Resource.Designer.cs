@@ -385,6 +385,24 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Background task could not be scheduled.
+        /// </summary>
+        public static string JobCouldntBeScheduled {
+            get {
+                return ResourceManager.GetString("JobCouldntBeScheduled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Background task was successfully scheduled.
+        /// </summary>
+        public static string JobWasScheduled {
+            get {
+                return ResourceManager.GetString("JobWasScheduled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Light.
         /// </summary>
         public static string Light {
@@ -399,6 +417,15 @@ namespace MiraiNotes.Android.Localization {
         public static string Logout {
             get {
                 return ResourceManager.GetString("Logout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string Manual {
+            get {
+                return ResourceManager.GetString("Manual", resourceCulture);
             }
         }
         
@@ -727,11 +754,38 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A automatic full sync was successfully performed.
+        /// </summary>
+        public static string SyncAutoCompleted {
+            get {
+                return ResourceManager.GetString("SyncAutoCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Synchronization.
         /// </summary>
         public static string Synchronization {
             get {
                 return ResourceManager.GetString("Synchronization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A manual full sync was successfully performed.
+        /// </summary>
+        public static string SyncManualCompleted {
+            get {
+                return ResourceManager.GetString("SyncManualCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync results.
+        /// </summary>
+        public static string SyncResults {
+            get {
+                return ResourceManager.GetString("SyncResults", resourceCulture);
             }
         }
         

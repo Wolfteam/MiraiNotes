@@ -444,6 +444,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             Logger.Information(
                 $"{nameof(ChangeActiveAccount)}: Changing current active user to userId = {id}");
+
+            Messenger.Publish(new ShowProgressOverlayMsg(this));
             var userInDbResponse = await _dataService
                 .UserService
                 .FirstOrDefaultAsNoTrackingAsync(u => u.ID == id);
@@ -454,12 +456,22 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     $"{nameof(ChangeActiveAccount)}: Couldnt get the userId = {id} from db." +
                     $"Error = {userInDbResponse.Message}");
                 _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
+                Messenger.Publish(new ShowProgressOverlayMsg(this, false));
                 return;
             }
 
-            await _dataService
+            var currentActiveUserResponse = await _dataService
                 .UserService
                 .ChangeCurrentUserStatus(false);
+
+            if (!currentActiveUserResponse.Succeed)
+            {
+                Logger.Error(
+                    $"{nameof(ChangeActiveAccount)}: Couldnt change the the status of the current active user");
+                _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
+                Messenger.Publish(new ShowProgressOverlayMsg(this, false));
+                return;
+            }
 
             userInDbResponse.Result.IsActive = true;
 
@@ -473,6 +485,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     $"{nameof(ChangeActiveAccount)}: UserId = {id}  couldnt be saved / updated." +
                     $"Error = {userSaveResponse.Message}");
                 _dialogService.ShowSnackBar(GetText("DatabaseUnknownError"));
+                Messenger.Publish(new ShowProgressOverlayMsg(this, false));
                 return;
             }
 
@@ -481,6 +494,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 _userCredentialService.DefaultUsername,
                 false,
                 userInDbResponse.Result.Email);
+
+            IsDialogVisible = false;
 
             bool isNetworkAvailable = _networkService.IsInternetAvailable();
             if (isNetworkAvailable && AppSettings.RunFullSyncAfterSwitchingAccounts)
@@ -509,7 +524,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             {
                 _dialogService.ShowSnackBar(GetText("NetworkNotAvailableForSync"));
             }
+
+            IsDialogVisible = true;
             ChangeIsActiveStatus(false, id);
+            Messenger.Publish(new ShowProgressOverlayMsg(this, false));
             Messenger.Publish(new ShowDrawerMsg(this, false));
             Messenger.Publish(new ActiveAccountChangedMsg(this));
             await NavigationService.Close(this);
