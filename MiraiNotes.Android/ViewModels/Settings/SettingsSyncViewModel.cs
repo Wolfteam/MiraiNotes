@@ -28,23 +28,33 @@ namespace MiraiNotes.Android.ViewModels.Settings
             },
             new ItemModel
             {
+                ItemId = SyncBgTaskIntervals.EACH_30_MIN.ToString(),
+                Text = GetText("Sync30m")
+            },
+            new ItemModel
+            {
+                ItemId = SyncBgTaskIntervals.EACH_1_HOUR.ToString(),
+                Text = GetText("Sync1h")
+            },
+            new ItemModel
+            {
                 ItemId = SyncBgTaskIntervals.EACH_3_HOURS.ToString(),
-                Text = GetText("Sync3")
+                Text = GetText("Sync3h")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_6_HOURS.ToString(),
-                Text = GetText("Sync6")
+                Text = GetText("Sync6h")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_12_HOURS.ToString(),
-                Text = GetText("Sync12")
+                Text = GetText("Sync12h")
             },
             new ItemModel
             {
                 ItemId = SyncBgTaskIntervals.EACH_24_HOURS.ToString(),
-                Text = GetText("Sync24")
+                Text = GetText("Sync24h")
             }
         };
 
@@ -68,8 +78,10 @@ namespace MiraiNotes.Android.ViewModels.Settings
             set
             {
                 var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemId, true);
-                AppSettings.SyncBackgroundTaskInterval = selectedInterval;
+                if (AppSettings.SyncBackgroundTaskInterval == selectedInterval)
+                    return;
 
+                AppSettings.SyncBackgroundTaskInterval = selectedInterval;
                 if (selectedInterval == SyncBgTaskIntervals.NEVER)
                     _backgroundTaskManager.UnregisterBackgroundTasks(BackgroundTaskType.SYNC);
                 else

@@ -720,36 +720,54 @@ namespace MiraiNotes.Android.Localization {
         /// <summary>
         ///   Looks up a localized string similar to Each 12 hours.
         /// </summary>
-        public static string Sync12 {
+        public static string Sync12h {
             get {
-                return ResourceManager.GetString("Sync12", resourceCulture);
+                return ResourceManager.GetString("Sync12h", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Each hour.
+        /// </summary>
+        public static string Sync1h {
+            get {
+                return ResourceManager.GetString("Sync1h", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Each 24 hours.
         /// </summary>
-        public static string Sync24 {
+        public static string Sync24h {
             get {
-                return ResourceManager.GetString("Sync24", resourceCulture);
+                return ResourceManager.GetString("Sync24h", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Each 30 minutes.
+        /// </summary>
+        public static string Sync30m {
+            get {
+                return ResourceManager.GetString("Sync30m", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Each 3 hours.
         /// </summary>
-        public static string Sync3 {
+        public static string Sync3h {
             get {
-                return ResourceManager.GetString("Sync3", resourceCulture);
+                return ResourceManager.GetString("Sync3h", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Each 6 hours.
         /// </summary>
-        public static string Sync6 {
+        public static string Sync6h {
             get {
-                return ResourceManager.GetString("Sync6", resourceCulture);
+                return ResourceManager.GetString("Sync6h", resourceCulture);
             }
         }
         

@@ -171,16 +171,16 @@
   <data name="Never" xml:space="preserve">
     <value>Nunca</value>
   </data>
-  <data name="Sync12" xml:space="preserve">
+  <data name="Sync12h" xml:space="preserve">
     <value>Cada 12 horas</value>
   </data>
-  <data name="Sync6" xml:space="preserve">
+  <data name="Sync6h" xml:space="preserve">
     <value>Cada 6 horas</value>
   </data>
-  <data name="Sync3" xml:space="preserve">
+  <data name="Sync3h" xml:space="preserve">
     <value>Cada 3 horas</value>
   </data>
-  <data name="Sync24" xml:space="preserve">
+  <data name="Sync24h" xml:space="preserve">
     <value>Cada 24 horas</value>
   </data>
   <data name="AppTheme" xml:space="preserve">
@@ -413,5 +413,11 @@
   </data>
   <data name="JobCouldntBeScheduled" xml:space="preserve">
     <value>La tarea en segundo plano no pudo ser programada</value>
+  </data>
+  <data name="Sync1h" xml:space="preserve">
+    <value>Cada hora</value>
+  </data>
+  <data name="Sync30m" xml:space="preserve">
+    <value>Cada 30 minutos</value>
   </data>
 </root>

@@ -58,7 +58,8 @@ namespace MiraiNotes.Android.Background
                 try
                 {
                     bool startedManually = _parentBgTask == null;
-                    if (!AndroidUtils.IsAppInForeground())
+                    bool isAppInForeground = AndroidUtils.IsAppInForeground();
+                    if (!isAppInForeground)
                     {
                         new App().Initialize();
                     }
@@ -74,7 +75,7 @@ namespace MiraiNotes.Android.Background
                     logger.Information(
                         $"{nameof(SyncBackgroundTask)}: Started {(startedManually ? "manually" : "automatically")}");
 
-                    if (AndroidUtils.IsAppInForeground())
+                    if (isAppInForeground)
                     {
                         messenger.Publish(new ShowProgressOverlayMsg(this));
                     }
@@ -110,10 +111,11 @@ namespace MiraiNotes.Android.Background
 
                     logger.Information($"{nameof(SyncBackgroundTask)}: results = {message}");
 
-                    if (!AndroidUtils.IsAppInForeground()
+                    if (!isAppInForeground
                         && !startedManually
                         && appSettings.ShowToastNotificationAfterFullSync)
                     {
+                        logger.Information($"{nameof(SyncBackgroundTask)}: App is not in foreground, showing a notification...");
                         var notif = new TaskNotification
                         {
                             Conntent = message,
@@ -123,6 +125,7 @@ namespace MiraiNotes.Android.Background
                     }
                     else
                     {
+                        logger.Information($"{nameof(SyncBackgroundTask)}: App is in foreground, showing the snackbar msg...");
                         dialogService.ShowSnackBar(message);
                         messenger.Publish(new ShowProgressOverlayMsg(this, false));
                         messenger.Publish(new OnFullSyncMsg(this));

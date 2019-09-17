@@ -4,8 +4,10 @@ using Android.Graphics;
 using Android.Media;
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Background;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Views.Activities;
 using MiraiNotes.Core.Models;
 using Newtonsoft.Json;
@@ -84,11 +86,8 @@ namespace MiraiNotes.Android.Services
         public void ShowNotification(TaskNotification notification)
         {
             //TODO: APP ICON
-            var appIcon = BitmapFactory.DecodeResource(Application.Context.Resources, Resource.Drawable.notification_icon_background);
-            Bitmap bm = Bitmap.CreateScaledBitmap(appIcon,
-                48,
-                48,
-                true);
+            var iconDrawable = ContextCompat.GetDrawable(Application.Context, Resource.Drawable.ic_launcher);
+            var bm = iconDrawable.ToBitmap();
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
@@ -131,7 +130,7 @@ namespace MiraiNotes.Android.Services
                 //TODO: ACTIONS IN CASE OF SCHEDULED NOTIF
                 .SetAutoCancel(true)
                 //TODO: APPICON
-                .SetSmallIcon(Resource.Drawable.notification_icon_background)
+                .SetSmallIcon(Resource.Drawable.ic_notification_logo)
                 .SetColor(Color.Red.ToArgb())
                 .SetLargeIcon(bm)
                 .SetContentIntent(pendingIntent);
