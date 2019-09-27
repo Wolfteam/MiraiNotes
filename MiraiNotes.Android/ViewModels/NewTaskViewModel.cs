@@ -4,11 +4,13 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Helpers;
+using MvvmCross;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -76,7 +78,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand SaveChangesCommand { get; private set; }
         public IMvxAsyncCommand CloseCommand { get; private set; }
         public IMvxAsyncCommand ChangeTaskStatusCommand { get; private set; }
-        public IMvxCommand DeleteTaskCommand { get; private set; }
+        public IMvxAsyncCommand DeleteTaskCommand { get; private set; }
         #endregion
 
         public NewTaskViewModel(
@@ -133,13 +135,29 @@ namespace MiraiNotes.Android.ViewModels
                 await NavigationService.Close(this);
             });
 
-            DeleteTaskCommand = new MvxCommand(() => _dialogService.ShowDialog(
-                GetText("Confirmation"),
-                GetText("DeleteTask"),
-                GetText("Yes"),
-                GetText("No"),
-                async () => await DeleteTask())
-            );
+            DeleteTaskCommand = new MvxAsyncCommand(async () =>
+            {
+                Messenger.Publish(new HideKeyboardMsg(this));
+                ShowProgressBar = true;
+
+                bool deleted = await NavigationService
+                    .Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(Task);
+
+                ShowProgressBar = false;
+
+                if (deleted)
+                    await NavigationService.Close(this);
+            });
+
+            ChangeTaskStatusCommand = new MvxAsyncCommand(async () =>
+            {
+                ShowProgressBar = true;
+
+                await NavigationService
+                    .Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(Task);
+                
+                ShowProgressBar = false;
+            });
         }
 
         private async Task LoadTaskLists()
@@ -177,7 +195,7 @@ namespace MiraiNotes.Android.ViewModels
             ShowProgressBar = true;
             if (string.IsNullOrEmpty(taskId))
             {
-                Task = new TaskItemViewModel();
+                Task = Mvx.IoCProvider.Resolve<TaskItemViewModel>();
             }
             else
             {
@@ -396,80 +414,6 @@ namespace MiraiNotes.Android.ViewModels
             Messenger.Publish(new TaskSavedMsg(this, Task.TaskID));
 
             await CloseCommand.ExecuteAsync();
-        }
-
-        private void PromptTaskStatusChange(TaskItemViewModel task, GoogleTaskStatus newStatus)
-        {
-            string statusMessage =
-                $"{(newStatus == GoogleTaskStatus.COMPLETED ? GetText("Completed") : GetText("Incompleted"))}";
-
-
-            _dialogService.ShowDialog(
-                GetText("Confirmation"),
-                GetText("MarkTaskAsConfirmation", task.Title, statusMessage),
-                GetText("Yes"),
-                GetText("No"),
-                async () => await ChangeTaskStatus(task, newStatus));
-        }
-
-        private async Task ChangeTaskStatus(TaskItemViewModel task, GoogleTaskStatus newStatus)
-        {
-            string statusMessage =
-                $"{(newStatus == GoogleTaskStatus.COMPLETED ? GetText("Completed") : GetText("Incompleted"))}";
-
-            ShowProgressBar = true;
-
-            var response = await _dataService
-                .TaskService
-                .ChangeTaskStatusAsync(task.TaskID, newStatus);
-
-            ShowProgressBar = false;
-
-            if (!response.Succeed)
-            {
-                Logger.Error(
-                    $"{nameof(ChangeTaskStatus)}: An error occurred while trying to mark {task.Title} as {statusMessage}." +
-                    $"Error = {response.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-
-            task.Status = response.Result.Status;
-            task.CompletedOn = response.Result.CompletedOn;
-            task.UpdatedAt = response.Result.UpdatedAt;
-
-            Messenger.Publish(new TaskStatusChangedMsg(
-                this,
-                task.TaskID,
-                task.ParentTask,
-                task.CompletedOn,
-                task.UpdatedAt,
-                task.Status));
-
-            _dialogService.ShowSnackBar(GetText("TaskStatusChanged", task.Title, statusMessage));
-        }
-
-        private async Task DeleteTask()
-        {
-            ShowProgressBar = true;
-
-            var deleteResponse = await _dataService
-                .TaskService
-                .RemoveTaskAsync(Task.TaskID);
-
-            ShowProgressBar = false;
-
-            if (!deleteResponse.Succeed)
-            {
-                Logger.Error(
-                    $"{nameof(DeleteTask)}: Couldn't delete the selected task." +
-                    $"Error = {deleteResponse.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-
-            Messenger.Publish(new TaskDeletedMsg(this, Task.TaskID, Task.ParentTask));
-            await NavigationService.Close(this);
         }
 
         private async Task MoveCurrentTask()

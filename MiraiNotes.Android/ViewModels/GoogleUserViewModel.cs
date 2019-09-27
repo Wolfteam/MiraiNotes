@@ -91,7 +91,7 @@ namespace MiraiNotes.Android.ViewModels
             DeleteAccountCommand = new MvxCommand(() =>
                 _dialogService.ShowDialog(
                     $"{GetText("Delete")} {Fullname}",
-                    GetText("DeleteThisAccount"),
+                    GetText("DeleteThisAccountConfirmation"),
                     GetText("Yes"),
                     GetText("No"),
                     () => Messenger.Publish(new AccountChangeRequestMsg(this, true, false, this))

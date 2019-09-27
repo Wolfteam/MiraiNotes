@@ -291,7 +291,7 @@
   <data name="Delete" xml:space="preserve">
     <value>Borrar</value>
   </data>
-  <data name="DeleteThisAccount" xml:space="preserve">
+  <data name="DeleteThisAccountConfirmation" xml:space="preserve">
     <value>¿ Estás seguro que deseas borrar esta cuenta ?</value>
   </data>
   <data name="Yes" xml:space="preserve">
@@ -309,7 +309,7 @@
   <data name="WannaLogOut" xml:space="preserve">
     <value>¿ Estás seguro que deseas cerrar sesión ?</value>
   </data>
-  <data name="DeleteTask" xml:space="preserve">
+  <data name="DeleteTaskConfirmation" xml:space="preserve">
     <value>¿ Estás seguro que quieres borrar esta tarea ?</value>
   </data>
   <data name="Welcome" xml:space="preserve">
@@ -419,5 +419,35 @@
   </data>
   <data name="Sync30m" xml:space="preserve">
     <value>Cada 30 minutos</value>
+  </data>
+  <data name="FingerprintAuthFailed" xml:space="preserve">
+    <value>Huella no reconocida. Intente de nuevo.</value>
+  </data>
+  <data name="FingerprintAuthMsg" xml:space="preserve">
+    <value>Confirme la huella para confirmar</value>
+  </data>
+  <data name="AskForFingerprint" xml:space="preserve">
+    <value>Solicitar huella al iniciar la aplicación</value>
+  </data>
+  <data name="FingerprintIsNotAvailable" xml:space="preserve">
+    <value>El lector de huellas no se encuentra disponible</value>
+  </data>
+  <data name="SelectAnOption" xml:space="preserve">
+    <value>Seleciona una opción</value>
+  </data>
+  <data name="DeleteTask" xml:space="preserve">
+    <value>Borrar tarea</value>
+  </data>
+  <data name="AddSubTask" xml:space="preserve">
+    <value>Agregar una subtarea</value>
+  </data>
+  <data name="MoveToDifferentTaskList" xml:space="preserve">
+    <value>Mover a una lista diferente</value>
+  </data>
+  <data name="AddReminder" xml:space="preserve">
+    <value>Agregar un recordatorio</value>
+  </data>
+  <data name="MarkTaskAs" xml:space="preserve">
+    <value>Marcar como {0}</value>
   </data>
 </root>

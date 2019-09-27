@@ -124,11 +124,38 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add a reminder.
+        /// </summary>
+        public static string AddReminder {
+            get {
+                return ResourceManager.GetString("AddReminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a subtask.
+        /// </summary>
+        public static string AddSubTask {
+            get {
+                return ResourceManager.GetString("AddSubTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to App Theme.
         /// </summary>
         public static string AppTheme {
             get {
                 return ResourceManager.GetString("AppTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ask for fingerprint when the app starts.
+        /// </summary>
+        public static string AskForFingerprint {
+            get {
+                return ResourceManager.GetString("AskForFingerprint", resourceCulture);
             }
         }
         
@@ -313,7 +340,7 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you wanna delete this task ?.
+        ///   Looks up a localized string similar to Delete task.
         /// </summary>
         public static string DeleteTask {
             get {
@@ -322,11 +349,20 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you wanna delete this task ?.
+        /// </summary>
+        public static string DeleteTaskConfirmation {
+            get {
+                return ResourceManager.GetString("DeleteTaskConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you wanna delete this account ?.
         /// </summary>
-        public static string DeleteThisAccount {
+        public static string DeleteThisAccountConfirmation {
             get {
-                return ResourceManager.GetString("DeleteThisAccount", resourceCulture);
+                return ResourceManager.GetString("DeleteThisAccountConfirmation", resourceCulture);
             }
         }
         
@@ -354,6 +390,33 @@ namespace MiraiNotes.Android.Localization {
         public static string English {
             get {
                 return ResourceManager.GetString("English", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fingerprint not recognized. Try again..
+        /// </summary>
+        public static string FingerprintAuthFailed {
+            get {
+                return ResourceManager.GetString("FingerprintAuthFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm fingerprint to continue.
+        /// </summary>
+        public static string FingerprintAuthMsg {
+            get {
+                return ResourceManager.GetString("FingerprintAuthMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fingerprint is not available.
+        /// </summary>
+        public static string FingerprintIsNotAvailable {
+            get {
+                return ResourceManager.GetString("FingerprintIsNotAvailable", resourceCulture);
             }
         }
         
@@ -430,6 +493,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mark as {0}.
+        /// </summary>
+        public static string MarkTaskAs {
+            get {
+                return ResourceManager.GetString("MarkTaskAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mark {0} as {1} ?.
         /// </summary>
         public static string MarkTaskAsConfirmation {
@@ -444,6 +516,15 @@ namespace MiraiNotes.Android.Localization {
         public static string MoveTaskConfirmation {
             get {
                 return ResourceManager.GetString("MoveTaskConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move to a different task list.
+        /// </summary>
+        public static string MoveToDifferentTaskList {
+            get {
+                return ResourceManager.GetString("MoveToDifferentTaskList", resourceCulture);
             }
         }
         
@@ -606,6 +687,15 @@ namespace MiraiNotes.Android.Localization {
         public static string SaveChanges {
             get {
                 return ResourceManager.GetString("SaveChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select an option.
+        /// </summary>
+        public static string SelectAnOption {
+            get {
+                return ResourceManager.GetString("SelectAnOption", resourceCulture);
             }
         }
         

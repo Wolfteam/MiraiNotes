@@ -271,7 +271,7 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="DeleteThisAccount" xml:space="preserve">
+  <data name="DeleteThisAccountConfirmation" xml:space="preserve">
     <value>Are you sure you wanna delete this account ?</value>
   </data>
   <data name="Yes" xml:space="preserve">
@@ -289,7 +289,7 @@
   <data name="WannaLogOut" xml:space="preserve">
     <value>Are you sure you want to log out?</value>
   </data>
-  <data name="DeleteTask" xml:space="preserve">
+  <data name="DeleteTaskConfirmation" xml:space="preserve">
     <value>Are you sure you wanna delete this task ?</value>
   </data>
   <data name="Welcome" xml:space="preserve">
@@ -399,5 +399,35 @@
   </data>
   <data name="Sync30m" xml:space="preserve">
     <value>Each 30 minutes</value>
+  </data>
+  <data name="FingerprintAuthFailed" xml:space="preserve">
+    <value>Fingerprint not recognized. Try again.</value>
+  </data>
+  <data name="FingerprintAuthMsg" xml:space="preserve">
+    <value>Confirm fingerprint to continue</value>
+  </data>
+  <data name="AskForFingerprint" xml:space="preserve">
+    <value>Ask for fingerprint when the app starts</value>
+  </data>
+  <data name="FingerprintIsNotAvailable" xml:space="preserve">
+    <value>Fingerprint is not available</value>
+  </data>
+  <data name="SelectAnOption" xml:space="preserve">
+    <value>Select an option</value>
+  </data>
+  <data name="DeleteTask" xml:space="preserve">
+    <value>Delete task</value>
+  </data>
+  <data name="AddSubTask" xml:space="preserve">
+    <value>Add a subtask</value>
+  </data>
+  <data name="MoveToDifferentTaskList" xml:space="preserve">
+    <value>Move to a different task list</value>
+  </data>
+  <data name="AddReminder" xml:space="preserve">
+    <value>Add a reminder</value>
+  </data>
+  <data name="MarkTaskAs" xml:space="preserve">
+    <value>Mark as {0}</value>
   </data>
 </root>
