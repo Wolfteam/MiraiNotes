@@ -4,13 +4,11 @@ using Android.Support.V4.View;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MiraiNotes.Android.Interfaces;
-using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Binding.Extensions;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.ViewModels;
-using System;
 using System.Linq;
 
 namespace MiraiNotes.Android.Adapters
