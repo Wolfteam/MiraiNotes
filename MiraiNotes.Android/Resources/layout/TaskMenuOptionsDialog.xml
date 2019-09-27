@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:padding="10dp"
+    android:background="?AppBackground">
+
+    <View
+        android:layout_width="120dp"
+        android:layout_height="10dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="?AccentColorDark"
+        android:background="@drawable/rectangle"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="Select an option"
+        android:textStyle="bold"
+        android:textSize="@dimen/task_item_title"
+        app:MvxBind="Text [SelectAnOption]"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_delete_black_24dp"
+        android:textAlignment="textStart"
+        android:drawablePadding="10dp"
+        android:textColor="@color/VividRedAccentColorPrimary"
+        android:drawableTint="@color/VividRedAccentColorPrimary"
+        android:text="Delete task"
+        app:MvxBind="Text [DeleteTask]; Click DeleteTaskCommand"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_done_24dp"
+        android:textAlignment="textStart"
+        android:drawablePadding="10dp"
+        android:textColor="@color/DarkGreenAccentColorLight"
+        android:drawableTint="@color/DarkGreenAccentColorLight"
+        android:text="Mark as completed"
+        app:MvxBind="Text MarkAsTitle; Click ChangeTaskStatusCommand"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_add_circle_black_24dp"
+        android:textAlignment="textStart"
+        android:drawablePadding="10dp"
+        android:textColor="@color/LigthBlueAccentColorLight"
+        android:drawableTint="@color/LigthBlueAccentColorLight"
+        android:text="Add a subtask"
+        app:MvxBind="Text [AddSubTask]; Click AddSubTaskCommand"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_move_24dp"
+        android:textColor="?TextInvertedColor"
+        android:drawableTint="?TextInvertedColor"
+        android:textAlignment="textStart"
+        android:drawablePadding="10dp"
+        android:text="Move to a different task list"
+        app:MvxBind="Text [MoveToDifferentTaskList]; Click MoveTaskCommand"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_calendar_24dp"
+        android:textAlignment="textStart"
+        android:drawablePadding="10dp"
+        android:textColor="@color/OrangeAccentColorLight"
+        android:drawableTint="@color/OrangeAccentColorLight"
+        android:text="Add a reminder"
+        app:MvxBind="Text [AddReminder]; Click AddReminderCommand"/>
+</LinearLayout>

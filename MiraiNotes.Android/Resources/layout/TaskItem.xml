@@ -1,15 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:minHeight ="90dp"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="10dp"
+    android:background="?android:attr/selectableItemBackground">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        app:MvxBind="Text Title" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_height="match_parent"
+                android:layout_width="10dp"
+                android:background="@android:color/holo_red_dark"
+                style="@style/VerticalDivider"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="5"
+                android:layout_marginStart="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/task_item_title"
+                    android:text="Task name"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:gravity="center_vertical"
+                    app:MvxBind="Text Title; StrikeThroughText IsCompleted" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:textSize="@dimen/task_item_content"
+                    android:text="Task content goes here"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    app:MvxBind="Text Notes;Visibility Visibility(HasNotes); StrikeThroughText IsCompleted" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/ShowSubTasks"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                android:background="@android:color/transparent"
+                android:layout_gravity="center"
+                android:textSize="@dimen/task_item_content"
+                app:MvxBind="Click ShowSubTasksCommand; Visibility Visibility(HasSubTasks); ShowSubTasks ShowSubTasks"/>
+        </LinearLayout>
+
+        <!--    <MvvmCross.Platforms.Android.Binding.Views.MvxListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:divider="?DividerColor"
+        android:dividerHeight="@dimen/divider_height"
+        android:choiceMode="singleChoice"
+        app:MvxBind="ItemsSource SubTasks;"
+        app:MvxItemTemplate="@layout/subtaskitem">
+    </MvvmCross.Platforms.Android.Binding.Views.MvxListView>-->
+        <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:id="@+id/SubTaskRecyclerView"
+            android:scrollbars="vertical"
+            app:MvxItemTemplate="@layout/subtaskitem"
+            app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks)" />
+    </LinearLayout>
+</android.support.v7.widget.CardView>
+

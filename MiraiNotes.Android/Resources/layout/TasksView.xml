@@ -18,14 +18,14 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             app:MvxBind="Refreshing IsBusy; RefreshCommand RefreshTasksCommand">
+
             <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
                 android:id="@+id/TaskRecyclerView"
                 android:scrollbars="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:MvxItemTemplate="@layout/taskitem"
-                app:MvxBind="ItemsSource Tasks; ItemClick TaskSelectedCommand" />
-
+                app:MvxBind="ItemsSource Tasks; ItemClick TaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
         </MvxSwipeRefreshLayout>
     </RelativeLayout>
 
@@ -97,7 +97,6 @@
             app:srcCompat="@drawable/ic_add_black_24dp"
             app:MvxBind="Click AddNewTaskCommand" />
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="wrap_content"

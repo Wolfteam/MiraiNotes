@@ -55,7 +55,7 @@
                     android:inputType="textShortMessage"
                     android:background="@android:color/transparent"
                     app:MvxBind="Text Task.Title; Error Errors['Title']; Hint [Title]"/>
-                    
+
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/TaskNotes"
                     android:drawableLeft="@drawable/ic_list_black_24dp"
@@ -75,6 +75,13 @@
                     android:textColorHint="?TextInvertedColor"
                     android:background="@android:color/transparent"
                     app:MvxBind="Text Task.Notes; Error Errors['Notes']; Hint [Notes]"/>
+
+                <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+                    android:scrollbars="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:MvxItemTemplate="@layout/subtaskitem"
+                    app:MvxBind="ItemsSource Task.SubTasks;" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

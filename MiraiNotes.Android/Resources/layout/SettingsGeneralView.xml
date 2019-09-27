@@ -206,6 +206,40 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:layout_marginTop="@dimen/settings_margin"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click AskForFingerPrintWhenAppStartsCommand">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="wrap_content"
+                    android:text="Ask for fingerprint"
+                    android:textSize="@dimen/settings_font_size_content"
+                    app:MvxBind="Text ['AskForFingerprint']"/>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:clickable="false"
+                    app:MvxBind="Checked AskForFingerPrintWhenAppStarts"/>
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
 
