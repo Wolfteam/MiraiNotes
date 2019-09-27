@@ -106,17 +106,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\AccountsDialogAdapter.cs" />
+    <Compile Include="Adapters\TasksAdapter.cs" />
     <Compile Include="App.cs" />
     <Compile Include="Background\NotificationSchedulerReceiver.cs" />
     <Compile Include="Background\SyncBackgroundTask.cs" />
+    <Compile Include="Bindings\StrikeThroughTextBinding.cs" />
+    <Compile Include="Bindings\SubTaskButtonAnimateBinding.cs" />
     <Compile Include="Common\MappingProfile.cs" />
     <Compile Include="Common\Messages\AccountChangeRequestMsg.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
     <Compile Include="Common\Messages\AppThemeChangedMsg.cs" />
     <Compile Include="Common\Messages\AppLanguageChangedMessage.cs" />
     <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
+    <Compile Include="Common\Messages\DeleteTaskRequestMsg.cs" />
     <Compile Include="Common\Messages\HideKeyboardMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
+    <Compile Include="Common\Messages\ChangeTaskStatusRequestMsg.cs" />
     <Compile Include="Common\Messages\OnFullSyncMsg.cs" />
     <Compile Include="Common\Messages\RefreshNumberOfTasksMsg.cs" />
     <Compile Include="Common\Messages\SettingsTitleChanged.cs" />
@@ -145,14 +150,26 @@
     <Compile Include="Common\Converters\SettingsPageTypeToResourceDrawableConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
     <Compile Include="Common\Extensions\ObservableDictionary.cs" />
+    <Compile Include="Interfaces\IBaseViewModel.cs" />
+    <Compile Include="Interfaces\IItemTouchHelperAdapter.cs" />
+    <Compile Include="Interfaces\IOnStartDragListener.cs" />
     <Compile Include="Interfaces\ITextProvider.cs" />
     <Compile Include="Listeners\ClickListener.cs" />
+    <Compile Include="Interfaces\IItemTouchHelperViewHolder.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
+    <Compile Include="Listeners\SimpleItemTouchHelperCallback.cs" />
+    <Compile Include="Listeners\TaskRecyclerViewDecoration.cs" />
+    <Compile Include="Listeners\TasksRecyclerViewScrollListener.cs" />
+    <Compile Include="Listeners\TouchListener.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\BaseConfirmationDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\ChangeTaskStatusDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\DeleteTaskDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskListDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\TaskMenuOptionsViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsAboutViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsGeneralViewModel.cs" />
@@ -164,6 +181,9 @@
     <Compile Include="Views\Activities\SettingsActivity.cs" />
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\BaseDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\ChangeTaskStatusFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\DeleteTaskFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\FingerprintCustomDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\PasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
     <Compile Include="Interfaces\IDialogService.cs" />
@@ -196,6 +216,7 @@
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Views\Fragments\BaseFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\TaskListDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\TasksMenuOptionsDialogFragment.cs" />
     <Compile Include="Views\Fragments\MenuFragmet.cs" />
     <Compile Include="Views\Fragments\NewTaskFragment.cs" />
     <Compile Include="Views\Fragments\Settings\SettingsAboutFragment.cs" />
@@ -257,6 +278,9 @@
     <PackageReference Include="MvvmCross.Plugin.Visibility">
       <Version>6.3.1</Version>
     </PackageReference>
+    <PackageReference Include="MvvmCross.Plugins.Fingerprint">
+      <Version>1.4.9</Version>
+    </PackageReference>
     <PackageReference Include="Refit">
       <Version>4.7.51</Version>
     </PackageReference>
@@ -313,7 +337,9 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Localization\Resource.es.resx" />
+    <EmbeddedResource Include="Localization\Resource.es.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Localization\Resource.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
@@ -602,6 +628,41 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xhdpi\ic_notification_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SubTaskItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_down_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\TaskMenuOptionsDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_move_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_calendar_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\rectangle.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\ConfirmationDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

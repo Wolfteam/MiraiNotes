@@ -1,9 +1,14 @@
 ﻿using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
 using Android.Views;
 using Android.Widget;
+using MiraiNotes.Android.Adapters;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
+using MvvmCross.Droid.Support.V7.RecyclerView;
+using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 
 namespace MiraiNotes.Android.Views.Fragments
@@ -21,12 +26,12 @@ namespace MiraiNotes.Android.Views.Fragments
         private FloatingActionButton _newTaskListFab;
         private FloatingActionButton _newTaskFab;
         private View _fabBgLayout;
+        private MvxRecyclerView _taskRecyclerView;
+        private TasksAdapter _tasksAdapter;
+        private SimpleItemTouchHelperCallback _callback;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            // Use this to return your custom view for this Fragment
-            // return inflater.Inflate(Resource.Layout.YourFragment, container, false);
-
             var view = base.OnCreateView(inflater, container, savedInstanceState);
 
             _mainFab = view.FindViewById<FloatingActionButton>(Resource.Id.AppFab);
@@ -59,7 +64,20 @@ namespace MiraiNotes.Android.Views.Fragments
             _newTaskFab.Click += (sender, args)
                 => CloseFabMenu();
 
-            //ParentActivity.SupportActionBar.Title = ViewModel.GetText("Tasks");
+            _tasksAdapter = new TasksAdapter((IMvxAndroidBindingContext)BindingContext);
+            _callback = new SimpleItemTouchHelperCallback(_tasksAdapter);
+            var touchHelper = new ItemTouchHelper(_callback);
+
+            _taskRecyclerView = view.FindViewById<MvxRecyclerView>(Resource.Id.TaskRecyclerView);
+            _taskRecyclerView.AddOnScrollListener(new TasksRecyclerViewScrollListener(_mainFab, CloseSwypedItem));
+            _taskRecyclerView.Adapter = _tasksAdapter;
+            _taskRecyclerView.AddItemDecoration(new DividerItemDecoration(ParentActivity, LinearLayoutManager.Vertical));
+
+            //_taskRecyclerView.AddItemDecoration(new TaskRecyclerViewDecoration(c =>
+            //{
+            //    callback.OnDraw(c);
+            //}));
+            touchHelper.AttachToRecyclerView(_taskRecyclerView);
 
             return view;
         }
@@ -96,6 +114,12 @@ namespace MiraiNotes.Android.Views.Fragments
                 _addNewTaskFabLayout.Visibility = ViewStates.Gone;
                 _addNewTaskListFabLayout.Visibility = ViewStates.Gone;
             }
+        }
+
+        private void CloseSwypedItem()
+        {
+            if (_callback.CurrentViewHolder != null)
+                _callback.ClearView(_taskRecyclerView, _callback.CurrentViewHolder);
         }
     }
 }
