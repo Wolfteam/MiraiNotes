@@ -1,5 +1,8 @@
-﻿using MiraiNotes.Core.Enums;
+﻿using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
+using MvvmCross.Commands;
+using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 using System;
 
@@ -11,13 +14,18 @@ namespace MiraiNotes.Android.ViewModels
 
         private string _taskID;
         private string _status;
+        private string _notes;
         private string _parentTask;
         private bool _hasSubTasks;
+        private bool _showSubTasks;
         private DateTimeOffset? _completedOn;
         private MvxObservableCollection<TaskItemViewModel> _subTasks = new MvxObservableCollection<TaskItemViewModel>();
         private DateTimeOffset? _remindOn;
-
+        private readonly IMvxMessenger _messenger;
         #endregion
+
+        #region Properties
+        public int ID { get; set; }
 
         public string TaskID
         {
@@ -49,7 +57,15 @@ namespace MiraiNotes.Android.ViewModels
 
         public string Position { get; set; }
 
-        public string Notes { get; set; }
+        public string Notes
+        {
+            get => _notes;
+            set
+            {
+                SetProperty(ref _notes, value);
+                RaisePropertyChanged(() => HasNotes);
+            }
+        }
 
         public string Status
         {
@@ -183,7 +199,7 @@ namespace MiraiNotes.Android.ViewModels
             set
             {
                 _hasSubTasks = value;
-                RaisePropertyChanged(nameof(HasSubTasks));
+                SetProperty(ref _hasSubTasks, value);
             }
         }
 
@@ -204,7 +220,11 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public bool ShowSubTasks { get; set; }
+        public bool ShowSubTasks
+        {
+            get => _showSubTasks;
+            set => SetProperty(ref _showSubTasks, value);
+        }
 
         public bool HasParentTask
         {
@@ -253,5 +273,34 @@ namespace MiraiNotes.Android.ViewModels
             ? string.Empty
             : RemindOn.Value.ToString("ddd, MMM d HH:mm");
 
+        public bool HasNotes
+            => !string.IsNullOrEmpty(Notes);
+
+        #endregion    }
+
+        #region Commands
+        public IMvxCommand ShowSubTasksCommand { get; private set; }
+        public IMvxCommand DeleteTaskCommand { get; private set; }
+        public IMvxCommand ChangeTaskStatusCommand { get; private set; }
+        #endregion
+
+        public TaskItemViewModel(IMvxMessenger messenger)
+        {
+            SetCommands();
+            _messenger = messenger;
+        }
+
+        private void SetCommands()
+        {
+            ShowSubTasksCommand = new MvxCommand(() => ShowSubTasks = !ShowSubTasks);
+            DeleteTaskCommand = new MvxCommand(() => _messenger.Publish(new DeleteTaskRequestMsg(this, this)));
+            ChangeTaskStatusCommand = new MvxCommand(() =>
+            {
+                var status = TaskStatus == GoogleTaskStatus.COMPLETED
+                    ? GoogleTaskStatus.NEEDS_ACTION
+                    : GoogleTaskStatus.COMPLETED;
+                _messenger.Publish(new ChangeTaskStatusRequestMsg(this, this, status));
+            });
+        }
     }
 }

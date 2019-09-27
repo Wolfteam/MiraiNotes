@@ -12,13 +12,17 @@ using MiraiNotes.Android.Services;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Android.ViewModels.Settings;
+using MiraiNotes.Android.Views.Fragments.Dialogs;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Services.Data;
 using MvvmCross;
 using MvvmCross.IoC;
+using MvvmCross.Platforms.Android;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Plugin.Fingerprint;
+using Plugin.Fingerprint.Abstractions;
 using Refit;
 using Serilog;
 using Serilog.Core;
@@ -64,6 +68,15 @@ namespace MiraiNotes.Android
             Mvx.IoCProvider.RegisterType<ITaskDataService, TaskDataService>();
             Mvx.IoCProvider.RegisterType<IMiraiNotesDataService, MiraiNotesDataService>();
 
+            CrossFingerprint.SetCurrentActivityResolver(() =>
+            {
+                var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
+                return top.Activity;
+            });
+            
+            Mvx.IoCProvider.RegisterType(() => CrossFingerprint.Current);
+            CrossFingerprint.SetDialogFragmentType<FingerprintCustomDialogFragment>();
+
             var client = new HttpClient(
                 new AuthenticatedHttpClientHandler(
                     Mvx.IoCProvider.Resolve<ILogger>().ForContext<AuthenticatedHttpClientHandler>(),
@@ -90,6 +103,7 @@ namespace MiraiNotes.Android
 
             //since im using automapper to resolve this one, i need to explicit register it
             Mvx.IoCProvider.RegisterType<GoogleUserViewModel>();
+            Mvx.IoCProvider.RegisterType<TaskItemViewModel>();
 
             RegisterAppStart<LoginViewModel>();
             //RegisterCustomAppStart<CustomAppStart>();

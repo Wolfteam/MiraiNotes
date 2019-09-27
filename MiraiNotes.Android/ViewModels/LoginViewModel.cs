@@ -7,10 +7,10 @@ using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
-using MvvmCross.Localization;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Plugin.Fingerprint.Abstractions;
 using Serilog;
 using System;
 using System.Threading.Tasks;
@@ -25,11 +25,11 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IGoogleApiService _googleApiService;
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
-
+        private readonly IFingerprint _fingerprintService;
         private bool _showLoading;
         private bool _showLoginButton = true;
 
-        private MvxInteraction<string> _loginRequest = new MvxInteraction<string>();
+        private readonly MvxInteraction<string> _loginRequest = new MvxInteraction<string>();
         #endregion
 
         #region Interactors
@@ -72,7 +72,8 @@ namespace MiraiNotes.Android.ViewModels
             IUserCredentialService userCredentialService,
             IGoogleApiService googleAuthService,
             IMiraiNotesDataService dataService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IFingerprint fingerprint)
             : base(textProvider, messenger, logger.ForContext<LoginViewModel>(), navigationService, appSettings)
         {
             _syncService = syncService;
@@ -80,6 +81,7 @@ namespace MiraiNotes.Android.ViewModels
             _googleApiService = googleAuthService;
             _dataService = dataService;
             _dialogService = dialogService;
+            _fingerprintService = fingerprint;
             SetCommands();
 
             TextProvider.SetLanguage(AppSettings.AppLanguage, false);
@@ -298,23 +300,47 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
-            if (isUserLoggedIn && AppSettings.AskForPasswordWhenAppStarts)
+            var fingerprintAvailability = await _fingerprintService.GetAvailabilityAsync();
+
+            if (isUserLoggedIn &&
+                fingerprintAvailability == FingerprintAvailability.Available &&
+                AppSettings.AskForFingerPrintWhenAppStarts)
+            {
+                var authenticated = false;
+                while (!authenticated)
+                {
+                    var authResult = await _fingerprintService.AuthenticateAsync(GetText("FingerprintAuthMsg"));
+                    if (authResult.Status == FingerprintAuthenticationResultStatus.Succeeded &&
+                        authResult.Authenticated)
+                    {
+                        authenticated = true;
+                    }
+                    else if (authResult.Status == FingerprintAuthenticationResultStatus.Canceled)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        _dialogService.ShowErrorToast(GetText("FingerprintAuthFailed"));
+                    }
+                }
+
+                if (authenticated)
+                    await GoToMainPage();
+            }
+            else if (isUserLoggedIn && AppSettings.AskForPasswordWhenAppStarts)
             {
                 ShowLoading = false;
                 var passwordMatches = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
                 if (passwordMatches)
-                {
                     await GoToMainPage();
-                }
             }
             else if (isUserLoggedIn)
             {
                 await GoToMainPage();
             }
-            else
-            {
-                ShowLoading = false;
-            }
+
+            ShowLoading = false;
         }
 
         private async Task GoToMainPage()

@@ -11,6 +11,7 @@ using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.UI;
 using MvvmCross.ViewModels;
+using Plugin.Fingerprint.Abstractions;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
         private ItemModel _selectedTaskListSortOrder;
         private ItemModel _selectedTaskSortOrder;
         private readonly MvxInteraction<MvxColor> _onAccentColorSelected = new MvxInteraction<MvxColor>();
+        private readonly IFingerprint _fingerprintService;
+        private readonly IDialogService _dialogService;
         #endregion
 
         #region Interactors
@@ -199,6 +202,16 @@ namespace MiraiNotes.Android.ViewModels.Settings
             }
         }
 
+        public bool AskForFingerPrintWhenAppStarts
+        {
+            get => AppSettings.AskForFingerPrintWhenAppStarts;
+            set
+            {
+                AppSettings.AskForFingerPrintWhenAppStarts = value;
+                RaisePropertyChanged(() => AskForFingerPrintWhenAppStarts);
+            }
+        }
+
         public ItemModel SelectedAppLanguage
         {
             get
@@ -226,6 +239,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
         #region Commands
         public IMvxCommand<MvxColor> AccentColorChangedCommand { get; private set; }
         public IMvxAsyncCommand AskForPasswordWhenAppStartsCommand { get; private set; }
+        public IMvxAsyncCommand AskForFingerPrintWhenAppStartsCommand { get; private set; }
         #endregion
 
         public SettingsGeneralViewModel(
@@ -233,7 +247,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IMvxMessenger messenger,
             IMvxNavigationService navigationService,
             ILogger logger,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            IFingerprint fingerprint,
+            IDialogService dialogService)
             : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
             AccentColors = AppConstants.AppAccentColors
@@ -242,6 +258,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 .ToList();
 
             SetCommands();
+            _fingerprintService = fingerprint;
+            _dialogService = dialogService;
         }
 
         private void SetCommands()
@@ -259,13 +277,31 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 {
                     var result = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(false);
                     AskForPasswordWhenAppStarts = result;
+
+                    if (result)
+                        AskForFingerPrintWhenAppStarts = false;
                 }
                 else
                 {
                     AskForPasswordWhenAppStarts = prompt;
                 }
-
                 Messenger.Publish(new HideKeyboardMsg(this));
+            });
+            AskForFingerPrintWhenAppStartsCommand = new MvxAsyncCommand(async() =>
+            {
+                var value = !AskForFingerPrintWhenAppStarts;
+                var fingerprintAvailability = await _fingerprintService.GetAvailabilityAsync();
+
+                if (!value && fingerprintAvailability != FingerprintAvailability.Available)
+                {
+                    Logger.Warning($"Fingerprint is not available. Current value = {fingerprintAvailability}");
+                    _dialogService.ShowWarningToast(GetText("FingerprintIsNotAvailable"));
+                }
+                else
+                {
+                    AskForPasswordWhenAppStarts = false;
+                }
+                AskForFingerPrintWhenAppStarts = value;
             });
         }
     }

@@ -54,6 +54,12 @@ namespace MiraiNotes.Android.Services
             set => SetBoolean(nameof(AskForPasswordWhenAppStarts), value);
         }
 
+        public bool AskForFingerPrintWhenAppStarts
+        {
+            get => GetBoolean(nameof(AskForFingerPrintWhenAppStarts));
+            set => SetBoolean(nameof(AskForFingerPrintWhenAppStarts), value);
+        }
+
         public AppLanguageType AppLanguage
         {
             get => (AppLanguageType)GetInt(nameof(AppLanguage));
@@ -96,7 +102,6 @@ namespace MiraiNotes.Android.Services
             get => GetBoolean(nameof(ShowToastNotificationForCompletedTasks));
             set => SetBoolean(nameof(ShowToastNotificationForCompletedTasks), value);
         }
-
         #endregion
 
         #region Helpers        

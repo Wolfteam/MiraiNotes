@@ -20,6 +20,8 @@ namespace MiraiNotes.Abstractions.Services
 
         bool AskForPasswordWhenAppStarts { get; set; }
 
+        bool AskForFingerPrintWhenAppStarts { get; set; }
+
         bool ShowCompletedTasks { get; set; }
 
         TaskListSortType DefaultTaskListSortOrder { get; set; }

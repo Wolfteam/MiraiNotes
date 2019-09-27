@@ -11,17 +11,6 @@ namespace MiraiNotes.Android.Common
         public MappingProfile()
         {
             #region Api mappings
-
-            CreateMap<GoogleTaskModel, TaskItemViewModel>();
-            CreateMap<TaskItemViewModel, GoogleTaskModel>();
-
-            CreateMap<GoogleTaskListModel, TaskListItemViewModel>()
-                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.TaskListID))
-                .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
-                .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
-                .ForMember(d => d.NumberOfTasks, opt => opt.Ignore());
-            //CreateMap<TaskListItemViewModel, GoogleTaskListModel>();
-
             CreateMap<GoogleTaskListModel, ItemModel>()
                 .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskListID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
@@ -30,19 +19,15 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
-            //CreateMap<TaskListItemViewModel, ItemModel>()
-            //    .ForMember(d => d.ItemID, opt => opt.MapFrom(s => s.TaskListID))
-            //    .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
-
             CreateMap<TaskItemViewModel, ItemModel>()
                 .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskID))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
-            CreateMap<TaskItemViewModel, TaskItemViewModel>();
+            CreateMap<TaskItemViewModel, TaskItemViewModel>()
+                .ConstructUsingServiceLocator();
             #endregion
 
             #region Database mappings
-
             CreateMap<GoogleTaskList, TaskListItemViewModel>()
                 .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
                 .ForMember(d => d.Id, opt => opt.MapFrom(s => s.GoogleTaskListID))
@@ -64,7 +49,8 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status))
                 .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
                 .ForMember(d => d.ToBeCompletedOn, opt => opt.MapFrom(s => s.ToBeCompletedOn))
-                .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt));
+                .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
+                .ConstructUsingServiceLocator();
 
             CreateMap<GoogleTask, ItemModel>()
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))
