@@ -72,12 +72,11 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             _dialogService = dialogService;
             _mapper = mapper;
             _validator = validatorFactory.GetValidator<TaskListDialogViewModel>();
-
-            SetCommands();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             AddTaskListCommand = new MvxAsyncCommand(SaveTaskList);
             CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this));
         }

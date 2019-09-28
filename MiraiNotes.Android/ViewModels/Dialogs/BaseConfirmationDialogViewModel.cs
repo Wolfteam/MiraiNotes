@@ -46,15 +46,11 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IAppSettingsService appSettings)
             : base(textProvider, messenger, logger, navigationService, appSettings)
         {
-            SetCommands();
         }
 
         public override void Prepare(TParameter parameter)
         {
             Parameter = parameter;
         }
-
-        public abstract void SetCommands();
-        public abstract void RegisterMessages();
     }
 }

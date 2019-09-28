@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class BaseViewModel : MvxViewModel
+    public abstract class BaseViewModel : MvxViewModel, IBaseViewModel
     {
         #region Members
         public List<MvxSubscriptionToken> SubscriptionTokens = new List<MvxSubscriptionToken>();
@@ -55,10 +55,16 @@ namespace MiraiNotes.Android.ViewModels
             Logger = logger;
             NavigationService = navigationService;
             AppSettings = appSettings;
+
             RegisterMessages();
+            SetCommands();
         }
 
-        private void RegisterMessages()
+        public virtual void SetCommands()
+        {
+        }
+
+        public virtual void RegisterMessages()
         {
         }
 
@@ -78,7 +84,7 @@ namespace MiraiNotes.Android.ViewModels
         }
     }
 
-    public abstract class BaseViewModel<TParameter> : MvxViewModel<TParameter>
+    public abstract class BaseViewModel<TParameter> : MvxViewModel<TParameter>, IBaseViewModel
     {
         #region Members
         public List<MvxSubscriptionToken> SubscriptionTokens = new List<MvxSubscriptionToken>();
@@ -125,10 +131,15 @@ namespace MiraiNotes.Android.ViewModels
             Logger = logger;
             NavigationService = navigationService;
             AppSettings = appSettings;
+
             RegisterMessages();
+            SetCommands();
+        }
+        public virtual void SetCommands()
+        {
         }
 
-        private void RegisterMessages()
+        public virtual void RegisterMessages()
         {
         }
 
@@ -149,7 +160,7 @@ namespace MiraiNotes.Android.ViewModels
     }
 
     public abstract class BaseViewModel<TParameter, TResult>
-        : MvxViewModel<TParameter, TResult>, IMvxViewModel<TParameter, TResult>
+        : MvxViewModel<TParameter, TResult>, IMvxViewModel<TParameter, TResult>, IBaseViewModel
     {
         #region Members
         public List<MvxSubscriptionToken> SubscriptionTokens = new List<MvxSubscriptionToken>();
@@ -195,10 +206,16 @@ namespace MiraiNotes.Android.ViewModels
             Logger = logger;
             NavigationService = navigationService;
             AppSettings = appSettings;
+            
             RegisterMessages();
+            SetCommands();
         }
 
-        private void RegisterMessages()
+        public virtual void SetCommands()
+        {
+        }
+
+        public virtual void RegisterMessages()
         {
         }
 
@@ -220,5 +237,4 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
     }
-
 }

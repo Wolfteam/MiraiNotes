@@ -76,13 +76,11 @@ namespace MiraiNotes.Android.ViewModels
             _dialogService = dialogService;
             _dataService = dataService;
             _backgroundTaskManager = backgroundTaskManager;
-
-            SetCommands();
-            RegisterMessages();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             OnSettingsSelectedCommand = new MvxAsyncCommand(
                 async () => await NavigationService.Navigate<SettingsMainViewModel>());
             OnAccountsSelectedCommand = new MvxAsyncCommand(OnAccountsSelected);
@@ -102,8 +100,9 @@ namespace MiraiNotes.Android.ViewModels
                 () => _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC));
         }
 
-        private void RegisterMessages()
+        public override void RegisterMessages()
         {
+            base.RegisterMessages();
             var tokens = new[]
             {
                 Messenger.Subscribe<ShowDrawerMsg>(msg => _showDrawer.Raise(msg.Show)),

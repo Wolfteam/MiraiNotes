@@ -82,13 +82,13 @@ namespace MiraiNotes.Android.ViewModels
             _dataService = dataService;
             _dialogService = dialogService;
             _fingerprintService = fingerprint;
-            SetCommands();
 
             TextProvider.SetLanguage(AppSettings.AppLanguage, false);
         }
 
-        public void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             LoginCommand = new MvxCommand(OnLoginRequest);
             OnAuthCodeGrantedCommand = new MvxAsyncCommand<string>(OnCodeGranted);
             InitViewCommand = new MvxAsyncCommand(InitView);

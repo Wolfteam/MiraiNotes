@@ -116,11 +116,11 @@ namespace MiraiNotes.Android.ViewModels.Settings
             : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
             _backgroundTaskManager = backgroundTaskManager;
-            SetCommands();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             RunSyncBackgroundTaskAfterStartCommand = new MvxCommand(
                 () => RunSyncBackgroundTaskAfterStart = !RunSyncBackgroundTaskAfterStart);
 

@@ -37,19 +37,15 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             string statusMessage =
                 $"{(Parameter.IsCompleted ? GetText("Incompleted") : GetText("Completed"))}";
 
-
             Title = GetText("Confirmation");
             ContentText = GetText("MarkTaskAsConfirmation", Parameter.Title, statusMessage);
             OkText = GetText("Yes");
             CancelText = GetText("No");
         }
 
-        public override void RegisterMessages()
-        {
-        }
-
         public override void SetCommands()
         {
+            base.SetCommands();
             OkCommand = new MvxAsyncCommand(async () =>
             {
                 var newStatus = Parameter.IsCompleted

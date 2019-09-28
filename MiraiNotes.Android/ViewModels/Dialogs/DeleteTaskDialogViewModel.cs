@@ -38,12 +38,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             CancelText = GetText("No");
         }
 
-        public override void RegisterMessages()
-        {
-        }
-
         public override void SetCommands()
         {
+            base.SetCommands();
             OkCommand = new MvxAsyncCommand(DeleteTask);
             CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
         }

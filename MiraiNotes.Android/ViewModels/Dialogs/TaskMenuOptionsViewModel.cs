@@ -32,7 +32,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IAppSettingsService appSettings)
             : base(textProvider, messenger, logger.ForContext<TaskMenuOptionsViewModel>(), navigationService, appSettings)
         {
-            SetCommands();
         }
 
         public override void Prepare(TaskItemViewModel parameter)
@@ -43,8 +42,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             MarkAsTitle = GetText("MarkTaskAs", statusMessage);
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             DeleteTaskCommand = new MvxAsyncCommand(async() =>
             {
                 await NavigationService.Close(this);

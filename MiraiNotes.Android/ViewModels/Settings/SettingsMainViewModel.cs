@@ -20,18 +20,18 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IAppSettingsService appSettings)
             : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
-            SetCommands();
-            RegisterMessages();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             InitViewCommand = new MvxAsyncCommand
                 (async () => await NavigationService.Navigate<SettingsHomeViewModel>());
         }
 
-        private void RegisterMessages()
+        public override void RegisterMessages()
         {
+            base.RegisterMessages();
             var tokens = new[]
             {
                 Messenger.Subscribe<SettingsTitleChanged>(msg => Title = msg.NewTitle)

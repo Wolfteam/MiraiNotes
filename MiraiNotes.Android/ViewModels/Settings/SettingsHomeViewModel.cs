@@ -73,7 +73,6 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IAppSettingsService appSettings)
             : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService,appSettings)
         {
-            SetCommands();
         }
 
         public override void ViewAppeared()
@@ -82,8 +81,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             base.ViewAppeared();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             SettingItemSelectedCommand = new MvxAsyncCommand<SettingsPageItem>(NavigateTo);
         }
 

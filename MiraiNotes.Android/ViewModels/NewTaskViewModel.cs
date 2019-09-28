@@ -97,8 +97,6 @@ namespace MiraiNotes.Android.ViewModels
             _dialogService = dialogService;
             _dataService = dataService;
             _notificationService = notificationService;
-
-            SetCommands();
         }
 
         public override void Prepare(Tuple<TaskListItemViewModel, string> kvp)
@@ -125,8 +123,9 @@ namespace MiraiNotes.Android.ViewModels
             base.ViewAppeared();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             SaveChangesCommand = new MvxAsyncCommand(SaveChanges);
 
             CloseCommand = new MvxAsyncCommand(async () =>

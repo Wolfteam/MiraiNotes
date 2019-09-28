@@ -257,13 +257,13 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 .Select(color => new MvxColor(color.R, color.G, color.B, color.A))
                 .ToList();
 
-            SetCommands();
             _fingerprintService = fingerprint;
             _dialogService = dialogService;
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             AccentColorChangedCommand = new MvxCommand<MvxColor>(color =>
             {
                 _onAccentColorSelected.Raise(color);

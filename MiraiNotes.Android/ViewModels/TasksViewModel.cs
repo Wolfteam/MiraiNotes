@@ -79,9 +79,6 @@ namespace MiraiNotes.Android.ViewModels
             _dataService = dataService;
             _googleApiService = googleApiService;
             _userCredentialService = userCredentialService;
-
-            SetCommands();
-            RegisterMessages();
         }
 
         public override void Prepare(TaskListItemViewModel taskList)
@@ -102,8 +99,9 @@ namespace MiraiNotes.Android.ViewModels
             base.ViewAppeared();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.TaskID));
             RefreshTasksCommand = new MvxAsyncCommand(Refresh);
             AddNewTaskListCommand = new MvxAsyncCommand(() => NavigationService.Navigate<TaskListDialogViewModel>());
@@ -112,8 +110,9 @@ namespace MiraiNotes.Android.ViewModels
                 (task) => NavigationService.Navigate<TaskMenuOptionsViewModel, TaskItemViewModel>(task));
         }
 
-        private void RegisterMessages()
+        public override void RegisterMessages()
         {
+            base.RegisterMessages();
             var subscriptions = new[] {
                 Messenger.Subscribe<TaskDeletedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask)),
                 Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg.TaskId)),

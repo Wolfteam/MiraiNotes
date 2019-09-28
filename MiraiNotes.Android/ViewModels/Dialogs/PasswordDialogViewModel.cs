@@ -88,7 +88,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             _dataService = dataService;
             _dialogService = dialogService;
             _validator = validatorFactory.GetValidator<PasswordDialogViewModel>();
-            SetComamnds();
         }
 
         public override void Prepare(bool parameter)
@@ -110,8 +109,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 response.Result.Email);
         }
 
-        private void SetComamnds()
+        public override void SetCommands()
         {
+            base.SetCommands();
             SaveChangesCommand = new MvxAsyncCommand(SaveChanges);
             CloseCommand = new MvxAsyncCommand(async () =>
                 await NavigationService.Close(this, false));

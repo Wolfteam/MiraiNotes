@@ -74,12 +74,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             _syncService = syncService;
             _googleApiService = googleApiService;
             _userCredentialService = userCredentialService;
-
-            SetCommands();
-
-            RegisterMessages();
         }
-
 
         public override async Task Initialize()
         {
@@ -87,15 +82,17 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             await InitView();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             NewAccountCommand = new MvxCommand(AddAccountRequest);
             CloseCommand = new MvxAsyncCommand(async () => await NavigationService.Close(this));
             OnAuthCodeGrantedCommand = new MvxAsyncCommand<string>(OnCodeGranted);
         }
 
-        private void RegisterMessages()
+        public override void RegisterMessages()
         {
+            base.RegisterMessages();
             var tokens = new[]
             {
                 Messenger.Subscribe<AccountChangeRequestMsg>(async (msg) =>

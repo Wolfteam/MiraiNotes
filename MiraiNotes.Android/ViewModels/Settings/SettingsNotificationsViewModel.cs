@@ -46,12 +46,11 @@ namespace MiraiNotes.Android.ViewModels.Settings
             : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
         {
             _dialogService = dialogService;
-
-            SetCommands();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             ShowToastNotificationAfterFullSyncCommand = new MvxCommand(
                 () => ShowToastNotificationAfterFullSync = !ShowToastNotificationAfterFullSync);
         }

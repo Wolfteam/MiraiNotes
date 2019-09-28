@@ -80,12 +80,11 @@ namespace MiraiNotes.Android.ViewModels
             : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings)
         {
             _dialogService = dialogService;
-
-            SetCommands();
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             ChangeCurrentAccountCommand = new MvxCommand(() =>
                 Messenger.Publish(new AccountChangeRequestMsg(this, false, true, this)));
             DeleteAccountCommand = new MvxCommand(() =>

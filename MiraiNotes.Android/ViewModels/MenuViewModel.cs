@@ -86,9 +86,6 @@ namespace MiraiNotes.Android.ViewModels
             _dialogService = dialogService;
             _dataService = dataService;
             _backgroundTaskManager = backgroundTaskManager;
-
-            SetCommands();
-            RegisterMessages();
         }
 
         public override async Task Initialize()
@@ -104,13 +101,15 @@ namespace MiraiNotes.Android.ViewModels
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             OnTaskListSelectedCommand = new MvxAsyncCommand<int>(OnTaskListSelected);
         }
 
-        private void RegisterMessages()
+        public override void RegisterMessages()
         {
+            base.RegisterMessages();
             var tokens = new[]
             {
                 Messenger.Subscribe<ActiveAccountChangedMsg>(async(msg) =>
