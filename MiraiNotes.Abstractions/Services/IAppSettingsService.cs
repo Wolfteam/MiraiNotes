@@ -31,5 +31,7 @@ namespace MiraiNotes.Abstractions.Services
         bool RunFullSyncAfterSwitchingAccounts { get; set; }
 
         AppLanguageType AppLanguage { get; set; }
+
+        string SelectedTaskListId { get; set; }
     }
 }

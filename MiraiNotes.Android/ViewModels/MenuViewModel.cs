@@ -133,6 +133,7 @@ namespace MiraiNotes.Android.ViewModels
                 {
                     TaskLists.Add(msg.TaskList);
                     SelectedTaskList = msg.TaskList;
+                    AppSettings.SelectedTaskListId = SelectedTaskList.Id;
                     _onTaskListsLoaded.Raise();
                 }),
                 Messenger.Subscribe<RefreshNumberOfTasksMsg>(msg =>
@@ -175,7 +176,7 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task InitView(bool onFullSync = false)
         {
-            string selectedTaskListID = SelectedTaskList?.Id;
+            string selectedTaskListID = AppSettings.SelectedTaskListId;
 
             if (!onFullSync && AppSettings.RunSyncBackgroundTaskAfterStart)
             {
@@ -234,6 +235,8 @@ namespace MiraiNotes.Android.ViewModels
                 ? TaskLists.First(tl => tl.Id == selectedTaskListID)
                 : TaskLists.FirstOrDefault();
 
+            AppSettings.SelectedTaskListId = SelectedTaskList.Id;
+
             _onTaskListsLoaded.Raise();
             //
             //            TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
@@ -283,6 +286,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             var taskList = TaskLists[position];
             SelectedTaskList = taskList;
+            AppSettings.SelectedTaskListId = SelectedTaskList.Id;
             var tasks = new List<Task>
             {
                 Task.Delay(300),

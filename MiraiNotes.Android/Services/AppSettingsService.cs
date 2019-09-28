@@ -65,6 +65,12 @@ namespace MiraiNotes.Android.Services
             get => (AppLanguageType)GetInt(nameof(AppLanguage));
             set => SetInt(nameof(AppLanguage), (int)value);
         }
+
+        public string SelectedTaskListId
+        {
+            get => GetString(nameof(SelectedTaskListId));
+            set => SetString(nameof(SelectedTaskListId), value);
+        }
         #endregion
 
         #region Synchronization
