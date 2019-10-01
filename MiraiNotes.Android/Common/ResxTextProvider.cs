@@ -10,6 +10,8 @@ namespace MiraiNotes.Android
     public class ResxTextProvider : MvxResxTextProvider, ITextProvider
     {
         private readonly IMvxMessenger _messenger;
+        public CultureInfo CurrentCulture
+            => CurrentLanguage;
 
         public ResxTextProvider(
             ResourceManager resourceManager,
