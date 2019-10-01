@@ -34,26 +34,45 @@
     <item name="android:windowBackground">?AppBackground</item>
   </style>
 
-<!--Menu option style-->
+  <!--TimePickerDialog-->
+  <style name="TimePickerDialogCustom" parent="Theme.AppCompat.Light.Dialog">
+    <item name="colorAccent">?AccentColor</item>
+    <item name="colorPrimary">?AccentColorDark</item>
+    <item name="android:windowBackground">?AppBackground</item>
+    <item name="android:spinnerDropDownItemStyle">@style/SpinnerCustom</item>
+
+    <!--This changes the colors of minutes / seconds and the text inside a edittext-->
+    <!--<item name="android:textColorPrimary">@color/LigthBlueAccentColorPrimary</item>-->
+    
+    <!--This changes the colors of the little icon in the bottom left corner-->
+    <!--<item name="android:textColorSecondary">@color/LigthBlueAccentColorPrimary</item>-->
+
+    <!--<item name="android:textColor">@color/LigthBlueAccentColorPrimary</item>-->
+    <!--<item name="android:popupBackground">?AppBackground</item>-->
+    <!--<item name="android:popupMenuStyle">@style/CustomPopupMenu.Light</item>-->
+  </style>
+
+  <!--Spinner-->
+  <style name="SpinnerCustom" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+    <!--<item name="android:textColorPrimary">?TextColor</item>-->
+    <item name="android:textColor">@drawable/spinner_item_textcolor</item>
+    <!--<item name="android:textColor">?TextColor</item>-->
+    <item name="android:background">?AppBackground</item>
+  </style>
+
+  <!--Menu option style-->
   <style name="Actionbar.MenuTextStyle.Light" parent="ThemeOverlay.AppCompat.Light">
     <item name="android:textColor">@color/Black</item>
     <item name="android:textSize">18sp</item>
     <item name="android:windowBackground">@color/AppBackgroundLight</item>
     <item name="android:popupBackground">@color/AppBackgroundLight</item>
-
-    <!--<item name="android:colorBackground">@color/AppBackgroundLight</item>-->
-    <!--<item name="android:itemBackground">@color/AppBackgroundLight</item>-->
   </style>
 
   <style name="Actionbar.MenuTextStyle.Dark" parent="ThemeOverlay.AppCompat.Dark">
-    <item name="android:textColor">@color/Black</item>
+    <item name="android:textColor">@color/White</item>
     <item name="android:textSize">18sp</item>
     <item name="android:windowBackground">@color/AppBackgroundDark</item>
     <item name="android:popupBackground">@color/AppBackgroundDark</item>
-
-    <!--<item name="android:colorBackground">@color/DarkBlueAccentColorDark</item>
-    <item name="android:background">@color/DarkBlueAccentColorDark</item>-->
-    <!--<item name="android:itemBackground">@color/AppBackgroundDark</item>-->
   </style>
 
   <!--AppThemes-->
@@ -67,6 +86,7 @@
     <item name="android:windowBackground">@color/AppBackgroundDark</item>
     <!--Default text colors-->
     <item name="android:textColorPrimary">@color/White</item>
+    <item name="android:textColorSecondary">@color/White</item>
     <item name="android:textColor">@color/White</item>
 
     <!--Dialog background colors-->
@@ -75,15 +95,15 @@
 
     <!--To change the text styling of options menu items</item>-->
     <item name="android:itemTextAppearance">@style/Actionbar.MenuTextStyle.Dark</item>
-    <!--<item name="android:itemBackground">@color/AppBackgroundDark</item>-->
-
+    <item name="android:itemBackground">@color/AppBackgroundDark</item>
 
     <item name="alertDialogTheme">@style/AlertDialogCustom</item>
 
     <item name="AppBackground">@color/AppBackgroundDark</item>
     <item name="DividerColor">@color/White</item>
     <item name="IconColor">@color/White</item>
-    <item name="TextInvertedColor">@color/White</item>
+    <item name="TextColor">@color/White</item>
+    <item name="TextInvertedColor">@color/Black</item>
   </style>
 
   <style name="Theme.MiraiNotes.Light" parent="Theme.AppCompat.Light">
@@ -96,6 +116,7 @@
 
     <!--Default text colors-->
     <item name="android:textColorPrimary">@color/Black</item>
+    <item name="android:textColorSecondary">@color/Black</item>
     <item name="android:textColor">@color/Black</item>
 
     <!--Dialog background colors-->
@@ -104,15 +125,15 @@
 
     <!--To change the text styling of options menu items</item>-->
     <item name="android:itemTextAppearance">@style/Actionbar.MenuTextStyle.Light</item>
-    <!--<item name="android:popupMenuStyle">@style/CustomPopupMenu.Light</item>-->
-    <!--<item name="android:itemBackground">@color/AppBackgroundLight</item>-->
+    <item name="android:itemBackground">@color/AppBackgroundLight</item>
 
     <item name="alertDialogTheme">@style/AlertDialogCustom</item>
 
     <item name="AppBackground">@color/AppBackgroundLight</item>
     <item name="DividerColor">@color/Black</item>
     <item name="IconColor">@color/Black</item>
-    <item name="TextInvertedColor">@color/Black</item>
+    <item name="TextColor">@color/Black</item>
+    <item name="TextInvertedColor">@color/White</item>
   </style>
 
   <!--Accent themes-->

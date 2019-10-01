@@ -8,6 +8,7 @@
     <attr name="AccentColorLight" format="reference"/>
     <attr name="DividerColor" format="reference"></attr>
     <attr name="IconColor" format="reference"></attr>
+    <attr name="TextColor" format="reference"></attr>
     <attr name="TextInvertedColor" format="reference"></attr>
   </declare-styleable>
 </resources>

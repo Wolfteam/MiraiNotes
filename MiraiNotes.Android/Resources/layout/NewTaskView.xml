@@ -35,7 +35,7 @@
                     android:drawableLeft="@drawable/ic_edit_black_24dp"
                     android:drawablePadding="16dp"
                     android:drawableTint="?IconColor"
-                    android:layout_margin="12dp"
+                    android:layout_marginRight="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="30sp"
@@ -43,6 +43,24 @@
                     android:text="New Task"
                     android:textStyle="bold"/>
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="12dp"
+                    android:textColor="?AccentColor"
+                    android:textSize="@dimen/font_size_small"
+                    android:textStyle="italic"
+                    app:MvxBind="Text Task.FullCompletitionDateText; Visibility Visibility(Task.IsCompletitionDateSet)"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="12dp"
+                    android:textColor="?AccentColor"
+                    android:textSize="@dimen/font_size_small"
+                    android:textStyle="italic"
+                    app:MvxBind="Text Task.FullRemindOnText; Visibility Visibility(Task.HasAReminderDate)"/>
+                
                 <android.support.v7.widget.AppCompatEditText
                     android:drawableLeft="@drawable/ic_note_black_24dp"
                     android:drawablePadding="16dp"
@@ -51,7 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Title"
-                    android:textColorHint="?TextInvertedColor"
+                    android:textColorHint="?TextColor"
                     android:inputType="textShortMessage"
                     android:background="@android:color/transparent"
                     app:MvxBind="Text Task.Title; Error Errors['Title']; Hint [Title]"/>
@@ -72,7 +90,7 @@
                     android:elegantTextHeight="true"
                     android:scrollbars="vertical"
                     android:hint="Notes"
-                    android:textColorHint="?TextInvertedColor"
+                    android:textColorHint="?TextColor"
                     android:background="@android:color/transparent"
                     app:MvxBind="Text Task.Notes; Error Errors['Notes']; Hint [Notes]"/>
 
