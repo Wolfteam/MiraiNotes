@@ -2,6 +2,8 @@
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Android.ViewModels.Settings;
 using MiraiNotes.Core.Enums;
@@ -49,6 +51,8 @@ namespace MiraiNotes.Android.ViewModels
             get => _showProgressOverlay;
             set => SetProperty(ref _showProgressOverlay, value);
         }
+
+        public NotificationAction InitParams { get; set; }
         #endregion
 
 
@@ -93,8 +97,11 @@ namespace MiraiNotes.Android.ViewModels
                     GetText("No"),
                     async () => await Logout());
             });
-            InitViewCommand = new MvxAsyncCommand(
-                async () => await NavigationService.Navigate<MenuViewModel>());
+            InitViewCommand = new MvxAsyncCommand(() =>
+            {
+                var parameter = MenuViewModelParameter.Instance(InitParams);
+                return NavigationService.Navigate<MenuViewModel, MenuViewModelParameter>(parameter);
+            });
 
             SyncCommand = new MvxCommand(
                 () => _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC));
@@ -107,7 +114,7 @@ namespace MiraiNotes.Android.ViewModels
             {
                 Messenger.Subscribe<ShowDrawerMsg>(msg => _showDrawer.Raise(msg.Show)),
                 Messenger.Subscribe<AppThemeChangedMsg>(msg => _appThemeChanged.Raise(msg)),
-                Messenger.Subscribe<AppLanguageChangedMessage>(msg => 
+                Messenger.Subscribe<AppLanguageChangedMessage>(msg =>
                 {
                     if (msg.RestartActivity)
                         _appLanguageChanged.Raise();

@@ -1,14 +1,17 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Views;
+using MiraiNotes.Android.Models;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 using MvvmCross.ViewModels;
+using Newtonsoft.Json;
 
 namespace MiraiNotes.Android.Views.Activities
 {
@@ -24,6 +27,8 @@ namespace MiraiNotes.Android.Views.Activities
         private IMvxInteraction _hideKeyboardRequest;
         private IMvxInteraction _changeLanguageRequest;
         private bool _lockDrawerRequest;
+
+        public const string InitParamsKey = "InitParams";
 
         public IMvxInteraction<bool> ShowDrawerRequest
         {
@@ -99,6 +104,12 @@ namespace MiraiNotes.Android.Views.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            var extra = Intent?.GetStringExtra(InitParamsKey);
+            if (!string.IsNullOrEmpty(extra))
+            {
+                ViewModel.InitParams = JsonConvert.DeserializeObject<NotificationAction>(extra);
+            }
 
             DrawerLayout = FindViewById<DrawerLayout>(Resource.Id.AppDrawerLayout);
 
@@ -192,6 +203,19 @@ namespace MiraiNotes.Android.Views.Activities
                 DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
             else
                 DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
+        }
+
+        public static Intent CreateIntent(int id, string key, string extra)
+        {
+            var intent = new Intent(Application.Context, typeof(MainActivity))
+                .SetAction(nameof(MainActivity) + id);
+
+            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(extra))
+            {
+                intent.PutExtra(key, extra);
+            }
+
+            return intent;
         }
     }
 }

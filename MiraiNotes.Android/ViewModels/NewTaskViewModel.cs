@@ -4,6 +4,7 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
@@ -23,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class NewTaskViewModel : BaseViewModel<Tuple<TaskListItemViewModel, string>>
+    public class NewTaskViewModel : BaseViewModel<NewTaskViewModelParameter>
     {
         #region Members
         private readonly IMapper _mapper;
@@ -99,10 +100,10 @@ namespace MiraiNotes.Android.ViewModels
             _notificationService = notificationService;
         }
 
-        public override void Prepare(Tuple<TaskListItemViewModel, string> kvp)
+        public override void Prepare(NewTaskViewModelParameter parameter)
         {
-            _currentTaskList = kvp.Item1;
-            _selectedTaskId = kvp.Item2;
+            _currentTaskList = parameter.TaskList;
+            _selectedTaskId = parameter.TaskId;
         }
 
         public override async Task Initialize()

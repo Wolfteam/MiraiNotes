@@ -110,8 +110,10 @@
     <Compile Include="App.cs" />
     <Compile Include="Background\NotificationSchedulerReceiver.cs" />
     <Compile Include="Background\SyncBackgroundTask.cs" />
+    <Compile Include="Background\MarkTaskAsCompletedReceiver.cs" />
     <Compile Include="Bindings\StrikeThroughTextBinding.cs" />
     <Compile Include="Bindings\SubTaskButtonAnimateBinding.cs" />
+    <Compile Include="Common\Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Common\MappingProfile.cs" />
     <Compile Include="Common\Messages\AccountChangeRequestMsg.cs" />
     <Compile Include="Common\Messages\AuthCodeGrantedMsg.cs" />
@@ -143,6 +145,7 @@
     <Compile Include="Common\Extensions\ValidationExtensions.cs" />
     <Compile Include="Common\Validators\PasswordDialogViewModelValidator.cs" />
     <Compile Include="Common\Validators\TaskListDialogViewModelValidator.cs" />
+    <Compile Include="Common\Validators\TaskReminderDialogViewModelValidator.cs" />
     <Compile Include="Controls\TopGravityDrawable.cs" />
     <Compile Include="Common\Converters\ImgPathToBitmapConverter.cs" />
     <Compile Include="Common\Converters\IntToBooleanConverter.cs" />
@@ -161,6 +164,12 @@
     <Compile Include="Listeners\TaskRecyclerViewDecoration.cs" />
     <Compile Include="Listeners\TasksRecyclerViewScrollListener.cs" />
     <Compile Include="Listeners\TouchListener.cs" />
+    <Compile Include="Models\NotificationAction.cs" />
+    <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\TaskReminderDialogViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\TasksViewModelParameter.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
@@ -170,6 +179,7 @@
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskMenuOptionsViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\TaskReminderDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsAboutViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsGeneralViewModel.cs" />
@@ -216,6 +226,7 @@
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Views\Fragments\BaseFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\TaskListDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\TaskReminderDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\TasksMenuOptionsDialogFragment.cs" />
     <Compile Include="Views\Fragments\MenuFragmet.cs" />
     <Compile Include="Views\Fragments\NewTaskFragment.cs" />
@@ -311,7 +322,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <Folder Include="Resources\xml\" />
   </ItemGroup>
   <ItemGroup>
@@ -661,6 +671,21 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\ConfirmationDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\TaskReminderDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_access_alarm_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_access_time_black_24dp.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

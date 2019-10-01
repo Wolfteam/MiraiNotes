@@ -4,6 +4,8 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Extensions;
@@ -19,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class MenuViewModel : BaseViewModel
+    public class MenuViewModel : BaseViewModel<MenuViewModelParameter>
     {
         #region Members
         private readonly IMapper _mapper;
@@ -64,6 +66,8 @@ namespace MiraiNotes.Android.ViewModels
         }
 
         public TaskListItemViewModel SelectedTaskList { get; private set; }
+
+        public NotificationAction InitParams { get; set; }
         #endregion
 
         #region Commands
@@ -86,6 +90,11 @@ namespace MiraiNotes.Android.ViewModels
             _dialogService = dialogService;
             _dataService = dataService;
             _backgroundTaskManager = backgroundTaskManager;
+        }
+
+        public override void Prepare(MenuViewModelParameter parameter)
+        {
+            InitParams = parameter.Notification;
         }
 
         public override async Task Initialize()
@@ -176,7 +185,7 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task InitView(bool onFullSync = false)
         {
-            string selectedTaskListID = AppSettings.SelectedTaskListId;
+            string selectedTaskListID = null;
 
             if (!onFullSync && AppSettings.RunSyncBackgroundTaskAfterStart)
             {
@@ -185,24 +194,12 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
-            //If we have something in the init details, lets select that task list
-            //            if (!onFullSync &&
-            //                InitDetails is null == false &&
-            //                !string.IsNullOrEmpty(InitDetails.Item1) &&
-            //                !string.IsNullOrEmpty(InitDetails.Item2))
-            //            {
-            //                selectedTaskListID = InitDetails.Item1;
-            //            }
-            //            else
-            //                selectedTaskListID = CurrentTaskList?.TaskListID;
-            //
-            ////            _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            //
-            //            SelectedItem =
-            //                CurrentTaskList = null;
+            //If we have something in the init params, lets select that task list
+            selectedTaskListID = !onFullSync && InitParams != null
+                ? InitParams.TaskListId
+                : AppSettings.SelectedTaskListId;
+
             TaskLists.Clear();
-            //            TaskListsAutoSuggestBoxItems.Clear();
-            //
             var dbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(
@@ -238,23 +235,6 @@ namespace MiraiNotes.Android.ViewModels
             AppSettings.SelectedTaskListId = SelectedTaskList.Id;
 
             _onTaskListsLoaded.Raise();
-            //
-            //            TaskListsAutoSuggestBoxItems.AddRange(_mapper.Map<IEnumerable<ItemModel>>(dbResponse.Result));
-            //
-            //            SortTaskLists(_appSettings.DefaultTaskListSortOrder);
-            //
-            //            _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
-            //            //The msg send by nav vm could take longer.. so lets way a litte bit
-            //            //with that, the progress ring animation doesnt gets swallowed 
-            //            await Task.Delay(500);
-            //
-            //            SelectedItem = TaskLists.Any(tl => tl.TaskListID == selectedTaskListID)
-            //                ? TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID)
-            //                : TaskLists.FirstOrDefault();
-            //            //For some reason OnNavigationViewSelectionChangeAsync is not getting called
-            //            //if SelectedItem is null
-            //            if (SelectedItem is null)
-            //                OnNavigationViewSelectionChangeAsync(SelectedItem);
         }
 
         private void SortTaskLists(TaskListSortType sortType)
@@ -287,10 +267,12 @@ namespace MiraiNotes.Android.ViewModels
             var taskList = TaskLists[position];
             SelectedTaskList = taskList;
             AppSettings.SelectedTaskListId = SelectedTaskList.Id;
+
+            var parameter = TasksViewModelParameter.Instance(InitParams, taskList);
             var tasks = new List<Task>
             {
                 Task.Delay(300),
-                NavigationService.Navigate<TasksViewModel, TaskListItemViewModel>(taskList)
+                NavigationService.Navigate<TasksViewModel, TasksViewModelParameter>(parameter)
             };
             await Task.WhenAll(tasks);
         }

@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Parameters;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -7,8 +8,9 @@ using Serilog;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class TaskMenuOptionsViewModel : BaseViewModel<TaskItemViewModel>
+    public class TaskMenuOptionsViewModel : BaseViewModel<TaskMenuOptionsViewModelParameter>
     {
+        private TaskListItemViewModel _taskList;
         private TaskItemViewModel _task;
         private string _markAsTitle;
 
@@ -34,9 +36,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
         }
 
-        public override void Prepare(TaskItemViewModel parameter)
+        public override void Prepare(TaskMenuOptionsViewModelParameter parameter)
         {
-            _task = parameter;
+            _taskList = parameter.TaskList;
+            _task = parameter.Task;
             string statusMessage =
                 $"{(_task.IsCompleted ? GetText("Incompleted") : GetText("Completed"))}";
             MarkAsTitle = GetText("MarkTaskAs", statusMessage);
@@ -45,7 +48,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public override void SetCommands()
         {
             base.SetCommands();
-            DeleteTaskCommand = new MvxAsyncCommand(async() =>
+            DeleteTaskCommand = new MvxAsyncCommand(async () =>
             {
                 await NavigationService.Close(this);
                 await NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(_task);
@@ -55,6 +58,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             {
                 await NavigationService.Close(this);
                 await NavigationService.Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(_task);
+            });
+
+            AddReminderCommand = new MvxAsyncCommand(async () =>
+            {
+                var parameter = TaskReminderDialogViewModelParameter.Instance(_taskList, _task);
+                await NavigationService.Close(this);
+                await NavigationService.Navigate<TaskReminderDialogViewModel, TaskReminderDialogViewModelParameter, bool>(parameter);
             });
         }
     }

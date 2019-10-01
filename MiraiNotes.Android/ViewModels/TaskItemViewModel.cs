@@ -1,14 +1,18 @@
-﻿using MiraiNotes.Android.Common.Messages;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
+using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
+using Serilog;
 using System;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class TaskItemViewModel : MvxViewModel
+    public class TaskItemViewModel : BaseViewModel
     {
         #region Members
 
@@ -21,7 +25,7 @@ namespace MiraiNotes.Android.ViewModels
         private DateTimeOffset? _completedOn;
         private MvxObservableCollection<TaskItemViewModel> _subTasks = new MvxObservableCollection<TaskItemViewModel>();
         private DateTimeOffset? _remindOn;
-        private readonly IMvxMessenger _messenger;
+
         #endregion
 
         #region Properties
@@ -38,7 +42,7 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public string Title { get; set; }
+        public new string Title { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; }
 
@@ -155,14 +159,14 @@ namespace MiraiNotes.Android.ViewModels
                 if (difference >= 0)
                 {
                     if (difference == 0)
-                        return "Today";
+                        return GetText("Today");
                     else if (difference == 1)
-                        return $"{difference} day ago";
+                        return GetText("OneDayAgo");
                     else
-                        return $"{difference} days ago";
+                        return GetText("XDayAgo", $"{difference}");
                 }
                 else if (difference == -1)
-                    return "Tomorrow";
+                    return GetText("Tomorrow");
                 else
                     return $"{ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
             }
@@ -243,6 +247,8 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
+        public string RemindOnGUID { get; set; }
+
         public TimeSpan? RemindOnTime
         {
             get => RemindOn?.TimeOfDay;
@@ -262,44 +268,51 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public bool IsReminderDateSet
-            => RemindOn != null;
-
         public bool HasAReminderDate
             => RemindOn != null;
 
+        public string FullRemindOnText =>
+            !RemindOn.HasValue
+                ? string.Empty
+                : GetText("Reminder") + ": " + RemindOn.Value.ToString("ddd, MMM d HH:mm", TextProvider.CurrentCulture);
+
         public string RemindOnDateText =>
             !RemindOn.HasValue
-            ? string.Empty
-            : RemindOn.Value.ToString("ddd, MMM d HH:mm");
+                ? string.Empty
+                : RemindOn.Value.ToString("ddd, MMM d HH:mm");
 
         public bool HasNotes
             => !string.IsNullOrEmpty(Notes);
 
-        #endregion    }
-
+        #endregion    
+    
         #region Commands
         public IMvxCommand ShowSubTasksCommand { get; private set; }
         public IMvxCommand DeleteTaskCommand { get; private set; }
         public IMvxCommand ChangeTaskStatusCommand { get; private set; }
         #endregion
 
-        public TaskItemViewModel(IMvxMessenger messenger)
+        public TaskItemViewModel(
+            ITextProvider textProvider,
+            IMvxMessenger messenger,
+            ILogger logger,
+            IMvxNavigationService navigationService,
+            IAppSettingsService appSettings)
+            : base(textProvider, messenger, logger.ForContext<TaskItemViewModel>(), navigationService, appSettings)
         {
-            SetCommands();
-            _messenger = messenger;
         }
 
-        private void SetCommands()
+        public override void SetCommands()
         {
+            base.SetCommands();
             ShowSubTasksCommand = new MvxCommand(() => ShowSubTasks = !ShowSubTasks);
-            DeleteTaskCommand = new MvxCommand(() => _messenger.Publish(new DeleteTaskRequestMsg(this, this)));
+            DeleteTaskCommand = new MvxCommand(() => Messenger.Publish(new DeleteTaskRequestMsg(this, this)));
             ChangeTaskStatusCommand = new MvxCommand(() =>
             {
                 var status = TaskStatus == GoogleTaskStatus.COMPLETED
                     ? GoogleTaskStatus.NEEDS_ACTION
                     : GoogleTaskStatus.COMPLETED;
-                _messenger.Publish(new ChangeTaskStatusRequestMsg(this, this, status));
+                Messenger.Publish(new ChangeTaskStatusRequestMsg(this, this, status));
             });
         }
     }

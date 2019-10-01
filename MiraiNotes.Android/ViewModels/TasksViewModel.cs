@@ -3,6 +3,8 @@ using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Extensions;
@@ -18,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class TasksViewModel : BaseViewModel<TaskListItemViewModel>
+    public class TasksViewModel : BaseViewModel<TasksViewModelParameter>
     {
         #region Members
         private readonly IMapper _mapper;
@@ -51,6 +53,8 @@ namespace MiraiNotes.Android.ViewModels
             get => _currentTasksSortOrder;
             set => SetProperty(ref _currentTasksSortOrder, value);
         }
+
+        public NotificationAction InitParams { get; set; }
         #endregion
 
         #region Commands
@@ -81,9 +85,10 @@ namespace MiraiNotes.Android.ViewModels
             _userCredentialService = userCredentialService;
         }
 
-        public override void Prepare(TaskListItemViewModel taskList)
+        public override void Prepare(TasksViewModelParameter parameter)
         {
-            _currentTaskList = taskList;
+            InitParams = parameter.NotificationAction;
+            _currentTaskList = parameter.TaskList;
         }
 
         public override async Task Initialize()
@@ -106,8 +111,11 @@ namespace MiraiNotes.Android.ViewModels
             RefreshTasksCommand = new MvxAsyncCommand(Refresh);
             AddNewTaskListCommand = new MvxAsyncCommand(() => NavigationService.Navigate<TaskListDialogViewModel>());
             AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
-            ShowMenuOptionsDialogCommand = new MvxAsyncCommand<TaskItemViewModel>(
-                (task) => NavigationService.Navigate<TaskMenuOptionsViewModel, TaskItemViewModel>(task));
+            ShowMenuOptionsDialogCommand = new MvxAsyncCommand<TaskItemViewModel>((task) =>
+            {
+                var parameter = TaskMenuOptionsViewModelParameter.Instance(_currentTaskList, task);
+                return NavigationService.Navigate<TaskMenuOptionsViewModel, TaskMenuOptionsViewModelParameter>(parameter);
+            });
         }
 
         public override void RegisterMessages()
@@ -136,7 +144,6 @@ namespace MiraiNotes.Android.ViewModels
             IsBusy = true;
 
             Tasks.Clear();
-            //TaskAutoSuggestBoxItems.Clear();
 
             var dbResponse = await _dataService
                 .TaskService
@@ -178,24 +185,22 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             //CurrentTaskList = taskList;
-
-            //If we have something in the init details, lets select that task
-            //if (InitDetails is null == false &&
-            //    !string.IsNullOrEmpty(InitDetails.Item1) &&
-            //    !string.IsNullOrEmpty(InitDetails.Item2))
-            //{
-            //    var selectedTask = Tasks.FirstOrDefault(t => t.TaskID == InitDetails.Item2);
-            //    if (selectedTask is null == false)
-            //        selectedTask.IsSelected = true;
-            //    InitDetails = null;
-            //}
-
             IsBusy = false;
+
+            //If we have something in the init params, lets select that task
+            if (InitParams != null && Tasks.Any(t => t.TaskID == InitParams.TaskId))
+            {
+                string taskId = InitParams.TaskId;
+                InitParams = null;
+                await OnTaskSelected(taskId);
+            }
         }
 
         public async Task OnTaskSelected(string taskId)
-            => await NavigationService.Navigate<NewTaskViewModel, Tuple<TaskListItemViewModel, string>>(
-                new Tuple<TaskListItemViewModel, string>(_currentTaskList, taskId));
+        {
+            var parameter = NewTaskViewModelParameter.Instance(_currentTaskList, taskId);
+            await NavigationService.Navigate<NewTaskViewModel, NewTaskViewModelParameter>(parameter);
+        }
 
         public async Task OnTaskSaved(string taskId)
         {
