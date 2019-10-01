@@ -118,7 +118,7 @@ namespace MiraiNotes.Android.Background
                         logger.Information($"{nameof(SyncBackgroundTask)}: App is not in foreground, showing a notification...");
                         var notif = new TaskNotification
                         {
-                            Conntent = message,
+                            Content = message,
                             Title = textProvider.Get("SyncResults")
                         };
                         notificationService.ShowNotification(notif);
