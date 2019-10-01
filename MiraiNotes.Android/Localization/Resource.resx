@@ -430,4 +430,43 @@
   <data name="MarkTaskAs" xml:space="preserve">
     <value>Mark as {0}</value>
   </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="OneDayAgo" xml:space="preserve">
+    <value>One day ago</value>
+  </data>
+  <data name="XDayAgo" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Tomorrow</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="OnThisDate" xml:space="preserve">
+    <value>On this date</value>
+  </data>
+  <data name="AtThisHour" xml:space="preserve">
+    <value>At this hour</value>
+  </data>
+  <data name="ReminderDateCannotBeEmpty" xml:space="preserve">
+    <value>Reminder date cannot be empty</value>
+  </data>
+  <data name="ReminderHourCannotBeEmpty" xml:space="preserve">
+    <value>Reminder hour cannot be empty</value>
+  </data>
+  <data name="InvalidReminderDate" xml:space="preserve">
+    <value>Invalid reminder date</value>
+  </data>
+  <data name="InvalidReminderHour" xml:space="preserve">
+    <value>Invalid reminder hour</value>
+  </data>
+  <data name="ReminderWasCreated" xml:space="preserve">
+    <value>Reminder was successfully created</value>
+  </data>
+  <data name="ReminderDateIsSetTo" xml:space="preserve">
+    <value>A reminder date was set to the {0}</value>
+  </data>
 </root>

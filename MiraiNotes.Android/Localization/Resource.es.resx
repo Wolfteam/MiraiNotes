@@ -450,4 +450,43 @@
   <data name="MarkTaskAs" xml:space="preserve">
     <value>Marcar como {0}</value>
   </data>
+  <data name="Today" xml:space="preserve">
+    <value>Hoy</value>
+  </data>
+  <data name="OneDayAgo" xml:space="preserve">
+    <value>Hace un día</value>
+  </data>
+  <data name="XDayAgo" xml:space="preserve">
+    <value>Hace {0} días</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Mañana</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="OnThisDate" xml:space="preserve">
+    <value>En esta fecha</value>
+  </data>
+  <data name="AtThisHour" xml:space="preserve">
+    <value>A esta hora</value>
+  </data>
+  <data name="ReminderDateCannotBeEmpty" xml:space="preserve">
+    <value>La fecha del recordatorio no puede estar vacía</value>
+  </data>
+  <data name="ReminderHourCannotBeEmpty" xml:space="preserve">
+    <value>La hora del recordatorio no puede estar vacía</value>
+  </data>
+  <data name="InvalidReminderDate" xml:space="preserve">
+    <value>La fecha de recordatorio es inválida</value>
+  </data>
+  <data name="InvalidReminderHour" xml:space="preserve">
+    <value>La hora del recordatorio es inválida</value>
+  </data>
+  <data name="ReminderWasCreated" xml:space="preserve">
+    <value>El recordatorio fue creado exitosamente</value>
+  </data>
+  <data name="ReminderDateIsSetTo" xml:space="preserve">
+    <value>Una fecha de recordatorio estaba programada para el {0}</value>
+  </data>
 </root>

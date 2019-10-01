@@ -169,6 +169,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At this hour.
+        /// </summary>
+        public static string AtThisHour {
+            get {
+                return ResourceManager.GetString("AtThisHour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An automatic full sync was successfully performed.
         /// </summary>
         public static string AutomaticSyncWasPerformed {
@@ -439,6 +448,24 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid reminder date.
+        /// </summary>
+        public static string InvalidReminderDate {
+            get {
+                return ResourceManager.GetString("InvalidReminderDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid reminder hour.
+        /// </summary>
+        public static string InvalidReminderHour {
+            get {
+                return ResourceManager.GetString("InvalidReminderHour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The date of the reminder must be at least 2 mins above the current time.
         /// </summary>
         public static string InvalidTaskRemindOn {
@@ -601,6 +628,33 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ok.
+        /// </summary>
+        public static string Ok {
+            get {
+                return ResourceManager.GetString("Ok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One day ago.
+        /// </summary>
+        public static string OneDayAgo {
+            get {
+                return ResourceManager.GetString("OneDayAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On this date.
+        /// </summary>
+        public static string OnThisDate {
+            get {
+                return ResourceManager.GetString("OnThisDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Others.
         /// </summary>
         public static string Others {
@@ -660,6 +714,42 @@ namespace MiraiNotes.Android.Localization {
         public static string Reminder {
             get {
                 return ResourceManager.GetString("Reminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reminder date cannot be empty.
+        /// </summary>
+        public static string ReminderDateCannotBeEmpty {
+            get {
+                return ResourceManager.GetString("ReminderDateCannotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A reminder date was set to the {0}.
+        /// </summary>
+        public static string ReminderDateIsSetTo {
+            get {
+                return ResourceManager.GetString("ReminderDateIsSetTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reminder hour cannot be empty.
+        /// </summary>
+        public static string ReminderHourCannotBeEmpty {
+            get {
+                return ResourceManager.GetString("ReminderHourCannotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reminder was successfully created.
+        /// </summary>
+        public static string ReminderWasCreated {
+            get {
+                return ResourceManager.GetString("ReminderWasCreated", resourceCulture);
             }
         }
         
@@ -988,6 +1078,24 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Today.
+        /// </summary>
+        public static string Today {
+            get {
+                return ResourceManager.GetString("Today", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tomorrow.
+        /// </summary>
+        public static string Tomorrow {
+            get {
+                return ResourceManager.GetString("Tomorrow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type your password.
         /// </summary>
         public static string TypeYourPassword {
@@ -1047,6 +1155,15 @@ namespace MiraiNotes.Android.Localization {
         public static string Welcome {
             get {
                 return ResourceManager.GetString("Welcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} days ago.
+        /// </summary>
+        public static string XDayAgo {
+            get {
+                return ResourceManager.GetString("XDayAgo", resourceCulture);
             }
         }
         
