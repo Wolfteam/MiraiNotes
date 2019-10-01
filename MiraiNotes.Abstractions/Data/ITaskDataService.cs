@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
@@ -61,11 +62,21 @@ namespace MiraiNotes.Abstractions.Data
         Task<ResponseDto<GoogleTask>> ChangeTaskStatusAsync(string taskID, GoogleTaskStatus taskStatus);
 
         /// <summary>
-        /// Removes the a type of date of the specified task
+        /// Removes the notiifcation date of the specified task
         /// </summary>
         /// <param name="taskID">The task id</param>
         /// <param name="dateType">The type of date to remove</param>
         /// <returns><see cref="ResponseDto{GoogleTask}"/></returns>
         Task<ResponseDto<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType);
+
+        /// <summary>
+        /// Adds a notification date to the specified task
+        /// </summary>
+        /// <param name="taskID">The task id</param>
+        /// <param name="dateType">The type of date to remove</param>
+        /// <param name="remindOn">The date</param>
+        /// <param name="remindOnGuid">An integer string (only used when <paramref name="dateType"/> equals <see cref="TaskNotificationDateType.REMINDER_DATE"/>)</param>
+        /// <returns><see cref="ResponseDto{GoogleTask}"/></returns>
+        Task<ResponseDto<GoogleTask>> AddNotificationDate(string taskID, TaskNotificationDateType dateType, DateTimeOffset remindOn, string remindOnGuid);
     }
 }

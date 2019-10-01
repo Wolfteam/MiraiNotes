@@ -1047,6 +1047,61 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
+        public async Task<ResponseDto<GoogleTask>> AddNotificationDate(string taskID, TaskNotificationDateType dateType, DateTimeOffset remindOn, string remindOnGuid)
+        {
+            return await Task.Run(async () =>
+            {
+                _logger.Information($"AddReminderNotificationDate: Trying to add a reminder date for taskID = {taskID}");
+                var response = new ResponseDto<GoogleTask>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var taskToUpdate = await context
+                            .Tasks
+                            .FirstOrDefaultAsync(t => t.GoogleTaskID == taskID);
+
+                        if (taskToUpdate == null)
+                        {
+                            response.Message = $"Could not find the task with taskID = {taskID}";
+                            _logger.Warning($"AddReminderNotificationDate: Could not find a task with taskID = {taskID}");
+                            return response;
+                        }
+
+                        switch (dateType)
+                        {
+                            case TaskNotificationDateType.TO_BE_COMPLETED_DATE:
+                                taskToUpdate.ToBeCompletedOn = remindOn;
+                                break;
+                            case TaskNotificationDateType.REMINDER_DATE:
+                                if (string.IsNullOrEmpty(remindOnGuid))
+                                    throw new ArgumentNullException(nameof(remindOnGuid), "If the date type is reminder, then you must provide a valid guid");
+
+                                taskToUpdate.RemindOn = remindOn;
+                                taskToUpdate.RemindOnGUID = remindOnGuid;
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(dateType), dateType, "Provided google task date type does not exists");
+                        }
+
+                        response.Succeed = await context.SaveChangesAsync() > 0;
+                        response.Result = taskToUpdate;
+                        _logger.Information("AddReminderNotificationDate: Completed successfully");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "AddReminderNotificationDate: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
         private string GetExceptionMessage(Exception e)
         {
             string result = string.Empty;
