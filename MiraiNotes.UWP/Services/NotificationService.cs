@@ -1,7 +1,7 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
-using MiraiNotes.UWP.Models;
 using System.Linq;
 using Windows.UI.Notifications;
 
@@ -15,7 +15,7 @@ namespace MiraiNotes.UWP.Services
         {
             var content = GenerateSimpleToastContent(
                 notification.Title,
-                notification.Conntent,
+                notification.Content,
                 notification.UwpSettings?.ShowDismissButton ?? true,
                 notification.UwpSettings?.IsAudioSilent ?? false);
             var toastNotifcation = new ToastNotification(content.GetXml());
@@ -133,7 +133,7 @@ namespace MiraiNotes.UWP.Services
             {
                 //maybe this could be the date that this task was set to be reminded
                 //DisplayTimestamp = DateTimeOffset.Now,
-                Launch = $"action={(int)ToastNotificationActionType.OPEN_TASK}&taskListID={taskListID}&taskID={taskID}",
+                Launch = $"action={(int)NotificationActionType.OPEN_TASK}&taskListID={taskListID}&taskID={taskID}",
                 Scenario = ToastScenario.Reminder,
                 Visual = new ToastVisual()
                 {
@@ -181,7 +181,7 @@ namespace MiraiNotes.UWP.Services
                         },
                         new ToastButton(
                             "Complete",
-                            $"action={(int)ToastNotificationActionType.MARK_AS_COMPLETED}&taskID={taskID}")
+                            $"action={(int)NotificationActionType.MARK_AS_COMPLETED}&taskID={taskID}")
                         {
                             ActivationType = ToastActivationType.Background,
                             ActivationOptions = new ToastActivationOptions()

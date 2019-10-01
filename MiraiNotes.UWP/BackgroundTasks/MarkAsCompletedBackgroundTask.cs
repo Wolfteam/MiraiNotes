@@ -71,7 +71,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
 
                 _notificationService.ShowNotification(new TaskNotification
                 {
-                    Conntent = $"Task {response.Result.Title} was marked as completed",
+                    Content = $"Task {response.Result.Title} was marked as completed",
                     Title = "Succeess",
                     UwpSettings = new UwpNotificationSettings
                     {
@@ -84,7 +84,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
             {
                 _notificationService.ShowNotification(new TaskNotification
                 {
-                    Conntent = $"Task {response.Result.Title} could not be marked as completed. Error = {response.Message}",
+                    Content = $"Task {response.Result.Title} could not be marked as completed. Error = {response.Message}",
                     Title = "Error",
                     UwpSettings = new UwpNotificationSettings
                     {

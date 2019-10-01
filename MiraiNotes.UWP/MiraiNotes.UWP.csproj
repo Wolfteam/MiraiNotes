@@ -143,7 +143,6 @@
     </Compile>
     <Compile Include="Models\CustomDialogType.cs" />
     <Compile Include="Models\MessageType.cs" />
-    <Compile Include="Models\ToastActionType.cs" />
     <Compile Include="Pages\Dialogs\AccountsContentDialog.xaml.cs">
       <DependentUpon>AccountsContentDialog.xaml</DependentUpon>
     </Compile>

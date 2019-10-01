@@ -109,14 +109,14 @@ namespace MiraiNotes.UWP
                         .Split('&')
                         .ToDictionary(c => c.Split('=')[0], c => Uri.UnescapeDataString(c.Split('=')[1]));
 
-                    var actionType = (ToastNotificationActionType)Enum.Parse(typeof(ToastNotificationActionType), queryParams["action"]);
+                    var actionType = (NotificationActionType)Enum.Parse(typeof(NotificationActionType), queryParams["action"]);
 
                     switch (actionType)
                     {
-                        case ToastNotificationActionType.OPEN_TASK:
+                        case NotificationActionType.OPEN_TASK:
                             BaseViewModel.InitDetails = new Tuple<string, string>(queryParams["taskListID"], queryParams["taskID"]);
                             break;
-                        case ToastNotificationActionType.MARK_AS_COMPLETED:
+                        case NotificationActionType.MARK_AS_COMPLETED:
                         default:
                             throw new ArgumentOutOfRangeException(nameof(actionType), actionType, "The provided toast action type is not valid");
                     }

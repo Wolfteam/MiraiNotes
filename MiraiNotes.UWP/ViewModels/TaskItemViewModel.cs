@@ -260,6 +260,8 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
+        public string RemindOnGUID { get; set; }
+
         public TimeSpan? RemindOnTime
         {
             get => RemindOn?.TimeOfDay;

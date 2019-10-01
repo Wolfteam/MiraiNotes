@@ -81,7 +81,7 @@ namespace MiraiNotes.UWP.BackgroundTasks
                 _notificationService.ShowNotification(new TaskNotification
                 {
                     Title = "Sync Results",
-                    Conntent = message
+                    Content = message
                 });
             }
             else

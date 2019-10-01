@@ -57,6 +57,9 @@ namespace MiraiNotes.UWP.Services
             get => AppLanguageType.English;
             set => _settings[nameof(AppLanguage)] = (int)value;
         }
+
+        public bool AskForFingerPrintWhenAppStarts { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public string SelectedTaskListId { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         #endregion
 
 
