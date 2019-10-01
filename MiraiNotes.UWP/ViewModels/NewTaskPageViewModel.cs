@@ -338,22 +338,22 @@ namespace MiraiNotes.UWP.ViewModels
                 if (isNewTask)
                     entity.CreatedAt = DateTimeOffset.UtcNow;
                 entity.CompletedOn = CurrentTask.CompletedOn;
-                entity.GoogleTaskID = CurrentTask.IsNew 
-                    ? Guid.NewGuid().ToString() 
+                entity.GoogleTaskID = CurrentTask.IsNew
+                    ? Guid.NewGuid().ToString()
                     : CurrentTask.TaskID;
                 entity.IsDeleted = CurrentTask.IsDeleted;
                 entity.IsHidden = CurrentTask.IsHidden;
                 entity.Notes = CurrentTask.Notes;
                 entity.ParentTask = CurrentTask.ParentTask;
                 entity.Position = CurrentTask.Position;
-                entity.Status = CurrentTask.IsNew 
-                    ? GoogleTaskStatus.NEEDS_ACTION.GetString() 
+                entity.Status = CurrentTask.IsNew
+                    ? GoogleTaskStatus.NEEDS_ACTION.GetString()
                     : CurrentTask.Status;
                 entity.Title = CurrentTask.Title;
-                entity.LocalStatus = CurrentTask.IsNew 
-                    ? LocalStatus.CREATED 
-                    : entity.LocalStatus == LocalStatus.CREATED 
-                        ? LocalStatus.CREATED 
+                entity.LocalStatus = CurrentTask.IsNew
+                    ? LocalStatus.CREATED
+                    : entity.LocalStatus == LocalStatus.CREATED
+                        ? LocalStatus.CREATED
                         : LocalStatus.UPDATED;
                 entity.ToBeSynced = true;
                 entity.UpdatedAt = DateTimeOffset.UtcNow;
@@ -690,8 +690,8 @@ namespace MiraiNotes.UWP.ViewModels
             List<TaskItemViewModel> currentSubTasks)
         {
             ShowTaskProgressRing = true;
-            string taskListID = moveToDifferentTaskList 
-                ? SelectedTaskList.TaskListID 
+            string taskListID = moveToDifferentTaskList
+                ? SelectedTaskList.TaskListID
                 : _currentTaskList.TaskListID;
 
             if (moveToDifferentTaskList && !isNewTask)
@@ -715,15 +715,15 @@ namespace MiraiNotes.UWP.ViewModels
                     {
                         CompletedOn = subTask.CompletedOn,
                         CreatedAt = DateTimeOffset.UtcNow,
-                        GoogleTaskID = subTask.IsNew 
-                            ? Guid.NewGuid().ToString() 
+                        GoogleTaskID = subTask.IsNew
+                            ? Guid.NewGuid().ToString()
                             : subTask.TaskID,
                         IsDeleted = subTask.IsDeleted,
                         IsHidden = subTask.IsHidden,
                         LocalStatus = LocalStatus.CREATED,
                         Notes = subTask.Notes,
-                        ParentTask = isNewTask && moveToDifferentTaskList 
-                            ? subTask.ParentTask 
+                        ParentTask = isNewTask && moveToDifferentTaskList
+                            ? subTask.ParentTask
                             : CurrentTask.TaskID,
                         Position = lastStID,
                         Status = subTask.Status,
@@ -800,6 +800,12 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = true;
             if (!CurrentTask.IsNew)
             {
+                if (dateType == TaskNotificationDateType.REMINDER_DATE &&
+                    int.TryParse(CurrentTask.RemindOnGUID, out int id))
+                {
+                    _notificationService.RemoveScheduledNotification(id);
+                }
+
                 var response = await _dataService
                     .TaskService
                     .RemoveNotificationDate(CurrentTask.TaskID, dateType);
@@ -809,12 +815,6 @@ namespace MiraiNotes.UWP.ViewModels
                     await _dialogService.ShowMessageDialogAsync(
                         "Error",
                         $"Could not remove the {message} date of {CurrentTask.Title}");
-                }
-
-                if (dateType == TaskNotificationDateType.REMINDER_DATE)
-                {
-                    int id = int.Parse(response.Result.RemindOnGUID);
-                    _notificationService.RemoveScheduledNotification(id);
                 }
 
                 CurrentTask = _mapper.Map<TaskItemViewModel>(response.Result);
