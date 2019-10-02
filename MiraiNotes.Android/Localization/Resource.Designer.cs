@@ -592,6 +592,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New SubTask.
+        /// </summary>
+        public static string NewSubTask {
+            get {
+                return ResourceManager.GetString("NewSubTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Task.
         /// </summary>
         public static string NewTask {

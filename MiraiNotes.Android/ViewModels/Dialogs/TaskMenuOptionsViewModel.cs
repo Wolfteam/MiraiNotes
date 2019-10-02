@@ -60,6 +60,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 await NavigationService.Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(_task);
             });
 
+            AddSubTaskCommand = new MvxAsyncCommand(async() =>
+            {
+                var parameter = AddSubTaskDialogViewModelParameter.Instance(_taskList.Id, _task);
+                await NavigationService.Close(this);
+                await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, bool>(parameter);
+            });
+
             AddReminderCommand = new MvxAsyncCommand(async () =>
             {
                 var parameter = TaskReminderDialogViewModelParameter.Instance(_taskList, _task);

@@ -143,6 +143,7 @@
     <Compile Include="Common\Utils\MiscellaneousUtils.cs" />
     <Compile Include="Common\Utils\MoveUpwardBehavior.cs" />
     <Compile Include="Common\Extensions\ValidationExtensions.cs" />
+    <Compile Include="Common\Validators\AddSubTaskDialogViewModelValidator.cs" />
     <Compile Include="Common\Validators\PasswordDialogViewModelValidator.cs" />
     <Compile Include="Common\Validators\TaskListDialogViewModelValidator.cs" />
     <Compile Include="Common\Validators\TaskReminderDialogViewModelValidator.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Listeners\TasksRecyclerViewScrollListener.cs" />
     <Compile Include="Listeners\TouchListener.cs" />
     <Compile Include="Models\NotificationAction.cs" />
+    <Compile Include="Models\Parameters\AddSubTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />
     <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\AddSubTaskDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BaseConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ChangeTaskStatusDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\DeleteTaskDialogViewModel.cs" />
@@ -190,6 +193,7 @@
     <Compile Include="Views\Activities\BaseActivity.cs" />
     <Compile Include="Views\Activities\SettingsActivity.cs" />
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\AddSubTaskDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\BaseDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\ChangeTaskStatusFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\DeleteTaskFragment.cs" />
@@ -686,6 +690,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\ic_access_time_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\AddSubTaskDialog.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

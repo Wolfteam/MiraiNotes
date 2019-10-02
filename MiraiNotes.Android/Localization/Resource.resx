@@ -475,4 +475,7 @@
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="NewSubTask" xml:space="preserve">
+    <value>New SubTask</value>
+  </data>
 </root>
