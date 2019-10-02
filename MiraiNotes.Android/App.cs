@@ -157,6 +157,30 @@ namespace MiraiNotes.Android
                         outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(AddSubTaskDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_addsubtask_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(ChangeTaskStatusDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_changetaskstatus_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(DeleteTaskDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_deletetask_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(PasswordDialogViewModel).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "mirai_notes_password_dialog_vm_.txt"),
@@ -168,6 +192,22 @@ namespace MiraiNotes.Android
                             Matching.FromSource($"{typeof(TaskListDialogViewModel).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "mirai_notes_tasklists_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(TaskMenuOptionsViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_taskmenuoptions_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(TaskReminderDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_taskreminder_dialog_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -240,6 +280,14 @@ namespace MiraiNotes.Android
                             Matching.FromSource($"{typeof(SyncBackgroundTask).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "mirai_notes_bg_sync_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MarkTaskAsCompletedReceiver.MarkAsCompletedTask).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_bg_marktaskascompleted_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
