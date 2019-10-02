@@ -92,7 +92,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             var entity = new GoogleTaskList
             {
                 GoogleTaskListID = Guid.NewGuid().ToString(),
-                Title = TaskListTitle,
+                Title = TaskListTitle.Trim(),
                 UpdatedAt = DateTimeOffset.UtcNow,
                 LocalStatus = LocalStatus.CREATED,
                 ToBeSynced = true,

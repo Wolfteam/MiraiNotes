@@ -151,7 +151,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             _credentialService.SaveUserCredential(
                 ResourceType.SETTINGS_PASSWORD_RESOURCE,
                 response.Result.Email,
-                Password);
+                Password.Trim());
         }
 
         private void Validate()

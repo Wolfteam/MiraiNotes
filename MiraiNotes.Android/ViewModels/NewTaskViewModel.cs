@@ -319,7 +319,7 @@ namespace MiraiNotes.Android.ViewModels
             entity.Status = Task.IsNew
                 ? GoogleTaskStatus.NEEDS_ACTION.GetString()
                 : Task.Status;
-            entity.Title = Task.Title;
+            entity.Title = Task.Title.Trim();
             entity.LocalStatus = Task.IsNew
                 ? LocalStatus.CREATED
                 : entity.LocalStatus == LocalStatus.CREATED
@@ -588,7 +588,7 @@ namespace MiraiNotes.Android.ViewModels
                             : Task.TaskID,
                         Position = lastStId,
                         Status = subTask.Status,
-                        Title = subTask.Title,
+                        Title = subTask.Title.Trim(),
                         ToBeCompletedOn = subTask.ToBeCompletedOn,
                         ToBeSynced = true,
                         UpdatedAt = DateTimeOffset.UtcNow
