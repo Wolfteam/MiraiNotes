@@ -1,4 +1,5 @@
 ﻿using MiraiNotes.Android.ViewModels;
+using System;
 
 namespace MiraiNotes.Android.Models.Parameters
 {
@@ -10,7 +11,7 @@ namespace MiraiNotes.Android.Models.Parameters
         private TasksViewModelParameter(NotificationAction notificationAction, TaskListItemViewModel taskList)
         {
             NotificationAction = notificationAction;
-            TaskList = taskList;
+            TaskList = taskList ?? throw new ArgumentNullException(nameof(taskList));
         }
 
         public static TasksViewModelParameter Instance(NotificationAction notificationAction, TaskListItemViewModel taskList)

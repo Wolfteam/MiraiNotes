@@ -1,4 +1,5 @@
 ﻿using MiraiNotes.Android.ViewModels;
+using System;
 
 namespace MiraiNotes.Android.Models.Parameters
 {
@@ -9,8 +10,8 @@ namespace MiraiNotes.Android.Models.Parameters
 
         private NewTaskViewModelParameter(TaskListItemViewModel taskList, string taskId)
         {
-            TaskList = taskList;
-            TaskId = taskId;
+            TaskList = taskList ?? throw new ArgumentNullException(nameof(taskList));
+            TaskId = taskId ?? throw new ArgumentNullException(nameof(taskId));
         }
 
         public static NewTaskViewModelParameter Instance(TaskListItemViewModel taskList, string taskId)
