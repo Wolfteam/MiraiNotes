@@ -160,6 +160,17 @@ namespace MiraiNotes.Android.ViewModels
             });
         }
 
+        public override void RegisterMessages()
+        {
+            base.RegisterMessages();
+            var tokens = new[]
+            {
+                Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged)
+            };
+
+            SubscriptionTokens.AddRange(tokens);
+        }
+
         private async Task LoadTaskLists()
         {
             ShowProgressBar = true;
@@ -621,6 +632,31 @@ namespace MiraiNotes.Android.ViewModels
                        .ToList() ??
                    Enumerable.Empty<TaskItemViewModel>()
                        .ToList();
+        }
+
+        private void OnTaskStatusChanged(TaskStatusChangedMsg msg)
+        {
+            TaskItemViewModel taskFound = null;
+
+            if (!msg.HasParentTask)
+            {
+                taskFound = Task?.TaskID == msg.TaskId 
+                    ? Task 
+                    : null;
+            }
+            else
+            {
+                taskFound = Task?
+                    .SubTasks?
+                    .FirstOrDefault(st => st.TaskID == msg.TaskId);
+            }
+
+            if (taskFound == null)
+                return;
+
+            taskFound.CompletedOn = msg.CompletedOn;
+            taskFound.UpdatedAt = msg.UpdatedAt;
+            taskFound.Status = msg.NewStatus;
         }
     }
 }

@@ -489,4 +489,10 @@
   <data name="ReminderDateIsSetTo" xml:space="preserve">
     <value>Una fecha de recordatorio estaba programada para el {0}</value>
   </data>
+  <data name="TaskCouldntBeMarkedAsCompleted" xml:space="preserve">
+    <value>La tarea {0} no pudo ser marcada como completada</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
 </root>

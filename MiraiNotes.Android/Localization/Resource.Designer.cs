@@ -403,6 +403,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fingerprint not recognized. Try again..
         /// </summary>
         public static string FingerprintAuthFailed {
@@ -993,6 +1002,15 @@ namespace MiraiNotes.Android.Localization {
         public static string SyncUnknownError {
             get {
                 return ResourceManager.GetString("SyncUnknownError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task {0} could not be marked as completed.
+        /// </summary>
+        public static string TaskCouldntBeMarkedAsCompleted {
+            get {
+                return ResourceManager.GetString("TaskCouldntBeMarkedAsCompleted", resourceCulture);
             }
         }
         

@@ -469,4 +469,10 @@
   <data name="ReminderDateIsSetTo" xml:space="preserve">
     <value>A reminder date was set to the {0}</value>
   </data>
+  <data name="TaskCouldntBeMarkedAsCompleted" xml:space="preserve">
+    <value>Task {0} could not be marked as completed</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
 </root>

@@ -2,10 +2,13 @@
 using Android.Content;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MvvmCross;
+using MvvmCross.Plugin.Messenger;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -52,7 +55,7 @@ namespace MiraiNotes.Android.Background
 
                 await MarkAsCompleted();
             }
-
+            //TODO: ADD ALL THE MISSING LOGGERS IN ALL THE VIEW MODELS
             public async Task MarkAsCompleted()
             {
                 try
@@ -66,6 +69,8 @@ namespace MiraiNotes.Android.Background
                     var dataService = Mvx.IoCProvider.Resolve<IMiraiNotesDataService>();
                     var logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<MarkTaskAsCompletedReceiver>();
                     var notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
+                    var textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
+                    var messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
 
                     logger.Information($"Marking taskId = {_notification.TaskId} as completed...");
 
@@ -76,18 +81,32 @@ namespace MiraiNotes.Android.Background
                     if (response.Succeed)
                     {
                         logger.Information($"TaskId = {_notification.TaskId} was successfully marked as completed");
+
+                        if (isAppInForeground)
+                        {
+                            var task = response.Result;
+                            var msg = new TaskStatusChangedMsg(
+                                this, 
+                                task.GoogleTaskID, 
+                                task.ParentTask, 
+                                task.CompletedOn, 
+                                task.UpdatedAt, 
+                                task.Status);
+                            messenger.Publish(msg);
+                        }
                     }
                     else
                     {
                         logger.Error($"TaskId = {_notification.TaskId} couldnt be marked as completed. Error = {response.Message}");
 
-                        //TRANSLATE THIS
                         notificationService.ShowNotification(new TaskNotification
                         {
-                            Content = $"Task {_notification.TaskTitle} couldnt be marked as completed",
-                            Title = "Error"
+                            Content = textProvider.Get("TaskCouldntBeMarkedAsCompleted", _notification.TaskTitle),
+                            Title = textProvider.Get("Error")
                         });
                     }
+
+                    logger.Information("Process completed...");
                 }
                 catch (Exception)
                 {
