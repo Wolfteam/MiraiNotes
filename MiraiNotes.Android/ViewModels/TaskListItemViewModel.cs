@@ -9,6 +9,7 @@ namespace MiraiNotes.Android.ViewModels
         private string _title;
         private DateTimeOffset? _updatedAt;
         private int _numberOfTasks;
+        private bool _isSelected;
 
         public string Id
         {
@@ -33,6 +34,13 @@ namespace MiraiNotes.Android.ViewModels
         {
             get => _numberOfTasks;
             set => SetProperty(ref _numberOfTasks, value);
+        }
+
+        //you need to manually set this one
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
         }
     }
 }

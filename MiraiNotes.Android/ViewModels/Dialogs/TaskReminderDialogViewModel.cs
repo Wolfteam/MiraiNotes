@@ -76,7 +76,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             set => SetProperty(ref _errors, value);
         }
         //TODO: SHOULD I ALLOW DELETE / CREATE COMPLETETION DATES IN THIS VIEWMODEL?
-        public IMvxAsyncCommand DeleteCurrentReminderCommand { get; set; }
+        public IMvxAsyncCommand DeleteCurrentReminderCommand { get; private set; }
 
         public TaskReminderDialogViewModel(
             ITextProvider textProvider,

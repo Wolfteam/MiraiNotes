@@ -31,6 +31,10 @@ namespace MiraiNotes.Android
             registry.RegisterCustomBindingFactory<TextView>(
                 StrikeThroughTextBinding.PropertyName,
                 view => new StrikeThroughTextBinding(view));
+
+            registry.RegisterCustomBindingFactory<LinearLayout>(
+                IsSelectedBackgroundColorBinding.PropertyName,
+                view => new IsSelectedBackgroundColorBinding(view));
         }
     }
 }

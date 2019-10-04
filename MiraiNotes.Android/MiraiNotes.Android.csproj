@@ -111,6 +111,7 @@
     <Compile Include="Background\NotificationSchedulerReceiver.cs" />
     <Compile Include="Background\SyncBackgroundTask.cs" />
     <Compile Include="Background\MarkTaskAsCompletedReceiver.cs" />
+    <Compile Include="Bindings\IsSelectedBackgroundColorBinding.cs" />
     <Compile Include="Bindings\StrikeThroughTextBinding.cs" />
     <Compile Include="Bindings\SubTaskButtonAnimateBinding.cs" />
     <Compile Include="Common\Converters\StringToVisibilityConverter.cs" />
@@ -168,6 +169,8 @@
     <Compile Include="Models\NotificationAction.cs" />
     <Compile Include="Models\Parameters\AddSubTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\MoveTaskDialogViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\MoveToTaskListDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskReminderDialogViewModelParameter.cs" />
@@ -179,6 +182,8 @@
     <Compile Include="ViewModels\Dialogs\BaseConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ChangeTaskStatusDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\DeleteTaskDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\MoveTaskDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\MoveToTaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskMenuOptionsViewModel.cs" />
@@ -198,6 +203,8 @@
     <Compile Include="Views\Fragments\Dialogs\ChangeTaskStatusFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\DeleteTaskFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\FingerprintCustomDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\MoveTaskDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\MoveToTaskListDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\PasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
     <Compile Include="Interfaces\IDialogService.cs" />
@@ -695,6 +702,16 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\AddSubTaskDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\MoveToTaskListDialog.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\MoveToTaskListDialogItem.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

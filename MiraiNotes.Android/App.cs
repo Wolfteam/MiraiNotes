@@ -181,6 +181,22 @@ namespace MiraiNotes.Android
                         outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MoveTaskDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_movetask_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MoveToTaskListDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_movetotasklist_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(PasswordDialogViewModel).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "mirai_notes_password_dialog_vm_.txt"),
