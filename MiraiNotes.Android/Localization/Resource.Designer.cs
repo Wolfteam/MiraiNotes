@@ -556,6 +556,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you wanna move &apos;{0}&apos; to &apos;{1}&apos;  ?.
+        /// </summary>
+        public static string MoveTaskConfirmationB {
+            get {
+                return ResourceManager.GetString("MoveTaskConfirmationB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move to a different task list.
         /// </summary>
         public static string MoveToDifferentTaskList {
@@ -723,6 +732,15 @@ namespace MiraiNotes.Android.Localization {
         public static string PasswordMaxLength {
             get {
                 return ResourceManager.GetString("PasswordMaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick a task list.
+        /// </summary>
+        public static string PickTaskList {
+            get {
+                return ResourceManager.GetString("PickTaskList", resourceCulture);
             }
         }
         

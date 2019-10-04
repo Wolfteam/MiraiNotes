@@ -9974,124 +9974,130 @@ namespace MiraiNotes.Android
 			public const int MenuView = 2131427380;
 			
 			// aapt resource value: 0x7F0B0035
-			public const int mtrl_layout_snackbar = 2131427381;
+			public const int MoveToTaskListDialog = 2131427381;
 			
 			// aapt resource value: 0x7F0B0036
-			public const int mtrl_layout_snackbar_include = 2131427382;
+			public const int MoveToTaskListDialogItem = 2131427382;
 			
 			// aapt resource value: 0x7F0B0037
-			public const int NewTaskView = 2131427383;
+			public const int mtrl_layout_snackbar = 2131427383;
 			
 			// aapt resource value: 0x7F0B0038
-			public const int notification_action = 2131427384;
+			public const int mtrl_layout_snackbar_include = 2131427384;
 			
 			// aapt resource value: 0x7F0B0039
-			public const int notification_action_tombstone = 2131427385;
+			public const int NewTaskView = 2131427385;
 			
 			// aapt resource value: 0x7F0B003A
-			public const int notification_media_action = 2131427386;
+			public const int notification_action = 2131427386;
 			
 			// aapt resource value: 0x7F0B003B
-			public const int notification_media_cancel_action = 2131427387;
+			public const int notification_action_tombstone = 2131427387;
 			
 			// aapt resource value: 0x7F0B003C
-			public const int notification_template_big_media = 2131427388;
+			public const int notification_media_action = 2131427388;
 			
 			// aapt resource value: 0x7F0B003D
-			public const int notification_template_big_media_custom = 2131427389;
+			public const int notification_media_cancel_action = 2131427389;
 			
 			// aapt resource value: 0x7F0B003E
-			public const int notification_template_big_media_narrow = 2131427390;
+			public const int notification_template_big_media = 2131427390;
 			
 			// aapt resource value: 0x7F0B003F
-			public const int notification_template_big_media_narrow_custom = 2131427391;
+			public const int notification_template_big_media_custom = 2131427391;
 			
 			// aapt resource value: 0x7F0B0040
-			public const int notification_template_custom_big = 2131427392;
+			public const int notification_template_big_media_narrow = 2131427392;
 			
 			// aapt resource value: 0x7F0B0041
-			public const int notification_template_icon_group = 2131427393;
+			public const int notification_template_big_media_narrow_custom = 2131427393;
 			
 			// aapt resource value: 0x7F0B0042
-			public const int notification_template_lines_media = 2131427394;
+			public const int notification_template_custom_big = 2131427394;
 			
 			// aapt resource value: 0x7F0B0043
-			public const int notification_template_media = 2131427395;
+			public const int notification_template_icon_group = 2131427395;
 			
 			// aapt resource value: 0x7F0B0044
-			public const int notification_template_media_custom = 2131427396;
+			public const int notification_template_lines_media = 2131427396;
 			
 			// aapt resource value: 0x7F0B0045
-			public const int notification_template_part_chronometer = 2131427397;
+			public const int notification_template_media = 2131427397;
 			
 			// aapt resource value: 0x7F0B0046
-			public const int notification_template_part_time = 2131427398;
+			public const int notification_template_media_custom = 2131427398;
 			
 			// aapt resource value: 0x7F0B0047
-			public const int NumberOfTasks = 2131427399;
+			public const int notification_template_part_chronometer = 2131427399;
 			
 			// aapt resource value: 0x7F0B0048
-			public const int PasswordDialog = 2131427400;
+			public const int notification_template_part_time = 2131427400;
 			
 			// aapt resource value: 0x7F0B0049
-			public const int ProgressOverlay = 2131427401;
+			public const int NumberOfTasks = 2131427401;
 			
 			// aapt resource value: 0x7F0B004A
-			public const int select_dialog_item_material = 2131427402;
+			public const int PasswordDialog = 2131427402;
 			
 			// aapt resource value: 0x7F0B004B
-			public const int select_dialog_multichoice_material = 2131427403;
+			public const int ProgressOverlay = 2131427403;
 			
 			// aapt resource value: 0x7F0B004C
-			public const int select_dialog_singlechoice_material = 2131427404;
+			public const int select_dialog_item_material = 2131427404;
 			
 			// aapt resource value: 0x7F0B004D
-			public const int Settings = 2131427405;
+			public const int select_dialog_multichoice_material = 2131427405;
 			
 			// aapt resource value: 0x7F0B004E
-			public const int SettingsAboutView = 2131427406;
+			public const int select_dialog_singlechoice_material = 2131427406;
 			
 			// aapt resource value: 0x7F0B004F
-			public const int SettingsAccentColorItem = 2131427407;
+			public const int Settings = 2131427407;
 			
 			// aapt resource value: 0x7F0B0050
-			public const int SettingsGeneralView = 2131427408;
+			public const int SettingsAboutView = 2131427408;
 			
 			// aapt resource value: 0x7F0B0051
-			public const int SettingsHomeView = 2131427409;
+			public const int SettingsAccentColorItem = 2131427409;
 			
 			// aapt resource value: 0x7F0B0052
-			public const int SettingsItem = 2131427410;
+			public const int SettingsGeneralView = 2131427410;
 			
 			// aapt resource value: 0x7F0B0053
-			public const int SettingsNotificationsView = 2131427411;
+			public const int SettingsHomeView = 2131427411;
 			
 			// aapt resource value: 0x7F0B0054
-			public const int SettingsSyncView = 2131427412;
+			public const int SettingsItem = 2131427412;
 			
 			// aapt resource value: 0x7F0B0055
-			public const int SubTaskItem = 2131427413;
+			public const int SettingsNotificationsView = 2131427413;
 			
 			// aapt resource value: 0x7F0B0056
-			public const int support_simple_spinner_dropdown_item = 2131427414;
+			public const int SettingsSyncView = 2131427414;
 			
 			// aapt resource value: 0x7F0B0057
-			public const int TaskItem = 2131427415;
+			public const int SubTaskItem = 2131427415;
 			
 			// aapt resource value: 0x7F0B0058
-			public const int TaskListDialog = 2131427416;
+			public const int support_simple_spinner_dropdown_item = 2131427416;
 			
 			// aapt resource value: 0x7F0B0059
-			public const int TaskMenuOptionsDialog = 2131427417;
+			public const int TaskItem = 2131427417;
 			
 			// aapt resource value: 0x7F0B005A
-			public const int TaskReminderDialog = 2131427418;
+			public const int TaskListDialog = 2131427418;
 			
 			// aapt resource value: 0x7F0B005B
-			public const int TasksView = 2131427419;
+			public const int TaskMenuOptionsDialog = 2131427419;
 			
 			// aapt resource value: 0x7F0B005C
-			public const int toast_layout = 2131427420;
+			public const int TaskReminderDialog = 2131427420;
+			
+			// aapt resource value: 0x7F0B005D
+			public const int TasksView = 2131427421;
+			
+			// aapt resource value: 0x7F0B005E
+			public const int toast_layout = 2131427422;
 			
 			static Layout()
 			{

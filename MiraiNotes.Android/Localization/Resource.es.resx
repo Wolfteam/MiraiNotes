@@ -498,4 +498,10 @@
   <data name="NewSubTask" xml:space="preserve">
     <value>Nueva SubTarea</value>
   </data>
+  <data name="PickTaskList" xml:space="preserve">
+    <value>Selecciona una lista de tareas</value>
+  </data>
+  <data name="MoveTaskConfirmationB" xml:space="preserve">
+    <value>¿ Estás seguro que deseas mover '{0}' hacia '{1}' ?</value>
+  </data>
 </root>
