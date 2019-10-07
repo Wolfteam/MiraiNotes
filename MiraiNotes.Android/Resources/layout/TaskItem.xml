@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:minHeight ="90dp"
     android:layout_margin="10dp"
-    app:cardCornerRadius="10dp"
-    android:background="?android:attr/selectableItemBackground">
+    app:cardCornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,8 +17,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?android:attr/selectableItemBackground">
 
             <View
                 android:layout_height="match_parent"
@@ -54,7 +55,7 @@
                         android:textSize="@dimen/task_item_title"
                         android:text="Task name"
                         android:ellipsize="end"
-                        android:singleLine="true"                        
+                        android:singleLine="true"
                         app:MvxBind="Text Title; StrikeThroughText IsCompleted" />
                 </LinearLayout>
 
@@ -74,16 +75,16 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
+                android:layout_weight="2.5"
                 android:orientation="vertical"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical|end">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center"
-                    app:MvxBind="Visibility Visibility(IsCompletitionDateSet)">
+                    android:gravity="center_vertical"
+                    app:MvxBind="Visibility Visibility(HasAToBeCompletedDate)">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -93,9 +94,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="406 days ago"
+                        android:textSize="@dimen/font_size_small"
                         android:ellipsize="end"
-                        android:maxLines="1"
-                        app:MvxBind="Text CompletitionDateText"/>
+                        android:maxLines="2"
+                        app:MvxBind="Text ToBeCompletedOnText"/>
                 </LinearLayout>
 
                 <ImageButton
@@ -104,7 +106,6 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
                     android:background="?android:attr/selectableItemBackground"
-                    android:layout_gravity="end"
                     android:textSize="@dimen/task_item_content"
                     app:MvxBind="Click ShowSubTasksCommand; Visibility Visibility(HasSubTasks); ShowSubTasks ShowSubTasks"/>
             </LinearLayout>

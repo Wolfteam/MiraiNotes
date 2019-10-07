@@ -13,7 +13,7 @@
         android:text="Reminder"
         android:textStyle="bold"
         android:textSize="@dimen/font_size_big"
-        app:MvxBind="Text [AddReminder]"/>
+        app:MvxBind="Text Title"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,12 +31,12 @@
             android:drawableRight="@drawable/ic_close_black_24dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="A reminder date was set to the Sunday, September 29, 2019 19:20"
-            app:MvxBind="Text CurrentReminderText; Click DeleteCurrentReminderCommand; Visibility StringToVisibility(CurrentReminderText)"/>
+            app:MvxBind="Text CurrentContentText; Click DeleteCurrentMomentCommand; Visibility StringToVisibility(CurrentContentText)"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="In this date:"
+            android:text="On this date:"
             android:drawableLeft="@drawable/ic_calendar_24dp"
             android:drawablePadding="5dp"
             android:textSize="@dimen/font_size_medium"
@@ -48,13 +48,13 @@
             android:layout_height="wrap_content"
             android:text="Monday, January 1, 1999"
             android:background="?android:attr/selectableItemBackground"
-            app:MvxBind="Text ReminderDateText"/>
+            app:MvxBind="Text DateText"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?AccentColor"
-            app:MvxBind="Text Errors['ReminderDateText']; Visibility StringToVisibility(Errors['ReminderDateText'])"/>
+            app:MvxBind="Text Errors['DateText']; Visibility StringToVisibility(Errors['DateText'])"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -63,7 +63,7 @@
             android:drawableLeft="@drawable/ic_access_time_black_24dp"
             android:drawablePadding="5dp"
             android:textSize="@dimen/font_size_medium"
-            app:MvxBind="Text [AtThisHour] + ':'"/>
+            app:MvxBind="Text [AtThisHour] + ':'; Visibility Visibility(IsAReminderDate)"/>
 
         <Button
             android:id="@+id/TaskReminderTime"
@@ -71,13 +71,13 @@
             android:layout_height="wrap_content"
             android:text="12:00 am"
             android:background="?android:attr/selectableItemBackground"
-            app:MvxBind="Text ReminderHourText"/>
+            app:MvxBind="Text HourText; Visibility Visibility(IsAReminderDate)"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?AccentColor"
-            app:MvxBind="Text Errors['ReminderHourText']; Visibility StringToVisibility(Errors['ReminderHourText'])"/>
+            app:MvxBind="Text Errors['HourText']; Visibility StringToVisibility(Errors['HourText'])"/>
     </LinearLayout>
 
     <LinearLayout
