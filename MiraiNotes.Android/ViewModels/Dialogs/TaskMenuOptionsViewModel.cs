@@ -76,9 +76,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             AddReminderCommand = new MvxAsyncCommand(async () =>
             {
-                var parameter = TaskReminderDialogViewModelParameter.Instance(_taskList, _task);
+                var parameter = TaskDateViewModelParameter.Instance(_taskList, _task, Core.Enums.TaskNotificationDateType.REMINDER_DATE);
                 await NavigationService.Close(this);
-                await NavigationService.Navigate<TaskReminderDialogViewModel, TaskReminderDialogViewModelParameter, bool>(parameter);
+                await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, bool>(parameter);
             });
         }
     }

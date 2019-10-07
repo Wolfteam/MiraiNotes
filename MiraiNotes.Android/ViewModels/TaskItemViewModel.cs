@@ -23,6 +23,7 @@ namespace MiraiNotes.Android.ViewModels
         private bool _hasSubTasks;
         private bool _showSubTasks;
         private DateTimeOffset? _completedOn;
+        private DateTimeOffset? _toBeCompletedOn;
         private MvxObservableCollection<TaskItemViewModel> _subTasks = new MvxObservableCollection<TaskItemViewModel>();
         private DateTimeOffset? _remindOn;
 
@@ -98,18 +99,27 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public DateTimeOffset? ToBeCompletedOn { get; set; }
+        public DateTimeOffset? ToBeCompletedOn
+        {
+            get => _toBeCompletedOn;
+            set
+            {
+                SetProperty(ref _toBeCompletedOn, value);
+                RaisePropertyChanged(nameof(HasAToBeCompletedDate));
+                RaisePropertyChanged(nameof(ToBeCompletedOnText));
+                RaisePropertyChanged(nameof(FullToBeCompletedOnText));
+            }
+        }
 
         public DateTimeOffset? CompletedOn
         {
             get => _completedOn;
             set
             {
-                _completedOn = value;
-                RaisePropertyChanged(nameof(CompletedOn));
+                SetProperty(ref _completedOn, value);
                 RaisePropertyChanged(nameof(IsCompleted));
-                RaisePropertyChanged(nameof(CompletitionDateText));
-                RaisePropertyChanged(nameof(FullCompletitionDateText));
+                RaisePropertyChanged(nameof(ToBeCompletedOnText));
+                RaisePropertyChanged(nameof(FullToBeCompletedOnText));
             }
         }
 
@@ -146,10 +156,10 @@ namespace MiraiNotes.Android.ViewModels
 
         public bool IsSelected { get; set; }
 
-        public bool IsCompletitionDateSet
+        public bool HasAToBeCompletedDate
             => ToBeCompletedOn.HasValue;
 
-        public string CompletitionDateText
+        public string ToBeCompletedOnText
         {
             get
             {
@@ -172,24 +182,26 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public string FullCompletitionDateText
+        public string FullToBeCompletedOnText
         {
             get
             {
                 if (!ToBeCompletedOn.HasValue)
                     return string.Empty;
                 var difference = DateTimeOffset.Now.Subtract(ToBeCompletedOn.Value).Days;
-                if (difference >= 0)
-                {
-                    if (difference == 0)
-                        return "This task is marked to be completed Today";
-                    else
-                        return $"This task was marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
-                }
+
+                //today
+                if (difference == 0)
+                    return GetText("ToBeCompletedOnB", GetText("Today"));
+                //n days ago
+                else if (difference > 0)
+                    return GetText("ToBeCompletedOnC", $"{ToBeCompletedOn.Value:ddd, MMM d, yyyy}");
+                //tomorrow
                 else if (difference == -1)
-                    return "This task is marked to be completed Tomorrow";
+                    return GetText("ToBeCompletedOnB", GetText("Tomorrow"));
+                //in n days
                 else
-                    return $"This task is marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
+                    return GetText("ToBeCompletedOnA", $"{ToBeCompletedOn.Value:ddd, MMM d, yyyy}");
             }
         }
 
@@ -202,7 +214,6 @@ namespace MiraiNotes.Android.ViewModels
             }
             set
             {
-                _hasSubTasks = value;
                 SetProperty(ref _hasSubTasks, value);
             }
         }
@@ -219,8 +230,7 @@ namespace MiraiNotes.Android.ViewModels
             }
             set
             {
-                _subTasks = value;
-                RaisePropertyChanged(nameof(SubTasks));
+                SetProperty(ref _subTasks, value);
             }
         }
 
@@ -240,10 +250,11 @@ namespace MiraiNotes.Android.ViewModels
             get => _remindOn;
             set
             {
-                _remindOn = value;
+                SetProperty(ref _remindOn, value);
                 RaisePropertyChanged(nameof(HasAReminderDate));
                 RaisePropertyChanged(nameof(RemindOnDateText));
                 RaisePropertyChanged(nameof(RemindOnTime));
+                RaisePropertyChanged(nameof(FullRemindOnText));
             }
         }
 
@@ -264,6 +275,7 @@ namespace MiraiNotes.Android.ViewModels
                     RaisePropertyChanged(nameof(RemindOn));
                     RaisePropertyChanged(nameof(HasAReminderDate));
                     RaisePropertyChanged(nameof(RemindOnDateText));
+                    RaisePropertyChanged(nameof(FullRemindOnText));
                 }
             }
         }
@@ -283,9 +295,8 @@ namespace MiraiNotes.Android.ViewModels
 
         public bool HasNotes
             => !string.IsNullOrEmpty(Notes);
+        #endregion
 
-        #endregion    
-    
         #region Commands
         public IMvxCommand ShowSubTasksCommand { get; private set; }
         public IMvxCommand DeleteTaskCommand { get; private set; }
@@ -306,7 +317,9 @@ namespace MiraiNotes.Android.ViewModels
         {
             base.SetCommands();
             ShowSubTasksCommand = new MvxCommand(() => ShowSubTasks = !ShowSubTasks);
+
             DeleteTaskCommand = new MvxCommand(() => Messenger.Publish(new DeleteTaskRequestMsg(this, this)));
+
             ChangeTaskStatusCommand = new MvxCommand(() =>
             {
                 var status = TaskStatus == GoogleTaskStatus.COMPLETED

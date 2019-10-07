@@ -136,6 +136,7 @@
     </Compile>
     <Compile Include="Common\Messages\TaskListSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskListSortOrderChangedMsg.cs" />
+    <Compile Include="Common\Messages\TaskDateUpdatedMsg.cs" />
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskStatusChangedMsg.cs" />
@@ -146,8 +147,9 @@
     <Compile Include="Common\Extensions\ValidationExtensions.cs" />
     <Compile Include="Common\Validators\AddSubTaskDialogViewModelValidator.cs" />
     <Compile Include="Common\Validators\PasswordDialogViewModelValidator.cs" />
+    <Compile Include="Common\Validators\TaskItemViewModelValidator.cs" />
     <Compile Include="Common\Validators\TaskListDialogViewModelValidator.cs" />
-    <Compile Include="Common\Validators\TaskReminderDialogViewModelValidator.cs" />
+    <Compile Include="Common\Validators\TaskDateDialogViewModelValidator.cs" />
     <Compile Include="Controls\TopGravityDrawable.cs" />
     <Compile Include="Common\Converters\ImgPathToBitmapConverter.cs" />
     <Compile Include="Common\Converters\IntToBooleanConverter.cs" />
@@ -173,7 +175,7 @@
     <Compile Include="Models\Parameters\MoveToTaskListDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
-    <Compile Include="Models\Parameters\TaskReminderDialogViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\TaskDateViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TasksViewModelParameter.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\ValidatorFactory.cs" />
@@ -187,7 +189,7 @@
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskMenuOptionsViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\TaskReminderDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\TaskDateDialogViewModel.cs" />
     <Compile Include="ViewModels\GoogleUserViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsAboutViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsGeneralViewModel.cs" />
@@ -237,7 +239,7 @@
     <Compile Include="Views\Activities\SplashActivity.cs" />
     <Compile Include="Views\Fragments\BaseFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\TaskListDialogFragment.cs" />
-    <Compile Include="Views\Fragments\Dialogs\TaskReminderDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\TaskDateDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\TasksMenuOptionsDialogFragment.cs" />
     <Compile Include="Views\Fragments\MenuFragmet.cs" />
     <Compile Include="Views\Fragments\NewTaskFragment.cs" />
@@ -686,7 +688,7 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\TaskReminderDialog.xml">
+    <AndroidResource Include="Resources\layout\TaskDateDialog.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -712,6 +714,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\MoveToTaskListDialogItem.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_subdirectory_arrow_right_black_24dp.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

@@ -221,9 +221,9 @@ namespace MiraiNotes.Android
                         outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(TaskReminderDialogViewModel).FullName}"))
+                            Matching.FromSource($"{typeof(TaskDateDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_taskreminder_dialog_vm_.txt"),
+                        Path.Combine(basePath, "mirai_notes_taskdate_dialog_vm_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))

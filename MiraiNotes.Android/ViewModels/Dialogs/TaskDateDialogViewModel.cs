@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class TaskReminderDialogViewModel : BaseConfirmationDialogViewModel<TaskReminderDialogViewModelParameter, bool>
+    public class TaskDateDialogViewModel : BaseConfirmationDialogViewModel<TaskDateViewModelParameter, bool>
     {
         private string _reminderDate;
         private string _reminderHour;
@@ -31,20 +31,34 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public DateTime MinDate
             => DateTime.Now.AddMinutes(5);
 
-        public string CurrentReminderText
+        public bool IsAReminderDate 
+            => Parameter.DateType == TaskNotificationDateType.REMINDER_DATE;
+
+        public string CurrentContentText
         {
             get
             {
-                if (!Parameter.Task.HasAReminderDate)
-                    return string.Empty;
+                string text = string.Empty;
+                if (!Parameter.Task.HasAReminderDate && !Parameter.Task.HasAToBeCompletedDate)
+                    return text;
+               
+                if (Parameter.DateType == TaskNotificationDateType.REMINDER_DATE &&
+                    Parameter.Task.RemindOn.HasValue)
+                {
+                    string date = Parameter.Task.RemindOn.Value.ToString("f", TextProvider.CurrentCulture);
+                    text = GetText("ReminderDateIsSetTo", date);
+                }
+                else if (Parameter.DateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE && 
+                    Parameter.Task.ToBeCompletedOn.HasValue)
+                {
+                    text = Parameter.Task.FullToBeCompletedOnText;
+                }
 
-                string date = Parameter.Task.RemindOn.Value.ToString("f", TextProvider.CurrentCulture);
-                string text = GetText("ReminderDateIsSetTo", date);
                 return text;
             }
         }
 
-        public string ReminderDateText
+        public string DateText
         {
             get => _reminderDate;
             set
@@ -54,7 +68,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             }
         }
 
-        public string ReminderHourText
+        public string HourText
         {
             get => _reminderHour;
             set
@@ -64,8 +78,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             }
         }
 
-        public string FullReminderText
-            => $"{ReminderDateText} {ReminderHourText}";
+        public string FullText
+            => $"{DateText} {HourText}";
 
         public bool IsSaveButtonEnabled
             => Errors.Count == 0;
@@ -75,10 +89,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             get => _errors;
             set => SetProperty(ref _errors, value);
         }
-        //TODO: SHOULD I ALLOW DELETE / CREATE COMPLETETION DATES IN THIS VIEWMODEL?
-        public IMvxAsyncCommand DeleteCurrentReminderCommand { get; private set; }
 
-        public TaskReminderDialogViewModel(
+        public IMvxAsyncCommand DeleteCurrentMomentCommand { get; private set; }
+
+        public TaskDateDialogViewModel(
             ITextProvider textProvider,
             IMvxMessenger messenger,
             ILogger logger,
@@ -88,27 +102,40 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IValidatorFactory validatorFactory,
             IDialogService dialogService,
             INotificationService notificationService)
-            : base(textProvider, messenger, logger.ForContext<TaskReminderDialogViewModel>(), navigationService, appSettings)
+            : base(textProvider, messenger, logger.ForContext<TaskDateDialogViewModel>(), navigationService, appSettings)
         {
             _dataService = dataService;
-            _validator = validatorFactory.GetValidator<TaskReminderDialogViewModel>();
+            _validator = validatorFactory.GetValidator<TaskDateDialogViewModel>();
             _dialogService = dialogService;
             _notificationService = notificationService;
         }
 
-        public override void Prepare(TaskReminderDialogViewModelParameter parameter)
+        public override void Prepare(TaskDateViewModelParameter parameter)
         {
             base.Prepare(parameter);
-            Title = GetText("Confirmation");
+
+            Title = IsAReminderDate
+                ? GetText("AddEditReminder")
+                : GetText("AddEditCompletitionDate");
             OkText = GetText("Ok");
-            CancelText = GetText("Cancel");
+            CancelText = GetText("Close");
 
-            var date = Parameter.Task.HasAReminderDate
-                ? Parameter.Task.RemindOn.Value.DateTime
-                : MinDate;
+            DateTime date;
+            if (IsAReminderDate)
+            {
+                date = Parameter.Task.HasAReminderDate
+                    ? Parameter.Task.RemindOn.Value.DateTime
+                    : MinDate;
+            }
+            else
+            {
+                date = Parameter.Task.HasAToBeCompletedDate
+                    ? Parameter.Task.ToBeCompletedOn.Value.DateTime
+                    : MinDate;
+            }
 
-            SetReminderDateText(date);
-            SetReminderHourTexxt(date);
+            SetDateText(date);
+            SetHourText(date);
 
             //If this task already had a reminder, we hide the validation msg
             Errors.Clear();
@@ -118,29 +145,45 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public override void SetCommands()
         {
             base.SetCommands();
-            OkCommand = new MvxAsyncCommand(AddReminderDate);
+            OkCommand = new MvxAsyncCommand(async() =>
+            {
+                Validate();
+
+                if (!IsSaveButtonEnabled)
+                    return;
+
+                if (IsAReminderDate)
+                    await AddReminderDate();
+                else
+                    await AddCompletitionDate();
+
+                SendUpdatedDateMsg();
+
+                await NavigationService.Close(this, true);
+            });
             CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
-            DeleteCurrentReminderCommand = new MvxAsyncCommand(() => RemoveNotificationDate(TaskNotificationDateType.REMINDER_DATE));
+            DeleteCurrentMomentCommand = new MvxAsyncCommand(() => RemoveNotificationDate(Parameter.DateType));
         }
 
-        public void SetReminderDateText(DateTime date)
-            => ReminderDateText = date.ToString("D", TextProvider.CurrentCulture);
+        public void SetDateText(DateTime date)
+            => DateText = date.ToString("D", TextProvider.CurrentCulture);
 
-        public void SetReminderHourTexxt(DateTime date)
-            => ReminderHourText = date.ToString("t", TextProvider.CurrentCulture);
+        public void SetHourText(DateTime date)
+            => HourText = date.ToString("t", TextProvider.CurrentCulture);
 
         private async Task AddReminderDate()
         {
-            Validate();
-
-            if (!IsSaveButtonEnabled)
-                return;
-
             Messenger.Publish(new ShowProgressOverlayMsg(this));
 
             var taskList = Parameter.TaskList;
             var task = Parameter.Task;
-            var date = DateTime.Parse(FullReminderText);
+
+            if (task.IsNew)
+            {
+                throw new ArgumentException("A reminder cannot be set to a task that is new");
+            }
+
+            var date = DateTime.Parse(FullText);
             string guid = string.IsNullOrEmpty(task.RemindOnGUID)
                 ? string.Join("", $"{task.GetHashCode()}".Where(c => c != '-'))
                 : task.RemindOnGUID;
@@ -184,7 +227,32 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 : GetText("DatabaseUnknownError");
 
             _dialogService.ShowSnackBar(msg);
-            await NavigationService.Close(this, true);
+        }
+
+        private async Task AddCompletitionDate()
+        {
+            var task = Parameter.Task;
+            var date = DateTime.Parse(DateText);
+            if (!task.IsNew)
+            {
+                var response = await _dataService.TaskService
+                    .AddNotificationDate(task.TaskID, TaskNotificationDateType.TO_BE_COMPLETED_DATE, date, null);
+
+                if (!response.Succeed)
+                {
+                    Logger.Error(
+                        $"{nameof(AddCompletitionDate)} An error occurred while trying to " +
+                        $"update taskId = {task.ID} into db. Error = {response.Message}");
+                }
+                else
+                {
+                    task.ToBeCompletedOn = response.Result.ToBeCompletedOn;
+                }
+            }
+            else
+            {
+                task.ToBeCompletedOn = date;
+            }
         }
 
         private async Task RemoveNotificationDate(TaskNotificationDateType dateType)
@@ -235,8 +303,16 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 }
             }
 
-            await RaisePropertyChanged(() => CurrentReminderText);
+            SendUpdatedDateMsg();
+            await RaisePropertyChanged(() => CurrentContentText);
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
+        }
+
+        private void SendUpdatedDateMsg()
+        {
+            var msg = new TaskDateUpdatedMsg(this, Parameter.Task, IsAReminderDate);
+            if (Parameter.SendUpdateMsg && !Parameter.Task.IsNew)
+                Messenger.Publish(msg);
         }
 
         private void Validate()

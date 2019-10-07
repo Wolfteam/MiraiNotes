@@ -3,7 +3,9 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using MiraiNotes.Android.Controls;
 using MiraiNotes.Android.ViewModels;
+using MvvmCross.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
+using MvvmCross.ViewModels;
 using System.Linq;
 
 namespace MiraiNotes.Android.Views.Fragments
@@ -11,7 +13,24 @@ namespace MiraiNotes.Android.Views.Fragments
     [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame, AddToBackStack = true)]
     public class NewTaskFragment : BaseFragment<NewTaskViewModel>
     {
-        protected override int FragmentId => Resource.Layout.NewTaskView;
+        private IMenu _menu;
+        private IMvxInteraction _onViewModelLoaded;
+
+        public IMvxInteraction OnViewModelLoaded
+        {
+            get => _onViewModelLoaded;
+            set
+            {
+                if (_onViewModelLoaded != null)
+                    _onViewModelLoaded.Requested -= (sender, args) => EnableMenuOptions();
+
+                _onViewModelLoaded = value;
+                _onViewModelLoaded.Requested += (sender, args) => EnableMenuOptions();
+            }
+        }
+
+        protected override int FragmentId
+            => Resource.Layout.NewTaskView;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -25,6 +44,10 @@ namespace MiraiNotes.Android.Views.Fragments
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
             SetActionBarTitle(true);
+
+            var set = this.CreateBindingSet<NewTaskFragment, NewTaskViewModel>();
+            set.Bind(this).For(v => v.OnViewModelLoaded).To(vm => vm.ViewModelLoaded);
+            set.Apply();
 
             //lines below are used to place the icon to the top, otherwise it will appear at the center
             //of the edittext
@@ -47,14 +70,20 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public override void OnPrepareOptionsMenu(IMenu menu)
         {
+            _menu = menu;
             var saveOption = menu.FindItem(Resource.Id.SaveTask);
-            saveOption?.SetTitle(ViewModel.GetText("SaveChanges"));
+            saveOption.SetTitle(ViewModel.GetText("SaveChanges"));
 
             var discardOption = menu.FindItem(Resource.Id.DiscardChanges);
-            discardOption?.SetTitle(ViewModel.GetText("DiscardChanges"));
+            discardOption.SetTitle(ViewModel.GetText("DiscardChanges"));
 
             var deleteOption = menu.FindItem(Resource.Id.DeleteTask);
-            deleteOption?.SetTitle(ViewModel.GetText("Delete"));
+            deleteOption.SetTitle(ViewModel.GetText("Delete"));
+
+            var moveOption = menu.FindItem(Resource.Id.MoveTask);
+            moveOption.SetTitle(ViewModel.GetText("Move"));
+
+            EnableMenuOptions();
 
             base.OnPrepareOptionsMenu(menu);
         }
@@ -72,11 +101,23 @@ namespace MiraiNotes.Android.Views.Fragments
                 case Resource.Id.DeleteTask:
                     ViewModel.DeleteTaskCommand.Execute();
                     break;
+                case Resource.Id.MoveTask:
+                    ViewModel.MoveTaskCommand.Execute();
+                    break;
                 default:
                     return false;
             }
 
             return true;
+        }
+
+        private void EnableMenuOptions()
+        {
+            if (ViewModel.Parameter.IsNewTask)
+            {
+                _menu.RemoveItem(Resource.Id.DeleteTask);
+                _menu.RemoveItem(Resource.Id.MoveTask);
+            }
         }
     }
 }

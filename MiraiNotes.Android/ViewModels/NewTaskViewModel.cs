@@ -1,15 +1,17 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
-using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Extensions;
 using MiraiNotes.Shared.Helpers;
 using MvvmCross;
 using MvvmCross.Commands;
@@ -31,15 +33,23 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly IValidator _validator;
 
         private TaskListItemViewModel _currentTaskList;
         private string _selectedTaskId;
         private bool _showProgressBar;
-        private TaskItemViewModel _task;
+        private TaskItemViewModel _task = Mvx.IoCProvider.Resolve<TaskItemViewModel>();
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
         private TaskListItemViewModel _selectedTaskList;
 
         private ObservableDictionary<string, string> _errors = new ObservableDictionary<string, string>();
+
+        private readonly MvxInteraction _viewModelLoaded = new MvxInteraction();
+        #endregion
+
+        #region Interactors
+        public IMvxInteraction ViewModelLoaded
+            => _viewModelLoaded;
         #endregion
 
         #region Properties
@@ -74,12 +84,16 @@ namespace MiraiNotes.Android.ViewModels
         }
         #endregion
 
-
         #region Commands
         public IMvxAsyncCommand SaveChangesCommand { get; private set; }
         public IMvxAsyncCommand CloseCommand { get; private set; }
         public IMvxAsyncCommand ChangeTaskStatusCommand { get; private set; }
         public IMvxAsyncCommand DeleteTaskCommand { get; private set; }
+        public IMvxAsyncCommand AddReminderCommand { get; private set; }
+        public IMvxAsyncCommand AddSubTaskCommand { get; private set; }
+        public IMvxAsyncCommand<TaskItemViewModel> DeleteSubTaskCommand { get; private set; }
+        public IMvxAsyncCommand MoveTaskCommand { get; private set; }
+        public IMvxAsyncCommand AddCompletitionDateCommand { get; private set; }
         #endregion
 
         public NewTaskViewModel(
@@ -91,19 +105,27 @@ namespace MiraiNotes.Android.ViewModels
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IValidatorFactory validatorFactory)
             : base(textProvider, messenger, logger.ForContext<NewTaskViewModel>(), navigationService, appSettings)
         {
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
             _notificationService = notificationService;
+            _validator = validatorFactory.GetValidator<TaskItemViewModel>();
         }
 
         public override void Prepare(NewTaskViewModelParameter parameter)
         {
+            base.Prepare(parameter);
+
             _currentTaskList = parameter.TaskList;
             _selectedTaskId = parameter.TaskId;
+
+            Title = string.IsNullOrEmpty(_selectedTaskId)
+                ? GetText("NewTask")
+                : GetText("UpdateTask");
         }
 
         public override async Task Initialize()
@@ -113,15 +135,6 @@ namespace MiraiNotes.Android.ViewModels
             await LoadTaskLists();
 
             await InitView(_selectedTaskId);
-        }
-
-        public override void ViewAppeared()
-        {
-            Title = string.IsNullOrEmpty(_selectedTaskId)
-                ? GetText("NewTask")
-                : GetText("UpdateTask");
-
-            base.ViewAppeared();
         }
 
         public override void SetCommands()
@@ -155,8 +168,35 @@ namespace MiraiNotes.Android.ViewModels
 
                 await NavigationService
                     .Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(Task);
-                
+
                 ShowProgressBar = false;
+            });
+
+            AddReminderCommand = new MvxAsyncCommand(async () =>
+            {
+                var parameter = TaskDateViewModelParameter.Instance(_currentTaskList, Task, TaskNotificationDateType.REMINDER_DATE, true);
+                await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, bool>(parameter);
+            });
+
+            AddSubTaskCommand = new MvxAsyncCommand(async () =>
+            {
+                var parameter = AddSubTaskDialogViewModelParameter.Instance(_currentTaskList.Id, Task);
+                await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, bool>(parameter);
+            });
+
+            DeleteSubTaskCommand = new MvxAsyncCommand<TaskItemViewModel>(subTask =>
+                NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(subTask));
+
+            MoveTaskCommand = new MvxAsyncCommand(async () =>
+            {
+                var parameter = MoveToTaskListDialogViewModelParameter.Instance(_currentTaskList, Task);
+                await NavigationService.Navigate<MoveToTaskListDialogViewModel, MoveToTaskListDialogViewModelParameter, bool>(parameter);
+            });
+
+            AddCompletitionDateCommand = new MvxAsyncCommand(async () =>
+            {
+                var parameter = TaskDateViewModelParameter.Instance(_currentTaskList, Task, TaskNotificationDateType.TO_BE_COMPLETED_DATE, true);
+                await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, bool>(parameter);
             });
         }
 
@@ -165,7 +205,8 @@ namespace MiraiNotes.Android.ViewModels
             base.RegisterMessages();
             var tokens = new[]
             {
-                Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged)
+                Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
+                Messenger.Subscribe<TaskDeletedMsg>(async msg => await OnTaskDeleted(msg.TaskId, msg.HasParentTask))
             };
 
             SubscriptionTokens.AddRange(tokens);
@@ -201,40 +242,35 @@ namespace MiraiNotes.Android.ViewModels
 
         public async Task InitView(string taskId)
         {
-            //MinDate = DateTimeOffset.Now;
+            if (string.IsNullOrEmpty(taskId))
+                return;
 
             ShowProgressBar = true;
-            if (string.IsNullOrEmpty(taskId))
+
+            var ta = await _dataService
+                .TaskService
+                .FirstOrDefaultAsNoTrackingAsync(x => x.GoogleTaskID == taskId);
+
+            var sts = await _dataService
+                .TaskService
+                .GetAsNoTrackingAsync(
+                    st => st.ParentTask == taskId,
+                    st => st.OrderBy(x => x.Position));
+
+            if (!ta.Succeed || !sts.Succeed)
             {
-                Task = Mvx.IoCProvider.Resolve<TaskItemViewModel>();
+                ShowProgressBar = false;
+
+                Logger.Error(
+                    $"{nameof(InitView)}: An error occurred while trying to retrieve taskId = {taskId}. " +
+                    $"Error = {ta.Message} {sts.Message}");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
+                return;
             }
-            else
-            {
-                var ta = await _dataService
-                    .TaskService
-                    .FirstOrDefaultAsNoTrackingAsync(x => x.GoogleTaskID == taskId);
 
-                var sts = await _dataService
-                    .TaskService
-                    .GetAsNoTrackingAsync(
-                        st => st.ParentTask == taskId,
-                        st => st.OrderBy(x => x.Position));
-
-                if (!ta.Succeed || !sts.Succeed)
-                {
-                    ShowProgressBar = false;
-
-                    Logger.Error(
-                        $"{nameof(InitView)}: An error occurred while trying to retrieve taskId = {taskId}. " +
-                        $"Error = {ta.Message} {sts.Message}");
-                    _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                    return;
-                }
-
-                var t = _mapper.Map<TaskItemViewModel>(ta.Result);
-                t.SubTasks = _mapper.Map<MvxObservableCollection<TaskItemViewModel>>(sts.Result);
-                Task = t;
-            }
+            var t = _mapper.Map<TaskItemViewModel>(ta.Result);
+            t.SubTasks = _mapper.Map<MvxObservableCollection<TaskItemViewModel>>(sts.Result);
+            Task = t;
 
             ShowProgressBar = false;
         }
@@ -242,6 +278,11 @@ namespace MiraiNotes.Android.ViewModels
         private async Task SaveChanges()
         {
             bool isNewTask = Task.IsNew;
+
+            Validate();
+
+            if (Errors.Any())
+                return;
 
             if (SelectedTaskList?.Id == null || _currentTaskList?.Id == null)
             {
@@ -252,16 +293,6 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
-            if (Task.RemindOn.HasValue)
-            {
-                var minutesDiff = (Task.RemindOn.Value - DateTimeOffset.Now).TotalMinutes;
-                if (minutesDiff < 2)
-                {
-                    _dialogService.ShowSnackBar(GetText("InvalidTaskRemindOn"));
-                    return;
-                }
-            }
-
             //If the task list selected in the combo is not the same as the one in the 
             //navigation view, its because we are trying to save/update a 
             //task into a different task list
@@ -270,13 +301,7 @@ namespace MiraiNotes.Android.ViewModels
             //If we are updating a task but also moving it into a different tasklist
             if (moveToDifferentTaskList && !isNewTask)
             {
-                _dialogService.ShowDialog(
-                    GetText("Confirmation"),
-                    GetText("MoveTaskConfirmation"),
-                    GetText("Yes"),
-                    GetText("No"),
-                    async () => await MoveCurrentTask());
-                return;
+                throw new Exception("Moving an existing task is not possible while saving changes");
             }
 
             GoogleTask entity;
@@ -329,13 +354,7 @@ namespace MiraiNotes.Android.ViewModels
             entity.UpdatedAt = DateTimeOffset.UtcNow;
             entity.ToBeCompletedOn = Task.ToBeCompletedOn;
             entity.RemindOn = Task.RemindOn;
-
-            //If the current task has a reminder date and the entity doesn't have
-            //a reminder guid, we set it up. I do this to avoid replacing the guid
-            if (Task.RemindOn.HasValue && string.IsNullOrEmpty(entity.RemindOnGUID))
-            {
-                entity.RemindOnGUID = string.Join("", $"{entity.GetHashCode()}".Where(c => c != '-'));
-            }
+            entity.RemindOnGUID = Task.RemindOnGUID;
 
             ResponseDto<GoogleTask> response;
             var subTasksToSave = GetSubTasksToSave(isNewTask, moveToDifferentTaskList);
@@ -402,93 +421,9 @@ namespace MiraiNotes.Android.ViewModels
 
             Task.SubTasks = new MvxObservableCollection<TaskItemViewModel>(sts);
 
-            if (Task.RemindOn.HasValue)
-            {
-                string notes = Task.Notes.Length > 15
-                    ? $"{Task.Notes.Substring(0, 15)}...."
-                    : $"{Task.Notes}....";
-
-                int id = int.Parse(response.Result.RemindOnGUID);
-
-                _notificationService.RemoveScheduledNotification(id);
-                _notificationService.ScheduleNotification(new TaskReminderNotification
-                {
-                    Id = id,
-                    TaskListId = _currentTaskList.Id,
-                    TaskId = Task.TaskID,
-                    TaskListTitle = _currentTaskList.Title,
-                    TaskTitle = Task.Title,
-                    TaskBody = notes,
-                    DeliveryOn = Task.RemindOn.Value
-                });
-            }
             Messenger.Publish(new TaskSavedMsg(this, Task.TaskID));
 
             await CloseCommand.ExecuteAsync();
-        }
-
-        private async Task MoveCurrentTask()
-        {
-            ShowProgressBar = true;
-
-            var moveResponse = await _dataService
-                .TaskService
-                .MoveAsync(SelectedTaskList.Id, Task.TaskID, null, null);
-
-            if (!moveResponse.Succeed)
-            {
-                ShowProgressBar = false;
-                Logger.Error(
-                    $"{nameof(MoveCurrentTask)}: An error occurred while trying to move the " +
-                    $"selected task from {_currentTaskList.Title} to {SelectedTaskList.Title}." +
-                    $"Error = {moveResponse.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-
-            Messenger.Publish(new TaskDeletedMsg(this, Task.TaskID, Task.ParentTask));
-
-            var subTasks = GetSubTasksToSave(false, true);
-
-            subTasks.ForEach(st => st.ParentTask = moveResponse.Result.GoogleTaskID);
-
-            ShowProgressBar = false;
-
-            await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
-
-            _dialogService.ShowSnackBar(GetText("TaskWasMoved", _currentTaskList.Title, SelectedTaskList.Title));
-
-            //TODO: SHOULD I DO SOMETHING HERE WHEN MOVING THE TASK ?
-            await CloseCommand.ExecuteAsync();
-        }
-
-        private async Task DeleteSubTask(TaskItemViewModel subTask)
-        {
-            if (subTask.IsNew)
-            {
-                Task.SubTasks?.Remove(subTask);
-                return;
-            }
-
-            ShowProgressBar = true;
-
-            var deleteResponse = await _dataService
-                .TaskService
-                .RemoveTaskAsync(subTask.TaskID);
-
-            ShowProgressBar = false;
-            if (!deleteResponse.Succeed)
-            {
-                Logger.Error(
-                    $"{nameof(DeleteSubTask)}: An error occurred while trying to delete the selected sub task" +
-                    $"Error = {deleteResponse.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-
-            Task.SubTasks?.Remove(subTask);
-
-            Messenger.Publish(new TaskDeletedMsg(this, Task.TaskID, subTask.TaskID));
         }
 
         private async Task RemoveTaskNotificationDate(TaskNotificationDateType dateType)
@@ -640,8 +575,8 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!msg.HasParentTask)
             {
-                taskFound = Task?.TaskID == msg.TaskId 
-                    ? Task 
+                taskFound = Task?.TaskID == msg.TaskId
+                    ? Task
                     : null;
             }
             else
@@ -657,6 +592,26 @@ namespace MiraiNotes.Android.ViewModels
             taskFound.CompletedOn = msg.CompletedOn;
             taskFound.UpdatedAt = msg.UpdatedAt;
             taskFound.Status = msg.NewStatus;
+        }
+
+        private async Task OnTaskDeleted(string taskId, bool hasParentTask)
+        {
+            //if the deleted task isnt a sub task, just return
+            if (!hasParentTask)
+            {
+                await NavigationService.Close(this);
+                return;
+            }
+
+            Task.SubTasks.RemoveAll(st => st.TaskID == taskId);
+        }
+
+        private void Validate()
+        {
+            Errors.Clear();
+            var validationResult = _validator.Validate(Task);
+            Errors.AddRange(validationResult.ToDictionary());
+            //RaisePropertyChanged(() => IsSaveButtonEnabled);
         }
     }
 }

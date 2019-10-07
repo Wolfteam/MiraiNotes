@@ -7,6 +7,8 @@ namespace MiraiNotes.Android.Models.Parameters
     {
         public TaskListItemViewModel TaskList { get; }
         public string TaskId { get; }
+        public bool IsNewTask
+            => string.IsNullOrEmpty(TaskId);
 
         private NewTaskViewModelParameter(TaskListItemViewModel taskList, string taskId)
         {
