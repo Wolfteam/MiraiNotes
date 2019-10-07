@@ -1,22 +1,23 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using FluentValidation;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Shared.Helpers;
+using MvvmCross;
+using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MiraiNotes.Shared.Helpers;
-using MiraiNotes.Android.Models.Parameters;
-using AutoMapper;
-using MvvmCross.Commands;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
@@ -82,38 +83,53 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             if (!IsSaveButtonEnabled)
                 return;
 
-            Messenger.Publish(new ShowProgressOverlayMsg(this));
             var task = Parameter.Task;
-            var lastStId = task.SubTasks.OrderBy(st => st.Position).LastOrDefault()?.TaskID;
-            var now = DateTimeOffset.UtcNow;
-            var entity = new GoogleTask
-            {
-                CreatedAt = now,
-                GoogleTaskID = Guid.NewGuid().ToString(),
-                LocalStatus = LocalStatus.CREATED,
-                ParentTask = task.TaskID,
-                Position = lastStId,
-                Status = GoogleTaskStatus.NEEDS_ACTION.GetString(),
-                Title = SubTaskTitle.Trim(),
-                ToBeSynced = true,
-                UpdatedAt = now
-            };
 
-            var response = await _dataService
-                .TaskService
-                .AddAsync(Parameter.TaskListId, entity);
-
-            Messenger.Publish(new ShowProgressOverlayMsg(this, false));
-            if (response.Succeed)
+            if (task.IsNew)
             {
-                task.SubTasks.Add(_mapper.Map<TaskItemViewModel>(response.Result));
+                var subTask = Mvx.IoCProvider.Resolve<TaskItemViewModel>();
+                subTask.Title = SubTaskTitle.Trim();
+                subTask.Status = GoogleTaskStatus.NEEDS_ACTION.GetString();
+                task.SubTasks.Add(subTask);
                 await NavigationService.Close(this, true);
             }
             else
             {
-                Logger.Error($"An unknown error occurred while trying to save the subtask. Error = {response.Message}");
-                _dialogService.ShowErrorToast(TextProvider.Get("DatabaseUnknownError"));
+                Messenger.Publish(new ShowProgressOverlayMsg(this));
+                var lastStId = task.SubTasks.OrderBy(st => st.Position).LastOrDefault()?.TaskID;
+                var now = DateTimeOffset.UtcNow;
+                var entity = new GoogleTask
+                {
+                    CreatedAt = now,
+                    GoogleTaskID = Guid.NewGuid().ToString(),
+                    LocalStatus = LocalStatus.CREATED,
+                    ParentTask = task.TaskID,
+                    Position = lastStId,
+                    Status = GoogleTaskStatus.NEEDS_ACTION.GetString(),
+                    Title = SubTaskTitle.Trim(),
+                    ToBeSynced = true,
+                    UpdatedAt = now
+                };
+
+                var response = await _dataService
+                    .TaskService
+                    .AddAsync(Parameter.TaskListId, entity);
+
+                Messenger.Publish(new ShowProgressOverlayMsg(this, false));
+                if (response.Succeed)
+                {
+                    task.SubTasks.Add(_mapper.Map<TaskItemViewModel>(response.Result));
+                    await NavigationService.Close(this, true);
+                }
+                else
+                {
+                    Logger.Error($"An unknown error occurred while trying to save the subtask. Error = {response.Message}");
+                    _dialogService.ShowErrorToast(TextProvider.Get("DatabaseUnknownError"));
+                }
             }
+
+            if (!task.HasSubTasks && task.SubTasks.Any())
+                task.HasSubTasks = true;
         }
 
         private void Validate()

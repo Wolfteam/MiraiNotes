@@ -1,5 +1,4 @@
-﻿using MiraiNotes.Core.Enums;
-using MvvmCross.Plugin.Messenger;
+﻿using MvvmCross.Plugin.Messenger;
 using System;
 
 namespace MiraiNotes.Android.Common.Messages

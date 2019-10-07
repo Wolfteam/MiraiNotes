@@ -89,6 +89,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             InitParams = parameter.NotificationAction;
             _currentTaskList = parameter.TaskList;
+            Title = GetText("Tasks");
         }
 
         public override async Task Initialize()
@@ -96,12 +97,6 @@ namespace MiraiNotes.Android.ViewModels
             await base.Initialize();
 
             await InitView(_currentTaskList);
-        }
-
-        public override void ViewAppeared()
-        {
-            Title = GetText("Tasks");
-            base.ViewAppeared();
         }
 
         public override void SetCommands()
@@ -129,6 +124,7 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder)),
                 Messenger.Subscribe<DeleteTaskRequestMsg>(async msg => await DeleteTask(msg.Task)),
                 Messenger.Subscribe<ChangeTaskStatusRequestMsg>(async msg => await ChangeTaskStatus(msg.Task, msg.NewStatus)),
+                Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate))
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -284,6 +280,36 @@ namespace MiraiNotes.Android.ViewModels
                 {
                     Tasks.Add(task);
                 }
+            }
+        }
+
+        public void OnTaskDateUpdated(TaskItemViewModel task, bool isAReminderDate)
+        {
+            TaskItemViewModel updatedTask = null;
+
+            if (!task.HasParentTask)
+            {
+                updatedTask = Tasks.FirstOrDefault(t => t.TaskID == task.TaskID);
+            }
+            else
+            {
+                Tasks
+                    .FirstOrDefault(t => t.TaskID == task.ParentTask)?
+                    .SubTasks?
+                    .FirstOrDefault(st => st.TaskID == task.TaskID);
+            }
+
+            if (updatedTask is null)
+                return;
+
+            if (isAReminderDate)
+            {
+                updatedTask.RemindOn = task.RemindOn;
+                updatedTask.RemindOnGUID = task.RemindOnGUID;
+            }
+            else
+            {
+                updatedTask.ToBeCompletedOn = task.ToBeCompletedOn;
             }
         }
 

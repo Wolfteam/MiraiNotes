@@ -33,7 +33,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             base.Prepare(parameter);
             Title = GetText("Confirmation");
-            ContentText = GetText("DeleteTaskConfirmation");
+            ContentText = GetText("DeleteTaskConfirmation", Parameter.Title);
             OkText = GetText("Yes");
             CancelText = GetText("No");
         }
@@ -47,6 +47,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         private async Task DeleteTask()
         {
+            if (Parameter.HasParentTask && Parameter.IsNew || 
+                Parameter.IsNew)
+            {
+                Messenger.Publish(new TaskDeletedMsg(this, Parameter.TaskID, Parameter.ParentTask));
+                await NavigationService.Close(this, true);
+                return;
+            }
+
             Messenger.Publish(new ShowProgressOverlayMsg(this));
 
             var deleteResponse = await _dataService
