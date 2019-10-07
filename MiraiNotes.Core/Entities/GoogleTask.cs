@@ -1,18 +1,14 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using MiraiNotes.Core.Enums;
+﻿using MiraiNotes.Core.Enums;
+using System;
 
 namespace MiraiNotes.Core.Entities
 {
     public class GoogleTask
     {
-        [Key]
         public int ID { get; set; }
 
-        [Required]
         public string GoogleTaskID { get; set; }
 
-        [Required]
         public string Title { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
@@ -28,7 +24,6 @@ namespace MiraiNotes.Core.Entities
 
         public string Notes { get; set; }
 
-        [Required]
         public string Status { get; set; }
 
         public DateTimeOffset? ToBeCompletedOn { get; set; }
@@ -47,8 +42,7 @@ namespace MiraiNotes.Core.Entities
 
         public string RemindOnGUID { get; set; }
 
-
-        [Required]
-        public virtual GoogleTaskList TaskList { get; set; }
+        public int TaskListID { get; set; }
+        public GoogleTaskList TaskList { get; set; }
     }
 }

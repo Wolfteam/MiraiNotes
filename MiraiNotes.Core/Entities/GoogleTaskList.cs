@@ -1,19 +1,15 @@
-﻿using System;
+﻿using MiraiNotes.Core.Enums;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.Core.Entities
 {
     public class GoogleTaskList
     {
-        [Key]
         public int ID { get; set; }
 
-        [Required]
         public string GoogleTaskListID { get; set; }
 
-        [Required]
         public string Title { get; set; }
 
         //[Required]
@@ -26,9 +22,9 @@ namespace MiraiNotes.Core.Entities
 
         public bool ToBeSynced { get; set; }
 
-        public virtual IEnumerable<GoogleTask> Tasks { get; set; }
+        public IEnumerable<GoogleTask> Tasks { get; set; } = new List<GoogleTask>();
 
-        [Required]
-        public virtual GoogleUser User { get; set; }
+        public int UserID { get; set; }
+        public GoogleUser User { get; set; }
     }
 }
