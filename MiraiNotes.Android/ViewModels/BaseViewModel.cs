@@ -105,7 +105,7 @@ namespace MiraiNotes.Android.ViewModels
             => AppSettings.AppLanguage;
         public string this[string key]
             => TextProvider.GetText(string.Empty, string.Empty, key);
-
+        public TParameter Parameter { get; private set; }
 
         /// <summary>
         /// This one is to set the apptollbar title
@@ -149,6 +149,11 @@ namespace MiraiNotes.Android.ViewModels
         public string GetText(string key, params string[] args)
             => TextProvider.GetText(string.Empty, string.Empty, key, args);
 
+        public override void Prepare(TParameter parameter)
+        {
+            Parameter = parameter;
+        }
+
         public override void ViewDestroy(bool viewFinishing = true)
         {
             base.ViewDestroy(viewFinishing);
@@ -181,6 +186,8 @@ namespace MiraiNotes.Android.ViewModels
             => AppSettings.AppLanguage;
         public string this[string key]
             => TextProvider.GetText(string.Empty, string.Empty, key);
+        public TParameter Parameter { get; private set; }
+
 
         /// <summary>
         /// This one is to set the apptollbar title
@@ -224,6 +231,11 @@ namespace MiraiNotes.Android.ViewModels
 
         public string GetText(string key, params string[] args)
             => TextProvider.GetText(string.Empty, string.Empty, key, args);
+
+        public override void Prepare(TParameter parameter)
+        {
+            Parameter = parameter;
+        }
 
         public override void ViewDestroy(bool viewFinishing = true)
         {

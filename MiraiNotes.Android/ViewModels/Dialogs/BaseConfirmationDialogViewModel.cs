@@ -1,4 +1,5 @@
 ﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
@@ -13,8 +14,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private string _contentText;
         private string _okText;
         private string _cancelText;
-
-        public TParameter Parameter { get; private set; }
 
         public string ContentText
         {
@@ -48,9 +47,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
         }
 
-        public override void Prepare(TParameter parameter)
+        public override void ViewDestroy(bool viewFinishing = true)
         {
-            Parameter = parameter;
+            Messenger.Publish(new HideKeyboardMsg(this));
+            base.ViewDestroy(viewFinishing);
         }
     }
 }
