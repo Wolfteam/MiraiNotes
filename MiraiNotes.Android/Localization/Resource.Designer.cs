@@ -124,6 +124,33 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add a completition date.
+        /// </summary>
+        public static string AddCompletitionDate {
+            get {
+                return ResourceManager.GetString("AddCompletitionDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add / Edit completition date.
+        /// </summary>
+        public static string AddEditCompletitionDate {
+            get {
+                return ResourceManager.GetString("AddEditCompletitionDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add / Edit a reminder.
+        /// </summary>
+        public static string AddEditReminder {
+            get {
+                return ResourceManager.GetString("AddEditReminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add a reminder.
         /// </summary>
         public static string AddReminder {
@@ -358,7 +385,7 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you wanna delete this task ?.
+        ///   Looks up a localized string similar to Are you sure you wanna delete &apos;{0}&apos; ?.
         /// </summary>
         public static string DeleteTaskConfirmation {
             get {
@@ -547,6 +574,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Move.
+        /// </summary>
+        public static string Move {
+            get {
+                return ResourceManager.GetString("Move", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Since you are moving an existing task to a different task list, any change made here that is not saved will be lost. Do you want to continue ?.
         /// </summary>
         public static string MoveTaskConfirmation {
@@ -642,6 +678,24 @@ namespace MiraiNotes.Android.Localization {
         public static string Notes {
             get {
                 return ResourceManager.GetString("Notes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notes cannot be empty.
+        /// </summary>
+        public static string NotesCannotBeEmpty {
+            get {
+                return ResourceManager.GetString("NotesCannotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notes cannot have more than {0} characters.
+        /// </summary>
+        public static string NotesMaxLength {
+            get {
+                return ResourceManager.GetString("NotesMaxLength", resourceCulture);
             }
         }
         
@@ -1119,6 +1173,33 @@ namespace MiraiNotes.Android.Localization {
         public static string TitleMaxLength {
             get {
                 return ResourceManager.GetString("TitleMaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This task is marked to be completed on {0}.
+        /// </summary>
+        public static string ToBeCompletedOnA {
+            get {
+                return ResourceManager.GetString("ToBeCompletedOnA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This task is marked to be completed {0}.
+        /// </summary>
+        public static string ToBeCompletedOnB {
+            get {
+                return ResourceManager.GetString("ToBeCompletedOnB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This task was marked to be completed on {0}.
+        /// </summary>
+        public static string ToBeCompletedOnC {
+            get {
+                return ResourceManager.GetString("ToBeCompletedOnC", resourceCulture);
             }
         }
         

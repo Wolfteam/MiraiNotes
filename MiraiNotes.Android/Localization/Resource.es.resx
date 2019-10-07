@@ -310,7 +310,7 @@
     <value>¿ Estás seguro que deseas cerrar sesión ?</value>
   </data>
   <data name="DeleteTaskConfirmation" xml:space="preserve">
-    <value>¿ Estás seguro que quieres borrar esta tarea ?</value>
+    <value>¿ Estás seguro que deseas borrar '{0}' ?</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenido a Mirai Notes</value>
@@ -503,5 +503,32 @@
   </data>
   <data name="MoveTaskConfirmationB" xml:space="preserve">
     <value>¿ Estás seguro que deseas mover '{0}' hacia '{1}' ?</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Mover</value>
+  </data>
+  <data name="AddCompletitionDate" xml:space="preserve">
+    <value>Agregar una fecha de completación</value>
+  </data>
+  <data name="AddEditReminder" xml:space="preserve">
+    <value>Agregar / Editar un recordatorio</value>
+  </data>
+  <data name="AddEditCompletitionDate" xml:space="preserve">
+    <value>Agregar / Editar fecha de completación</value>
+  </data>
+  <data name="ToBeCompletedOnA" xml:space="preserve">
+    <value>Esta tarea esta marcada para completarse el {0}</value>
+  </data>
+  <data name="ToBeCompletedOnB" xml:space="preserve">
+    <value>Esta tarea esta marcada para completarse {0}</value>
+  </data>
+  <data name="ToBeCompletedOnC" xml:space="preserve">
+    <value>Esta tarea estaba marcada para ser completada el {0}</value>
+  </data>
+  <data name="NotesCannotBeEmpty" xml:space="preserve">
+    <value>Las notas no pueden estar vacías</value>
+  </data>
+  <data name="NotesMaxLength" xml:space="preserve">
+    <value>Las notas no puede contener mas de {0} caracteres</value>
   </data>
 </root>
