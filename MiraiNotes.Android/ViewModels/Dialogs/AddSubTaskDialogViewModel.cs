@@ -56,11 +56,12 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ILogger logger,
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
+            ITelemetryService telemetryService,
             IValidatorFactory validatorFactory,
             IMiraiNotesDataService dataService,
             IDialogService dialogService,
             IMapper mapper)
-            : base(textProvider, messenger, logger.ForContext<AddSubTaskDialogViewModel>(), navigationService, appSettings)
+            : base(textProvider, messenger, logger.ForContext<AddSubTaskDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _validator = validatorFactory.GetValidator<AddSubTaskDialogViewModel>();
             _dataService = dataService;

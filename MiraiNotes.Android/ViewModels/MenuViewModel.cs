@@ -83,8 +83,9 @@ namespace MiraiNotes.Android.ViewModels
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            IBackgroundTaskManagerService backgroundTaskManager)
-            : base(textProvider, messenger, logger.ForContext<MenuViewModel>(), navigationService, appSettings)
+            IBackgroundTaskManagerService backgroundTaskManager,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<MenuViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;
@@ -145,16 +146,7 @@ namespace MiraiNotes.Android.ViewModels
                     AppSettings.SelectedTaskListId = SelectedTaskList.Id;
                     _onTaskListsLoaded.Raise();
                 }),
-                Messenger.Subscribe<RefreshNumberOfTasksMsg>(msg =>
-                {
-                    if (msg.WasAdded)
-                        SelectedTaskList.NumberOfTasks +=1;
-                    else
-                        SelectedTaskList.NumberOfTasks -=1;
-
-                    int position = TaskLists.IndexOf(SelectedTaskList);
-                    _refreshNumberOfTasks.Raise(position);
-                }),
+                Messenger.Subscribe<RefreshNumberOfTasksMsg>(UpdateNumberOfTasks),
                 Messenger.Subscribe<OnFullSyncMsg>(async msg =>
                 {
                     await InitView(true);
@@ -275,6 +267,28 @@ namespace MiraiNotes.Android.ViewModels
                 NavigationService.Navigate<TasksViewModel, TasksViewModelParameter>(parameter)
             };
             await Task.WhenAll(tasks);
+        }
+
+        private void UpdateNumberOfTasks(RefreshNumberOfTasksMsg msg)
+        {
+            if (msg.WasAdded)
+                SelectedTaskList.NumberOfTasks += 1;
+            else
+                SelectedTaskList.NumberOfTasks -= 1;
+
+            int position = TaskLists.IndexOf(SelectedTaskList);
+            _refreshNumberOfTasks.Raise(position);
+
+            if (msg.TaskWasMoved && TaskLists.Any(tl => tl.Id == msg.TaskListId))
+            {
+                var taskList = TaskLists.First(tl => tl.Id == msg.TaskListId);
+                if (msg.WasAdded)
+                    taskList.NumberOfTasks -= 1;
+                else
+                    taskList.NumberOfTasks += 1;
+                int newPosition = TaskLists.IndexOf(taskList);
+                _refreshNumberOfTasks.Raise(newPosition);
+            }
         }
     }
 }

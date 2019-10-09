@@ -64,8 +64,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IAppSettingsService appSettings,
             ISyncService syncService,
             IGoogleApiService googleApiService,
-            IUserCredentialService userCredentialService)
-            : base(textProvider, messenger, logger.ForContext<AccountDialogViewModel>(), navigationService, appSettings)
+            IUserCredentialService userCredentialService,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<AccountDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;

@@ -18,8 +18,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             IMvxMessenger messenger,
             ILogger logger,
             IMvxNavigationService navigationService,
-            IAppSettingsService appSettings)
-            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
+            IAppSettingsService appSettings,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings, telemetryService)
         {
         }
 

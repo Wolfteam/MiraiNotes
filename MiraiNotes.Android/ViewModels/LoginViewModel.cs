@@ -1,3 +1,4 @@
+using Microsoft.AppCenter.Crashes;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Utils;
@@ -73,8 +74,9 @@ namespace MiraiNotes.Android.ViewModels
             IGoogleApiService googleAuthService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService,
-            IFingerprint fingerprint)
-            : base(textProvider, messenger, logger.ForContext<LoginViewModel>(), navigationService, appSettings)
+            IFingerprint fingerprint,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<LoginViewModel>(), navigationService, appSettings, telemetryService)
         {
             _syncService = syncService;
             _userCredentialService = userCredentialService;

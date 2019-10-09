@@ -15,6 +15,7 @@ using MiraiNotes.Android.ViewModels.Settings;
 using MiraiNotes.Android.Views.Fragments.Dialogs;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Helpers;
+using MiraiNotes.Shared.Services;
 using MiraiNotes.Shared.Services.Data;
 using MvvmCross;
 using MvvmCross.IoC;
@@ -22,7 +23,6 @@ using MvvmCross.Platforms.Android;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 using Plugin.Fingerprint;
-using Plugin.Fingerprint.Abstractions;
 using Refit;
 using Serilog;
 using Serilog.Core;
@@ -60,6 +60,7 @@ namespace MiraiNotes.Android
             Mvx.IoCProvider.RegisterType<ISyncService, SyncService>();
             Mvx.IoCProvider.RegisterType<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
             Mvx.IoCProvider.RegisterType<INotificationService, NotificationService>();
+            Mvx.IoCProvider.RegisterType<ITelemetryService, TelemetryService>();
 
             Mvx.IoCProvider.RegisterType(CreateMapper);
 
@@ -73,7 +74,7 @@ namespace MiraiNotes.Android
                 var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
                 return top.Activity;
             });
-            
+
             Mvx.IoCProvider.RegisterType(() => CrossFingerprint.Current);
             CrossFingerprint.SetDialogFragmentType<FingerprintCustomDialogFragment>();
 

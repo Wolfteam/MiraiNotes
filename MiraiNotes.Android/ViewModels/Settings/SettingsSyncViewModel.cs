@@ -112,8 +112,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             ILogger logger,
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
-            IBackgroundTaskManagerService backgroundTaskManager)
-            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
+            IBackgroundTaskManagerService backgroundTaskManager,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings, telemetryService)
         {
             _backgroundTaskManager = backgroundTaskManager;
         }

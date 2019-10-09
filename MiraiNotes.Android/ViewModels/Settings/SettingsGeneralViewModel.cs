@@ -249,8 +249,9 @@ namespace MiraiNotes.Android.ViewModels.Settings
             ILogger logger,
             IAppSettingsService appSettings,
             IFingerprint fingerprint,
-            IDialogService dialogService)
-            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings)
+            IDialogService dialogService,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<SettingsMainViewModel>(), navigationService, appSettings, telemetryService)
         {
             AccentColors = AppConstants.AppAccentColors
                 .Select(hex => hex.ToColor())

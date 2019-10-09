@@ -43,6 +43,9 @@ namespace MiraiNotes.Android.Background
         public class MarkAsCompletedTask : Java.Lang.Thread
         {
             private readonly TaskReminderNotification _notification;
+            
+            private ILogger _logger;
+            private ITelemetryService _telemetryService;
 
             public MarkAsCompletedTask(TaskReminderNotification notification)
             {
@@ -55,7 +58,7 @@ namespace MiraiNotes.Android.Background
 
                 await MarkAsCompleted();
             }
-            //TODO: ADD ALL THE MISSING LOGGERS IN ALL THE VIEW MODELS
+
             public async Task MarkAsCompleted()
             {
                 try
@@ -67,12 +70,16 @@ namespace MiraiNotes.Android.Background
                     }
 
                     var dataService = Mvx.IoCProvider.Resolve<IMiraiNotesDataService>();
-                    var logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<MarkTaskAsCompletedReceiver>();
                     var notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
                     var textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
                     var messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
+                    _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<MarkTaskAsCompletedReceiver>();
+                    _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
 
-                    logger.Information($"Marking taskId = {_notification.TaskId} as completed...");
+                    if (!isAppInForeground)
+                        _telemetryService.Init();
+
+                    _logger.Information($"Marking taskId = {_notification.TaskId} as completed...");
 
                     var response = await dataService.TaskService.ChangeTaskStatusAsync(
                         _notification.TaskId,
@@ -80,7 +87,7 @@ namespace MiraiNotes.Android.Background
 
                     if (response.Succeed)
                     {
-                        logger.Information($"TaskId = {_notification.TaskId} was successfully marked as completed");
+                        _logger.Information($"TaskId = {_notification.TaskId} was successfully marked as completed");
 
                         if (isAppInForeground)
                         {
@@ -97,7 +104,7 @@ namespace MiraiNotes.Android.Background
                     }
                     else
                     {
-                        logger.Error($"TaskId = {_notification.TaskId} couldnt be marked as completed. Error = {response.Message}");
+                        _logger.Error($"TaskId = {_notification.TaskId} couldnt be marked as completed. Error = {response.Message}");
 
                         notificationService.ShowNotification(new TaskNotification
                         {
@@ -106,11 +113,12 @@ namespace MiraiNotes.Android.Background
                         });
                     }
 
-                    logger.Information("Process completed...");
+                    _logger.Information("Process completed...");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //well...
+                    _logger?.Error(e, $"An unknown error occurred while trying to mark taskId = {_notification.Id} as completed");
+                    _telemetryService?.TrackError(e);
                 }
             }
         }

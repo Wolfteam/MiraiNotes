@@ -48,10 +48,11 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ILogger logger,
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
+            ITelemetryService telemetryService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService,
             IMapper mapper)
-            : base(textProvider, messenger, logger.ForContext<MoveToTaskListDialogViewModel>(), navigationService, appSettings)
+            : base(textProvider, messenger, logger.ForContext<MoveToTaskListDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;
             _dialogService = dialogService;

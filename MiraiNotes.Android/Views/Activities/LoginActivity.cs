@@ -48,6 +48,8 @@ namespace MiraiNotes.Android.Views.Activities
             var set = this.CreateBindingSet<LoginActivity, LoginViewModel>();
             set.Bind(this).For(v => v.LoginRequest).To(vm => vm.LoginRequest).OneWay();
             set.Apply();
+
+            ViewModel.TelemetryService.Init();
         }
 
         protected override void OnResume()

@@ -73,8 +73,9 @@ namespace MiraiNotes.Android.ViewModels
             IUserCredentialService userCredentialService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            IBackgroundTaskManagerService backgroundTaskManager)
-            : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings)
+            IBackgroundTaskManagerService backgroundTaskManager,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings, telemetryService)
         {
             _userCredentialService = userCredentialService;
             _dialogService = dialogService;

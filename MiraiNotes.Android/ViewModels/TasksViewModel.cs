@@ -75,8 +75,9 @@ namespace MiraiNotes.Android.ViewModels
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
             IGoogleApiService googleApiService,
-            IUserCredentialService userCredentialService)
-            : base(textProvider, messenger, logger.ForContext<TasksViewModel>(), navigationService, appSettings)
+            IUserCredentialService userCredentialService,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<TasksViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;
@@ -124,7 +125,8 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder)),
                 Messenger.Subscribe<DeleteTaskRequestMsg>(async msg => await DeleteTask(msg.Task)),
                 Messenger.Subscribe<ChangeTaskStatusRequestMsg>(async msg => await ChangeTaskStatus(msg.Task, msg.NewStatus)),
-                Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate))
+                Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate)),
+                Messenger.Subscribe<TaskMovedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask, msg.NewTaskListId))
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -338,8 +340,11 @@ namespace MiraiNotes.Android.ViewModels
         }
 
         public void OnTaskDeleted(string taskId, string parentTask, bool hasParentTask)
+            => OnTaskDeleted(taskId, parentTask, hasParentTask, null);
+
+        public void OnTaskDeleted(string taskId, string parentTask, bool hasParentTask, string taskListId)
         {
-            Messenger.Publish(new RefreshNumberOfTasksMsg(this, false));
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, false, taskListId));
             if (!hasParentTask)
             {
                 Tasks.RemoveAll(t => t.TaskID == taskId);

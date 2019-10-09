@@ -106,8 +106,9 @@ namespace MiraiNotes.Android.ViewModels
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
             INotificationService notificationService,
-            IValidatorFactory validatorFactory)
-            : base(textProvider, messenger, logger.ForContext<NewTaskViewModel>(), navigationService, appSettings)
+            IValidatorFactory validatorFactory,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<NewTaskViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;
@@ -157,9 +158,6 @@ namespace MiraiNotes.Android.ViewModels
                     .Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(Task);
 
                 ShowProgressBar = false;
-
-                if (deleted)
-                    await NavigationService.Close(this);
             });
 
             ChangeTaskStatusCommand = new MvxAsyncCommand(async () =>
@@ -206,7 +204,8 @@ namespace MiraiNotes.Android.ViewModels
             var tokens = new[]
             {
                 Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
-                Messenger.Subscribe<TaskDeletedMsg>(async msg => await OnTaskDeleted(msg.TaskId, msg.HasParentTask))
+                Messenger.Subscribe<TaskDeletedMsg>(async msg => await OnTaskDeleted(msg.TaskId, msg.HasParentTask)),
+                Messenger.Subscribe<TaskMovedMsg>(async msg => await OnTaskDeleted(msg.TaskId, msg.HasParentTask)),
             };
 
             SubscriptionTokens.AddRange(tokens);
@@ -599,7 +598,7 @@ namespace MiraiNotes.Android.ViewModels
             //if the deleted task isnt a sub task, just return
             if (!hasParentTask)
             {
-                await NavigationService.Close(this);
+                await CloseCommand.ExecuteAsync();
                 return;
             }
 

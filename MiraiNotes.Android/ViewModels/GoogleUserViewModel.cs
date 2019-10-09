@@ -76,8 +76,9 @@ namespace MiraiNotes.Android.ViewModels
             ILogger logger,
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
-            IDialogService dialogService)
-            : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings)
+            IDialogService dialogService,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<MainViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dialogService = dialogService;
         }

@@ -76,13 +76,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ITextProvider textProvider,
             IMvxMessenger messenger,
             ILogger logger,
-            IAppSettingsService appSettings,
             IMvxNavigationService navigationService,
+            IAppSettingsService appSettings,
+            ITelemetryService telemetryService,
             IDialogService dialogService,
             IUserCredentialService userCredentialService,
             IMiraiNotesDataService dataService,
             IValidatorFactory validatorFactory)
-            : base(textProvider, messenger, logger.ForContext<PasswordDialogViewModel>(), navigationService, appSettings)
+            : base(textProvider, messenger, logger.ForContext<PasswordDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _credentialService = userCredentialService;
             _dataService = dataService;

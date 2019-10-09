@@ -22,6 +22,8 @@ namespace MiraiNotes.Android.ViewModels
         public ILogger Logger { get; }
         public IMvxNavigationService NavigationService { get; }
         public IAppSettingsService AppSettings { get; }
+        public ITelemetryService TelemetryService { get; }
+
         public AppThemeType CurrentAppTheme
             => AppSettings.AppTheme;
         public string CurrentHexAccentColor
@@ -48,13 +50,15 @@ namespace MiraiNotes.Android.ViewModels
             IMvxMessenger messenger,
             ILogger logger,
             IMvxNavigationService navigationService,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            ITelemetryService telemetryService)
         {
             TextProvider = textProvider;
             Messenger = messenger;
             Logger = logger;
             NavigationService = navigationService;
             AppSettings = appSettings;
+            TelemetryService = telemetryService;
 
             RegisterMessages();
             SetCommands();
@@ -97,6 +101,8 @@ namespace MiraiNotes.Android.ViewModels
         public ILogger Logger { get; }
         public IMvxNavigationService NavigationService { get; }
         public IAppSettingsService AppSettings { get; }
+        public ITelemetryService TelemetryService { get; }
+
         public AppThemeType CurrentAppTheme
             => AppSettings.AppTheme;
         public string CurrentHexAccentColor
@@ -124,13 +130,15 @@ namespace MiraiNotes.Android.ViewModels
             IMvxMessenger messenger,
             ILogger logger,
             IMvxNavigationService navigationService,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            ITelemetryService telemetryService)
         {
             TextProvider = textProvider;
             Messenger = messenger;
             Logger = logger;
             NavigationService = navigationService;
             AppSettings = appSettings;
+            TelemetryService = telemetryService;
 
             RegisterMessages();
             SetCommands();
@@ -178,6 +186,8 @@ namespace MiraiNotes.Android.ViewModels
         public ILogger Logger { get; }
         public IMvxNavigationService NavigationService { get; }
         public IAppSettingsService AppSettings { get; }
+        public ITelemetryService TelemetryService { get; }
+
         public AppThemeType CurrentAppTheme
             => AppSettings.AppTheme;
         public string CurrentHexAccentColor
@@ -206,14 +216,16 @@ namespace MiraiNotes.Android.ViewModels
             IMvxMessenger messenger,
             ILogger logger,
             IMvxNavigationService navigationService,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            ITelemetryService telemetryService)
         {
             TextProvider = textProvider;
             Messenger = messenger;
             Logger = logger;
             NavigationService = navigationService;
             AppSettings = appSettings;
-            
+            TelemetryService = telemetryService;
+
             RegisterMessages();
             SetCommands();
         }

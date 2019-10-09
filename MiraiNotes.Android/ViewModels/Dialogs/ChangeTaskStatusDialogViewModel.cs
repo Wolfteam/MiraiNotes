@@ -22,9 +22,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ILogger logger,
             IMvxNavigationService navigationService,
             IAppSettingsService appSettings,
+            ITelemetryService telemetryService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService)
-            : base(textProvider, messenger, logger.ForContext<ChangeTaskStatusDialogViewModel>(), navigationService, appSettings)
+            : base(textProvider, messenger, logger.ForContext<ChangeTaskStatusDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;
             _dialogService = dialogService;

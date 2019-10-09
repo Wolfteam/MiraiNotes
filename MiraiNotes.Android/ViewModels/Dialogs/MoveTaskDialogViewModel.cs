@@ -24,10 +24,11 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IMvxMessenger messenger,
             ILogger logger,
             IMvxNavigationService navigationService,
+            ITelemetryService telemetryService,
             IAppSettingsService appSettings,
             IMiraiNotesDataService dataService,
             IDialogService dialogService)
-            : base(textProvider, messenger, logger.ForContext<MoveTaskDialogViewModel>(), navigationService, appSettings)
+            : base(textProvider, messenger, logger.ForContext<MoveTaskDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;
             _dialogService = dialogService;
@@ -78,7 +79,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             }
             else
             {
-                Messenger.Publish(new TaskDeletedMsg(this, task.TaskID));
+                Messenger.Publish(new TaskMovedMsg(this, task.TaskID, selectedTaskList.Id, task.ParentTask));
                 _dialogService.ShowSnackBar(GetText("TaskWasMoved", Parameter.CurrentTaskList.Title, selectedTaskList.Title));
             }
 

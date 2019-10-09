@@ -137,6 +137,7 @@
     <Compile Include="Common\Messages\TaskListSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskListSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskDateUpdatedMsg.cs" />
+    <Compile Include="Common\Messages\TaskMovedMsg.cs" />
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
     <Compile Include="Common\Messages\TaskSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskStatusChangedMsg.cs" />
