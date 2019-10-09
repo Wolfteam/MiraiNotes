@@ -92,6 +92,7 @@ namespace MiraiNotes.Android
 
             Mvx.IoCProvider.RegisterType<IGoogleApiService>(() => new GoogleApiService(
                 Mvx.IoCProvider.Resolve<IGoogleApi>(),
+                Mvx.IoCProvider.Resolve<ITelemetryService>(),
                 AppConstants.ClientId,
                 string.Empty,
                 AppConstants.RedirectUrl)

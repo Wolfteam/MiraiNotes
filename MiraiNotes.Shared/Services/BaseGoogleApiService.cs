@@ -14,6 +14,7 @@ namespace MiraiNotes.Shared.Services
     public abstract class BaseGoogleApiService : IGoogleApiService
     {
         private readonly IGoogleApi _googleApi;
+        private readonly ITelemetryService _telemetryService;
         private readonly string _clientId;
         private readonly string _clientSecret;
         private readonly string _redirectUrl;
@@ -31,11 +32,13 @@ namespace MiraiNotes.Shared.Services
 
         public BaseGoogleApiService(
             IGoogleApi googleApi,
+            ITelemetryService telemetryService,
             string clientId,
             string clientSecret,
             string redirectUrl)
         {
             _googleApi = googleApi;
+            _telemetryService = telemetryService;
             _clientId = clientId;
             _clientSecret = clientSecret;
             _redirectUrl = redirectUrl;
@@ -73,7 +76,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception e)
             {
-                response.Message = e.Message;
+                HandleException(e, response);
             }
 
             return response;
@@ -99,7 +102,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception e)
             {
-                response.Message = e.Message;
+                HandleException(e, response);
             }
 
             return response;
@@ -135,7 +138,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception e)
             {
-                response.Message = e.Message;
+                HandleException(e, response);
             }
 
             return response;
@@ -165,7 +168,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -187,7 +190,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -208,7 +211,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -230,7 +233,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -254,7 +257,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -279,7 +282,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -300,7 +303,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -328,7 +331,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -350,7 +353,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -383,7 +386,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -406,7 +409,7 @@ namespace MiraiNotes.Shared.Services
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
+                HandleException(ex, response);
             }
 
             return response;
@@ -416,7 +419,13 @@ namespace MiraiNotes.Shared.Services
 
         #region Helpers
 
-        private static async Task HandleApiException<T>(ApiException apiEx, T response) where T : EmptyResponseDto
+        private void HandleException<T>(Exception ex, T response) where T: EmptyResponseDto
+        {
+            response.Message = ex.Message;
+            _telemetryService.TrackError(ex);
+        }
+
+        private async Task HandleApiException<T>(ApiException apiEx, T response) where T : EmptyResponseDto
         {
             try
             {
@@ -435,6 +444,8 @@ namespace MiraiNotes.Shared.Services
             {
                 response.Message = apiEx.Message;
             }
+
+            _telemetryService.TrackError(apiEx);
         }
 
         private static string GetGoogleError(GoogleResponseErrorModel error)

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using MiraiNotes.Abstractions.GoogleApi;
+using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Dto.Google.Responses;
 using MiraiNotes.Shared.Services;
@@ -9,10 +10,11 @@ namespace MiraiNotes.Android.Services
     public class GoogleApiService : BaseGoogleApiService
     {
         public GoogleApiService(
-            IGoogleApi googleApiService, 
+            IGoogleApi googleApi, 
+            ITelemetryService telemetryService,
             string clientId, 
             string clientSecret, 
-            string redirectUrl) : base(googleApiService, clientId, clientSecret, redirectUrl)
+            string redirectUrl) : base(googleApi, telemetryService, clientId, clientSecret, redirectUrl)
         {
         }
 
