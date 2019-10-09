@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using Serilog;
@@ -14,9 +15,12 @@ namespace MiraiNotes.Shared.Services.Data
     public class TaskListDataService : ITaskListDataService
     {
         private readonly ILogger _logger;
-        public TaskListDataService(ILogger logger)
+        private readonly ITelemetryService _telemetryService;
+
+        public TaskListDataService(ILogger logger, ITelemetryService telemetryService)
         {
             _logger = logger.ForContext<TaskListDataService>();
+            _telemetryService = telemetryService;
         }
 
         public async Task<ResponseDto<GoogleTaskList>> AddAsync(GoogleTaskList entity)
@@ -659,6 +663,8 @@ namespace MiraiNotes.Shared.Services.Data
                 result = $"{e.Message}. Inner Exception: {inner}";
             else
                 result = $"{e.Message}. StackTrace: {e.StackTrace}";
+            
+            _telemetryService.TrackError(e);
             return result;
         }
     }

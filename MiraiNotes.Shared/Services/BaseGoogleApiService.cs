@@ -13,7 +13,7 @@ namespace MiraiNotes.Shared.Services
 {
     public abstract class BaseGoogleApiService : IGoogleApiService
     {
-        private readonly IGoogleApi _googleApiService;
+        private readonly IGoogleApi _googleApi;
         private readonly string _clientId;
         private readonly string _clientSecret;
         private readonly string _redirectUrl;
@@ -30,12 +30,12 @@ namespace MiraiNotes.Shared.Services
 
 
         public BaseGoogleApiService(
-            IGoogleApi googleApiService,
+            IGoogleApi googleApi,
             string clientId,
             string clientSecret,
             string redirectUrl)
         {
-            _googleApiService = googleApiService;
+            _googleApi = googleApi;
             _clientId = clientId;
             _clientSecret = clientSecret;
             _redirectUrl = redirectUrl;
@@ -59,7 +59,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                var tokenResponse = await _googleApiService.GetAccessToken(new TokenRequestDto
+                var tokenResponse = await _googleApi.GetAccessToken(new TokenRequestDto
                 {
                     ClientId = _clientId,
                     ClientSecret = _clientSecret,
@@ -85,7 +85,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                var tokenResponse = await _googleApiService.RenewToken(new RenewTokenRequestDto
+                var tokenResponse = await _googleApi.RenewToken(new RenewTokenRequestDto
                 {
                     ClientId = _clientId,
                     ClientSecret = _clientSecret,
@@ -117,7 +117,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                response.Result = await _googleApiService.GetUserInfo();
+                response.Result = await _googleApi.GetUserInfo();
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -154,8 +154,8 @@ namespace MiraiNotes.Shared.Services
             try
             {
                 response.Result = string.IsNullOrEmpty(pageToken)
-                    ? await _googleApiService.GetAllTaskLists(maxResults)
-                    : await _googleApiService.GetAllTaskLists(pageToken, maxResults);
+                    ? await _googleApi.GetAllTaskLists(maxResults)
+                    : await _googleApi.GetAllTaskLists(pageToken, maxResults);
 
                 response.Succeed = true;
             }
@@ -178,7 +178,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                response.Result = await _googleApiService.GetTaskList(taskListId);
+                response.Result = await _googleApi.GetTaskList(taskListId);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -199,7 +199,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                await _googleApiService.DeleteTaskList(taskListId);
+                await _googleApi.DeleteTaskList(taskListId);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -220,7 +220,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                var googleResponse = await _googleApiService.SaveTaskList(taskList);
+                var googleResponse = await _googleApi.SaveTaskList(taskList);
                 response.Succeed = true;
                 response.Result = googleResponse;
             }
@@ -244,7 +244,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                var googleResponse = await _googleApiService.UpdateTaskList(taskListId, taskList);
+                var googleResponse = await _googleApi.UpdateTaskList(taskListId, taskList);
                 response.Succeed = true;
                 response.Result = googleResponse;
             }
@@ -270,7 +270,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                await _googleApiService.ClearTasks(taskListId);
+                await _googleApi.ClearTasks(taskListId);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -291,7 +291,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                await _googleApiService.DeleteTask(taskListId, taskId);
+                await _googleApi.DeleteTask(taskListId, taskId);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -317,9 +317,9 @@ namespace MiraiNotes.Shared.Services
             try
             {
                 if (!string.IsNullOrEmpty(pageToken))
-                    response.Result = await _googleApiService.GetAllTasks(taskListId, pageToken, maxResults, showHidden);
+                    response.Result = await _googleApi.GetAllTasks(taskListId, pageToken, maxResults, showHidden);
                 else
-                    response.Result = await _googleApiService.GetAllTasks(taskListId, maxResults, showHidden);
+                    response.Result = await _googleApi.GetAllTasks(taskListId, maxResults, showHidden);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -341,7 +341,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                response.Result = await _googleApiService.GetTask(taskListId, taskId);
+                response.Result = await _googleApi.GetTask(taskListId, taskId);
                 response.Succeed = true;
             }
             catch (ApiException apiEx)
@@ -367,13 +367,13 @@ namespace MiraiNotes.Shared.Services
             try
             {
                 if (!string.IsNullOrEmpty(parent) && !string.IsNullOrEmpty(previous))
-                    response.Result = await _googleApiService.SaveTask(taskListId, task, parent, previous);
+                    response.Result = await _googleApi.SaveTask(taskListId, task, parent, previous);
                 else if (!string.IsNullOrEmpty(parent))
-                    response.Result = await _googleApiService.SaveTask(taskListId, task, parent);
+                    response.Result = await _googleApi.SaveTask(taskListId, task, parent);
                 else if (!string.IsNullOrEmpty(previous))
                     throw new NotImplementedException("I think that if you have a previous valid you need a parent one");
                 else
-                    response.Result = await _googleApiService.SaveTask(taskListId, task);
+                    response.Result = await _googleApi.SaveTask(taskListId, task);
 
                 response.Succeed = true;
             }
@@ -396,7 +396,7 @@ namespace MiraiNotes.Shared.Services
 
             try
             {
-                var googleResponse = await _googleApiService.UpdateTask(taskListId, taskId, task);
+                var googleResponse = await _googleApi.UpdateTask(taskListId, taskId, task);
                 response.Succeed = true;
                 response.Result = googleResponse;
             }
