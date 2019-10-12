@@ -184,7 +184,9 @@
     <Compile Include="ViewModels\Dialogs\AddSubTaskDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BaseConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ChangeTaskStatusDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\DeleteAccountDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\DeleteTaskDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\LogoutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\MoveTaskDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\MoveToTaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
@@ -204,8 +206,10 @@
     <Compile Include="Views\Fragments\Dialogs\AddSubTaskDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\BaseDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\ChangeTaskStatusFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\DeleteAccountDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\DeleteTaskFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\FingerprintCustomDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\LogoutDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\MoveTaskDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\MoveToTaskListDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\PasswordDialogFragment.cs" />

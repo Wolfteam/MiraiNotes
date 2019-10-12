@@ -125,6 +125,7 @@ namespace MiraiNotes.Android
             //i can use .txt or .json
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
+                //data services
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
                         Matching.FromSource($"{typeof(TaskListDataService).FullName}"))
@@ -149,6 +150,7 @@ namespace MiraiNotes.Android
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
+                //view models
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(AccountDialogViewModel).FullName}"))
@@ -231,6 +233,22 @@ namespace MiraiNotes.Android
                         outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(DeleteAccountDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_deleteaccount_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(LogoutDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_logout_dialog_vm_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(SettingsMainViewModel).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "mirai_notes_settings_main_vm_.txt"),
@@ -285,6 +303,7 @@ namespace MiraiNotes.Android
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
+                //others
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(AuthenticatedHttpClientHandler).FullName}"))

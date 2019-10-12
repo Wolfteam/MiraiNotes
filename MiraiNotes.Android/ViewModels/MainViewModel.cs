@@ -59,7 +59,7 @@ namespace MiraiNotes.Android.ViewModels
         #region Commands
         public IMvxAsyncCommand OnSettingsSelectedCommand { get; private set; }
         public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
-        public IMvxCommand LogoutCommand { get; private set; }
+        public IMvxAsyncCommand LogoutCommand { get; private set; }
         public IMvxAsyncCommand InitViewCommand { get; private set; }
         public IMvxCommand SyncCommand { get; private set; }
         #endregion
@@ -89,14 +89,12 @@ namespace MiraiNotes.Android.ViewModels
             OnSettingsSelectedCommand = new MvxAsyncCommand(
                 async () => await NavigationService.Navigate<SettingsMainViewModel>());
             OnAccountsSelectedCommand = new MvxAsyncCommand(OnAccountsSelected);
-            LogoutCommand = new MvxCommand(() =>
+            LogoutCommand = new MvxAsyncCommand(async() =>
             {
-                _dialogService.ShowDialog(
-                    GetText("Confirmation"),
-                    GetText("WannaLogOut"),
-                    GetText("Yes"),
-                    GetText("No"),
-                    async () => await Logout());
+                bool logout = await NavigationService.Navigate<LogoutDialogViewModel, bool?, bool>(null);
+
+                if (logout)
+                    await Logout();
             });
             InitViewCommand = new MvxAsyncCommand(() =>
             {

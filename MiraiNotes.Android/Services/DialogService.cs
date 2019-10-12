@@ -78,26 +78,6 @@ namespace MiraiNotes.Android.Services
             snackbar.Show();
         }
 
-        public void ShowDialog(
-            string title,
-            string msg,
-            string yesButtonText,
-            string cancelButtonText,
-            Action onOk = null,
-            Action onCancel = null)
-        {
-            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-
-            var dialog = new AlertDialog.Builder(top.Activity)
-                .SetMessage(msg)
-                .SetTitle(title)
-                .SetPositiveButton(yesButtonText, (sender, args) => onOk?.Invoke())
-                .SetNegativeButton(cancelButtonText, (sender, args) => onCancel?.Invoke())
-                .Create();
-
-            dialog.Show();
-        }
-
         private static int GetToastLength(bool longToast)
             => longToast
                 ? (int)ToastLength.Long
