@@ -1,4 +1,7 @@
 <resources>
+  <!--In da future when we use androidx we might change to Theme.MaterialComponents instead of using the bridge theme
+    https://github.com/material-components/material-components-android/blob/master/docs/getting-started.md#material-components-themes-->
+
   <!--Splash-->
   <style name="Theme.Splash" parent="Theme.AppCompat.NoActionBar">
     <item name="android:windowBackground">@drawable/splash_centered</item>
@@ -104,11 +107,9 @@
     <item name="android:popupBackground">@color/AppBackgroundDark</item>
   </style>
 
-
-  <!--In da future we might change to Theme.MaterialComponents-->
   <!--AppThemes-->
   <!--Base Themes-->
-  <style name="Theme.MiraiNotes.Dark" parent="Theme.AppCompat.Light">
+  <style name="Theme.MiraiNotes.Dark" parent="Theme.MaterialComponents.Bridge">
     <!--Since we are using a custom app bar, we must explicit set this values-->
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
@@ -142,7 +143,7 @@
     <item name="TextInvertedColor">@color/Black</item>
   </style>
 
-  <style name="Theme.MiraiNotes.Light" parent="Theme.AppCompat.Light">
+  <style name="Theme.MiraiNotes.Light" parent="Theme.MaterialComponents.Light.Bridge">
     <!--Since we are using a custom app bar, we must explicit set this values-->
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
