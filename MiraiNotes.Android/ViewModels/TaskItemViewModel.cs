@@ -1,6 +1,7 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
@@ -301,6 +302,9 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxCommand ShowSubTasksCommand { get; private set; }
         public IMvxCommand DeleteTaskCommand { get; private set; }
         public IMvxCommand ChangeTaskStatusCommand { get; private set; }
+        public IMvxCommand<TaskItemViewModel> SubTaskSelectedCommand { get; private set; }
+        public IMvxAsyncCommand DeleteSubTaskCommand { get; private set; }
+        public IMvxCommand<TaskItemViewModel> ShowMenuOptionsDialogCommand { get; private set; }
         #endregion
 
         public TaskItemViewModel(
@@ -328,6 +332,15 @@ namespace MiraiNotes.Android.ViewModels
                     : GoogleTaskStatus.COMPLETED;
                 Messenger.Publish(new ChangeTaskStatusRequestMsg(this, this, status));
             });
+
+            SubTaskSelectedCommand = new MvxCommand<TaskItemViewModel>(
+                (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask)));
+
+            DeleteSubTaskCommand = new MvxAsyncCommand(() =>
+                NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(this));
+
+            ShowMenuOptionsDialogCommand = new MvxCommand<TaskItemViewModel>(
+                (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask, true)));
         }
     }
 }

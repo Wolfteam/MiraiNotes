@@ -92,6 +92,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 subTask.Title = SubTaskTitle.Trim();
                 subTask.Status = GoogleTaskStatus.NEEDS_ACTION.GetString();
                 task.SubTasks.Add(subTask);
+
+                _dialogService.ShowInfoToast(GetText("SubTaskWasAdded"));
+
                 await NavigationService.Close(this, true);
             }
             else
@@ -120,6 +123,12 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 if (response.Succeed)
                 {
                     task.SubTasks.Add(_mapper.Map<TaskItemViewModel>(response.Result));
+
+                    if (Parameter.Notify)
+                        Messenger.Publish(new TaskSavedMsg(true, response.Result.GoogleTaskID));
+
+                    _dialogService.ShowSucceedToast(GetText("SubTaskWasCreated"));
+
                     await NavigationService.Close(this, true);
                 }
                 else

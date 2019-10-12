@@ -119,6 +119,6 @@
             android:id="@+id/SubTaskRecyclerView"
             android:scrollbars="vertical"
             app:MvxItemTemplate="@layout/subtaskitem"
-            app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks)" />
+            app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks); ItemClick SubTaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
     </LinearLayout>
 </android.support.v7.widget.CardView>

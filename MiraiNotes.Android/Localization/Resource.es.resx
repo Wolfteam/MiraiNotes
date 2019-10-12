@@ -531,4 +531,10 @@
   <data name="NotesMaxLength" xml:space="preserve">
     <value>Las notas no puede contener mas de {0} caracteres</value>
   </data>
+  <data name="SubTaskWasCreated" xml:space="preserve">
+    <value>La subtarea fue creada exitosamente</value>
+  </data>
+  <data name="SubTaskWasAdded" xml:space="preserve">
+    <value>La subtarea fue agregada pero debes guardar cambios</value>
+  </data>
 </root>

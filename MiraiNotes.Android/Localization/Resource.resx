@@ -511,4 +511,10 @@
   <data name="NotesMaxLength" xml:space="preserve">
     <value>Notes cannot have more than {0} characters</value>
   </data>
+  <data name="SubTaskWasCreated" xml:space="preserve">
+    <value>Subtask was successfully created</value>
+  </data>
+  <data name="SubTaskWasAdded" xml:space="preserve">
+    <value>Subtask was added but you need to save changes</value>
+  </data>
 </root>

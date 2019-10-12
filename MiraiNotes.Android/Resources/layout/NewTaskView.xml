@@ -154,7 +154,8 @@
                     app:MvxBind="Text [Move]; Visibility InvertedVisibility(Task.IsNew); Click MoveTaskCommand;"/>
 
                 <View
-                    style="@style/Divider"/>
+                    style="@style/Divider"
+                    app:MvxBind="Visibility InvertedVisibility(Task.HasParentTask)"/>
 
                 <Button
                     android:layout_width="wrap_content"
@@ -165,7 +166,7 @@
                     android:text="Add a subtask"
                     android:textAllCaps="false"
                     android:background="?android:attr/selectableItemBackground"
-                    app:MvxBind="Text [AddSubTask]; Click AddSubTaskCommand"/>
+                    app:MvxBind="Text [AddSubTask]; Visibility InvertedVisibility(Task.HasParentTask); Click AddSubTaskCommand;"/>
 
                 <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
                     android:layout_width="match_parent"
@@ -173,7 +174,7 @@
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
                     app:MvxItemTemplate="@layout/subtaskitem"
-                    app:MvxBind="ItemsSource Task.SubTasks; ItemClick DeleteSubTaskCommand" />
+                    app:MvxBind="ItemsSource Task.SubTasks;" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

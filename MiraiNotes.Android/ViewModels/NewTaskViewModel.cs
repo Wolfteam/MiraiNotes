@@ -91,7 +91,6 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand DeleteTaskCommand { get; private set; }
         public IMvxAsyncCommand AddReminderCommand { get; private set; }
         public IMvxAsyncCommand AddSubTaskCommand { get; private set; }
-        public IMvxAsyncCommand<TaskItemViewModel> DeleteSubTaskCommand { get; private set; }
         public IMvxAsyncCommand MoveTaskCommand { get; private set; }
         public IMvxAsyncCommand AddCompletitionDateCommand { get; private set; }
         #endregion
@@ -178,12 +177,9 @@ namespace MiraiNotes.Android.ViewModels
 
             AddSubTaskCommand = new MvxAsyncCommand(async () =>
             {
-                var parameter = AddSubTaskDialogViewModelParameter.Instance(_currentTaskList.Id, Task);
+                var parameter = AddSubTaskDialogViewModelParameter.Instance(_currentTaskList.Id, Task, true);
                 await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, bool>(parameter);
             });
-
-            DeleteSubTaskCommand = new MvxAsyncCommand<TaskItemViewModel>(subTask =>
-                NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(subTask));
 
             MoveTaskCommand = new MvxAsyncCommand(async () =>
             {

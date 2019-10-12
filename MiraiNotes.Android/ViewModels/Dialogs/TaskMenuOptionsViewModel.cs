@@ -13,11 +13,18 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private TaskListItemViewModel _taskList;
         private TaskItemViewModel _task;
         private string _markAsTitle;
+        private bool _showAddSubTaskButton;
 
         public string MarkAsTitle
         {
             get => _markAsTitle;
             set => SetProperty(ref _markAsTitle, value);
+        }
+
+        public bool ShowAddSubTaskButton
+        {
+            get => _showAddSubTaskButton;
+            set => SetProperty(ref _showAddSubTaskButton, value);
         }
 
         public IMvxAsyncCommand DeleteTaskCommand { get; private set; }
@@ -44,6 +51,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             string statusMessage =
                 $"{(_task.IsCompleted ? GetText("Incompleted") : GetText("Completed"))}";
             MarkAsTitle = GetText("MarkTaskAs", statusMessage);
+            ShowAddSubTaskButton = !_task.HasParentTask;
         }
 
         public override void SetCommands()

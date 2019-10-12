@@ -48,7 +48,7 @@
         style="@style/TaskMenuOptionButton"
         app:icon="@drawable/ic_delete_black_24dp"
         app:iconTint="@color/LigthBlueAccentColorLight"
-        app:MvxBind="Text [AddSubTask]; Click AddSubTaskCommand"/>
+        app:MvxBind="Text [AddSubTask]; Visibility Visibility(ShowAddSubTaskButton); Click AddSubTaskCommand"/>
 
     <android.support.design.button.MaterialButton
         android:textColor="?TextColor"

@@ -272,20 +272,18 @@ namespace MiraiNotes.Android.ViewModels
         private void UpdateNumberOfTasks(RefreshNumberOfTasksMsg msg)
         {
             if (msg.WasAdded)
-                SelectedTaskList.NumberOfTasks += 1;
+                SelectedTaskList.NumberOfTasks += msg.AffectedItems;
             else
-                SelectedTaskList.NumberOfTasks -= 1;
+                SelectedTaskList.NumberOfTasks -= msg.AffectedItems;
 
             int position = TaskLists.IndexOf(SelectedTaskList);
             _refreshNumberOfTasks.Raise(position);
 
-            if (msg.TaskWasMoved && TaskLists.Any(tl => tl.Id == msg.TaskListId))
+            if (msg.TaskWasMoved && TaskLists.Any(tl => tl.Id == msg.MovedToTaskListId))
             {
-                var taskList = TaskLists.First(tl => tl.Id == msg.TaskListId);
-                if (msg.WasAdded)
-                    taskList.NumberOfTasks -= 1;
-                else
-                    taskList.NumberOfTasks += 1;
+                var taskList = TaskLists.First(tl => tl.Id == msg.MovedToTaskListId);
+                taskList.NumberOfTasks += msg.AffectedItems;
+
                 int newPosition = TaskLists.IndexOf(taskList);
                 _refreshNumberOfTasks.Raise(newPosition);
             }

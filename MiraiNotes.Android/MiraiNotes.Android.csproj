@@ -131,6 +131,7 @@
     <Compile Include="Common\Messages\ShowDrawerMsg.cs" />
     <Compile Include="Common\Messages\ShowProgressOverlayMsg.cs" />
     <Compile Include="Common\Messages\ShowTasksLoadingMsg.cs" />
+    <Compile Include="Common\Messages\SubTaskSelectedMsg.cs" />
     <Compile Include="Common\Messages\TaskDeletedMsg.cs">
       <SubType>Code</SubType>
     </Compile>

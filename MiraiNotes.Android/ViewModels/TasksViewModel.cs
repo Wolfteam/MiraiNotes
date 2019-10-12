@@ -126,7 +126,8 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<DeleteTaskRequestMsg>(async msg => await DeleteTask(msg.Task)),
                 Messenger.Subscribe<ChangeTaskStatusRequestMsg>(async msg => await ChangeTaskStatus(msg.Task, msg.NewStatus)),
                 Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate)),
-                Messenger.Subscribe<TaskMovedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask, msg.NewTaskListId))
+                Messenger.Subscribe<TaskMovedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask, msg.NewTaskListId)),
+                Messenger.Subscribe<SubTaskSelectedMsg>(async msg => await OnSubTaskSelected(msg))
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -202,7 +203,7 @@ namespace MiraiNotes.Android.ViewModels
 
         public async Task OnTaskSaved(string taskId)
         {
-            Messenger.Publish(new RefreshNumberOfTasksMsg(this, true));
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, true, 1));
 
             IsBusy = true;
             var dbResponse = await _dataService
@@ -344,10 +345,12 @@ namespace MiraiNotes.Android.ViewModels
 
         public void OnTaskDeleted(string taskId, string parentTask, bool hasParentTask, string taskListId)
         {
-            Messenger.Publish(new RefreshNumberOfTasksMsg(this, false, taskListId));
+            int affectedItems = 1;
             if (!hasParentTask)
             {
-                Tasks.RemoveAll(t => t.TaskID == taskId);
+                var task = Tasks.First(t => t.TaskID == taskId);
+                affectedItems += task.SubTasks.Count;
+                Tasks.Remove(task);
             }
             else
             {
@@ -355,6 +358,19 @@ namespace MiraiNotes.Android.ViewModels
                     .FirstOrDefault(t => t.TaskID == parentTask)?
                     .SubTasks?
                     .RemoveAll(st => st.TaskID == taskId);
+            }
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, affectedItems, taskListId));
+        }
+
+        private async Task OnSubTaskSelected(SubTaskSelectedMsg msg)
+        {
+            if (msg.ShowMenuOptions)
+            {
+                await ShowMenuOptionsDialogCommand.ExecuteAsync(msg.SubTask);
+            }
+            else
+            {
+                await OnTaskSelected(msg.SubTask.TaskID);
             }
         }
 

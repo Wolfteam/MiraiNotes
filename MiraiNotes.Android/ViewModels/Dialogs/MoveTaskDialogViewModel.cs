@@ -59,7 +59,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             var moveResponse = await _dataService
                 .TaskService
-                .MoveAsync(selectedTaskList.Id, task.TaskID, task.ParentTask, task.Position);
+                .MoveAsync(selectedTaskList.Id, task.TaskID, null, null);
 
             if (moveResponse.Succeed && task.HasSubTasks)
             {

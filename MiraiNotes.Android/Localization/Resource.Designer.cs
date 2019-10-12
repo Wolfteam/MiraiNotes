@@ -979,6 +979,24 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Subtask was added but you need to save changes.
+        /// </summary>
+        public static string SubTaskWasAdded {
+            get {
+                return ResourceManager.GetString("SubTaskWasAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subtask was successfully created.
+        /// </summary>
+        public static string SubTaskWasCreated {
+            get {
+                return ResourceManager.GetString("SubTaskWasCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Support.
         /// </summary>
         public static string Support {
