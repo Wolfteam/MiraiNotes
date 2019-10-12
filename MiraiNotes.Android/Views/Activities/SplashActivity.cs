@@ -8,8 +8,7 @@ namespace MiraiNotes.Android.Views.Activities
         Label = "@string/app_name",
         MainLauncher = true,
         Theme = "@style/Theme.Splash",
-        NoHistory = true,
-        ScreenOrientation = ScreenOrientation.Portrait)]
+        NoHistory = true)]
     public class SplashActivity : MvxSplashScreenAppCompatActivity<Setup<App>, App>
     {
         public SplashActivity()

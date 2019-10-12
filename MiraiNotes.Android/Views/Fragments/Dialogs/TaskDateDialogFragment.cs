@@ -12,8 +12,8 @@ using System;
 namespace MiraiNotes.Android.Views.Fragments.Dialogs
 {
     [MvxDialogFragmentPresentation(ActivityHostViewModelType = typeof(MainViewModel), Tag = nameof(TaskDateDialogFragment), Cancelable = true)]
-    public class TaskDateDialogFragment : BaseDialogFragment<TaskDateDialogViewModel>, 
-        DatePickerDialog.IOnDateSetListener, 
+    public class TaskDateDialogFragment : BaseDialogFragment<TaskDateDialogViewModel>,
+        DatePickerDialog.IOnDateSetListener,
         TimePickerDialog.IOnTimeSetListener
     {
         public override int LayoutId
@@ -29,7 +29,7 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
             dateButton.Click += (sender, args) =>
             {
                 var currentDate = DateTime.Parse(ViewModel.FullText);
-                var dialog = new DatePickerDialog(Activity, this, currentDate.Year, currentDate.Month - 1, currentDate.Day);
+                var dialog = new DatePickerDialog(Activity, Resource.Style.DatePickerDialogCustom, this, currentDate.Year, currentDate.Month - 1, currentDate.Day);
                 dialog.DatePicker.SetMinDate(ViewModel.MinDate);
                 dialog.Show();
             };

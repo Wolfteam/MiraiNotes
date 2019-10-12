@@ -304,51 +304,68 @@ namespace MiraiNotes.Android.ViewModels
 
             var fingerprintAvailability = await _fingerprintService.GetAvailabilityAsync();
 
+            bool isAuthenticated = false;
+
             if (isUserLoggedIn &&
                 fingerprintAvailability == FingerprintAvailability.Available &&
                 AppSettings.AskForFingerPrintWhenAppStarts)
             {
-                var authenticated = false;
-                while (!authenticated)
-                {
-                    var authResult = await _fingerprintService.AuthenticateAsync(GetText("FingerprintAuthMsg"));
-                    if (authResult.Status == FingerprintAuthenticationResultStatus.Succeeded &&
-                        authResult.Authenticated)
-                    {
-                        authenticated = true;
-                    }
-                    else if (authResult.Status == FingerprintAuthenticationResultStatus.Canceled)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        _dialogService.ShowErrorToast(GetText("FingerprintAuthFailed"));
-                    }
-                }
-
-                if (authenticated)
-                    await GoToMainPage();
+                isAuthenticated = await LoginWithFingerPrint();
             }
             else if (isUserLoggedIn && AppSettings.AskForPasswordWhenAppStarts)
             {
-                ShowLoading = false;
-                var passwordMatches = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
-                if (passwordMatches)
-                    await GoToMainPage();
+                isAuthenticated = await LoginWithPassword();
             }
             else if (isUserLoggedIn)
             {
+                isAuthenticated = true;
                 await GoToMainPage();
             }
 
-            ShowLoading = false;
+            if (!isAuthenticated)
+                ShowLoading = false;
         }
 
         private async Task GoToMainPage()
         {
             await NavigationService.Close(this);
             await NavigationService.Navigate<MainViewModel>();
+        }
+
+        private async Task<bool> LoginWithFingerPrint()
+        {
+            var isAuthenticated = false;
+            while (!isAuthenticated)
+            {
+                var authResult = await _fingerprintService.AuthenticateAsync(GetText("FingerprintAuthMsg"));
+                if (authResult.Status == FingerprintAuthenticationResultStatus.Succeeded &&
+                    authResult.Authenticated)
+                {
+                    isAuthenticated = true;
+                }
+                else if (authResult.Status == FingerprintAuthenticationResultStatus.Canceled)
+                {
+                    break;
+                }
+                else
+                {
+                    _dialogService.ShowErrorToast(GetText("FingerprintAuthFailed"));
+                }
+            }
+
+            if (isAuthenticated)
+                await GoToMainPage();
+
+            return isAuthenticated;
+        }
+
+        private async Task<bool> LoginWithPassword()
+        {
+            var passwordMatches = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
+            if (passwordMatches)
+                await GoToMainPage();
+
+            return passwordMatches;
         }
     }
 }

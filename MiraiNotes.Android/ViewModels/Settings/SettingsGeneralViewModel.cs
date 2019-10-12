@@ -293,16 +293,16 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 var value = !AskForFingerPrintWhenAppStarts;
                 var fingerprintAvailability = await _fingerprintService.GetAvailabilityAsync();
 
-                if (!value && fingerprintAvailability != FingerprintAvailability.Available)
+                if (value && fingerprintAvailability != FingerprintAvailability.Available)
                 {
                     Logger.Warning($"Fingerprint is not available. Current value = {fingerprintAvailability}");
                     _dialogService.ShowWarningToast(GetText("FingerprintIsNotAvailable"));
+                    AskForPasswordWhenAppStarts = false;
                 }
                 else
                 {
-                    AskForPasswordWhenAppStarts = false;
+                    AskForFingerPrintWhenAppStarts = value;
                 }
-                AskForFingerPrintWhenAppStarts = value;
             });
         }
     }
