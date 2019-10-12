@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_vertical"
-    android:padding="5dp">
+    android:padding="20dp">
     <refractored.controls.CircleImageView
         android:id="@+id/AccountImg"
         android:layout_width="64dp"
@@ -21,8 +21,9 @@
         android:layout_width="0dp"
         android:layout_weight="2"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:textAlignment="center"
-        android:gravity="center_horizontal"
+        android:gravity="start"
         android:orientation="vertical">
 
         <TextView
@@ -32,7 +33,6 @@
             android:textStyle="bold"
             android:ellipsize="end" 
             android:maxLines="1"
-            android:gravity="center"
             android:text="@string/PersonName"
             app:MvxBind="Text Fullname;"/>
         <TextView
@@ -41,7 +41,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end" 
             android:maxLines="1"
-            android:gravity="center"
             android:text="@string/PersonEmail"
             app:MvxBind="Text Email;"/>
     </LinearLayout>
@@ -51,14 +50,14 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:gravity="center_horizontal"
+        android:gravity="end"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/ChangeAccount"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="15dp"
             android:background="@drawable/ic_done_black_24dp"
             android:contentDescription="Change"
             android:foreground="?android:attr/selectableItemBackground"

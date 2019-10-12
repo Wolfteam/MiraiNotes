@@ -3,6 +3,7 @@
 <resources>
   <declare-styleable name="AppTheme" >
     <attr name="AppBackground" format="reference"/>
+    <attr name="AppBackgroundInverted" format="reference"/>
     <attr name="AccentColor" format="reference"/>
     <attr name="AccentColorDark" format="reference"/>
     <attr name="AccentColorLight" format="reference"/>

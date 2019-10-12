@@ -1,8 +1,4 @@
 <resources>
-  <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-  <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-
   <!--Splash-->
   <style name="Theme.Splash" parent="Theme.AppCompat.NoActionBar">
     <item name="android:windowBackground">@drawable/splash_centered</item>
@@ -22,6 +18,23 @@
     <item name="android:background">?android:attr/listDivider</item>
   </style>
 
+  <style name="CustomMaterialButton" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
+    <item name="android:theme">@style/Theme.MaterialComponents</item>
+    <item name="android:textColor">?AccentColor</item>
+    <item name="strokeColor">?AccentColor</item>
+    <item name="backgroundTint">?AppBackground</item>
+    <item name="strokeWidth">1dp</item>
+  </style>
+
+  <style name="TaskMenuOptionButton" parent="@style/CustomMaterialButton">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textAlignment">textStart</item>
+    <item name="android:paddingStart">10dp</item>
+    <item name="strokeWidth">0dp</item>
+    <item name="iconPadding">10dp</item>
+  </style>
+
   <!--Dialogs-->
   <style name="AlertDialogCustom" parent="android:Theme.Material.Light.Dialog.Alert">
     <!--buttons color-->
@@ -38,18 +51,33 @@
   <style name="TimePickerDialogCustom" parent="Theme.AppCompat.Light.Dialog">
     <item name="colorAccent">?AccentColor</item>
     <item name="colorPrimary">?AccentColorDark</item>
+    <item name="colorPrimaryDark">?AccentColorDark</item>
     <item name="android:windowBackground">?AppBackground</item>
     <item name="android:spinnerDropDownItemStyle">@style/SpinnerCustom</item>
 
     <!--This changes the colors of minutes / seconds and the text inside a edittext-->
-    <!--<item name="android:textColorPrimary">@color/LigthBlueAccentColorPrimary</item>-->
-    
-    <!--This changes the colors of the little icon in the bottom left corner-->
-    <!--<item name="android:textColorSecondary">@color/LigthBlueAccentColorPrimary</item>-->
+    <!--<item name="android:textColorPrimary">@color/PinkAccentColorLight</item>-->
+
+    <!--This changes the colors of the little icon in the bottom left corner. On android 5 it changes the color of the hours / mins-->
+    <item name="android:textColorSecondary">?TextColor</item>
 
     <!--<item name="android:textColor">@color/LigthBlueAccentColorPrimary</item>-->
     <!--<item name="android:popupBackground">?AppBackground</item>-->
     <!--<item name="android:popupMenuStyle">@style/CustomPopupMenu.Light</item>-->
+  </style>
+
+  <!--DatePickerDialog-->
+  <style name="DatePickerDialogCustom" parent="Theme.AppCompat.Light.Dialog">
+    <item name="colorAccent">?AccentColor</item>
+    <item name="colorPrimary">?AccentColorDark</item>
+    <item name="colorPrimaryDark">?AccentColorDark</item>
+    <item name="android:windowBackground">?AppBackground</item>
+
+    <!--This changes the tex color of the days, left / right arrow, the month-->
+    <item name="android:textColorPrimary">?TextColor</item>
+
+    <!--This changes the colors of the week day-->
+    <item name="android:textColorSecondary">?TextColor</item>
   </style>
 
   <!--Spinner-->
@@ -58,6 +86,7 @@
     <item name="android:textColor">@drawable/spinner_item_textcolor</item>
     <!--<item name="android:textColor">?TextColor</item>-->
     <item name="android:background">?AppBackground</item>
+    <!--<item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>-->
   </style>
 
   <!--Menu option style-->
@@ -75,6 +104,8 @@
     <item name="android:popupBackground">@color/AppBackgroundDark</item>
   </style>
 
+
+  <!--In da future we might change to Theme.MaterialComponents-->
   <!--AppThemes-->
   <!--Base Themes-->
   <style name="Theme.MiraiNotes.Dark" parent="Theme.AppCompat.Light">
@@ -99,7 +130,12 @@
 
     <item name="alertDialogTheme">@style/AlertDialogCustom</item>
 
+    <!--<item name="spinnerStyle">@style/SpinnerCustom</item>-->
+    <!--<item name="android:datePickerStyle">@style/datePickerStyle</item>
+    <item name="android:timePickerStyle">@style/TimePickerDialogCustom</item>-->
+
     <item name="AppBackground">@color/AppBackgroundDark</item>
+    <item name="AppBackgroundInverted">@color/AppBackgroundLight</item>
     <item name="DividerColor">@color/White</item>
     <item name="IconColor">@color/White</item>
     <item name="TextColor">@color/White</item>
@@ -129,7 +165,13 @@
 
     <item name="alertDialogTheme">@style/AlertDialogCustom</item>
 
+    <!--<item name="spinnerStyle">@style/SpinnerCustom</item>-->
+    <!--<item name="datePickerStyle">@style/datePickerStyle</item>
+    <item name="timePickerStyle">@style/TimePickerDialogCustom</item>-->
+
+
     <item name="AppBackground">@color/AppBackgroundLight</item>
+    <item name="AppBackgroundInverted">@color/AppBackgroundDark</item>
     <item name="DividerColor">@color/Black</item>
     <item name="IconColor">@color/Black</item>
     <item name="TextColor">@color/Black</item>

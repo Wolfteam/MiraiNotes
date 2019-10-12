@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -26,78 +26,43 @@
         android:textSize="@dimen/task_item_title"
         app:MvxBind="Text [SelectAnOption]"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:paddingStart="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:drawableLeft="@drawable/ic_delete_black_24dp"
-        android:textAlignment="textStart"
-        android:drawablePadding="10dp"
+    <android.support.design.button.MaterialButton
         android:textColor="@color/VividRedAccentColorPrimary"
-        android:drawableTint="@color/VividRedAccentColorPrimary"
         android:text="Delete task"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_delete_black_24dp"
+        app:iconTint="@color/VividRedAccentColorPrimary"
         app:MvxBind="Text [DeleteTask]; Click DeleteTaskCommand"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:paddingStart="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:drawableLeft="@drawable/ic_done_24dp"
-        android:textAlignment="textStart"
-        android:drawablePadding="10dp"
+    <android.support.design.button.MaterialButton
         android:textColor="@color/DarkGreenAccentColorLight"
-        android:drawableTint="@color/DarkGreenAccentColorLight"
         android:text="Mark as completed"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_done_24dp"
+        app:iconTint="@color/DarkGreenAccentColorLight"
         app:MvxBind="Text MarkAsTitle; Click ChangeTaskStatusCommand"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:paddingStart="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:drawableLeft="@drawable/ic_add_circle_black_24dp"
-        android:textAlignment="textStart"
-        android:drawablePadding="10dp"
+    <android.support.design.button.MaterialButton
         android:textColor="@color/LigthBlueAccentColorLight"
-        android:drawableTint="@color/LigthBlueAccentColorLight"
         android:text="Add a subtask"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_delete_black_24dp"
+        app:iconTint="@color/LigthBlueAccentColorLight"
         app:MvxBind="Text [AddSubTask]; Click AddSubTaskCommand"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:paddingStart="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:drawableLeft="@drawable/ic_move_24dp"
+    <android.support.design.button.MaterialButton
         android:textColor="?TextColor"
-        android:drawableTint="?TextColor"
-        android:textAlignment="textStart"
-        android:drawablePadding="10dp"
         android:text="Move to a different task list"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_move_24dp"
+        app:iconTint="?TextColor"
         app:MvxBind="Text [MoveToDifferentTaskList]; Click MoveTaskCommand"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:paddingStart="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:drawableLeft="@drawable/ic_notifications_black_24dp"
-        android:textAlignment="textStart"
-        android:drawablePadding="10dp"
+    <android.support.design.button.MaterialButton
         android:textColor="@color/OrangeAccentColorLight"
-        android:drawableTint="@color/OrangeAccentColorLight"
         android:text="Add a reminder"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_notifications_black_24dp"
+        app:iconTint="@color/OrangeAccentColorLight"
         app:MvxBind="Text [AddReminder]; Click AddReminderCommand"/>
 </LinearLayout>

@@ -85,19 +85,20 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
-        <Button
+        <android.support.design.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ok"
-            android:textColor="?AccentColor"
-            android:background="?android:attr/selectableItemBackground"
+            style="@style/CustomMaterialButton"
             app:MvxBind="Click OkCommand; Text OkText, Visibility Visibility(IsSaveButtonEnabled)"/>
-        <Button
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"/>
+        <android.support.design.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            android:textColor="?AccentColor"
-            android:background="?android:attr/selectableItemBackground"
+            style="@style/CustomMaterialButton"
             app:MvxBind="Click CloseCommand; Text CancelText"/>
     </LinearLayout>
 </LinearLayout>

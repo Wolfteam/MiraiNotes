@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/fab_margin"
+    android:background="?AppBackground"
     app:MvxBind="Visibility Visibility(IsDialogVisible)">
     <TextView
         android:layout_width="match_parent"
@@ -31,21 +32,20 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
-        <Button
+        <android.support.design.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add"
-            android:textColor="?AccentColor"
-            android:background="?android:attr/selectableItemBackground"
+            style="@style/CustomMaterialButton"
             app:MvxBind="Click NewAccountCommand; Text [Add]"/>
-        <Button
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"/>
+        <android.support.design.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            android:textColor="?AccentColor"
-            android:background="?android:attr/selectableItemBackground"
+            style="@style/CustomMaterialButton"
             app:MvxBind="Click CloseCommand; Text [Cancel]"/>
     </LinearLayout>
 </LinearLayout>
-
-
