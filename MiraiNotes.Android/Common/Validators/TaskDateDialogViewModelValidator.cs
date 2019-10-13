@@ -22,7 +22,7 @@ namespace MiraiNotes.Android.Common.Validators
                     .Must((dto, hourText) =>
                     {
                         var currentTime = DateTime.Now;
-                        var selectedDate = DateTime.Parse(dto.FullText);
+                        var selectedDate = DateTime.Parse(dto.FullText, textProvider.CurrentCulture);
                         return selectedDate > currentTime;
                     })
                     .WithMessage(textProvider.Get("InvalidReminderHour"));
