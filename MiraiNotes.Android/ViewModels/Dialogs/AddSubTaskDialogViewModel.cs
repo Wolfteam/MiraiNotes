@@ -85,12 +85,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 return;
 
             var task = Parameter.Task;
-
+            var now = DateTimeOffset.UtcNow;
             if (task.IsNew)
             {
                 var subTask = Mvx.IoCProvider.Resolve<TaskItemViewModel>();
                 subTask.Title = SubTaskTitle.Trim();
                 subTask.Status = GoogleTaskStatus.NEEDS_ACTION.GetString();
+                subTask.CreatedAt = now;
                 task.SubTasks.Add(subTask);
 
                 _dialogService.ShowInfoToast(GetText("SubTaskWasAdded"));
@@ -100,15 +101,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             else
             {
                 Messenger.Publish(new ShowProgressOverlayMsg(this));
-                var lastStId = task.SubTasks.OrderBy(st => st.Position).LastOrDefault()?.TaskID;
-                var now = DateTimeOffset.UtcNow;
+
                 var entity = new GoogleTask
                 {
                     CreatedAt = now,
                     GoogleTaskID = Guid.NewGuid().ToString(),
                     LocalStatus = LocalStatus.CREATED,
-                    ParentTask = task.TaskID,
-                    Position = lastStId,
+                    ParentTask = task.GoogleId,
                     Status = GoogleTaskStatus.NEEDS_ACTION.GetString(),
                     Title = SubTaskTitle.Trim(),
                     ToBeSynced = true,

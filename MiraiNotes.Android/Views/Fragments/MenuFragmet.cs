@@ -156,7 +156,7 @@ namespace MiraiNotes.Android.Views.Fragments
                     .SetChecked(false)
                     .SetActionView(numberOfTaskView);
 
-                if (taskList.Id == ViewModel.SelectedTaskList.Id)
+                if (taskList.GoogleId == ViewModel.SelectedTaskList.GoogleId)
                 {
                     menuItem.SetChecked(true).SetCheckable(true);
                     _previousMenuItem = menuItem;

@@ -17,7 +17,7 @@ namespace MiraiNotes.Android.ViewModels
     {
         #region Members
 
-        private string _taskID;
+        private string _googleId;
         private string _status;
         private string _notes;
         private string _parentTask;
@@ -31,22 +31,19 @@ namespace MiraiNotes.Android.ViewModels
         #endregion
 
         #region Properties
-        public int ID { get; set; }
+        public int Id { get; set; }
 
-        public string TaskID
+        public string GoogleId
         {
-            get => _taskID;
+            get => _googleId;
             set
             {
-                _taskID = value;
-                RaisePropertyChanged(nameof(TaskID));
+                SetProperty(ref _googleId, value);
                 RaisePropertyChanged(nameof(IsNew));
             }
         }
 
         public new string Title { get; set; }
-
-        public DateTimeOffset UpdatedAt { get; set; }
 
         public string SelfLink { get; set; }
 
@@ -129,7 +126,7 @@ namespace MiraiNotes.Android.ViewModels
         public bool IsHidden { get; set; }
 
         public bool IsNew
-            => string.IsNullOrEmpty(TaskID);
+            => string.IsNullOrEmpty(GoogleId);
 
         public bool IsCompleted => CompletedOn != null && TaskStatus == GoogleTaskStatus.COMPLETED;
 
@@ -296,6 +293,10 @@ namespace MiraiNotes.Android.ViewModels
 
         public bool HasNotes
             => !string.IsNullOrEmpty(Notes);
+
+        public DateTimeOffset CreatedAt { get; set; }
+
+        public DateTimeOffset UpdatedAt { get; set; }
         #endregion
 
         #region Commands

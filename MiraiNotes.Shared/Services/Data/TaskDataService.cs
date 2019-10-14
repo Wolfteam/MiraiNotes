@@ -78,7 +78,13 @@ namespace MiraiNotes.Shared.Services.Data
                         }
                         else
                         {
+                            if (string.IsNullOrEmpty(task.Position))
+                            {
+                                string position = await GetLastestPosition(context, taskList.GoogleTaskListID, task.ParentTask);
+                                task.Position = position;
+                            }
                             task.TaskList = taskList;
+
                             await context.AddAsync(task);
                             response.Succeed = await context.SaveChangesAsync() > 0;
                             response.Result = task;
@@ -747,17 +753,7 @@ namespace MiraiNotes.Shared.Services.Data
                             return response;
                         }
 
-                        //if this isnt a sub task
-                        if (string.IsNullOrEmpty(oldEntity.ParentTask))
-                        {
-                            previous = context.Tasks
-                                .Where(
-                                    t => t.TaskList == taskList &&
-                                    t.LocalStatus != LocalStatus.CREATED &&
-                                    string.IsNullOrEmpty(t.ParentTask))
-                                .OrderBy(t => t.Position)
-                                .LastOrDefault()?.GoogleTaskID;
-                        }
+                        string position = await GetLastestPosition(context, taskList.GoogleTaskListID, parentTask);
 
                         var entity = new GoogleTask
                         {
@@ -769,7 +765,7 @@ namespace MiraiNotes.Shared.Services.Data
                             LocalStatus = LocalStatus.CREATED,
                             Notes = oldEntity.Notes,
                             ParentTask = parentTask,
-                            Position = previous,
+                            Position = position,
                             RemindOn = oldEntity.RemindOn,
                             RemindOnGUID = oldEntity.RemindOnGUID,
                             Status = oldEntity.Status,
@@ -1104,6 +1100,93 @@ namespace MiraiNotes.Shared.Services.Data
                 }
                 return response;
             }).ConfigureAwait(false);
+        }
+
+        public async Task<ResponseDto<string>> GetLastestPosition(string taskListId, string parentTask = null)
+        {
+            return await Task.Run(async () =>
+            {
+                _logger.Information(
+                    $"{nameof(GetLastestPosition)}: Trying to get the last position " +
+                    $"in taskListId = {taskListId} - taskId = {parentTask}");
+                var response = new ResponseDto<string>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        response.Result = await GetLastestPosition(context, taskListId, parentTask);
+                        response.Succeed = true;
+                        _logger.Information($"{nameof(GetLastestPosition)}: Completed successfully");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, $"{nameof(GetLastestPosition)}: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+        public async Task<ResponseDto<string>> GetPreviousTaskId(string taskListId, string parentTask)
+        {
+            return await Task.Run(async () =>
+            {
+                _logger.Information(
+                    $"{nameof(GetPreviousTaskId)}: Trying to get the last position " +
+                    $"in taskListId = {taskListId} - parentTask = {parentTask}");
+                var response = new ResponseDto<string>
+                {
+                    Message = string.Empty,
+                    Succeed = false
+                };
+                using (var context = new MiraiNotesContext())
+                {
+                    try
+                    {
+                        var query = context.Tasks
+                            .Where(t => t.TaskList.GoogleTaskListID == taskListId);
+
+                        if (!string.IsNullOrEmpty(parentTask))
+                        {
+                            query = query.Where(t => t.ParentTask == parentTask);
+                        }
+
+                        var lastTask = await query.OrderBy(t => t.Position).LastOrDefaultAsync();
+
+                        response.Result = lastTask?.GoogleTaskID;
+                        response.Succeed = true;
+                        _logger.Information($"{nameof(GetPreviousTaskId)}: Completed successfully");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, $"{nameof(GetPreviousTaskId)}: An unknown error occurred");
+                        response.Message = GetExceptionMessage(e);
+                    }
+                }
+                return response;
+            }).ConfigureAwait(false);
+        }
+
+
+        private async Task<string> GetLastestPosition(MiraiNotesContext context, string taskListId, string parentTask = null)
+        {
+            var query = context.Tasks
+                .Where(t => t.TaskList.GoogleTaskListID == taskListId);
+
+            if (!string.IsNullOrEmpty(parentTask))
+            {
+                query = query.Where(t => t.ParentTask == parentTask);
+            }
+
+            var lastTask = await query.OrderBy(t => t.Position).LastOrDefaultAsync();
+            int lastestPosition = int.Parse(lastTask?.Position ?? "0") + 1;
+
+            return $"{lastestPosition:D20}";
         }
 
         private string GetExceptionMessage(Exception e)

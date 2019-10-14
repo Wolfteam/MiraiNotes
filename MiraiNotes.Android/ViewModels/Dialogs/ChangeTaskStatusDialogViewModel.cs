@@ -66,7 +66,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             var response = await _dataService
                 .TaskService
-                .ChangeTaskStatusAsync(task.TaskID, newStatus);
+                .ChangeTaskStatusAsync(task.GoogleId, newStatus);
 
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
 
@@ -86,7 +86,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             Messenger.Publish(new TaskStatusChangedMsg(
                 this,
-                task.TaskID,
+                task.GoogleId,
                 task.ParentTask,
                 task.CompletedOn,
                 task.UpdatedAt,

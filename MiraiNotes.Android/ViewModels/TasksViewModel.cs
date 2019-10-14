@@ -103,7 +103,7 @@ namespace MiraiNotes.Android.ViewModels
         public override void SetCommands()
         {
             base.SetCommands();
-            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.TaskID));
+            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.GoogleId));
             RefreshTasksCommand = new MvxAsyncCommand(Refresh);
             AddNewTaskListCommand = new MvxAsyncCommand(() => NavigationService.Navigate<TaskListDialogViewModel>());
             AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
@@ -147,9 +147,8 @@ namespace MiraiNotes.Android.ViewModels
             var dbResponse = await _dataService
                 .TaskService
                 .GetAsNoTrackingAsync(
-                    t => t.TaskList.GoogleTaskListID == taskList.Id &&
-                         t.LocalStatus != LocalStatus.DELETED,
-                    t => t.OrderBy(ta => ta.Position));
+                    t => t.TaskList.GoogleTaskListID == taskList.GoogleId &&
+                         t.LocalStatus != LocalStatus.DELETED);
 
             if (!dbResponse.Succeed)
             {
@@ -169,11 +168,11 @@ namespace MiraiNotes.Android.ViewModels
 
                 foreach (var t in mainTasks)
                 {
-                    if (!tasks.Any(st => st.ParentTask == t.TaskID))
+                    if (!tasks.Any(st => st.ParentTask == t.GoogleId))
                         continue;
                     t.SubTasks = _mapper.Map<MvxObservableCollection<TaskItemViewModel>>(
                         tasks
-                            .Where(st => st.ParentTask == t.TaskID)
+                            .Where(st => st.ParentTask == t.GoogleId)
                             .OrderBy(st => st.Position));
                 }
                 Tasks.AddRange(mainTasks);
@@ -187,7 +186,7 @@ namespace MiraiNotes.Android.ViewModels
             IsBusy = false;
 
             //If we have something in the init params, lets select that task
-            if (InitParams != null && Tasks.Any(t => t.TaskID == InitParams.TaskId))
+            if (InitParams != null && Tasks.Any(t => t.GoogleId == InitParams.TaskId))
             {
                 string taskId = InitParams.TaskId;
                 InitParams = null;
@@ -231,7 +230,7 @@ namespace MiraiNotes.Android.ViewModels
                 var stsResponse = await _dataService
                     .TaskService
                     .GetAsNoTrackingAsync(
-                        st => st.ParentTask == task.TaskID,
+                        st => st.ParentTask == task.GoogleId,
                         st => st.OrderBy(s => s.Position));
 
                 if (!stsResponse.Succeed)
@@ -253,7 +252,7 @@ namespace MiraiNotes.Android.ViewModels
             {
                 task.IsSelected = true;
                 var parentTask = Tasks?
-                    .FirstOrDefault(t => t.TaskID == task.ParentTask);
+                    .FirstOrDefault(t => t.GoogleId == task.ParentTask);
 
                 if (parentTask == null)
                     return;
@@ -261,7 +260,7 @@ namespace MiraiNotes.Android.ViewModels
                 int updatedSubTaskIndex = parentTask
                                               .SubTasks?
                                               .ToList()
-                                              .FindIndex(st => st.TaskID == task.TaskID) ?? -1;
+                                              .FindIndex(st => st.GoogleId == task.GoogleId) ?? -1;
 
                 if (updatedSubTaskIndex != -1)
                     parentTask.SubTasks[updatedSubTaskIndex] = task;
@@ -272,7 +271,7 @@ namespace MiraiNotes.Android.ViewModels
             {
                 int updatedTaskIndex = Tasks?
                                            .ToList()
-                                           .FindIndex(t => t.TaskID == task.TaskID) ?? -1;
+                                           .FindIndex(t => t.GoogleId == task.GoogleId) ?? -1;
 
                 if (updatedTaskIndex >= 0)
                 {
@@ -292,14 +291,14 @@ namespace MiraiNotes.Android.ViewModels
 
             if (!task.HasParentTask)
             {
-                updatedTask = Tasks.FirstOrDefault(t => t.TaskID == task.TaskID);
+                updatedTask = Tasks.FirstOrDefault(t => t.GoogleId == task.GoogleId);
             }
             else
             {
                 Tasks
-                    .FirstOrDefault(t => t.TaskID == task.ParentTask)?
+                    .FirstOrDefault(t => t.GoogleId == task.ParentTask)?
                     .SubTasks?
-                    .FirstOrDefault(st => st.TaskID == task.TaskID);
+                    .FirstOrDefault(st => st.GoogleId == task.GoogleId);
             }
 
             if (updatedTask is null)
@@ -322,14 +321,14 @@ namespace MiraiNotes.Android.ViewModels
             if (!msg.HasParentTask)
             {
                 taskFound = Tasks
-                    .FirstOrDefault(t => t.TaskID == msg.TaskId);
+                    .FirstOrDefault(t => t.GoogleId == msg.TaskId);
             }
             else
             {
                 taskFound = Tasks
-                    .FirstOrDefault(t => t.TaskID == msg.ParentTask)?
+                    .FirstOrDefault(t => t.GoogleId == msg.ParentTask)?
                     .SubTasks?
-                    .FirstOrDefault(st => st.TaskID == msg.TaskId);
+                    .FirstOrDefault(st => st.GoogleId == msg.TaskId);
             }
 
             if (taskFound == null)
@@ -348,16 +347,16 @@ namespace MiraiNotes.Android.ViewModels
             int affectedItems = 1;
             if (!hasParentTask)
             {
-                var task = Tasks.First(t => t.TaskID == taskId);
+                var task = Tasks.First(t => t.GoogleId == taskId);
                 affectedItems += task.SubTasks.Count;
                 Tasks.Remove(task);
             }
             else
             {
                 Tasks
-                    .FirstOrDefault(t => t.TaskID == parentTask)?
+                    .FirstOrDefault(t => t.GoogleId == parentTask)?
                     .SubTasks?
-                    .RemoveAll(st => st.TaskID == taskId);
+                    .RemoveAll(st => st.GoogleId == taskId);
             }
             Messenger.Publish(new RefreshNumberOfTasksMsg(this, affectedItems, taskListId));
         }
@@ -370,7 +369,7 @@ namespace MiraiNotes.Android.ViewModels
             }
             else
             {
-                await OnTaskSelected(msg.SubTask.TaskID);
+                await OnTaskSelected(msg.SubTask.GoogleId);
             }
         }
 
@@ -424,7 +423,7 @@ namespace MiraiNotes.Android.ViewModels
 
             var deleteResponse = await _dataService
                 .TaskService
-                .RemoveTaskAsync(task.TaskID);
+                .RemoveTaskAsync(task.GoogleId);
 
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
 
@@ -436,7 +435,7 @@ namespace MiraiNotes.Android.ViewModels
                 _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
             }
-            OnTaskDeleted(task.TaskID, task.ParentTask, task.HasParentTask);
+            OnTaskDeleted(task.GoogleId, task.ParentTask, task.HasParentTask);
         }
 
         private async Task ChangeTaskStatus(TaskItemViewModel task, GoogleTaskStatus newStatus)
@@ -448,7 +447,7 @@ namespace MiraiNotes.Android.ViewModels
 
             var response = await _dataService
                 .TaskService
-                .ChangeTaskStatusAsync(task.TaskID, newStatus);
+                .ChangeTaskStatusAsync(task.GoogleId, newStatus);
 
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
 
@@ -467,7 +466,7 @@ namespace MiraiNotes.Android.ViewModels
 
             var msg = new TaskStatusChangedMsg(
                 this,
-                task.TaskID,
+                task.GoogleId,
                 task.ParentTask,
                 task.CompletedOn,
                 task.UpdatedAt,

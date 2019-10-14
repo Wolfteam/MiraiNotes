@@ -59,7 +59,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             var moveResponse = await _dataService
                 .TaskService
-                .MoveAsync(selectedTaskList.Id, task.TaskID, null, null);
+                .MoveAsync(selectedTaskList.GoogleId, task.GoogleId, null, null);
 
             if (moveResponse.Succeed && task.HasSubTasks)
             {
@@ -68,18 +68,18 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     st.ParentTask = moveResponse.Result.GoogleTaskID;
                 }
 
-                await MoveSubTasksAsync(selectedTaskList.Id, task.SubTasks);
+                await MoveSubTasksAsync(selectedTaskList.GoogleId, task.SubTasks);
             }
 
             if (!moveResponse.Succeed)
             {
                 Logger.Error(
-                    $"{nameof(MoveCurrentTask)}: An error occurred while tryingg to move taskId = {task.ID}. " +
+                    $"{nameof(MoveCurrentTask)}: An error occurred while tryingg to move taskId = {task.Id}. " +
                     $"Error = {moveResponse.Message}");
             }
             else
             {
-                Messenger.Publish(new TaskMovedMsg(this, task.TaskID, selectedTaskList.Id, task.ParentTask));
+                Messenger.Publish(new TaskMovedMsg(this, task.GoogleId, selectedTaskList.GoogleId, task.ParentTask));
                 _dialogService.ShowSnackBar(GetText("TaskWasMoved", Parameter.CurrentTaskList.Title, selectedTaskList.Title));
             }
 
@@ -91,21 +91,16 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         public async Task MoveSubTasksAsync(string taskListID, MvxObservableCollection<TaskItemViewModel> subTasks)
         {
-            //TODO: CREO QUE ACA NO SE ESTA COLOCANDO EN LA POSICION CORRECTA
-            var stList = new List<string>();
-            foreach (var st in subTasks)
+            var orderedSubTasks = subTasks.OrderBy(st => st.Position).ToList();
+            foreach (var st in orderedSubTasks)
             {
                 var moveResponse = await _dataService
                     .TaskService
-                    .MoveAsync(taskListID, st.TaskID, st.ParentTask, stList.LastOrDefault());
-                if (moveResponse.Succeed)
-                {
-                    stList.Add(moveResponse.Result.GoogleTaskID);
-                }
-                else
+                    .MoveAsync(taskListID, st.GoogleId, st.ParentTask, null);
+                if (!moveResponse.Succeed)
                 {
                     Logger.Error(
-                        $"{nameof(MoveSubTasksAsync)}: An error occurred while trying to move subtaskId = {st.TaskID}. " +
+                        $"{nameof(MoveSubTasksAsync)}: An error occurred while trying to move subtaskId = {st.GoogleId}. " +
                         $"Error = {moveResponse.Message}");
                 }
             }

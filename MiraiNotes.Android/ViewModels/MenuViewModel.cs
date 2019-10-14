@@ -143,7 +143,7 @@ namespace MiraiNotes.Android.ViewModels
                 {
                     TaskLists.Add(msg.TaskList);
                     SelectedTaskList = msg.TaskList;
-                    AppSettings.SelectedTaskListId = SelectedTaskList.Id;
+                    AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
                     _onTaskListsLoaded.Raise();
                 }),
                 Messenger.Subscribe<RefreshNumberOfTasksMsg>(UpdateNumberOfTasks),
@@ -211,7 +211,7 @@ namespace MiraiNotes.Android.ViewModels
             foreach (var taskList in taskLists)
             {
                 taskList.NumberOfTasks = dbResponse.Result
-                    .First(tl => tl.GoogleTaskListID == taskList.Id)
+                    .First(tl => tl.GoogleTaskListID == taskList.GoogleId)
                     .Tasks
                     .Count();
             }
@@ -220,11 +220,11 @@ namespace MiraiNotes.Android.ViewModels
 
             SortTaskLists(AppSettings.DefaultTaskListSortOrder);
 
-            SelectedTaskList = TaskLists.Any(tl => tl.Id == selectedTaskListID)
-                ? TaskLists.First(tl => tl.Id == selectedTaskListID)
+            SelectedTaskList = TaskLists.Any(tl => tl.GoogleId == selectedTaskListID)
+                ? TaskLists.First(tl => tl.GoogleId == selectedTaskListID)
                 : TaskLists.FirstOrDefault();
 
-            AppSettings.SelectedTaskListId = SelectedTaskList.Id;
+            AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
 
             _onTaskListsLoaded.Raise();
         }
@@ -258,7 +258,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             var taskList = TaskLists[position];
             SelectedTaskList = taskList;
-            AppSettings.SelectedTaskListId = SelectedTaskList.Id;
+            AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
 
             var parameter = TasksViewModelParameter.Instance(InitParams, taskList);
             var tasks = new List<Task>
@@ -276,12 +276,15 @@ namespace MiraiNotes.Android.ViewModels
             else
                 SelectedTaskList.NumberOfTasks -= msg.AffectedItems;
 
+            if (SelectedTaskList.NumberOfTasks < 0)
+                SelectedTaskList.NumberOfTasks = 0;
+
             int position = TaskLists.IndexOf(SelectedTaskList);
             _refreshNumberOfTasks.Raise(position);
 
-            if (msg.TaskWasMoved && TaskLists.Any(tl => tl.Id == msg.MovedToTaskListId))
+            if (msg.TaskWasMoved && TaskLists.Any(tl => tl.GoogleId == msg.MovedToTaskListId))
             {
-                var taskList = TaskLists.First(tl => tl.Id == msg.MovedToTaskListId);
+                var taskList = TaskLists.First(tl => tl.GoogleId == msg.MovedToTaskListId);
                 taskList.NumberOfTasks += msg.AffectedItems;
 
                 int newPosition = TaskLists.IndexOf(taskList);

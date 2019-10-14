@@ -190,13 +190,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 : task.RemindOnGUID;
 
             var response = await _dataService.TaskService
-                .AddNotificationDate(task.TaskID, TaskNotificationDateType.REMINDER_DATE, date, guid);
+                .AddNotificationDate(task.GoogleId, TaskNotificationDateType.REMINDER_DATE, date, guid);
 
             if (!response.Succeed)
             {
                 Logger.Error(
                     $"{nameof(AddReminderDate)} An error occurred while trying to " +
-                    $"update taskId = {task.ID} into db. Error = {response.Message}");
+                    $"update taskId = {task.Id} into db. Error = {response.Message}");
             }
             else
             {
@@ -212,8 +212,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 _notificationService.ScheduleNotification(new TaskReminderNotification
                 {
                     Id = id,
-                    TaskListId = taskList.Id,
-                    TaskId = task.TaskID,
+                    TaskListId = taskList.GoogleId,
+                    TaskId = task.GoogleId,
                     TaskListTitle = taskList.Title,
                     TaskTitle = task.Title,
                     TaskBody = notes,
@@ -237,13 +237,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             if (!task.IsNew)
             {
                 var response = await _dataService.TaskService
-                    .AddNotificationDate(task.TaskID, TaskNotificationDateType.TO_BE_COMPLETED_DATE, date, null);
+                    .AddNotificationDate(task.GoogleId, TaskNotificationDateType.TO_BE_COMPLETED_DATE, date, null);
 
                 if (!response.Succeed)
                 {
                     Logger.Error(
                         $"{nameof(AddCompletitionDate)} An error occurred while trying to " +
-                        $"update taskId = {task.ID} into db. Error = {response.Message}");
+                        $"update taskId = {task.Id} into db. Error = {response.Message}");
                 }
                 else
                 {
@@ -275,7 +275,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 var response = await _dataService
                     .TaskService
-                    .RemoveNotificationDate(task.TaskID, dateType);
+                    .RemoveNotificationDate(task.GoogleId, dateType);
 
                 if (!response.Succeed)
                 {

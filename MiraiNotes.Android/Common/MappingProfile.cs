@@ -20,7 +20,7 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<TaskItemViewModel, ItemModel>()
-                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.TaskID))
+                .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.GoogleId))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title));
 
             CreateMap<TaskItemViewModel, TaskItemViewModel>()
@@ -29,8 +29,9 @@ namespace MiraiNotes.Android.Common
 
             #region Database mappings
             CreateMap<GoogleTaskList, TaskListItemViewModel>()
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.ID))
                 .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
-                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.GoogleTaskListID))
+                .ForMember(d => d.GoogleId, opt => opt.MapFrom(s => s.GoogleTaskListID))
                 .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
                 .ForMember(d => d.NumberOfTasks, opt => opt.Ignore());
 
@@ -39,8 +40,9 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.ItemId, opt => opt.MapFrom(s => s.GoogleTaskListID));
 
             CreateMap<GoogleTask, TaskItemViewModel>()
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.ID))
                 .ForMember(d => d.CompletedOn, opt => opt.MapFrom(s => s.CompletedOn))
-                .ForMember(d => d.TaskID, opt => opt.MapFrom(s => s.GoogleTaskID))
+                .ForMember(d => d.GoogleId, opt => opt.MapFrom(s => s.GoogleTaskID))
                 .ForMember(d => d.IsDeleted, opt => opt.MapFrom(s => s.IsDeleted))
                 .ForMember(d => d.IsHidden, opt => opt.MapFrom(s => s.IsHidden))
                 .ForMember(d => d.Notes, opt => opt.MapFrom(s => s.Notes))
@@ -49,6 +51,7 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status))
                 .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
                 .ForMember(d => d.ToBeCompletedOn, opt => opt.MapFrom(s => s.ToBeCompletedOn))
+                .ForMember(d => d.CreatedAt, opt => opt.MapFrom(s => s.CreatedAt))
                 .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
                 .ConstructUsingServiceLocator();
 

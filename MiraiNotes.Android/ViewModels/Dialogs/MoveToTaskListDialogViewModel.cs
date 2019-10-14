@@ -72,7 +72,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             TaskListSelectedCommand = new MvxAsyncCommand<TaskListItemViewModel>(async (selectedTaskList) =>
             {
-                if (selectedTaskList.Id == Parameter.TaskList.Id)
+                if (selectedTaskList.GoogleId == Parameter.TaskList.GoogleId)
                     return;
 
                 var parameter = MoveTaskDialogViewModelParameter.Instance(Parameter.TaskList, selectedTaskList, Parameter.Task);
@@ -103,7 +103,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 var taskLists = _mapper.Map<List<TaskListItemViewModel>>(dbResponse.Result);
                 TaskLists.AddRange(taskLists);
 
-                CurrentTaskList = TaskLists.FirstOrDefault(tl => tl.Id == Parameter.TaskList.Id);
+                CurrentTaskList = TaskLists.FirstOrDefault(tl => tl.GoogleId == Parameter.TaskList.GoogleId);
             }
 
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
@@ -113,7 +113,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             foreach (var tl in TaskLists)
             {
-                tl.IsSelected = tl.Id == _currentTaskList.Id
+                tl.IsSelected = tl.GoogleId == _currentTaskList.GoogleId
                     ? true
                     : false;
             }

@@ -51,7 +51,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             if (Parameter.HasParentTask && Parameter.IsNew || 
                 Parameter.IsNew)
             {
-                Messenger.Publish(new TaskDeletedMsg(this, Parameter.TaskID, Parameter.ParentTask));
+                Messenger.Publish(new TaskDeletedMsg(this, Parameter.GoogleId, Parameter.ParentTask));
                 await NavigationService.Close(this, true);
                 return;
             }
@@ -60,7 +60,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             var deleteResponse = await _dataService
                 .TaskService
-                .RemoveTaskAsync(Parameter.TaskID);
+                .RemoveTaskAsync(Parameter.GoogleId);
 
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
 
@@ -74,7 +74,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 return;
             }
 
-            Messenger.Publish(new TaskDeletedMsg(this, Parameter.TaskID, Parameter.ParentTask));
+            Messenger.Publish(new TaskDeletedMsg(this, Parameter.GoogleId, Parameter.ParentTask));
             await NavigationService.Close(this, true);
         }
     }

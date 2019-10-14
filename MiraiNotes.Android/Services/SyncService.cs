@@ -21,9 +21,9 @@ namespace MiraiNotes.Android.Services
         private readonly ILogger _logger;
 
         public SyncService(
-            IGoogleApiService apiService, 
-            IMiraiNotesDataService dataService, 
-            INetworkService networkService, 
+            IGoogleApiService apiService,
+            IMiraiNotesDataService dataService,
+            INetworkService networkService,
             ILogger logger)
         {
             _apiService = apiService;
@@ -31,7 +31,7 @@ namespace MiraiNotes.Android.Services
             _networkService = networkService;
             _logger = logger.ForContext<SyncService>();
         }
-        
+
         #region Public sync methods
 
 
@@ -506,7 +506,6 @@ namespace MiraiNotes.Android.Services
                 {
                     var tasksToCreate = tasksToBeSyncedDbResponse.Result
                         .Where(t => t.LocalStatus == LocalStatus.CREATED)
-                        .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
                         .ToList();
 
                     if (!tasksToCreate.Any())
@@ -514,9 +513,14 @@ namespace MiraiNotes.Android.Services
                     _logger.Information(
                         $"{nameof(SyncUpTasksAsync)}: Trying to save remotely {tasksToCreate.Count} tasks");
 
-                    foreach (var task in tasksToCreate)
+                    var parentTasks = tasksToCreate
+                        .Where(t => t.ParentTask == null)
+                        .OrderBy(t => t.Position)
+                        .ToList();
+
+                    foreach (var task in parentTasks)
                     {
-                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to save remotely taskId = {task.ID}");
+                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to save remotely parent taskId = {task.ID}");
                         string localID = task.GoogleTaskID;
                         var result = await SaveUpTask(task);
                         syncUpResults.Add(result);
@@ -524,31 +528,40 @@ namespace MiraiNotes.Android.Services
                         if (!result.Succeed)
                             continue;
 
-                        //If this isn't a sub task, lets update the sub tasks that belong to this one
-                        if (string.IsNullOrEmpty(task.ParentTask))
+                        foreach (var st in tasksToCreate
+                            .Where(st => st.ParentTask == localID))
                         {
                             _logger.Information(
-                                $"{nameof(SyncUpTasksAsync)}: Checking if taskId = {task.ID} contains subtask, " +
-                                $"and if it does, we are updating their parenttask with the new googletaskid");
-                            foreach (var st in tasksToCreate
-                                .Where(st => st.ParentTask == localID))
-                            {
-                                _logger.Information(
-                                    $"{nameof(SyncUpTasksAsync)}: TaskId = {st.ID} is a subtask of taskId = {task.ID}");
-                                st.ParentTask = task.GoogleTaskID;
-                            }
+                                $"{nameof(SyncUpTasksAsync)}: TaskId = {st.ID} is a subtask of taskId = {task.ID}");
+                            st.ParentTask = task.GoogleTaskID;
                         }
-                        //If this is a sub task and there are sts whose position depends in the current one
-                        //we need to update them
-                        else if (tasksToCreate.Any(st => st.Position == localID))
-                        {
-                            //In theory this should only affect 1 st
-                            foreach (var st in tasksToCreate
-                                .Where(st => st.Position == localID))
-                            {
-                                st.Position = task.GoogleTaskID;
-                            }
-                        }
+                    }
+
+                    var subTasks = tasksToCreate
+                        .Where(t => t.ParentTask != null)
+                        .OrderBy(t => t.Position)
+                        .ToList();
+                    foreach (var task in subTasks)
+                    {
+                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to save remotely subtaskId = {task.ID}");
+                        string localID = task.GoogleTaskID;
+                        var result = await SaveUpTask(task);
+                        syncUpResults.Add(result);
+
+                        if (!result.Succeed)
+                            continue;
+
+                                                ////If this is a sub task and there are sts whose position depends in the current one
+                        ////we need to update them
+                        //else if (tasksToCreate.Any(st => st.Position == localID))
+                        //{
+                        //    //In theory this should only affect 1 st
+                        //    foreach (var st in tasksToCreate
+                        //        .Where(st => st.Position == localID))
+                        //    {
+                        //        st.Position = task.GoogleTaskID;
+                        //    }
+                        //}
                     }
                 }),
 
@@ -725,6 +738,8 @@ namespace MiraiNotes.Android.Services
         #region Private task sync methods
         private async Task<EmptyResponseDto> SaveUpTask(GoogleTask task)
         {
+            var result = new EmptyResponseDto();
+
             var t = new GoogleTaskModel
             {
                 Notes = task.Notes,
@@ -734,12 +749,20 @@ namespace MiraiNotes.Android.Services
                 UpdatedAt = task.UpdatedAt
             };
 
-            var response = await _apiService.SaveTask(task.TaskList.GoogleTaskListID, t, task.ParentTask, task.Position);
+            var previousResponse = await _dataService
+                .TaskService
+                .GetPreviousTaskId(task.TaskList.GoogleTaskListID, task.ParentTask);
 
-            var result = new EmptyResponseDto
+            if (!previousResponse.Succeed)
             {
-                Succeed = response.Succeed
-            };
+                _logger.Error(
+                    $"{nameof(SyncUpTasksAsync)}: Couldnt get the previous taskId " +
+                    $"for taskListId = {task.TaskList.GoogleTaskListID} - parentTask = {task.ParentTask}");
+                result.Message = "Couldnt get the previous taskId";
+                return result;
+            }
+
+            var response = await _apiService.SaveTask(task.TaskList.GoogleTaskListID, t, task.ParentTask, previousResponse.Result);
 
             if (response.Succeed)
             {

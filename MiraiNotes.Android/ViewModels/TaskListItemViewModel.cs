@@ -5,16 +5,18 @@ namespace MiraiNotes.Android.ViewModels
 {
     public class TaskListItemViewModel : MvxViewModel
     {
-        private string _id;
+        private string _googleId;
         private string _title;
         private DateTimeOffset? _updatedAt;
         private int _numberOfTasks;
         private bool _isSelected;
 
-        public string Id
+        public int Id { get; set; }
+
+        public string GoogleId
         {
-            get => _id;
-            set => SetProperty(ref _id, value);
+            get => _googleId;
+            set => SetProperty(ref _googleId, value);
         }
 
         public string Title

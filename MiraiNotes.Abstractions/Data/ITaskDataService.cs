@@ -78,5 +78,25 @@ namespace MiraiNotes.Abstractions.Data
         /// <param name="remindOnGuid">An integer string (only used when <paramref name="dateType"/> equals <see cref="TaskNotificationDateType.REMINDER_DATE"/>)</param>
         /// <returns><see cref="ResponseDto{GoogleTask}"/></returns>
         Task<ResponseDto<GoogleTask>> AddNotificationDate(string taskID, TaskNotificationDateType dateType, DateTimeOffset remindOn, string remindOnGuid);
+
+        /// <summary>
+        /// Gets the lastest position in the specified <paramref name="taskListId"/>
+        /// </summary>
+        /// <param name="taskListId">The google tasklist id</param>
+        /// <param name="parentTask">The parent task id. If you supply this param, 
+        /// you will get the lastest position inside a task (AKA the lastest subtask position inside this task)
+        /// </param>
+        /// <returns>The lastest position</returns>
+        Task<ResponseDto<string>> GetLastestPosition(string taskListId, string parentTask = null);
+
+        /// <summary>
+        /// Gets the lastest taskId in the specified <paramref name="taskListId"/>
+        /// </summary>
+        /// <param name="taskListId">The google tasklist id</param>
+        /// <param name="parentTask">The parent task id. If you supply this param, 
+        /// you will get the lastest taskId inside a task (AKA the lastest subtaskid inside this task)
+        /// </param>
+        /// <returns>The lastest taskId</returns>
+        Task<ResponseDto<string>> GetPreviousTaskId(string taskListId, string parentTask);
     }
 }
