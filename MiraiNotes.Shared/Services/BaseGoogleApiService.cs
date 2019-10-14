@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MiraiNotes.Abstractions.GoogleApi;
 using MiraiNotes.Abstractions.Services;
@@ -8,6 +9,7 @@ using MiraiNotes.Core.Dto.Google.Requests;
 using MiraiNotes.Core.Dto.Google.Responses;
 using MiraiNotes.Core.Models.GoogleApi;
 using Refit;
+using Serilog;
 
 namespace MiraiNotes.Shared.Services
 {
@@ -15,6 +17,7 @@ namespace MiraiNotes.Shared.Services
     {
         private readonly IGoogleApi _googleApi;
         private readonly ITelemetryService _telemetryService;
+        private readonly ILogger _logger;
         private readonly string _clientId;
         private readonly string _clientSecret;
         private readonly string _redirectUrl;
@@ -33,15 +36,15 @@ namespace MiraiNotes.Shared.Services
         public BaseGoogleApiService(
             IGoogleApi googleApi,
             ITelemetryService telemetryService,
-            string clientId,
-            string clientSecret,
-            string redirectUrl)
+            ILogger logger)
         {
             _googleApi = googleApi;
             _telemetryService = telemetryService;
-            _clientId = clientId;
-            _clientSecret = clientSecret;
-            _redirectUrl = redirectUrl;
+            _logger = logger;
+
+            _clientId = AppConstants.ClientId;
+            _clientSecret = AppConstants.ClientSecret;
+            _redirectUrl = AppConstants.RedirectUrl;
         }
 
         public string GetAuthorizationUrl()
@@ -54,7 +57,7 @@ namespace MiraiNotes.Shared.Services
                    "&include_granted_scopes=true";
         }
 
-        #region Auth
+#region Auth
 
         public async Task<ResponseDto<TokenResponseDto>> GetAccessTokenAsync(string approvalCode)
         {
@@ -110,9 +113,9 @@ namespace MiraiNotes.Shared.Services
 
         public abstract Task<ResponseDto<TokenResponseDto>> SignInWithGoogle();
 
-        #endregion
+#endregion
 
-        #region User
+#region User
 
         public async Task<ResponseDto<GoogleUserResponseDto>> GetUser()
         {
@@ -144,9 +147,9 @@ namespace MiraiNotes.Shared.Services
             return response;
         }
 
-        #endregion
+#endregion
 
-        #region TaskList
+#region TaskList
 
         public async Task<ResponseDto<GoogleTaskApiResponseModel<GoogleTaskListModel>>> GetAllTaskLists(
             int maxResults = 100,
@@ -263,9 +266,9 @@ namespace MiraiNotes.Shared.Services
             return response;
         }
 
-        #endregion
+#endregion
 
-        #region Tasks
+#region Tasks
 
         public async Task<EmptyResponseDto> ClearTasks(string taskListId)
         {
@@ -373,8 +376,8 @@ namespace MiraiNotes.Shared.Services
                     response.Result = await _googleApi.SaveTask(taskListId, task, parent, previous);
                 else if (!string.IsNullOrEmpty(parent))
                     response.Result = await _googleApi.SaveTask(taskListId, task, parent);
-                else if (!string.IsNullOrEmpty(previous))
-                    throw new NotImplementedException("I think that if you have a previous valid you need a parent one");
+                //else if (!string.IsNullOrEmpty(previous))
+                //    throw new NotImplementedException("I think that if you have a previous valid you need a parent one");
                 else
                     response.Result = await _googleApi.SaveTask(taskListId, task);
 
@@ -415,29 +418,35 @@ namespace MiraiNotes.Shared.Services
             return response;
         }
 
-        #endregion
+#endregion
 
-        #region Helpers
+#region Helpers
 
-        private void HandleException<T>(Exception ex, T response) where T: EmptyResponseDto
+        private void HandleException<T>(Exception ex, T response, [CallerMemberName] string methodName = "") 
+            where T: EmptyResponseDto
         {
             response.Message = ex.Message;
+            _logger.Error(ex, $"{methodName}: An unknown error occurred");
             _telemetryService.TrackError(ex);
         }
 
-        private async Task HandleApiException<T>(ApiException apiEx, T response) where T : EmptyResponseDto
+        private async Task HandleApiException<T>(ApiException apiEx, T response, [CallerMemberName] string methodName = "") 
+            where T : EmptyResponseDto
         {
             try
             {
+                _logger.Error(apiEx, $"{methodName}: Api error occurred. Checking if we can get an google response error");
                 var error = await apiEx.GetContentAsAsync<GoogleResponseErrorModel>();
                 if (error is null)
                 {
                     response.Message = apiEx.Message;
+                    _logger.Error($"{methodName}: Couldnt get the google.. ApiMsg = {response.Message}");
                 }
                 else
                 {
                     string msg = GetGoogleError(error);
                     response.Message = msg;
+                    _logger.Error($"{methodName}: Got the google error = {msg}");
                 }
             }
             catch (Exception)
@@ -456,6 +465,6 @@ namespace MiraiNotes.Shared.Services
             return msg;
         }
 
-        #endregion
+#endregion
     }
 }

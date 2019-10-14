@@ -4,17 +4,16 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Dto.Google.Responses;
 using MiraiNotes.Shared.Services;
+using Serilog;
 
 namespace MiraiNotes.Android.Services
 {
     public class GoogleApiService : BaseGoogleApiService
     {
         public GoogleApiService(
-            IGoogleApi googleApi, 
+            IGoogleApi googleApi,
             ITelemetryService telemetryService,
-            string clientId, 
-            string clientSecret, 
-            string redirectUrl) : base(googleApi, telemetryService, clientId, clientSecret, redirectUrl)
+            ILogger logger) : base(googleApi, telemetryService, logger.ForContext<GoogleApiService>())
         {
         }
 

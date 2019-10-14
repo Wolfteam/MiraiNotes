@@ -90,13 +90,7 @@ namespace MiraiNotes.Android
             var googleApiService = RestService.For<IGoogleApi>(client);
             Mvx.IoCProvider.RegisterSingleton(googleApiService);
 
-            Mvx.IoCProvider.RegisterType<IGoogleApiService>(() => new GoogleApiService(
-                Mvx.IoCProvider.Resolve<IGoogleApi>(),
-                Mvx.IoCProvider.Resolve<ITelemetryService>(),
-                AppConstants.ClientId,
-                string.Empty,
-                AppConstants.RedirectUrl)
-            );
+            Mvx.IoCProvider.RegisterType<IGoogleApiService, GoogleApiService>();
 
             AssemblyScanner
                 .FindValidatorsInAssembly(typeof(PasswordDialogViewModelValidator).Assembly)
@@ -325,6 +319,14 @@ namespace MiraiNotes.Android
                             Matching.FromSource($"{typeof(MarkTaskAsCompletedReceiver.MarkAsCompletedTask).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "mirai_notes_bg_marktaskascompleted_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(GoogleApiService).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "mirai_notes_googleapi_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
