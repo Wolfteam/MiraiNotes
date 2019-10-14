@@ -390,7 +390,7 @@ namespace MiraiNotes.Android.ViewModels
 
             Task.SubTasks = new MvxObservableCollection<TaskItemViewModel>(sts);
 
-            Messenger.Publish(new TaskSavedMsg(this, Task.GoogleId));
+            Messenger.Publish(new TaskSavedMsg(this, Task.GoogleId, 1 + subTasksToSave.Count));
 
             await CloseCommand.ExecuteAsync();
         }

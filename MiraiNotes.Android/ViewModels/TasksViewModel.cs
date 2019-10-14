@@ -119,7 +119,7 @@ namespace MiraiNotes.Android.ViewModels
             base.RegisterMessages();
             var subscriptions = new[] {
                 Messenger.Subscribe<TaskDeletedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask)),
-                Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg.TaskId)),
+                Messenger.Subscribe<TaskSavedMsg>(async msg => await OnTaskSaved(msg.TaskId, msg.ItemsAdded)),
                 Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
                 Messenger.Subscribe<ShowTasksLoadingMsg>(msg => IsBusy = msg.Show),
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder)),
@@ -200,9 +200,9 @@ namespace MiraiNotes.Android.ViewModels
             await NavigationService.Navigate<NewTaskViewModel, NewTaskViewModelParameter>(parameter);
         }
 
-        public async Task OnTaskSaved(string taskId)
+        public async Task OnTaskSaved(string taskId, int itemsAdded)
         {
-            Messenger.Publish(new RefreshNumberOfTasksMsg(this, true, 1));
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, true, itemsAdded));
 
             IsBusy = true;
             var dbResponse = await _dataService
