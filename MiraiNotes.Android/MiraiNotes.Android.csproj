@@ -312,7 +312,7 @@
       <Version>1.4.9</Version>
     </PackageReference>
     <PackageReference Include="Refit">
-      <Version>4.7.51</Version>
+      <Version>4.7.9</Version>
     </PackageReference>
     <PackageReference Include="Refractored.Controls.CircleImageView">
       <Version>1.2.0-beta</Version>
