@@ -48,6 +48,15 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
         }
 
+        public override void Prepare(TParameter parameter)
+        {
+            base.Prepare(parameter);
+
+            Title = TextProvider.Get("Confirmation");
+            OkText = TextProvider.Get("Ok");
+            CancelText = TextProvider.Get("Cancel");
+        }
+
         public override void ViewDestroy(bool viewFinishing = true)
         {
             Messenger.Publish(new HideKeyboardMsg(this));

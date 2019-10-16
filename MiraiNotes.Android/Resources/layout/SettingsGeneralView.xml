@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -172,74 +172,91 @@
                 app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
         </LinearLayout>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:minHeight="60dp"
+            android:orientation="horizontal"
             android:clickable="true"
             android:layout_marginTop="@dimen/settings_margin"
             android:background="?android:attr/selectableItemBackground"
             app:MvxBind="Click AskForPasswordWhenAppStartsCommand">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_gravity="center_vertical"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="Aks for a password when the app starts"
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['AskForPassword']"/>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="4"
-                    android:layout_gravity="center_vertical"
-                    android:layout_height="wrap_content"
-                    android:text="Aks for a password when the app starts"
-                    android:textSize="@dimen/settings_font_size_content"
-                    app:MvxBind="Text ['AskForPassword']"/>
-
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:clickable="false"
-                    app:MvxBind="Checked AskForPasswordWhenAppStarts"/>
-            </LinearLayout>
-
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:layout_gravity="center_vertical"
+                android:clickable="false"
+                app:MvxBind="Checked AskForPasswordWhenAppStarts"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:minHeight="60dp"
+            android:orientation="horizontal"
             android:clickable="true"
             android:layout_marginTop="@dimen/settings_margin"
             android:background="?android:attr/selectableItemBackground"
             app:MvxBind="Click AskForFingerPrintWhenAppStartsCommand">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_gravity="center_vertical"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="Ask for fingerprint"
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['AskForFingerprint']"/>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="4"
-                    android:layout_gravity="center_vertical"
-                    android:layout_height="wrap_content"
-                    android:text="Ask for fingerprint"
-                    android:textSize="@dimen/settings_font_size_content"
-                    app:MvxBind="Text ['AskForFingerprint']"/>
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:layout_gravity="center_vertical"
+                android:clickable="false"
+                app:MvxBind="Checked AskForFingerPrintWhenAppStarts"/>
+        </LinearLayout>
 
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:clickable="false"
-                    app:MvxBind="Checked AskForFingerPrintWhenAppStarts"/>
-            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:layout_marginTop="@dimen/settings_margin"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click AskBeforeDiscardChangesCommand">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content"
+                android:text="Ask before discard changes when creating / editing a task"
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['AskBeforeDiscardChanges']"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:layout_gravity="center_vertical"
+                android:clickable="false"
+                app:MvxBind="Checked AskBeforeDiscardChanges"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
-

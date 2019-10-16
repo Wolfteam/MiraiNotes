@@ -234,12 +234,23 @@ namespace MiraiNotes.Android.ViewModels.Settings
             get => AppSettings.ShowCompletedTasks;
             set => AppSettings.ShowCompletedTasks = value;
         }
+
+        public bool AskBeforeDiscardChanges
+        {
+            get => AppSettings.AskBeforeDiscardChanges;
+            set
+            {
+                AppSettings.AskBeforeDiscardChanges = value;
+                RaisePropertyChanged(() => AskBeforeDiscardChanges);
+            }
+        }
         #endregion
 
         #region Commands
         public IMvxCommand<MvxColor> AccentColorChangedCommand { get; private set; }
         public IMvxAsyncCommand AskForPasswordWhenAppStartsCommand { get; private set; }
         public IMvxAsyncCommand AskForFingerPrintWhenAppStartsCommand { get; private set; }
+        public IMvxCommand AskBeforeDiscardChangesCommand { get; private set; }
         #endregion
 
         public SettingsGeneralViewModel(
@@ -304,6 +315,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
                     AskForFingerPrintWhenAppStarts = value;
                 }
             });
+            AskBeforeDiscardChangesCommand = new MvxCommand(
+                () => AskBeforeDiscardChanges = !AskBeforeDiscardChanges);
         }
     }
 }

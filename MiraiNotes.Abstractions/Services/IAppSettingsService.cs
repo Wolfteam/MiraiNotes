@@ -33,5 +33,7 @@ namespace MiraiNotes.Abstractions.Services
         AppLanguageType AppLanguage { get; set; }
 
         string SelectedTaskListId { get; set; }
+
+        bool AskBeforeDiscardChanges { get; set; }
     }
 }

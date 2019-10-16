@@ -178,6 +178,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ask before discard changes when creating / editing a task.
+        /// </summary>
+        public static string AskBeforeDiscardChanges {
+            get {
+                return ResourceManager.GetString("AskBeforeDiscardChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ask for fingerprint when the app starts.
         /// </summary>
         public static string AskForFingerprint {
@@ -1281,6 +1290,15 @@ namespace MiraiNotes.Android.Localization {
         public static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to discard the changes made?.
+        /// </summary>
+        public static string WannaDiscardChanges {
+            get {
+                return ResourceManager.GetString("WannaDiscardChanges", resourceCulture);
             }
         }
         

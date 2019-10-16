@@ -183,6 +183,7 @@
     <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\AddSubTaskDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\AskBeforeDiscardChangesDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BaseConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ChangeTaskStatusDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\DeleteAccountDialogViewModel.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Views\Activities\SettingsActivity.cs" />
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\AddSubTaskDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\AskBeforeDiscardChangesDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\BaseDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\ChangeTaskStatusFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\DeleteAccountDialogFragment.cs" />

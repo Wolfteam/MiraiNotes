@@ -71,6 +71,12 @@ namespace MiraiNotes.Android.Services
             get => GetString(nameof(SelectedTaskListId));
             set => SetString(nameof(SelectedTaskListId), value);
         }
+
+        public bool AskBeforeDiscardChanges
+        {
+            get => GetBoolean(nameof(AskBeforeDiscardChanges));
+            set => SetBoolean(nameof(AskBeforeDiscardChanges), value);
+        }
         #endregion
 
         #region Synchronization

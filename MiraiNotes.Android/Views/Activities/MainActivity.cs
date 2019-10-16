@@ -183,6 +183,11 @@ namespace MiraiNotes.Android.Views.Activities
             {
                 tasksFragment.CloseFabMenu();
             }
+            else if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is NewTaskFragment fragment && 
+                fragment.ViewModel.ChangesWereMade())
+            {
+                fragment.ViewModel.CloseCommand.Execute();
+            }
             else
             {
                 base.OnBackPressed();

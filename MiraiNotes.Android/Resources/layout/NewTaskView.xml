@@ -71,6 +71,7 @@
                     app:MvxBind="Text Task.FullRemindOnText; Visibility Visibility(Task.HasAReminderDate)"/>
 
                 <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/TaskTitle"
                     android:layout_margin="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -537,4 +537,10 @@
   <data name="SubTaskWasAdded" xml:space="preserve">
     <value>La subtarea fue agregada pero debes guardar cambios</value>
   </data>
+  <data name="AskBeforeDiscardChanges" xml:space="preserve">
+    <value>Preguntar antes de descartar cambios al crear / editar una tarea</value>
+  </data>
+  <data name="WannaDiscardChanges" xml:space="preserve">
+    <value>¿ Estás seguro que deseas descartar los cambios realizados ?</value>
+  </data>
 </root>

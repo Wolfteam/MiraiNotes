@@ -22,6 +22,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
@@ -42,8 +43,10 @@ namespace MiraiNotes.Android.ViewModels
         private TaskListItemViewModel _selectedTaskList;
 
         private ObservableDictionary<string, string> _errors = new ObservableDictionary<string, string>();
-
+        private List<string> _changedProperties = new List<string>();
         private readonly MvxInteraction _viewModelLoaded = new MvxInteraction();
+
+        public readonly Dictionary<string, string> InitialValues = new Dictionary<string, string>();
         #endregion
 
         #region Interactors
@@ -142,7 +145,18 @@ namespace MiraiNotes.Android.ViewModels
             CloseCommand = new MvxAsyncCommand(async () =>
             {
                 Messenger.Publish(new HideKeyboardMsg(this));
-                await NavigationService.Close(this);
+
+                if (!AppSettings.AskBeforeDiscardChanges || !ChangesWereMade())
+                {
+                    await NavigationService.Close(this);
+                    return;
+                }
+
+                bool close = await NavigationService
+                    .Navigate<AskBeforeDiscardChangesDialogViewModel, TaskItemViewModel, bool>(Task);
+
+                if (close)
+                    await NavigationService.Close(this);
             });
 
             DeleteTaskCommand = new MvxAsyncCommand(async () =>
@@ -260,6 +274,8 @@ namespace MiraiNotes.Android.ViewModels
 
             task.SubTasks = _mapper.Map<MvxObservableCollection<TaskItemViewModel>>(subTasks);
             Task = task;
+
+            SaveInitialValues();
 
             ShowProgressBar = false;
         }
@@ -541,5 +557,50 @@ namespace MiraiNotes.Android.ViewModels
             var validationResult = _validator.Validate(Task);
             Errors.AddRange(validationResult.ToDictionary());
         }
+
+        private void SaveInitialValues()
+        {
+            var propertyTypes = new[] { typeof(string), typeof(bool), typeof(DateTimeOffset) };
+            var properties = Task.GetType()
+                .GetProperties()
+                .Where(p =>
+                    p.CanWrite &&
+                    p.CanRead &&
+                    p.MemberType == MemberTypes.Property &&
+                    propertyTypes.Contains(p.PropertyType));
+
+            foreach (PropertyInfo pi in properties)
+            {
+                InitialValues[pi.Name] = pi.GetValue(Task, null)?.ToString();
+            }
+        }
+
+        private void PropertyIsDirty(string property, bool isDirty)
+        {
+            if (isDirty && !_changedProperties.Contains(property))
+            {
+                _changedProperties.Add(property);
+            }
+            else if (!isDirty && _changedProperties.Contains(property))
+            {
+                _changedProperties.Remove(property);
+            }
+        }
+
+        public void TextChanged(string property, string newValue)
+        {
+            if (InitialValues.ContainsKey(property) &&
+                InitialValues[property] != newValue)
+            {
+                PropertyIsDirty(property, true);
+            }
+            else
+            {
+                PropertyIsDirty(property, false);
+            }
+        }
+
+        public bool ChangesWereMade() =>
+            _changedProperties.Any();
     }
 }

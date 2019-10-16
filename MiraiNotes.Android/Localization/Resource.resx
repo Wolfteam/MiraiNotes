@@ -517,4 +517,10 @@
   <data name="SubTaskWasAdded" xml:space="preserve">
     <value>Subtask was added but you need to save changes</value>
   </data>
+  <data name="AskBeforeDiscardChanges" xml:space="preserve">
+    <value>Ask before discard changes when creating / editing a task</value>
+  </data>
+  <data name="WannaDiscardChanges" xml:space="preserve">
+    <value>Are you sure you want to discard the changes made?</value>
+  </data>
 </root>

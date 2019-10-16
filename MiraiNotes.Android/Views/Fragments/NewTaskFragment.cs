@@ -51,7 +51,20 @@ namespace MiraiNotes.Android.Views.Fragments
 
             //lines below are used to place the icon to the top, otherwise it will appear at the center
             //of the edittext
+            var titleText = view.FindViewById<AppCompatEditText>(Resource.Id.TaskTitle);
             var editText = view.FindViewById<AppCompatEditText>(Resource.Id.TaskNotes);
+            editText.AfterTextChanged += (sender, args) =>
+            {
+                string key = nameof(TaskItemViewModel.Notes);
+                ViewModel.TextChanged(key, args.Editable?.ToString());
+            };
+
+            titleText.AfterTextChanged += (sender, args) =>
+            {
+                string key = nameof(TaskItemViewModel.Title);
+                ViewModel.TextChanged(key, args.Editable?.ToString());
+            };
+
             var innerDrawable = editText.GetCompoundDrawables().First();
             var gravityDrawable = new TopGravityDrawable(innerDrawable);
             innerDrawable.SetBounds(0, 0, innerDrawable.IntrinsicWidth, innerDrawable.IntrinsicHeight);
