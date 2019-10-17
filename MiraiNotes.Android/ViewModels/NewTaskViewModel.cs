@@ -408,7 +408,7 @@ namespace MiraiNotes.Android.ViewModels
 
             Messenger.Publish(new TaskSavedMsg(this, Task.GoogleId, 1 + subTasksToSave.Count));
 
-            await CloseCommand.ExecuteAsync();
+            await NavigationService.Close(this);
         }
 
         private async Task SaveNewTaskIntoDifferentTaskList(GoogleTask entity)
@@ -439,7 +439,7 @@ namespace MiraiNotes.Android.ViewModels
             _dialogService.ShowSnackBar(GetText("TaskWasCreated", SelectedTaskList.Title));
 
             //TODO: I SHOULD DO SOMETHING HERE WHEN MOVING THE TASK
-            await CloseCommand.ExecuteAsync();
+            await NavigationService.Close(this);
         }
 
 
