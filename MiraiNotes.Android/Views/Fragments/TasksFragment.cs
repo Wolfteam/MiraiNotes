@@ -1,20 +1,24 @@
-﻿using Android.OS;
+﻿using Android.Graphics;
+using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Views;
 using Android.Widget;
 using MiraiNotes.Android.Adapters;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
+using System;
+using System.Collections.Generic;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
     [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame)]
-    public class TasksFragment : BaseFragment<TasksViewModel>
+    public class TasksFragment : BaseFragment<TasksViewModel>, ISwipeButtonClickListener
     {
         protected override int FragmentId => Resource.Layout.TasksView;
         public bool IsFabOpen = false;
@@ -28,7 +32,9 @@ namespace MiraiNotes.Android.Views.Fragments
         private View _fabBgLayout;
         private MvxRecyclerView _taskRecyclerView;
         private TasksAdapter _tasksAdapter;
-        private SimpleItemTouchHelperCallback _callback;
+        private SwipeCallback _swipeCallback;
+        private const int MoveTaskButtonId = 1;
+        private const int DeleteTaskButtonId = 2;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -65,20 +71,23 @@ namespace MiraiNotes.Android.Views.Fragments
                 => CloseFabMenu();
 
             _tasksAdapter = new TasksAdapter((IMvxAndroidBindingContext)BindingContext);
-            _callback = new SimpleItemTouchHelperCallback(_tasksAdapter);
-            var touchHelper = new ItemTouchHelper(_callback);
 
             _taskRecyclerView = view.FindViewById<MvxRecyclerView>(Resource.Id.TaskRecyclerView);
-            _taskRecyclerView.AddOnScrollListener(new TasksRecyclerViewScrollListener(_mainFab, CloseSwypedItem));
             _taskRecyclerView.Adapter = _tasksAdapter;
             _taskRecyclerView.AddItemDecoration(new DividerItemDecoration(ParentActivity, LinearLayoutManager.Vertical));
 
-            //_taskRecyclerView.AddItemDecoration(new TaskRecyclerViewDecoration(c =>
-            //{
-            //    callback.OnDraw(c);
-            //}));
-            touchHelper.AttachToRecyclerView(_taskRecyclerView);
 
+            string delete = ViewModel.GetText("Delete");
+            string markAsCompleted = ViewModel.GetText("MarkTaskAs", "Completed");
+            var white = Color.White;
+            var green = new Color(ContextCompat.GetColor(MainActivity, Resource.Color.DarkGreenAccentColorLight));
+            var buttons = new List<SwipeButton>
+            {
+                new SwipeButton(MainActivity,DeleteTaskButtonId ,delete, Resource.Drawable.ic_delete_black_24dp, Color.Red, white, white, listener: this),
+                new SwipeButton(MainActivity,MoveTaskButtonId,markAsCompleted, Resource.Drawable.ic_done_black_24dp, green, white, white, position: UnderlayButtonPosition.Left, listener: this),
+            };
+
+            _swipeCallback = new SwipeCallback(MainActivity, _taskRecyclerView, buttons);
             return view;
         }
 
@@ -116,10 +125,20 @@ namespace MiraiNotes.Android.Views.Fragments
             }
         }
 
-        private void CloseSwypedItem()
+        public void OnClick(int buttonId, int pos)
         {
-            if (_callback.CurrentViewHolder != null)
-                _callback.ClearView(_taskRecyclerView, _callback.CurrentViewHolder);
+            switch (buttonId)
+            {
+                case DeleteTaskButtonId:
+                    ViewModel.SwipeToDeleteCommand.Execute(pos);
+                    break;
+                case MoveTaskButtonId:
+                    ViewModel.SwipeToChangeTaskStatus.Execute(pos);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(buttonId), buttonId, "The provided buttonId is not valid");
+            }
+            _swipeCallback.ResetView();
         }
     }
 }

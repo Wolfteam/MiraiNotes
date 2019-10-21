@@ -165,11 +165,16 @@
     <Compile Include="Interfaces\ITextProvider.cs" />
     <Compile Include="Listeners\ClickListener.cs" />
     <Compile Include="Interfaces\IItemTouchHelperViewHolder.cs" />
+    <Compile Include="Interfaces\ISwipeButtonClickListener.cs" />
     <Compile Include="Listeners\ProgressOverlayListener.cs" />
     <Compile Include="Listeners\SimpleItemTouchHelperCallback.cs" />
+    <Compile Include="Listeners\SimpleOnGestureListener.cs" />
+    <Compile Include="Listeners\SwipeCallbackBase.cs" />
+    <Compile Include="Listeners\SwipeCallback.cs" />
     <Compile Include="Listeners\TaskRecyclerViewDecoration.cs" />
     <Compile Include="Listeners\TasksRecyclerViewScrollListener.cs" />
     <Compile Include="Listeners\TouchListener.cs" />
+    <Compile Include="Listeners\SwipeButton.cs" />
     <Compile Include="Models\NotificationAction.cs" />
     <Compile Include="Models\Parameters\AddSubTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />

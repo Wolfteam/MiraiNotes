@@ -63,6 +63,8 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand AddNewTaskListCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskCommand { get; private set; }
         public IMvxAsyncCommand<TaskItemViewModel> ShowMenuOptionsDialogCommand { get; private set; }
+        public IMvxAsyncCommand<int> SwipeToDeleteCommand { get; private set; }
+        public IMvxAsyncCommand<int> SwipeToChangeTaskStatus { get; private set; }
         #endregion
 
         public TasksViewModel(
@@ -111,6 +113,17 @@ namespace MiraiNotes.Android.ViewModels
             {
                 var parameter = TaskMenuOptionsViewModelParameter.Instance(_currentTaskList, task);
                 return NavigationService.Navigate<TaskMenuOptionsViewModel, TaskMenuOptionsViewModelParameter>(parameter);
+            });
+            SwipeToDeleteCommand = new MvxAsyncCommand<int>((position) =>
+            {
+                var vm = Tasks.ElementAt(position);
+                return NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(vm);
+            });
+
+            SwipeToChangeTaskStatus = new MvxAsyncCommand<int>((position) =>
+            {
+                var vm = Tasks.ElementAt(position);
+                return NavigationService.Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(vm);
             });
         }
 
