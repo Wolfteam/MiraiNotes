@@ -32,6 +32,7 @@ namespace MiraiNotes.Android.Views.Fragments
         private View _fabBgLayout;
         private MvxRecyclerView _taskRecyclerView;
         private TasksAdapter _tasksAdapter;
+
         private SwipeCallback _swipeCallback;
         private const int MoveTaskButtonId = 1;
         private const int DeleteTaskButtonId = 2;
@@ -84,7 +85,7 @@ namespace MiraiNotes.Android.Views.Fragments
             var buttons = new List<SwipeButton>
             {
                 new SwipeButton(MainActivity,DeleteTaskButtonId ,delete, Resource.Drawable.ic_delete_black_24dp, Color.Red, white, white, listener: this),
-                new SwipeButton(MainActivity,MoveTaskButtonId,markAsCompleted, Resource.Drawable.ic_done_black_24dp, green, white, white, position: UnderlayButtonPosition.Left, listener: this),
+                new SwipeButton(MainActivity, MoveTaskButtonId, GetChangeTaskStatusText, Resource.Drawable.ic_done_black_24dp, GetChangeTaskStatusColor, white, white, position: UnderlayButtonPosition.Left, listener: this)
             };
 
             _swipeCallback = new SwipeCallback(MainActivity, _taskRecyclerView, buttons);
@@ -139,6 +140,22 @@ namespace MiraiNotes.Android.Views.Fragments
                     throw new ArgumentOutOfRangeException(nameof(buttonId), buttonId, "The provided buttonId is not valid");
             }
             _swipeCallback.ResetView();
+        }
+
+        public Color GetChangeTaskStatusColor(int position)
+        {
+            var item = ViewModel.Tasks[position];
+            return item.IsCompleted
+                ? new Color(ContextCompat.GetColor(MainActivity, Resource.Color.LigthBlueAccentColorLight))
+                : new Color(ContextCompat.GetColor(MainActivity, Resource.Color.DarkGreenAccentColorLight));
+        }
+
+        public string GetChangeTaskStatusText(int position)
+        {
+            var item = ViewModel.Tasks[position];
+            return item.IsCompleted
+                ? ViewModel.GetText("MarkTaskAs", "Incompleted")
+                : ViewModel.GetText("MarkTaskAs", "Completed");
         }
     }
 }

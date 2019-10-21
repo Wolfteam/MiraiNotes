@@ -14,7 +14,7 @@ namespace MiraiNotes.Android.Listeners
 {
     public abstract class SwipeCallbackBase : ItemTouchHelper.SimpleCallback
     {
-        private readonly Context _context;
+        public readonly Context Context;
         private readonly RecyclerView _recyclerView;
         private readonly Dictionary<int, List<SwipeButton>> _buttonsBuffer = new Dictionary<int, List<SwipeButton>>();
         private readonly Queue<int> _recoverQueue = new Queue<int>();
@@ -22,18 +22,18 @@ namespace MiraiNotes.Android.Listeners
         private int _swipedPos = -1;
         private float _swipeThreshold = 0.5f;
         private GestureDetector _gestureDetector;
-        
+
         public List<SwipeButton> Buttons { get; private set; } = new List<SwipeButton>();
         public virtual int ButtonWidth { get; set; } = (int)AndroidUtils.ToPixel(60, Application.Context);
-        
+
         public SwipeCallbackBase(Context context, RecyclerView recyclerView)
             : base(0, ItemTouchHelper.Left | ItemTouchHelper.Right)
         {
-            _context = context;
+            Context = context;
             _recyclerView = recyclerView;
             _gestureDetector = new GestureDetector(context, new SimpleOnGestureListener(this));
             _recyclerView.SetOnTouchListener(new TouchListener((v, e) => OnTouch(e)));
-            
+
             AttachSwipe();
         }
 
@@ -118,7 +118,6 @@ namespace MiraiNotes.Android.Listeners
             int pos = viewHolder.AdapterPosition;
             float translationX = dX;
             View itemView = viewHolder.ItemView;
-
             if (pos < 0)
             {
                 _swipedPos = pos;
@@ -216,7 +215,8 @@ namespace MiraiNotes.Android.Listeners
                                     right,
                                     itemView.Bottom
                             ),
-                            pos, dX, itemView //(to draw button on right)
+                            pos, dX, itemView
+                    //(to draw button on right)
                     );
                     //System.Diagnostics.Debug.WriteLine($"Recf Right = {right} - Left = {left} - Top = {itemView.Top} - Bottom = {itemView.Bottom}");
                     right = left;
@@ -230,7 +230,8 @@ namespace MiraiNotes.Android.Listeners
                                     itemView.Top,
                                     right,
                                     itemView.Bottom
-                            ), pos, dX, itemView //(to draw button on left)
+                            ), pos, dX, itemView
+                    //(to draw button on left)
 
                     );
                     //System.Diagnostics.Debug.WriteLine($"Recf Right = {right} - Left = {left} - Top = {itemView.Top} - Bottom = {itemView.Bottom}");
@@ -250,7 +251,7 @@ namespace MiraiNotes.Android.Listeners
 
         private void SetGestureDetector()
         {
-            _gestureDetector = new GestureDetector(_context, new SimpleOnGestureListener(this));
+            _gestureDetector = new GestureDetector(Context, new SimpleOnGestureListener(this));
         }
 
         public abstract void InstantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<SwipeButton> underlayButtons);

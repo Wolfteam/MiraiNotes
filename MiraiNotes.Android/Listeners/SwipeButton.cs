@@ -22,10 +22,15 @@ namespace MiraiNotes.Android.Listeners
         private int _pos;
         private RectF _clickRegion;
 
+        private Func<int, string> _getText;
+        private Func<int, Color> _getBgColor;
+
         public int Id { get; }
-        public string Text { get; set; }
+        public string Text
+            => _getText(_pos);
         public int ImageResId { get; set; }
-        public Color BackgroundColor { get; set; }
+        public Color BackgroundColor
+            => _getBgColor(_pos);
         public Color IconColor { get; set; }
         public Color TextColor { get; set; }
         public int TextSize { get; }
@@ -45,10 +50,36 @@ namespace MiraiNotes.Android.Listeners
             ISwipeButtonClickListener listener = null)
         {
             _context = context;
+
+            _getText = (_) => text;
+            _getBgColor = (_) => backgroundColor;
             Id = id;
-            Text = text;
             ImageResId = imageResId;
-            BackgroundColor = backgroundColor;
+            IconColor = iconColor;
+            TextColor = textColor;
+            TextSize = textSize;
+            Position = position;
+            Listener = listener;
+        }
+
+        public SwipeButton(
+            Context context,
+            int id,
+            Func<int, string> text,
+            int imageResId,
+            Func<int, Color> backgroundColor,
+            Color iconColor,
+            Color textColor,
+            int textSize = 14,
+            UnderlayButtonPosition position = UnderlayButtonPosition.Right,
+            ISwipeButtonClickListener listener = null)
+        {
+            _context = context;
+            _getBgColor = backgroundColor;
+            _getText = text;
+
+            Id = id;
+            ImageResId = imageResId;
             IconColor = iconColor;
             TextColor = textColor;
             TextSize = textSize;
