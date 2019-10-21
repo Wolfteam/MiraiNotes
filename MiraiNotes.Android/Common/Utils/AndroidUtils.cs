@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Views;
@@ -7,6 +8,7 @@ using MiraiNotes.Android.Listeners;
 using System;
 using static Android.App.ActivityManager;
 using static Android.Graphics.Bitmap;
+using AndroidUtil = Android.Util;
 
 namespace MiraiNotes.Android.Common.Utils
 {
@@ -94,6 +96,18 @@ namespace MiraiNotes.Android.Common.Utils
 
             var longVal = dt - javaMinDt;
             picker.MaxDate = (long)longVal.TotalMilliseconds;
+        }
+
+        public static float ToPixel(float dp, Context context)
+        {
+            var dmd = (float)AndroidUtil.DisplayMetricsDensity.Default;
+            return dp * ((float)context.Resources.DisplayMetrics.DensityDpi / dmd);
+        }
+
+        public static float ToDp(float px, Context context)
+        {
+            var dmd = (float)AndroidUtil.DisplayMetricsDensity.Default;
+            return px / ((float)context.Resources.DisplayMetrics.DensityDpi / dmd);
         }
     }
 }
