@@ -249,7 +249,10 @@ namespace MiraiNotes.Android.ViewModels
         public async Task InitView(string taskId)
         {
             if (string.IsNullOrEmpty(taskId))
+            {
+                SaveInitialValues();
                 return;
+            }
 
             ShowProgressBar = true;
             var tasksResponse = await _dataService
