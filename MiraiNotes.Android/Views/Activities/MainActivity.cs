@@ -167,15 +167,15 @@ namespace MiraiNotes.Android.Views.Activities
             var sortOption = menu.FindItem(Resource.Id.SortTasks);
             sortOption?.SetTitle(ViewModel.GetText("Sort"));
 
-            var sortMenu = sortOption.SubMenu;
+            var sortMenu = sortOption?.SubMenu;
 
             var resourceId = GetSelectedResourceId(_selectedTaskSortType);
-            sortMenu.FindItem(Resource.Id.SortByNameAsc).SetTitle(ViewModel.GetText("SortByNameAsc"));
-            sortMenu.FindItem(Resource.Id.SortByNameDesc).SetTitle(ViewModel.GetText("SortByNameDesc"));
-            sortMenu.FindItem(Resource.Id.SortByUpdatedDateAsc).SetTitle(ViewModel.GetText("SortByUpdatedDateAsc"));
-            sortMenu.FindItem(Resource.Id.SortByUpdatedDateDesc).SetTitle(ViewModel.GetText("SortByUpdatedDateDesc"));
+            sortMenu?.FindItem(Resource.Id.SortByNameAsc)?.SetTitle(ViewModel.GetText("SortByNameAsc"));
+            sortMenu?.FindItem(Resource.Id.SortByNameDesc)?.SetTitle(ViewModel.GetText("SortByNameDesc"));
+            sortMenu?.FindItem(Resource.Id.SortByUpdatedDateAsc)?.SetTitle(ViewModel.GetText("SortByUpdatedDateAsc"));
+            sortMenu?.FindItem(Resource.Id.SortByUpdatedDateDesc)?.SetTitle(ViewModel.GetText("SortByUpdatedDateDesc"));
 
-            sortMenu.FindItem(resourceId).SetChecked(true);
+            sortMenu?.FindItem(resourceId)?.SetChecked(true);
 
             return base.OnPrepareOptionsMenu(menu);
         }
