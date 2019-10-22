@@ -10,23 +10,60 @@
     app:showAsAction="ifRoom" />
 
   <item
-    android:id="@+id/Accounts"
+    android:id="@+id/SortTasks"
     android:orderInCategory="101"
-    android:title="Accounts"
-    android:icon="@drawable/ic_account_circle_black_24dp"
-    app:showAsAction="never" />
+    android:title="Sort"
+    android:icon="@drawable/ic_sort_black_24dp"
+    app:showAsAction="ifRoom" >
+
+    <menu>
+      <group android:checkableBehavior="single">
+        <item
+          android:id="@+id/SortByNameAsc"
+          android:orderInCategory="1"
+          android:title="By name asc"
+          android:icon="@drawable/ic_keyboard_arrow_up_black_24dp"
+          app:showAsAction="ifRoom" />
+        <item
+          android:id="@+id/SortByNameDesc"
+          android:orderInCategory="2"
+          android:title="By name desc"
+          android:icon="@drawable/ic_keyboard_arrow_down_black_24dp"
+          app:showAsAction="ifRoom" />
+        <item
+          android:id="@+id/SortByUpdatedDateAsc"
+          android:orderInCategory="3"
+          android:title="By updated date asc"
+          android:icon="@drawable/ic_keyboard_arrow_up_black_24dp"
+          app:showAsAction="ifRoom" />
+        <item
+          android:id="@+id/SortByUpdatedDateDesc"
+          android:orderInCategory="4"
+          android:title="By updated date desc"
+          android:icon="@drawable/ic_keyboard_arrow_down_black_24dp"
+          app:showAsAction="ifRoom" />
+      </group>
+    </menu>
+  </item>
 
   <item
-      android:id="@+id/Settings"
-      android:orderInCategory="102"
-      android:title="@string/action_settings"
-      android:icon="@drawable/ic_settings_black_24dp"
-      app:showAsAction="never" />
+    android:id="@+id/Accounts"
+    android:orderInCategory="102"
+    android:title="Accounts"
+    android:icon="@drawable/ic_account_circle_black_24dp"
+    app:showAsAction="ifRoom" />
+
+  <item
+    android:id="@+id/Settings"
+    android:orderInCategory="103"
+    android:title="@string/action_settings"
+    android:icon="@drawable/ic_settings_black_24dp"
+    app:showAsAction="ifRoom" />
 
   <item
     android:id="@+id/Logout"
-    android:orderInCategory="103"
+    android:orderInCategory="104"
     android:title="Logout"
     android:icon="@drawable/ic_arrow_back_black_24dp"
-    app:showAsAction="never" />
+    app:showAsAction="ifRoom" />
 </menu>

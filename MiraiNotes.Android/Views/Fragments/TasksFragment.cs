@@ -134,7 +134,7 @@ namespace MiraiNotes.Android.Views.Fragments
                     ViewModel.SwipeToDeleteCommand.Execute(pos);
                     break;
                 case MoveTaskButtonId:
-                    ViewModel.SwipeToChangeTaskStatus.Execute(pos);
+                    ViewModel.SwipeToChangeTaskStatusCommand.Execute(pos);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(buttonId), buttonId, "The provided buttonId is not valid");

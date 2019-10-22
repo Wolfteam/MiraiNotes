@@ -27,6 +27,7 @@ namespace MiraiNotes.Android.ViewModels
         private readonly MvxInteraction<AppThemeChangedMsg> _appThemeChanged = new MvxInteraction<AppThemeChangedMsg>();
         private readonly MvxInteraction _appLanguageChanged = new MvxInteraction();
         private readonly MvxInteraction _hideKeyboard = new MvxInteraction();
+        private readonly MvxInteraction<TaskSortType> _updateTaskSortOrder = new MvxInteraction<TaskSortType>();
 
         private bool _showProgressOverlay;
         #endregion
@@ -43,6 +44,9 @@ namespace MiraiNotes.Android.ViewModels
 
         public IMvxInteraction HideKeyboard
             => _hideKeyboard;
+
+        public IMvxInteraction<TaskSortType> UpdateTaskSortOrder
+            => _updateTaskSortOrder;
         #endregion
 
         #region Properties
@@ -62,6 +66,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand LogoutCommand { get; private set; }
         public IMvxAsyncCommand InitViewCommand { get; private set; }
         public IMvxCommand SyncCommand { get; private set; }
+        public IMvxCommand<TaskSortType> TaskSortOrderChangedCommand { get; private set; }
         #endregion
 
         public MainViewModel(
@@ -104,6 +109,9 @@ namespace MiraiNotes.Android.ViewModels
 
             SyncCommand = new MvxCommand(
                 () => _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC));
+
+            TaskSortOrderChangedCommand = new MvxCommand<TaskSortType>(
+                (sortType) => Messenger.Publish(new TaskSortOrderChangedMsg(this, sortType)));
         }
 
         public override void RegisterMessages()
@@ -122,7 +130,8 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<ShowProgressOverlayMsg>(msg =>
                 {
                     ShowProgressOverlay = msg.Show;
-                })
+                }),
+                Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => _updateTaskSortOrder.Raise(msg.NewSortOrder))
             };
 
             SubscriptionTokens.AddRange(tokens);

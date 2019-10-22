@@ -523,4 +523,7 @@
   <data name="WannaDiscardChanges" xml:space="preserve">
     <value>Are you sure you want to discard the changes made?</value>
   </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Sort</value>
+  </data>
 </root>

@@ -543,4 +543,7 @@
   <data name="WannaDiscardChanges" xml:space="preserve">
     <value>¿ Estás seguro que deseas descartar los cambios realizados ?</value>
   </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Ordenar</value>
+  </data>
 </root>

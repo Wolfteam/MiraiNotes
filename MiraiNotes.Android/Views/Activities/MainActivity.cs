@@ -8,10 +8,12 @@ using Android.Views;
 using MiraiNotes.Android.Models;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments;
+using MiraiNotes.Core.Enums;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 using MvvmCross.ViewModels;
 using Newtonsoft.Json;
+using System;
 
 namespace MiraiNotes.Android.Views.Activities
 {
@@ -26,9 +28,12 @@ namespace MiraiNotes.Android.Views.Activities
         private IMvxInteraction<AppThemeChangedMsg> _changeThemeRequest;
         private IMvxInteraction _hideKeyboardRequest;
         private IMvxInteraction _changeLanguageRequest;
+        private IMvxInteraction<TaskSortType> _updateTaskSortOrderRequest;
         private bool _lockDrawerRequest;
+        private TaskSortType _selectedTaskSortType;
 
         public const string InitParamsKey = "InitParams";
+
 
         public IMvxInteraction<bool> ShowDrawerRequest
         {
@@ -86,7 +91,20 @@ namespace MiraiNotes.Android.Views.Activities
                         => HideSoftKeyboard();
             }
         }
+        public IMvxInteraction<TaskSortType> UpdateTaskSortOrderRequest
+        {
+            get => _updateTaskSortOrderRequest;
+            set
+            {
+                if (_updateTaskSortOrderRequest != null)
+                    _updateTaskSortOrderRequest.Requested -= (sender, args)
+                        => SetSelectedTaskSortType(args.Value);
 
+                _updateTaskSortOrderRequest = value;
+                _updateTaskSortOrderRequest.Requested += (sender, args)
+                        => SetSelectedTaskSortType(args.Value);
+            }
+        }
 
         public DrawerLayout DrawerLayout { get; private set; }
         public override int LayoutId
@@ -119,8 +137,10 @@ namespace MiraiNotes.Android.Views.Activities
             set.Bind(this).For(v => v.ChangeLanguageRequest).To(vm => vm.AppLanguageChanged).OneWay();
             set.Bind(this).For(v => v.HideKeyboardRequest).To(vm => vm.HideKeyboard).OneWay();
             set.Bind(this).For(v => v.LockDrawerRequest).To(vm => vm.ShowProgressOverlay).OneWay();
+            set.Bind(this).For(v => v.UpdateTaskSortOrderRequest).To(vm => vm.UpdateTaskSortOrder).OneWay();
             set.Apply();
 
+            _selectedTaskSortType = ViewModel.AppSettings.DefaultTaskSortOrder;
             ViewModel.InitViewCommand.Execute();
         }
 
@@ -144,6 +164,19 @@ namespace MiraiNotes.Android.Views.Activities
             var fullSyncOption = menu.FindItem(Resource.Id.FullSync);
             fullSyncOption?.SetTitle(ViewModel.GetText("Synchronization"));
 
+            var sortOption = menu.FindItem(Resource.Id.SortTasks);
+            sortOption?.SetTitle(ViewModel.GetText("Sort"));
+
+            var sortMenu = sortOption.SubMenu;
+
+            var resourceId = GetSelectedResourceId(_selectedTaskSortType);
+            sortMenu.FindItem(Resource.Id.SortByNameAsc).SetTitle(ViewModel.GetText("SortByNameAsc"));
+            sortMenu.FindItem(Resource.Id.SortByNameDesc).SetTitle(ViewModel.GetText("SortByNameDesc"));
+            sortMenu.FindItem(Resource.Id.SortByUpdatedDateAsc).SetTitle(ViewModel.GetText("SortByUpdatedDateAsc"));
+            sortMenu.FindItem(Resource.Id.SortByUpdatedDateDesc).SetTitle(ViewModel.GetText("SortByUpdatedDateDesc"));
+
+            sortMenu.FindItem(resourceId).SetChecked(true);
+
             return base.OnPrepareOptionsMenu(menu);
         }
 
@@ -165,6 +198,14 @@ namespace MiraiNotes.Android.Views.Activities
                 case Resource.Id.FullSync:
                     ViewModel.SyncCommand.Execute();
                     break;
+                case Resource.Id.SortByNameAsc:
+                case Resource.Id.SortByNameDesc:
+                case Resource.Id.SortByUpdatedDateAsc:
+                case Resource.Id.SortByUpdatedDateDesc:
+                    item.SetChecked(true);
+                    var sortType = GetSelectedTaskSortType(id);
+                    ViewModel.TaskSortOrderChangedCommand.Execute(sortType);
+                    break;
                 default:
                     return false;
             }
@@ -183,7 +224,7 @@ namespace MiraiNotes.Android.Views.Activities
             {
                 tasksFragment.CloseFabMenu();
             }
-            else if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is NewTaskFragment fragment && 
+            else if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is NewTaskFragment fragment &&
                 fragment.ViewModel.ChangesWereMade())
             {
                 fragment.ViewModel.CloseCommand.Execute();
@@ -221,6 +262,50 @@ namespace MiraiNotes.Android.Views.Activities
             }
 
             return intent;
+        }
+
+        private TaskSortType GetSelectedTaskSortType(int resourceId)
+        {
+            switch (resourceId)
+            {
+                case Resource.Id.SortByNameAsc:
+                    return TaskSortType.BY_NAME_ASC;
+                case Resource.Id.SortByNameDesc:
+                    return TaskSortType.BY_NAME_DESC;
+                case Resource.Id.SortByUpdatedDateAsc:
+                    return TaskSortType.BY_UPDATED_DATE_ASC;
+                case Resource.Id.SortByUpdatedDateDesc:
+                    return TaskSortType.BY_UPDATED_DATE_DESC;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(resourceId), resourceId, "The provided resource id does not exists");
+            }
+        }
+
+        private int GetSelectedResourceId(TaskSortType sortType)
+        {
+            switch (sortType)
+            {
+                case TaskSortType.BY_NAME_ASC:
+                    return Resource.Id.SortByNameAsc;
+                case TaskSortType.BY_NAME_DESC:
+                    return Resource.Id.SortByNameDesc;
+                case TaskSortType.BY_UPDATED_DATE_ASC:
+                    return Resource.Id.SortByUpdatedDateAsc;
+                case TaskSortType.BY_UPDATED_DATE_DESC:
+                    return Resource.Id.SortByUpdatedDateDesc;
+                case TaskSortType.CUSTOM_ASC:
+                case TaskSortType.CUSTOM_DESC:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sortType), sortType, "The TaskSortType doesnt have a default sort type");
+            }
+        }
+
+        private void SetSelectedTaskSortType(TaskSortType sortType)
+        {
+            //For some reason if the SorTask menu options item is visible, it wont automatically trigger the invalidate options
+            //when clicked
+            InvalidateOptionsMenu();
+            _selectedTaskSortType = sortType;
         }
     }
 }
