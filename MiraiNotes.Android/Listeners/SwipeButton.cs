@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
+using Android.OS;
 using Android.Support.V4.Content;
 using Android.Text;
 using Android.Views;
@@ -24,6 +25,9 @@ namespace MiraiNotes.Android.Listeners
 
         private Func<int, string> _getText;
         private Func<int, Color> _getBgColor;
+
+        private int _iconWidth;
+        private int _iconHeight;
 
         public int Id { get; }
         public string Text
@@ -60,6 +64,8 @@ namespace MiraiNotes.Android.Listeners
             TextSize = textSize;
             Position = position;
             Listener = listener;
+
+            Init();
         }
 
         public SwipeButton(
@@ -85,6 +91,14 @@ namespace MiraiNotes.Android.Listeners
             TextSize = textSize;
             Position = position;
             Listener = listener;
+
+            Init();
+        }
+
+        private void Init()
+        {
+            _iconWidth = (int)AndroidUtils.ToPixel(48, _context);
+            _iconHeight = (int)AndroidUtils.ToPixel(48, _context);
         }
 
         public bool OnClick(float x, float y)
@@ -102,52 +116,56 @@ namespace MiraiNotes.Android.Listeners
             _clickRegion = rect;
             _pos = pos;
 
-            //POR ALGUNA RAZON EL COLOR ROJO NO SE VE EN ANDROID 5...
-            using (var colorDrawable = new ColorDrawable(BackgroundColor))
-            {
-                colorDrawable.SetBounds((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
-                colorDrawable.Draw(c);
-            }
-
-            // Draw Icon
             float cHeight = rect.Height();
             float cWidth = rect.Width();
 
-            int iconHeight = (int)AndroidUtils.ToPixel(48, _context);
-            int iconWidth = (int)AndroidUtils.ToPixel(48, _context);
-            int iconTop = (int)(rect.Top + cHeight * 0.1);
-            int iconBottom = iconTop + iconHeight;
+            // Draw background
+            DrawBackground(c, rect);
+
+            var r = new Rect();
+            var textPaint = new TextPaint
+            {
+                TextSize = AndroidUtils.ToPixel(TextSize, _context),
+                Color = TextColor
+            };
+
+            textPaint.GetTextBounds(Text, 0, Text.Length, r);
+
+            int box = (int)(r.Height() + cHeight * 0.05 + _iconHeight);
+            var extraTop = GetExtraTop(cHeight, box);
+
+            //int iconTop = (int)(rect.Top + GetTop(cHeight, _iconHeight));
+            int iconTop = (int)(rect.Top + extraTop);
+            int iconBottom = iconTop + _iconHeight;
             int iconLeft = 0;
             int iconRight = 0;
 
             if (dX > 0)
             {
-                iconLeft = (int)(rect.Left + cWidth / 2 - iconWidth / 2);
-                iconRight = iconLeft + iconWidth;
+                iconLeft = (int)(rect.Left + cWidth / 2 - _iconWidth / 2);
+                iconRight = iconLeft + _iconWidth;
             }
             else if (dX < 0)
             {
-                iconLeft = (int)(rect.Left + cWidth / 2 - iconWidth / 2);
-                iconRight = iconLeft + iconWidth;
+                iconLeft = (int)(rect.Left + cWidth / 2 - _iconWidth / 2);
+                iconRight = iconLeft + _iconWidth;
             }
-            DrawIcon(c, dX, iconLeft, iconTop, iconRight, iconBottom);
 
             //Draw Text
-            var paint = new TextPaint
-            {
-                AntiAlias = true,
-                Color = TextColor,
-                TextSize = AndroidUtils.ToPixel(TextSize, _context),
-                TextAlign = Paint.Align.Left,
-            };
-            paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Bold));
-            var r = new Rect();
-            paint.GetTextBounds(Text, 0, Text.Length, r);
+            bool textWasDrawed = DrawText(c, rect, textPaint, r, iconBottom);
 
-            float x = cWidth / 2f - r.Width() / 2f - r.Left;
-            float y = cHeight / 2f + r.Height() / 2f - r.Bottom;
-            //c.DrawText(Text, rect.Left + x, rect.Top + y, p);
-            c.DrawText(Text, rect.Left + x, (float)(iconBottom + 20), paint);
+            // Draw Icon
+            if (textWasDrawed)
+                DrawIcon(c, dX, iconLeft, iconTop, iconRight, iconBottom);
+        }
+
+        private void DrawBackground(Canvas c, RectF rect)
+        {
+            using (var colorDrawable = new ColorDrawable(BackgroundColor))
+            {
+                colorDrawable.SetBounds((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
+                colorDrawable.Draw(c);
+            }
         }
 
         private void DrawIcon(Canvas c, float dx, int iconLeft, int iconTop, int iconRight, int iconBottom)
@@ -161,24 +179,45 @@ namespace MiraiNotes.Android.Listeners
             }
         }
 
-        private void DrawText(Canvas c, RectF rect)
+        private bool DrawText(Canvas c, RectF rect, TextPaint textPaint, Rect r, int iconBottom)
         {
-            // Draw Text
-            var textPaint = new TextPaint
-            {
-                TextSize = AndroidUtils.ToPixel(TextSize, _context),
-                Color = TextColor
-            };
             c.Save();
 
-            var sl = new StaticLayout(Text, textPaint, Math.Abs((int)rect.Width()), Layout.Alignment.AlignCenter, 1, 1, false);
-            var r = new Rect();
-            textPaint.GetTextBounds(Text, 0, Text.Length, r);
+            StaticLayout sl;
+            if (Build.VERSION.SdkInt > BuildVersionCodes.M)
+            {
+                sl = StaticLayout.Builder.Obtain(Text, 0, Text.Length, textPaint, Math.Abs((int)rect.Width()))
+                    .SetMaxLines(2)
+                    .SetLineSpacing(1, 1)
+                    .SetIncludePad(false)
+                    .SetEllipsize(TextUtils.TruncateAt.End)
+                    .SetAlignment(Layout.Alignment.AlignCenter)
+                    .Build();
+            }
+            else
+            {
+                sl = new StaticLayout(Text, textPaint, Math.Abs((int)rect.Width()), Layout.Alignment.AlignCenter, 1, 1, false);
+            }
 
-            float y = (rect.Height() / 2f) + (r.Height() / 2f) - r.Bottom - (sl.Height / 2);
-            c.Translate(rect.Left, rect.Top + y);
-            sl.Draw(c);
-            c.Restore();
+            using (sl)
+            {
+                //float y = rect.Top + rect.Height() / 2 + GetTop(rect.Height(), r.Height()) - sl.Height / 2;
+                float y = iconBottom;
+                if (r.Width() / 2 > rect.Width())
+                    return false;
+
+                c.Translate(rect.Left, y);
+                sl.Draw(c);
+                c.Restore();
+            }
+
+            return true;
+        }
+
+        private float GetExtraTop(float rectHeight, float itemHeight)
+        {
+            var diff = rectHeight - itemHeight;
+            return Math.Abs(diff / 2);
         }
     }
 }
