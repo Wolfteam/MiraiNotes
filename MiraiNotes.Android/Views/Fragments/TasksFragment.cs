@@ -9,9 +9,11 @@ using MiraiNotes.Android.Adapters;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
+using MvvmCross.Binding.BindingContext;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
+using MvvmCross.ViewModels;
 using System;
 using System.Collections.Generic;
 
@@ -33,13 +35,34 @@ namespace MiraiNotes.Android.Views.Fragments
         private MvxRecyclerView _taskRecyclerView;
         private TasksAdapter _tasksAdapter;
 
-        private SwipeCallback _swipeCallback;
+        public SwipeCallback SwipeCallback;
         private const int MoveTaskButtonId = 1;
         private const int DeleteTaskButtonId = 2;
+
+        private IMvxInteraction _resetSwipedItemsRequest;
+        public IMvxInteraction ResetSwipedItemsRequest
+        {
+            get => _resetSwipedItemsRequest;
+            set
+            {
+                if (_resetSwipedItemsRequest != null)
+                    _resetSwipedItemsRequest.Requested -= (sender, args)
+                        => ResetSwipedItems();
+
+                _resetSwipedItemsRequest = value;
+                _resetSwipedItemsRequest.Requested += (sender, args)
+                        => ResetSwipedItems();
+            }
+        }
+
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
+
+            var set = this.CreateBindingSet<TasksFragment, TasksViewModel>();
+            set.Bind(this).For(v => v.ResetSwipedItemsRequest).To(vm => vm.ResetSwipedItems);
+            set.Apply();
 
             _mainFab = view.FindViewById<FloatingActionButton>(Resource.Id.AppFab);
 
@@ -79,7 +102,6 @@ namespace MiraiNotes.Android.Views.Fragments
 
 
             string delete = ViewModel.GetText("Delete");
-            string markAsCompleted = ViewModel.GetText("MarkTaskAs", "Completed");
             var white = Color.White;
             var green = new Color(ContextCompat.GetColor(MainActivity, Resource.Color.DarkGreenAccentColorLight));
             var buttons = new List<SwipeButton>
@@ -88,7 +110,7 @@ namespace MiraiNotes.Android.Views.Fragments
                 new SwipeButton(MainActivity, MoveTaskButtonId, GetChangeTaskStatusText, Resource.Drawable.ic_done_black_24dp, GetChangeTaskStatusColor, white, white, position: UnderlayButtonPosition.Left, listener: this)
             };
 
-            _swipeCallback = new SwipeCallback(MainActivity, _taskRecyclerView, buttons);
+            SwipeCallback = new SwipeCallback(MainActivity, _taskRecyclerView, buttons);
             return view;
         }
 
@@ -139,10 +161,10 @@ namespace MiraiNotes.Android.Views.Fragments
                 default:
                     throw new ArgumentOutOfRangeException(nameof(buttonId), buttonId, "The provided buttonId is not valid");
             }
-            _swipeCallback.ResetView();
+            ResetSwipedItems();
         }
 
-        public Color GetChangeTaskStatusColor(int position)
+        private Color GetChangeTaskStatusColor(int position)
         {
             var item = ViewModel.Tasks[position];
             return item.IsCompleted
@@ -150,12 +172,17 @@ namespace MiraiNotes.Android.Views.Fragments
                 : new Color(ContextCompat.GetColor(MainActivity, Resource.Color.DarkGreenAccentColorLight));
         }
 
-        public string GetChangeTaskStatusText(int position)
+        private string GetChangeTaskStatusText(int position)
         {
             var item = ViewModel.Tasks[position];
             return item.IsCompleted
-                ? ViewModel.GetText("MarkTaskAs", "Incompleted")
-                : ViewModel.GetText("MarkTaskAs", "Completed");
+                ? ViewModel.GetText("Incompleted")
+                : ViewModel.GetText("Completed");
+        }
+
+        public void ResetSwipedItems()
+        {
+            SwipeCallback.ResetView();
         }
     }
 }

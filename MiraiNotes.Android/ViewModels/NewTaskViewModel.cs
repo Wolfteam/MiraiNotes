@@ -285,6 +285,7 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task SaveChanges()
         {
+            Messenger.Publish(new HideKeyboardMsg(this));
             bool isNewTask = Task.IsNew;
 
             Validate();

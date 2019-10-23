@@ -26,13 +26,17 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IGoogleApiService _googleApiService;
-        private readonly IUserCredentialService _userCredentialService;
 
         private TaskListItemViewModel _currentTaskList;
         private MvxObservableCollection<TaskItemViewModel> _tasks = new MvxObservableCollection<TaskItemViewModel>();
         private bool _isBusy;
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
+        private readonly MvxInteraction _resetSwipedItems = new MvxInteraction();
+        #endregion
+
+        #region Interactions
+        public IMvxInteraction ResetSwipedItems
+            => _resetSwipedItems;
         #endregion
 
         #region Properties
@@ -76,16 +80,12 @@ namespace MiraiNotes.Android.ViewModels
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            IGoogleApiService googleApiService,
-            IUserCredentialService userCredentialService,
             ITelemetryService telemetryService)
             : base(textProvider, messenger, logger.ForContext<TasksViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
-            _googleApiService = googleApiService;
-            _userCredentialService = userCredentialService;
         }
 
         public override void Prepare(TasksViewModelParameter parameter)
@@ -136,8 +136,6 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskStatusChangedMsg>(OnTaskStatusChanged),
                 Messenger.Subscribe<ShowTasksLoadingMsg>(msg => IsBusy = msg.Show),
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder)),
-                Messenger.Subscribe<DeleteTaskRequestMsg>(async msg => await DeleteTask(msg.Task)),
-                Messenger.Subscribe<ChangeTaskStatusRequestMsg>(async msg => await ChangeTaskStatus(msg.Task, msg.NewStatus)),
                 Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate)),
                 Messenger.Subscribe<TaskMovedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask, msg.NewTaskListId)),
                 Messenger.Subscribe<SubTaskSelectedMsg>(async msg => await OnSubTaskSelected(msg))
@@ -396,6 +394,8 @@ namespace MiraiNotes.Android.ViewModels
 
         private void SortTasks(TaskSortType sortType)
         {
+            _resetSwipedItems.Raise();
+
             if (Tasks == null)
                 return;
 
@@ -425,65 +425,6 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             CurrentTasksSortOrder = sortType;
-        }
-
-        private async Task DeleteTask(TaskItemViewModel task)
-        {
-            Messenger.Publish(new ShowProgressOverlayMsg(this));
-
-            var deleteResponse = await _dataService
-                .TaskService
-                .RemoveTaskAsync(task.GoogleId);
-
-            Messenger.Publish(new ShowProgressOverlayMsg(this, false));
-
-            if (!deleteResponse.Succeed)
-            {
-                Logger.Error(
-                    $"{nameof(DeleteTask)}: Couldn't delete the selected task." +
-                    $"Error = {deleteResponse.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-            OnTaskDeleted(task.GoogleId, task.ParentTask, task.HasParentTask);
-        }
-
-        private async Task ChangeTaskStatus(TaskItemViewModel task, GoogleTaskStatus newStatus)
-        {
-            string statusMessage =
-                $"{(newStatus == GoogleTaskStatus.COMPLETED ? GetText("Completed") : GetText("Incompleted"))}";
-
-            Messenger.Publish(new ShowProgressOverlayMsg(this));
-
-            var response = await _dataService
-                .TaskService
-                .ChangeTaskStatusAsync(task.GoogleId, newStatus);
-
-            Messenger.Publish(new ShowProgressOverlayMsg(this, false));
-
-            if (!response.Succeed)
-            {
-                Logger.Error(
-                    $"{nameof(ChangeTaskStatus)}: An error occurred while trying to mark {task.Title} as {statusMessage}." +
-                    $"Error = {response.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-
-            task.Status = response.Result.Status;
-            task.CompletedOn = response.Result.CompletedOn;
-            task.UpdatedAt = response.Result.UpdatedAt;
-
-            var msg = new TaskStatusChangedMsg(
-                this,
-                task.GoogleId,
-                task.ParentTask,
-                task.CompletedOn,
-                task.UpdatedAt,
-                task.Status);
-            OnTaskStatusChanged(msg);
-
-            _dialogService.ShowSnackBar(GetText("TaskStatusChanged", task.Title, statusMessage));
         }
     }
 }

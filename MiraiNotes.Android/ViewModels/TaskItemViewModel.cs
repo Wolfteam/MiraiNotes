@@ -301,8 +301,6 @@ namespace MiraiNotes.Android.ViewModels
 
         #region Commands
         public IMvxCommand ShowSubTasksCommand { get; private set; }
-        public IMvxCommand DeleteTaskCommand { get; private set; }
-        public IMvxCommand ChangeTaskStatusCommand { get; private set; }
         public IMvxCommand<TaskItemViewModel> SubTaskSelectedCommand { get; private set; }
         public IMvxAsyncCommand DeleteSubTaskCommand { get; private set; }
         public IMvxCommand<TaskItemViewModel> ShowMenuOptionsDialogCommand { get; private set; }
@@ -323,16 +321,6 @@ namespace MiraiNotes.Android.ViewModels
         {
             base.SetCommands();
             ShowSubTasksCommand = new MvxCommand(() => ShowSubTasks = !ShowSubTasks);
-
-            DeleteTaskCommand = new MvxCommand(() => Messenger.Publish(new DeleteTaskRequestMsg(this, this)));
-
-            ChangeTaskStatusCommand = new MvxCommand(() =>
-            {
-                var status = TaskStatus == GoogleTaskStatus.COMPLETED
-                    ? GoogleTaskStatus.NEEDS_ACTION
-                    : GoogleTaskStatus.COMPLETED;
-                Messenger.Publish(new ChangeTaskStatusRequestMsg(this, this, status));
-            });
 
             SubTaskSelectedCommand = new MvxCommand<TaskItemViewModel>(
                 (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask)));

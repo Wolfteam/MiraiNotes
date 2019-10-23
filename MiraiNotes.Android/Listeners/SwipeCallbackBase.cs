@@ -25,6 +25,8 @@ namespace MiraiNotes.Android.Listeners
 
         public List<SwipeButton> Buttons { get; private set; } = new List<SwipeButton>();
         public virtual int ButtonWidth { get; set; } = (int)AndroidUtils.ToPixel(60, Application.Context);
+        public bool AnItemIsOpen 
+            => _swipedPos != -1;
 
         public SwipeCallbackBase(Context context, RecyclerView recyclerView)
             : base(0, ItemTouchHelper.Left | ItemTouchHelper.Right)

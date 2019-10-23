@@ -220,9 +220,12 @@ namespace MiraiNotes.Android.Views.Activities
                 DrawerLayout.CloseDrawers();
             }
             else if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is TasksFragment tasksFragment &&
-                tasksFragment.IsFabOpen)
+                (tasksFragment.IsFabOpen || tasksFragment.SwipeCallback.AnItemIsOpen))
             {
-                tasksFragment.CloseFabMenu();
+                if (tasksFragment.IsFabOpen)
+                    tasksFragment.CloseFabMenu();
+                else if (tasksFragment.SwipeCallback.AnItemIsOpen)
+                    tasksFragment.ResetSwipedItems();
             }
             else if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is NewTaskFragment fragment &&
                 fragment.ViewModel.ChangesWereMade())

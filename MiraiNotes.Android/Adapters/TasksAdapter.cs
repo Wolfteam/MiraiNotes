@@ -31,6 +31,7 @@ namespace MiraiNotes.Android.Adapters
             //return itemViewHolder;
         }
 
+        //NOT USED
         public void OnItemSwiped(int position, bool swipedToTheRight)
         {
             var items = (MvxObservableCollection<TaskItemViewModel>)ItemsSource;
@@ -38,7 +39,7 @@ namespace MiraiNotes.Android.Adapters
 
             if (!swipedToTheRight)
             {
-                item.DeleteTaskCommand.Execute();
+                //item.DeleteTaskCommand.Execute();
                 //items.Remove(item);
                 //NotifyDataSetChanged();
                 //NotifyItemRemoved(position);
@@ -46,12 +47,13 @@ namespace MiraiNotes.Android.Adapters
             }
             else
             {
-                item.ChangeTaskStatusCommand.Execute();
+                //item.ChangeTaskStatusCommand.Execute();
                 items.Remove(item);
                 items.Add(item);
             }
         }
 
+        //NOT USED
         public bool OnItemMove(int fromPosition, int toPosition)
         {
             var items = (MvxObservableCollection<TaskItemViewModel>)ItemsSource;
