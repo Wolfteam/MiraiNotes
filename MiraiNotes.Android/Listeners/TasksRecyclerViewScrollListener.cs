@@ -9,7 +9,7 @@ namespace MiraiNotes.Android.Listeners
         private readonly FloatingActionButton _fab;
         private readonly Action _onScrolled;
 
-        public TasksRecyclerViewScrollListener(FloatingActionButton fab, Action onScrolled)
+        public TasksRecyclerViewScrollListener(FloatingActionButton fab, Action onScrolled = null)
         {
             _fab = fab;
             _onScrolled = onScrolled;
@@ -29,7 +29,7 @@ namespace MiraiNotes.Android.Listeners
 
             if (newState == RecyclerView.ScrollStateDragging)
             {
-                _onScrolled.Invoke();
+                _onScrolled?.Invoke();
             }
         }
     }

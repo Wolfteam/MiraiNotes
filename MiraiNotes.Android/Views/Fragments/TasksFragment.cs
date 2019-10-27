@@ -10,6 +10,7 @@ using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Binding.BindingContext;
+using MvvmCross.Droid.Support.V4;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
@@ -19,7 +20,7 @@ using System.Collections.Generic;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
-    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame)]
+    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame, Tag = nameof(TasksFragment))]
     public class TasksFragment : BaseFragment<TasksViewModel>, ISwipeButtonClickListener
     {
         protected override int FragmentId => Resource.Layout.TasksView;
@@ -64,6 +65,10 @@ namespace MiraiNotes.Android.Views.Fragments
             set.Bind(this).For(v => v.ResetSwipedItemsRequest).To(vm => vm.ResetSwipedItems);
             set.Apply();
 
+            var swipeRefreshLayout = view.FindViewById<MvxSwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout);
+            swipeRefreshLayout.SetDistanceToTriggerSync(600);
+            swipeRefreshLayout.SetSlingshotDistance(200);
+
             _mainFab = view.FindViewById<FloatingActionButton>(Resource.Id.AppFab);
 
             _addNewTaskListFabLayout = view.FindViewById<LinearLayout>(Resource.Id.AddNewTaskListFabLayout);
@@ -99,7 +104,7 @@ namespace MiraiNotes.Android.Views.Fragments
             _taskRecyclerView = view.FindViewById<MvxRecyclerView>(Resource.Id.TaskRecyclerView);
             _taskRecyclerView.Adapter = _tasksAdapter;
             _taskRecyclerView.AddItemDecoration(new DividerItemDecoration(ParentActivity, LinearLayoutManager.Vertical));
-
+            _taskRecyclerView.AddOnScrollListener(new TasksRecyclerViewScrollListener(_mainFab));
 
             string delete = ViewModel.GetText("Delete");
             var white = Color.White;

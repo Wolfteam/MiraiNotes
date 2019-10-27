@@ -15,6 +15,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <MvxSwipeRefreshLayout
+            android:id="@+id/SwipeRefreshLayout"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             app:MvxBind="Refreshing IsBusy; RefreshCommand RefreshTasksCommand">
