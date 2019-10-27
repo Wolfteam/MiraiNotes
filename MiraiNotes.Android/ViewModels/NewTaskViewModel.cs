@@ -434,13 +434,17 @@ namespace MiraiNotes.Android.ViewModels
 
             subTasksToSave.ForEach(st => st.ParentTask = entity.GoogleTaskID);
 
-            await SaveSubTasksAsync(
+            var sts = await SaveSubTasksAsync(
                 subTasksToSave,
                 true,
                 true,
                 Enumerable.Empty<TaskItemViewModel>().ToList());
 
             _dialogService.ShowSnackBar(GetText("TaskWasCreated", SelectedTaskList.Title));
+
+            Task = _mapper.Map<TaskItemViewModel>(response.Result);
+            Task.SubTasks = new MvxObservableCollection<TaskItemViewModel>(sts);
+            Messenger.Publish(new TaskSavedMsg(this, Task.GoogleId, 1 + subTasksToSave.Count));
 
             //TODO: I SHOULD DO SOMETHING HERE WHEN MOVING THE TASK
             await NavigationService.Close(this);
@@ -575,7 +579,11 @@ namespace MiraiNotes.Android.ViewModels
 
             foreach (PropertyInfo pi in properties)
             {
-                InitialValues[pi.Name] = pi.GetValue(Task, null)?.ToString();
+                var value = pi.GetValue(Task, null)?.ToString();
+                if (pi.PropertyType == typeof(string) && value == null)
+                    InitialValues[pi.Name] = string.Empty;
+                else
+                    InitialValues[pi.Name] = value;
             }
         }
 
