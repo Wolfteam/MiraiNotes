@@ -2,9 +2,11 @@
 using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views.InputMethods;
+using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared;
+using MvvmCross;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using System;
 
@@ -17,9 +19,13 @@ namespace MiraiNotes.Android.Views.Activities
 
         protected override void OnCreate(Bundle bundle)
         {
-            base.OnCreate(bundle);
+            //You need to set the theme FIRST before calling onCreate 
+            //When base.onCreate is called, it restores previous view and/or fragment states after orientation change, 
+            //before the theme gets applied.
+            var appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>();
+            SetAppTheme(appSettings.AppTheme, appSettings.AppHexAccentColor);
 
-            SetAppTheme(ViewModel.CurrentAppTheme, ViewModel.CurrentHexAccentColor);
+            base.OnCreate(bundle);
             SetContentView(LayoutId);
         }
 
