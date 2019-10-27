@@ -16,14 +16,14 @@ using System.Linq;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
-    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.MenuFrame)]
+    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.MenuFrame, Tag = nameof(MenuFragmet))]
     public class MenuFragmet : MvxFragment<MenuViewModel>, NavigationView.IOnNavigationItemSelectedListener
     {
         private NavigationView _navView;
         private IMenuItem _previousMenuItem;
 
         private IMvxInteraction<string> _onUserImgLoadedRequest;
-        private IMvxInteraction _onTaskListsLoadedRequest;
+        private IMvxInteraction<bool> _onTaskListsLoadedRequest;
         private IMvxInteraction<int> _onRefreshNumberOfTasksRequest;
 
         public IMvxInteraction<string> OnUserImgLoadedRequest
@@ -39,7 +39,7 @@ namespace MiraiNotes.Android.Views.Fragments
             }
         }
 
-        public IMvxInteraction OnTaskListsLoadedRequest
+        public IMvxInteraction<bool> OnTaskListsLoadedRequest
         {
             get => _onTaskListsLoadedRequest;
             set
@@ -139,9 +139,10 @@ namespace MiraiNotes.Android.Views.Fragments
             }
         }
 
-        private void OnTaskListsLoaded(object sender, EventArgs eventArgs)
+        private void OnTaskListsLoaded(object sender, MvxValueEventArgs<bool> eventArgs)
         {
             _navView.Menu.Clear();
+            bool orientationChanged = eventArgs.Value;
             var menu = _navView.Menu;
             int selectedTaskListPosition = 0;
 
@@ -179,7 +180,8 @@ namespace MiraiNotes.Android.Views.Fragments
                 BaseAdapter wrapped = (BaseAdapter)adapter.WrappedAdapter;
                 wrapped.NotifyDataSetChanged();
             }
-            if (ViewModel.TaskLists.Any())
+            //if we have tasklists and we must select a task
+            if (ViewModel.TaskLists.Any() && !orientationChanged)
                 ViewModel.OnTaskListSelectedCommand.Execute(selectedTaskListPosition);
         }
 

@@ -64,7 +64,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand OnSettingsSelectedCommand { get; private set; }
         public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
         public IMvxAsyncCommand LogoutCommand { get; private set; }
-        public IMvxAsyncCommand InitViewCommand { get; private set; }
+        public IMvxAsyncCommand<bool> InitViewCommand { get; private set; }
         public IMvxCommand SyncCommand { get; private set; }
         public IMvxCommand<TaskSortType> TaskSortOrderChangedCommand { get; private set; }
         #endregion
@@ -94,16 +94,16 @@ namespace MiraiNotes.Android.ViewModels
             OnSettingsSelectedCommand = new MvxAsyncCommand(
                 async () => await NavigationService.Navigate<SettingsMainViewModel>());
             OnAccountsSelectedCommand = new MvxAsyncCommand(OnAccountsSelected);
-            LogoutCommand = new MvxAsyncCommand(async() =>
+            LogoutCommand = new MvxAsyncCommand(async () =>
             {
                 bool logout = await NavigationService.Navigate<LogoutDialogViewModel, bool?, bool>(null);
 
                 if (logout)
                     await Logout();
             });
-            InitViewCommand = new MvxAsyncCommand(() =>
+            InitViewCommand = new MvxAsyncCommand<bool>((orientationChanged) =>
             {
-                var parameter = MenuViewModelParameter.Instance(InitParams);
+                var parameter = MenuViewModelParameter.Instance(InitParams, orientationChanged);
                 return NavigationService.Navigate<MenuViewModel, MenuViewModelParameter>(parameter);
             });
 

@@ -141,7 +141,8 @@ namespace MiraiNotes.Android.Views.Activities
             set.Apply();
 
             _selectedTaskSortType = ViewModel.AppSettings.DefaultTaskSortOrder;
-            ViewModel.InitViewCommand.Execute();
+            bool orientationChanged = savedInstanceState != null;
+            ViewModel.InitViewCommand.Execute(orientationChanged);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)

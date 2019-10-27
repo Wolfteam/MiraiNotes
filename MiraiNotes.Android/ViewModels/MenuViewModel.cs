@@ -32,7 +32,7 @@ namespace MiraiNotes.Android.ViewModels
         private string _currentUserEmail;
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
         private readonly MvxInteraction<string> _onUserProfileImgLoaded = new MvxInteraction<string>();
-        private readonly MvxInteraction _onTaskListsLoaded = new MvxInteraction();
+        private readonly MvxInteraction<bool> _onTaskListsLoaded = new MvxInteraction<bool>();
         private readonly MvxInteraction<int> _refreshNumberOfTasks = new MvxInteraction<int>();
         #endregion
 
@@ -40,7 +40,7 @@ namespace MiraiNotes.Android.ViewModels
         // need to expose it as a public property for binding (only IMvxInteraction is needed in the view)
         public IMvxInteraction<string> OnUserProfileImgLoaded
             => _onUserProfileImgLoaded;
-        public IMvxInteraction OnTaskListsLoaded
+        public IMvxInteraction<bool> OnTaskListsLoaded
             => _onTaskListsLoaded;
         public IMvxInteraction<int> RefreshNumberOfTasks
             => _refreshNumberOfTasks;
@@ -95,6 +95,7 @@ namespace MiraiNotes.Android.ViewModels
 
         public override void Prepare(MenuViewModelParameter parameter)
         {
+            base.Prepare(parameter);
             InitParams = parameter.Notification;
         }
 
@@ -137,14 +138,14 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskListSortOrderChangedMsg>(msg =>
                 {
                     SortTaskLists(msg.NewSortOrder);
-                    _onTaskListsLoaded.Raise();
+                    _onTaskListsLoaded.Raise(true);
                 }),
                 Messenger.Subscribe<TaskListSavedMsg>(msg =>
                 {
                     TaskLists.Add(msg.TaskList);
                     SelectedTaskList = msg.TaskList;
                     AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
-                    _onTaskListsLoaded.Raise();
+                    _onTaskListsLoaded.Raise(true);
                 }),
                 Messenger.Subscribe<RefreshNumberOfTasksMsg>(UpdateNumberOfTasks),
                 Messenger.Subscribe<OnFullSyncMsg>(async msg =>
@@ -226,7 +227,7 @@ namespace MiraiNotes.Android.ViewModels
 
             AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
 
-            _onTaskListsLoaded.Raise();
+            _onTaskListsLoaded.Raise(Parameter.OrientationChanged);
         }
 
         private void SortTaskLists(TaskListSortType sortType)
