@@ -90,6 +90,7 @@ namespace MiraiNotes.Android.ViewModels
 
         public override void Prepare(TasksViewModelParameter parameter)
         {
+            base.Prepare(parameter);
             InitParams = parameter.NotificationAction;
             _currentTaskList = parameter.TaskList;
             Title = GetText("Tasks");

@@ -46,6 +46,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         public override void Prepare(TaskMenuOptionsViewModelParameter parameter)
         {
+            base.Prepare(parameter);
             _taskList = parameter.TaskList;
             _task = parameter.Task;
             string statusMessage =

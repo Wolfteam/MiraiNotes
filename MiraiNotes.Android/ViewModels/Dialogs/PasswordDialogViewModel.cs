@@ -93,6 +93,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
         public override void Prepare(bool parameter)
         {
+            base.Prepare(parameter);
             PromptForPassword = parameter;
         }
 
