@@ -28,7 +28,7 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
 
             dateButton.Click += (sender, args) =>
             {
-                var currentDate = DateTime.Parse(ViewModel.FullText);
+                var currentDate = DateTime.Parse(ViewModel.FullText, ViewModel.TextProvider.CurrentCulture);
                 var dialog = new DatePickerDialog(Activity, Resource.Style.DatePickerDialogCustom, this, currentDate.Year, currentDate.Month - 1, currentDate.Day);
                 dialog.DatePicker.SetMinDate(ViewModel.MinDate);
                 dialog.Show();
@@ -36,7 +36,7 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
 
             timeButton.Click += (sender, args) =>
             {
-                var currentTime = DateTime.Parse(ViewModel.FullText);
+                var currentTime = DateTime.Parse(ViewModel.FullText, ViewModel.TextProvider.CurrentCulture);
                 bool is24HourFormat = DateFormat.Is24HourFormat(Activity);
                 var dialog = new TimePickerDialog(Activity, Resource.Style.TimePickerDialogCustom, this, currentTime.Hour, currentTime.Minute, is24HourFormat);
                 dialog.Show();
@@ -48,14 +48,14 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
         public void OnDateSet(DatePicker view, int year, int month, int dayOfMonth)
         {
             // Note: monthOfYear is a value between 0 and 11, not 1 and 12!
-            var selectedDate = new DateTime(year, month + 1, dayOfMonth);
+            var selectedDate = new DateTime(year, month + 1, dayOfMonth, ViewModel.TextProvider.CurrentCulture.Calendar);
             ViewModel.SetDateText(selectedDate);
         }
 
         public void OnTimeSet(TimePicker view, int hourOfDay, int minute)
         {
             var currentTime = DateTime.Now;
-            var selectedTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, hourOfDay, minute, 0);
+            var selectedTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, hourOfDay, minute, 0, ViewModel.TextProvider.CurrentCulture.Calendar);
             ViewModel.SetHourText(selectedTime);
         }
     }
