@@ -1184,7 +1184,7 @@ namespace MiraiNotes.Shared.Services.Data
             }
 
             var lastTask = await query.OrderBy(t => t.Position).LastOrDefaultAsync();
-            int lastestPosition = int.Parse(lastTask?.Position ?? "0") + 1;
+            var lastestPosition = ulong.Parse(lastTask?.Position ?? "0") + 1;
 
             return $"{lastestPosition:D20}";
         }
