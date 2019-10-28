@@ -77,7 +77,7 @@ namespace MiraiNotes.Android.Views.Fragments
             var view = this.BindingInflate(Resource.Layout.MenuView, null);
             _navView = view.FindViewById<NavigationView>(Resource.Id.AppNavView);
             _navView.SetNavigationItemSelectedListener(this);
-            
+
             var headerLayout = _navView.GetHeaderView(0);
             var circleImg = headerLayout.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
             circleImg.Click += (sender, ar) => MainActivity.ViewModel.OnAccountsSelectedCommand.Execute();
@@ -141,6 +141,9 @@ namespace MiraiNotes.Android.Views.Fragments
 
         private void OnTaskListsLoaded(object sender, MvxValueEventArgs<bool> eventArgs)
         {
+            //workaround to avoid calling LayoutInflater when the activity is null
+            if (!IsAdded)
+                return;
             _navView.Menu.Clear();
             bool orientationChanged = eventArgs.Value;
             var menu = _navView.Menu;
@@ -187,6 +190,9 @@ namespace MiraiNotes.Android.Views.Fragments
 
         private void SetNumberOfTasksView(int position)
         {
+            //workaround to avoid calling LayoutInflater when the activity is null
+            if (!IsAdded)
+                return;
             var taskList = ViewModel.TaskLists[position];
             var numberOfTaskView = GetNumberOfTasksView(taskList);
             var menuItem = _navView.Menu.FindItem(position);

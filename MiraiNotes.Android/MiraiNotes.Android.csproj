@@ -181,6 +181,7 @@
     <Compile Include="Models\Parameters\MoveTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MoveToTaskListDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
+    <Compile Include="Models\Results\NewTaskViewModelResult.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskDateViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TasksViewModelParameter.cs" />

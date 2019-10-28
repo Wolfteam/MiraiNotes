@@ -3,31 +3,15 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using MiraiNotes.Android.Controls;
 using MiraiNotes.Android.ViewModels;
-using MvvmCross.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
-using MvvmCross.ViewModels;
 using System.Linq;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
-    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame, AddToBackStack = true)]
+    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame, AddToBackStack = true, Tag = nameof(NewTaskFragment))]
     public class NewTaskFragment : BaseFragment<NewTaskViewModel>
     {
         private IMenu _menu;
-        private IMvxInteraction _onViewModelLoaded;
-
-        public IMvxInteraction OnViewModelLoaded
-        {
-            get => _onViewModelLoaded;
-            set
-            {
-                if (_onViewModelLoaded != null)
-                    _onViewModelLoaded.Requested -= (sender, args) => EnableMenuOptions();
-
-                _onViewModelLoaded = value;
-                _onViewModelLoaded.Requested += (sender, args) => EnableMenuOptions();
-            }
-        }
 
         protected override int FragmentId
             => Resource.Layout.NewTaskView;
@@ -44,10 +28,6 @@ namespace MiraiNotes.Android.Views.Fragments
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
             SetActionBarTitle(true);
-
-            var set = this.CreateBindingSet<NewTaskFragment, NewTaskViewModel>();
-            set.Bind(this).For(v => v.OnViewModelLoaded).To(vm => vm.ViewModelLoaded);
-            set.Apply();
 
             //lines below are used to place the icon to the top, otherwise it will appear at the center
             //of the edittext

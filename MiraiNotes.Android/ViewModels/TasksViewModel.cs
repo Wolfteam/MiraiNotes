@@ -5,6 +5,7 @@ using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Extensions;
@@ -209,7 +210,21 @@ namespace MiraiNotes.Android.ViewModels
         public async Task OnTaskSelected(string taskId)
         {
             var parameter = NewTaskViewModelParameter.Instance(_currentTaskList, taskId);
-            await NavigationService.Navigate<NewTaskViewModel, NewTaskViewModelParameter>(parameter);
+            var result = await NavigationService.Navigate<NewTaskViewModel, NewTaskViewModelParameter, NewTaskViewModelResult>(parameter);
+
+            //if back button was pressed, this may be null
+            if (result == null || result.NoChangesWereMade)
+                return;
+
+            if (result.WasCreated || result.WasUpdated)
+            {
+                await OnTaskSaved(result.Task.GoogleId, result.ItemsAdded);
+            }
+
+            if (result.WasDeleted)
+            {
+                OnTaskDeleted(result.Task.GoogleId, result.Task.ParentTask, result.Task.HasParentTask);
+            }
         }
 
         public async Task OnTaskSaved(string taskId, int itemsAdded)
@@ -359,7 +374,9 @@ namespace MiraiNotes.Android.ViewModels
             int affectedItems = 1;
             if (!hasParentTask)
             {
-                var task = Tasks.First(t => t.GoogleId == taskId);
+                var task = Tasks.FirstOrDefault(t => t.GoogleId == taskId);
+                if (task == null)
+                    return;
                 affectedItems += task.SubTasks.Count;
                 Tasks.Remove(task);
             }

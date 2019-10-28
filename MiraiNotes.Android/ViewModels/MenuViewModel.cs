@@ -138,14 +138,14 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskListSortOrderChangedMsg>(msg =>
                 {
                     SortTaskLists(msg.NewSortOrder);
-                    _onTaskListsLoaded.Raise(true);
+                    TaskListsWereLoaded(false);
                 }),
                 Messenger.Subscribe<TaskListSavedMsg>(msg =>
                 {
                     TaskLists.Add(msg.TaskList);
                     SelectedTaskList = msg.TaskList;
                     AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
-                    _onTaskListsLoaded.Raise(true);
+                    TaskListsWereLoaded(false);
                 }),
                 Messenger.Subscribe<RefreshNumberOfTasksMsg>(UpdateNumberOfTasks),
                 Messenger.Subscribe<OnFullSyncMsg>(async msg =>
@@ -227,7 +227,7 @@ namespace MiraiNotes.Android.ViewModels
 
             AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
 
-            _onTaskListsLoaded.Raise(Parameter.OrientationChanged);
+            TaskListsWereLoaded(Parameter.OrientationChanged);
         }
 
         private void SortTaskLists(TaskListSortType sortType)
@@ -291,6 +291,11 @@ namespace MiraiNotes.Android.ViewModels
                 int newPosition = TaskLists.IndexOf(taskList);
                 _refreshNumberOfTasks.Raise(newPosition);
             }
+        }
+
+        private void TaskListsWereLoaded(bool orientationChanged)
+        {
+            _onTaskListsLoaded.Raise(orientationChanged);
         }
     }
 }

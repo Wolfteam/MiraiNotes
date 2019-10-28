@@ -72,20 +72,32 @@ namespace MiraiNotes.Android.ViewModels
         {
         }
 
+        public override void ViewAppeared()
+        {
+            base.ViewAppeared();
+            if (SubscriptionTokens.Count == 0)
+            {
+                RegisterMessages();
+            }
+        }
+
+        public override void ViewDestroy(bool viewFinishing = true)
+        {
+            base.ViewDestroy(viewFinishing);
+            if (!viewFinishing)
+                return;
+            foreach (var token in SubscriptionTokens)
+            {
+                token.Dispose();
+            }
+            SubscriptionTokens.Clear();
+        }
+
         public string GetText(string key)
             => TextProvider.GetText(string.Empty, string.Empty, key);
 
         public string GetText(string key, params string[] args)
             => TextProvider.GetText(string.Empty, string.Empty, key, args);
-
-        public override void ViewDestroy(bool viewFinishing = true)
-        {
-            base.ViewDestroy(viewFinishing);
-            foreach (var token in SubscriptionTokens)
-            {
-                token.Dispose();
-            }
-        }
     }
 
     public abstract class BaseViewModel<TParameter> : MvxViewModel<TParameter>, IBaseViewModel
@@ -143,6 +155,7 @@ namespace MiraiNotes.Android.ViewModels
             RegisterMessages();
             SetCommands();
         }
+
         public virtual void SetCommands()
         {
         }
@@ -151,25 +164,37 @@ namespace MiraiNotes.Android.ViewModels
         {
         }
 
-        public string GetText(string key)
-            => TextProvider.GetText(string.Empty, string.Empty, key);
-
-        public string GetText(string key, params string[] args)
-            => TextProvider.GetText(string.Empty, string.Empty, key, args);
-
         public override void Prepare(TParameter parameter)
         {
             Parameter = parameter;
         }
 
+        public override void ViewAppeared()
+        {
+            base.ViewAppeared();
+            if (SubscriptionTokens.Count == 0)
+            {
+                RegisterMessages();
+            }
+        }
+
         public override void ViewDestroy(bool viewFinishing = true)
         {
             base.ViewDestroy(viewFinishing);
+            if (!viewFinishing)
+                return;
             foreach (var token in SubscriptionTokens)
             {
                 token.Dispose();
             }
+            SubscriptionTokens.Clear();
         }
+
+        public string GetText(string key)
+            => TextProvider.GetText(string.Empty, string.Empty, key);
+
+        public string GetText(string key, params string[] args)
+            => TextProvider.GetText(string.Empty, string.Empty, key, args);
     }
 
     public abstract class BaseViewModel<TParameter, TResult>
@@ -238,15 +263,18 @@ namespace MiraiNotes.Android.ViewModels
         {
         }
 
-        public string GetText(string key)
-            => TextProvider.GetText(string.Empty, string.Empty, key);
-
-        public string GetText(string key, params string[] args)
-            => TextProvider.GetText(string.Empty, string.Empty, key, args);
-
         public override void Prepare(TParameter parameter)
         {
             Parameter = parameter;
+        }
+
+        public override void ViewAppeared()
+        {
+            base.ViewAppeared();
+            if (SubscriptionTokens.Count == 0)
+            {
+                RegisterMessages();
+            }
         }
 
         public override void ViewDestroy(bool viewFinishing = true)
@@ -255,10 +283,19 @@ namespace MiraiNotes.Android.ViewModels
                 CloseCompletionSource?.TrySetCanceled();
 
             base.ViewDestroy(viewFinishing);
+            if (!viewFinishing)
+                return;
             foreach (var token in SubscriptionTokens)
             {
                 token.Dispose();
             }
+            SubscriptionTokens.Clear();
         }
+
+        public string GetText(string key)
+            => TextProvider.GetText(string.Empty, string.Empty, key);
+
+        public string GetText(string key, params string[] args)
+            => TextProvider.GetText(string.Empty, string.Empty, key, args);
     }
 }

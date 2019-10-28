@@ -23,6 +23,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private readonly IMapper _mapper;
         private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
         private TaskListItemViewModel _currentTaskList;
+        private readonly MvxInteraction _hideDialog = new MvxInteraction();
 
         public MvxObservableCollection<TaskListItemViewModel> TaskLists
         {
@@ -39,6 +40,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 UpdateSelectedItem();
             }
         }
+
+        public IMvxInteraction HideDialog
+            => _hideDialog;
 
         public IMvxAsyncCommand<TaskListItemViewModel> TaskListSelectedCommand { get; private set; }
 
@@ -75,9 +79,11 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 if (selectedTaskList.GoogleId == Parameter.TaskList.GoogleId)
                     return;
 
+                _hideDialog.Raise();
+
                 var parameter = MoveTaskDialogViewModelParameter.Instance(Parameter.TaskList, selectedTaskList, Parameter.Task);
-                await NavigationService.Close(this, true);
-                await NavigationService.Navigate<MoveTaskDialogViewModel, MoveTaskDialogViewModelParameter, bool>(parameter);
+                bool wasMoved = await NavigationService.Navigate<MoveTaskDialogViewModel, MoveTaskDialogViewModelParameter, bool>(parameter);
+                await NavigationService.Close(this, wasMoved);
             });
         }
 

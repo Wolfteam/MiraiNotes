@@ -33,8 +33,6 @@ namespace MiraiNotes.Android.Services
         }
 
         #region Public sync methods
-
-
         public async Task<EmptyResponseDto> SyncDownTaskListsAsync(bool isInBackground)
         {
             _logger.Information($"{nameof(SyncDownTaskListsAsync)}: Starting the sync down of task lists");
