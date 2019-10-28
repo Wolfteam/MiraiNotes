@@ -124,7 +124,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                         Matching.FromSource($"{typeof(TaskListDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_tasklist_data_service_.txt"),
+                        Path.Combine(basePath, "data_tasklist_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -132,7 +132,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                         Matching.FromSource($"{typeof(TaskDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_task_data_service_.txt"),
+                        Path.Combine(basePath, "data_task_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -140,7 +140,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                         Matching.FromSource($"{typeof(UserDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_user_data_service_.txt"),
+                        Path.Combine(basePath, "data_user_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -149,7 +149,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(AccountDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_account_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_account_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -157,7 +157,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(AddSubTaskDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_addsubtask_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_addsubtask_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -165,7 +165,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(ChangeTaskStatusDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_changetaskstatus_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_changetaskstatus_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -173,7 +173,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(DeleteTaskDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_deletetask_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_deletetask_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -181,7 +181,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(MoveTaskDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_movetask_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_movetask_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -189,7 +189,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(MoveToTaskListDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_movetotasklist_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_movetotasklist_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -197,7 +197,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(PasswordDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_password_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_password_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -205,7 +205,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(TaskListDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_tasklists_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_tasklists_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -213,7 +213,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(TaskMenuOptionsViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_taskmenuoptions_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_taskmenuoptions_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -221,7 +221,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(TaskDateDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_taskdate_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_taskdate_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -229,7 +229,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(DeleteAccountDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_deleteaccount_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_deleteaccount_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -237,7 +237,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(LogoutDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_logout_dialog_vm_.txt"),
+                        Path.Combine(basePath, "vm_logout_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -245,7 +245,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(SettingsMainViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_settings_main_vm_.txt"),
+                        Path.Combine(basePath, "vm_settings_main.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -253,7 +253,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(GoogleUserViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_google_user_vm_.txt"),
+                        Path.Combine(basePath, "vm_google_user.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -261,7 +261,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(LoginViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_login_vm_.txt"),
+                        Path.Combine(basePath, "vm_login.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -269,7 +269,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(MainViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_main_vm_.txt"),
+                        Path.Combine(basePath, "vm_main.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -277,7 +277,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(MenuViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_menu_vm_.txt"),
+                        Path.Combine(basePath, "vm_menu.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -285,7 +285,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(NewTaskViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_newtask_vm_.txt"),
+                        Path.Combine(basePath, "vm_newtask.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -293,7 +293,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(TasksViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_tasks_vm_.txt"),
+                        Path.Combine(basePath, "vm_tasks.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -302,7 +302,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(AuthenticatedHttpClientHandler).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_auth_http_handler_.txt"),
+                        Path.Combine(basePath, "auth_http_handler_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -310,7 +310,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(SyncBackgroundTask).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_bg_sync_.txt"),
+                        Path.Combine(basePath, "bg_sync_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -318,7 +318,7 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(MarkTaskAsCompletedReceiver.MarkAsCompletedTask).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_bg_marktaskascompleted_.txt"),
+                        Path.Combine(basePath, "bg_marktaskascompleted_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -326,7 +326,15 @@ namespace MiraiNotes.Android
                     .Filter.ByIncludingOnly(
                             Matching.FromSource($"{typeof(GoogleApiService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "mirai_notes_googleapi_.txt"),
+                        Path.Combine(basePath, "api_google.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(SyncService).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "sync_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
