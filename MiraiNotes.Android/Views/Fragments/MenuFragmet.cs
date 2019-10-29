@@ -145,7 +145,7 @@ namespace MiraiNotes.Android.Views.Fragments
             if (!IsAdded)
                 return;
             _navView.Menu.Clear();
-            bool orientationChanged = eventArgs.Value;
+            bool dontSetSelectedTaskList = eventArgs.Value;
             var menu = _navView.Menu;
             int selectedTaskListPosition = 0;
 
@@ -184,7 +184,7 @@ namespace MiraiNotes.Android.Views.Fragments
                 wrapped.NotifyDataSetChanged();
             }
             //if we have tasklists and we must select a task
-            if (ViewModel.TaskLists.Any() && !orientationChanged)
+            if (ViewModel.TaskLists.Any() && !dontSetSelectedTaskList)
                 ViewModel.OnTaskListSelectedCommand.Execute(selectedTaskListPosition);
         }
 

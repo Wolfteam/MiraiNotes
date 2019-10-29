@@ -33,7 +33,8 @@ namespace MiraiNotes.Android.Common
                 .ForMember(d => d.Title, opt => opt.MapFrom(s => s.Title))
                 .ForMember(d => d.GoogleId, opt => opt.MapFrom(s => s.GoogleTaskListID))
                 .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(s => s.UpdatedAt))
-                .ForMember(d => d.NumberOfTasks, opt => opt.Ignore());
+                .ForMember(d => d.NumberOfTasks, opt => opt.Ignore())
+                .ConstructUsingServiceLocator();
 
             CreateMap<GoogleTaskList, ItemModel>()
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Title))

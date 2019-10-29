@@ -8,7 +8,6 @@ using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 using Serilog;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

@@ -1,9 +1,15 @@
-﻿using MvvmCross.ViewModels;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Android.Interfaces;
+using MvvmCross.Commands;
+using MvvmCross.Navigation;
+using MvvmCross.Plugin.Messenger;
+using Serilog;
 using System;
 
 namespace MiraiNotes.Android.ViewModels
 {
-    public class TaskListItemViewModel : MvxViewModel
+    public class TaskListItemViewModel : BaseViewModel
     {
         private string _googleId;
         private string _title;
@@ -19,7 +25,7 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _googleId, value);
         }
 
-        public string Title
+        public new string Title
         {
             get => _title;
             set => SetProperty(ref _title, value);
@@ -43,6 +49,30 @@ namespace MiraiNotes.Android.ViewModels
         {
             get => _isSelected;
             set => SetProperty(ref _isSelected, value);
+        }
+
+        public IMvxCommand EditTaskListCommand { get; private set; }
+        public IMvxCommand DeleteTaskListCommand { get; private set; }
+
+        public TaskListItemViewModel(
+            ITextProvider textProvider,
+            IMvxMessenger messenger,
+            ILogger logger,
+            IMvxNavigationService navigationService,
+            IAppSettingsService appSettings,
+            ITelemetryService telemetryService)
+            : base(textProvider, messenger, logger.ForContext<TaskListItemViewModel>(), navigationService, appSettings, telemetryService)
+        {
+        }
+
+        public override void SetCommands()
+        {
+            base.SetCommands();
+            EditTaskListCommand = new MvxCommand(
+                () => Messenger.Publish(new OnManageTaskListItemClickMsg(this, this, false, true)));
+
+            DeleteTaskListCommand = new MvxCommand(
+                () => Messenger.Publish(new OnManageTaskListItemClickMsg(this, this, true, false)));
         }
     }
 }

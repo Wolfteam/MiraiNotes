@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:text="Ok"
             style="@style/CustomMaterialButton"
-            app:MvxBind="Click AddTaskListCommand; Visibility Visibility(IsSaveButtonEnabled); Text [Add]"/>
+            app:MvxBind="Click AddTaskListCommand; Visibility Visibility(IsSaveButtonEnabled); Text If(CreateTaskList, [Add], [Update])"/>
         <Space
             android:layout_width="20dp"
             android:layout_height="wrap_content"/>

@@ -27,6 +27,22 @@
     <item name="strokeColor">?AccentColor</item>
     <item name="backgroundTint">?AppBackground</item>
     <item name="strokeWidth">1dp</item>
+    <item name="rippleColor">?AccentColor</item>
+  </style>
+
+  <style name="CustomMaterialIconButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:theme">@style/Theme.MaterialComponents</item>
+    <item name="android:minWidth">0dp</item>
+    <item name="android:insetLeft">0dp</item>
+    <item name="android:insetTop">0dp</item>
+    <item name="android:insetRight">0dp</item>
+    <item name="android:insetBottom">0dp</item>
+    <item name="iconGravity">textStart</item>
+    <item name="iconPadding">0dp</item>
+    <item name="iconTint">?TextColor</item>
+    <item name="rippleColor">?AccentColor</item>
   </style>
 
   <style name="TaskMenuOptionButton" parent="@style/CustomMaterialButton">

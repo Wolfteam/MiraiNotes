@@ -108,14 +108,20 @@ namespace MiraiNotes.Android.ViewModels
         {
             base.SetCommands();
             TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.GoogleId));
+            
             RefreshTasksCommand = new MvxAsyncCommand(Refresh);
-            AddNewTaskListCommand = new MvxAsyncCommand(() => NavigationService.Navigate<TaskListDialogViewModel>());
+            
+            AddNewTaskListCommand = new MvxAsyncCommand(
+                () => NavigationService.Navigate<AddEditTaskListDialogViewModel, TaskListItemViewModel, AddEditTaskListDialogViewModelResult>(null));
+            
             AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
+            
             ShowMenuOptionsDialogCommand = new MvxAsyncCommand<TaskItemViewModel>((task) =>
             {
                 var parameter = TaskMenuOptionsViewModelParameter.Instance(_currentTaskList, task);
                 return NavigationService.Navigate<TaskMenuOptionsViewModel, TaskMenuOptionsViewModelParameter>(parameter);
             });
+
             SwipeToDeleteCommand = new MvxAsyncCommand<int>((position) =>
             {
                 var vm = Tasks.ElementAt(position);

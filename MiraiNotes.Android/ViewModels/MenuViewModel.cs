@@ -140,18 +140,13 @@ namespace MiraiNotes.Android.ViewModels
                     SortTaskLists(msg.NewSortOrder);
                     TaskListsWereLoaded(false);
                 }),
-                Messenger.Subscribe<TaskListSavedMsg>(msg =>
-                {
-                    TaskLists.Add(msg.TaskList);
-                    SelectedTaskList = msg.TaskList;
-                    AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
-                    TaskListsWereLoaded(false);
-                }),
+                Messenger.Subscribe<TaskListSavedMsg>(OnTaskListCreatedUpdated),
                 Messenger.Subscribe<RefreshNumberOfTasksMsg>(UpdateNumberOfTasks),
                 Messenger.Subscribe<OnFullSyncMsg>(async msg =>
                 {
                     await InitView(true);
-                })
+                }),
+                Messenger.Subscribe<TaskListDeletedMsg>(OnTaskListDeleted)
             };
 
             SubscriptionTokens.AddRange(tokens);
@@ -293,9 +288,57 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        private void TaskListsWereLoaded(bool orientationChanged)
+        private void TaskListsWereLoaded(bool dontSetSelectedTaskList)
         {
-            _onTaskListsLoaded.Raise(orientationChanged);
+            _onTaskListsLoaded.Raise(dontSetSelectedTaskList);
+        }
+
+        private void OnTaskListDeleted(TaskListDeletedMsg msg)
+        {
+            bool dontSetSelectedTaskList = true;
+            if (AppSettings.SelectedTaskListId == msg.TaskList.GoogleId)
+            {
+                var deletedTaskList = TaskLists.FirstOrDefault(tl => tl.GoogleId == msg.TaskList.GoogleId);
+                if (deletedTaskList == null)
+                    return;
+
+                int removedIndex = TaskLists.IndexOf(deletedTaskList);
+                if (removedIndex != -1 && removedIndex > 0)
+                {
+                    SelectedTaskList = TaskLists[removedIndex - 1];
+                }
+                else
+                {
+                    SelectedTaskList = TaskLists[removedIndex + 1];
+                }
+
+                AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
+                dontSetSelectedTaskList = false;
+            }
+            TaskLists.RemoveAll(tl => tl.GoogleId == msg.TaskList.GoogleId);
+            TaskListsWereLoaded(dontSetSelectedTaskList);
+        }
+
+        private void OnTaskListCreatedUpdated(TaskListSavedMsg msg)
+        {
+            bool dontSetSelectedTaskList = true;
+            if (!msg.WasUpdated)
+            {
+                TaskLists.Add(msg.TaskList);
+                dontSetSelectedTaskList = false;
+            }
+            else
+            {
+                var updatedTaskList = TaskLists.FirstOrDefault(tl => tl.GoogleId == msg.TaskList.GoogleId);
+                if (updatedTaskList == null)
+                    return;
+                updatedTaskList.Title = msg.TaskList.Title;
+                updatedTaskList.UpdatedAt = msg.TaskList.UpdatedAt;
+            }
+
+            SelectedTaskList = msg.TaskList;
+            AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
+            TaskListsWereLoaded(dontSetSelectedTaskList);
         }
     }
 }

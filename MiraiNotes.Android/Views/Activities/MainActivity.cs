@@ -168,6 +168,9 @@ namespace MiraiNotes.Android.Views.Activities
             var sortOption = menu.FindItem(Resource.Id.SortTasks);
             sortOption?.SetTitle(ViewModel.GetText("Sort"));
 
+            var manageTaskLists = menu.FindItem(Resource.Id.ManageTaskLists);
+            manageTaskLists?.SetTitle(ViewModel.GetText("ManageTaskLists"));
+
             var sortMenu = sortOption?.SubMenu;
 
             var resourceId = GetSelectedResourceId(_selectedTaskSortType);
@@ -198,6 +201,9 @@ namespace MiraiNotes.Android.Views.Activities
                     break;
                 case Resource.Id.FullSync:
                     ViewModel.SyncCommand.Execute();
+                    break;
+                case Resource.Id.ManageTaskLists:
+                    ViewModel.ManageTaskListsCommand.Execute();
                     break;
                 case Resource.Id.SortByNameAsc:
                 case Resource.Id.SortByNameDesc:

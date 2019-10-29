@@ -4,9 +4,9 @@ using MiraiNotes.Android.ViewModels.Dialogs;
 
 namespace MiraiNotes.Android.Common.Validators
 {
-    public class TaskListDialogViewModelValidator : AbstractValidator<TaskListDialogViewModel>
+    public class AddEditTaskListDialogViewModelValidator : AbstractValidator<AddEditTaskListDialogViewModel>
     {
-        public TaskListDialogViewModelValidator(ITextProvider textProvider)
+        public AddEditTaskListDialogViewModelValidator(ITextProvider textProvider)
         {
             RuleFor(vm => vm.TaskListTitle)
                 .MaximumLength(50)

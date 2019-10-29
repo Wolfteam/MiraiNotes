@@ -526,4 +526,16 @@
   <data name="Sort" xml:space="preserve">
     <value>Sort</value>
   </data>
+  <data name="ManageTaskLists" xml:space="preserve">
+    <value>Manage tasklists</value>
+  </data>
+  <data name="TaskListWasRemoved" xml:space="preserve">
+    <value>Task list was succesfully removed</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="TaskListWasUpdated" xml:space="preserve">
+    <value>Task list was succesfully updated</value>
+  </data>
 </root>

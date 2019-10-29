@@ -556,6 +556,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manage tasklists.
+        /// </summary>
+        public static string ManageTaskLists {
+            get {
+                return ResourceManager.GetString("ManageTaskLists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manual.
         /// </summary>
         public static string Manual {
@@ -1150,6 +1159,24 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Task list was succesfully removed.
+        /// </summary>
+        public static string TaskListWasRemoved {
+            get {
+                return ResourceManager.GetString("TaskListWasRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task list was succesfully updated.
+        /// </summary>
+        public static string TaskListWasUpdated {
+            get {
+                return ResourceManager.GetString("TaskListWasUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tasks.
         /// </summary>
         public static string Tasks {
@@ -1281,6 +1308,15 @@ namespace MiraiNotes.Android.Localization {
         public static string UnnistalledAppWithoutSigningOut {
             get {
                 return ResourceManager.GetString("UnnistalledAppWithoutSigningOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
             }
         }
         

@@ -59,7 +59,6 @@ namespace MiraiNotes.Android.ViewModels
         public NotificationAction InitParams { get; set; }
         #endregion
 
-
         #region Commands
         public IMvxAsyncCommand OnSettingsSelectedCommand { get; private set; }
         public IMvxAsyncCommand OnAccountsSelectedCommand { get; private set; }
@@ -67,6 +66,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand<bool> InitViewCommand { get; private set; }
         public IMvxCommand SyncCommand { get; private set; }
         public IMvxCommand<TaskSortType> TaskSortOrderChangedCommand { get; private set; }
+        public IMvxAsyncCommand ManageTaskListsCommand { get; private set; }
         #endregion
 
         public MainViewModel(
@@ -112,6 +112,9 @@ namespace MiraiNotes.Android.ViewModels
 
             TaskSortOrderChangedCommand = new MvxCommand<TaskSortType>(
                 (sortType) => Messenger.Publish(new TaskSortOrderChangedMsg(this, sortType)));
+
+            ManageTaskListsCommand = new MvxAsyncCommand(
+                () => NavigationService.Navigate<ManageTaskListsDialogViewModel>());
         }
 
         public override void RegisterMessages()

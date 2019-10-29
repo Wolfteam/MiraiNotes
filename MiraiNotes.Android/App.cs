@@ -100,6 +100,7 @@ namespace MiraiNotes.Android
             //since im using automapper to resolve this one, i need to explicit register it
             Mvx.IoCProvider.RegisterType<GoogleUserViewModel>();
             Mvx.IoCProvider.RegisterType<TaskItemViewModel>();
+            Mvx.IoCProvider.RegisterType<TaskListItemViewModel>();
 
             RegisterAppStart<LoginViewModel>();
             //RegisterCustomAppStart<CustomAppStart>();
@@ -203,9 +204,9 @@ namespace MiraiNotes.Android
                         outputTemplate: fileOutputTemplate))
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(
-                            Matching.FromSource($"{typeof(TaskListDialogViewModel).FullName}"))
+                            Matching.FromSource($"{typeof(AddEditTaskListDialogViewModel).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(basePath, "vm_tasklists_dialog.txt"),
+                        Path.Combine(basePath, "vm_add_edit_tasklists_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
@@ -294,6 +295,22 @@ namespace MiraiNotes.Android
                             Matching.FromSource($"{typeof(TasksViewModel).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "vm_tasks.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(DeleteTaskListDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "vm_deletetasklist_dialog.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(ManageTaskListsDialogViewModel).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "vm_managetasklists_dialog.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))
