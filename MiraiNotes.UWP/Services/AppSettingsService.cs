@@ -96,6 +96,7 @@ namespace MiraiNotes.UWP.Services
             get => (bool)(_settings[nameof(ShowToastNotificationForCompletedTasks)] ?? false);
             set => _settings[nameof(ShowToastNotificationForCompletedTasks)] = value;
         }
+        public bool AskBeforeDiscardChanges { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         #endregion
 
         public void ResetAppSettings()

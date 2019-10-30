@@ -35,9 +35,9 @@ namespace MiraiNotes.UWP.Services
         public string GetAuthorizationUrl()
         {
             return $"{AppConstants.BaseGoogleAuthUrl}" +
-                   $"?client_id={Uri.EscapeDataString(AppConstants.ClientId)}" +
+                   $"?client_id={Uri.EscapeDataString(Secrets.ClientId)}" +
                    $"&scope={string.Join(" ", _scopes)}" +
-                   $"&redirect_uri={Uri.EscapeDataString(AppConstants.RedirectUrl)}" +
+                   $"&redirect_uri={Uri.EscapeDataString(Secrets.RedirectUrl)}" +
                    "&response_type=code" +
                    "&include_granted_scopes=true";
         }
@@ -47,8 +47,8 @@ namespace MiraiNotes.UWP.Services
             var result = new ResponseDto<TokenResponseDto>();
 
             var tokenRequestBody = $"refresh_token={refreshToken}" +
-                                   $"&client_id={AppConstants.ClientId}" +
-                                   $"&client_secret={AppConstants.ClientSecret}" +
+                                   $"&client_id={Secrets.ClientId}" +
+                                   $"&client_secret={Secrets.ClientSecret}" +
                                    "&grant_type=refresh_token";
 
             var content = new StringContent(tokenRequestBody, Encoding.UTF8, "application/x-www-form-urlencoded");
@@ -80,9 +80,9 @@ namespace MiraiNotes.UWP.Services
             var result = new ResponseDto<TokenResponseDto>();
             // Builds the Token request
             var tokenRequestBody = $"code={approvalCode}" +
-                                   $"&client_id={AppConstants.ClientId}" +
-                                   $"&redirect_uri={Uri.EscapeDataString(AppConstants.RedirectUrl)}" +
-                                   $"&client_secret={AppConstants.ClientSecret}" +
+                                   $"&client_id={Secrets.ClientId}" +
+                                   $"&redirect_uri={Uri.EscapeDataString(Secrets.RedirectUrl)}" +
+                                   $"&client_secret={Secrets.ClientSecret}" +
                                    "&scope=&grant_type=authorization_code";
 
             var content = new StringContent(tokenRequestBody, Encoding.UTF8, "application/x-www-form-urlencoded");
