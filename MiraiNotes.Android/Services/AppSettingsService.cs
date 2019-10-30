@@ -20,8 +20,8 @@ namespace MiraiNotes.Android.Services
 
         public AppThemeType AppTheme
         {
-            get => (AppThemeType) GetInt(nameof(AppTheme));
-            set => SetInt(nameof(AppTheme), (int) value);
+            get => (AppThemeType)GetInt(nameof(AppTheme));
+            set => SetInt(nameof(AppTheme), (int)value);
         }
 
         public string AppHexAccentColor
@@ -32,14 +32,14 @@ namespace MiraiNotes.Android.Services
 
         public TaskListSortType DefaultTaskListSortOrder
         {
-            get => (TaskListSortType) GetInt(nameof(DefaultTaskListSortOrder));
-            set => SetInt(nameof(DefaultTaskListSortOrder), (int) value);
+            get => (TaskListSortType)GetInt(nameof(DefaultTaskListSortOrder));
+            set => SetInt(nameof(DefaultTaskListSortOrder), (int)value);
         }
 
         public TaskSortType DefaultTaskSortOrder
         {
-            get => (TaskSortType) GetInt(nameof(DefaultTaskSortOrder));
-            set => SetInt(nameof(DefaultTaskSortOrder), (int) value);
+            get => (TaskSortType)GetInt(nameof(DefaultTaskSortOrder));
+            set => SetInt(nameof(DefaultTaskSortOrder), (int)value);
         }
 
         public bool ShowCompletedTasks
@@ -83,8 +83,8 @@ namespace MiraiNotes.Android.Services
 
         public SyncBgTaskIntervals SyncBackgroundTaskInterval
         {
-            get => (SyncBgTaskIntervals) GetInt(nameof(SyncBackgroundTaskInterval));
-            set => SetInt(nameof(SyncBackgroundTaskInterval), (int) value);
+            get => (SyncBgTaskIntervals)GetInt(nameof(SyncBackgroundTaskInterval));
+            set => SetInt(nameof(SyncBackgroundTaskInterval), (int)value);
         }
 
         public bool RunSyncBackgroundTaskAfterStart
@@ -113,6 +113,11 @@ namespace MiraiNotes.Android.Services
         {
             get => GetBoolean(nameof(ShowToastNotificationForCompletedTasks));
             set => SetBoolean(nameof(ShowToastNotificationForCompletedTasks), value);
+        }
+        public string CurrentAppMigration
+        {
+            get => GetString(nameof(CurrentAppMigration));
+            set => SetString(nameof(CurrentAppMigration), value);
         }
         #endregion
 

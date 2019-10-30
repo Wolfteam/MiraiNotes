@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Shared.EntitiesConfiguration;
+using Serilog;
 using System;
 using System.IO;
 
@@ -9,7 +11,7 @@ namespace MiraiNotes.Shared
     public class MiraiNotesContext : DbContext
     {
         private const string DatabaseName = "mirai-notes.db";
-        private const string CurrentMigration = "Migration_v1";
+        private const string CurrentMigration = "Migration_v1.0.0.0";
 
 
         public DbSet<GoogleUser> Users { get; set; }
@@ -37,12 +39,23 @@ namespace MiraiNotes.Shared
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(GoogleTaskConfiguration).Assembly);
         }
 
-        public static void Init()
+        public static void Init(IAppSettingsService appSettings, ILogger logger)
         {
+            logger.Information($"Checking if the lastest migration = {CurrentMigration} is applied");
+            if (appSettings.CurrentAppMigration == CurrentMigration)
+            {
+                logger.Information("Lastest migration is applied...");
+                return;
+            }
+
+            logger.Information("Migration is not applied... Aplying it...");
             using (var context = new MiraiNotesContext())
             {
                 context.Database.Migrate();
+
+                appSettings.CurrentAppMigration = CurrentMigration;
             }
+            logger.Information("Migration was successfully applied");
         }
     }
 }

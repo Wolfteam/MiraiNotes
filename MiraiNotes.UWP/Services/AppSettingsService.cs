@@ -60,6 +60,11 @@ namespace MiraiNotes.UWP.Services
 
         public bool AskForFingerPrintWhenAppStarts { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         public string SelectedTaskListId { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public string CurrentAppMigration
+        {
+            get => _settings[nameof(CurrentAppMigration)] as string;
+            set => _settings[nameof(CurrentAppMigration)] = value;
+        }
         #endregion
 
 

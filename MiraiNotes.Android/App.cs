@@ -62,12 +62,12 @@ namespace MiraiNotes.Android
             Mvx.IoCProvider.RegisterType<INotificationService, NotificationService>();
             Mvx.IoCProvider.RegisterType<ITelemetryService, TelemetryService>();
 
-            Mvx.IoCProvider.RegisterType(CreateMapper);
+            Mvx.IoCProvider.RegisterSingleton(CreateMapper);
 
-            Mvx.IoCProvider.RegisterType<IUserDataService, UserDataService>();
-            Mvx.IoCProvider.RegisterType<ITaskListDataService, TaskListDataService>();
-            Mvx.IoCProvider.RegisterType<ITaskDataService, TaskDataService>();
-            Mvx.IoCProvider.RegisterType<IMiraiNotesDataService, MiraiNotesDataService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IUserDataService, UserDataService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<ITaskListDataService, TaskListDataService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<ITaskDataService, TaskDataService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IMiraiNotesDataService, MiraiNotesDataService>();
 
             CrossFingerprint.SetCurrentActivityResolver(() =>
             {
@@ -142,6 +142,14 @@ namespace MiraiNotes.Android
                         Matching.FromSource($"{typeof(UserDataService).FullName}"))
                     .WriteTo.File(
                         Path.Combine(basePath, "data_user_service_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(
+                            Matching.FromSource($"{typeof(MiraiNotesDataService).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "data_main_service_.txt"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate))

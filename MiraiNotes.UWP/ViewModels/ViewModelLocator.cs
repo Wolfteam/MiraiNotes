@@ -238,6 +238,14 @@ namespace MiraiNotes.UWP.ViewModels
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MiraiNotesDataService).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_data_main_service_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
                 .CreateLogger();
             Log.Logger = logger;
             return logger;

@@ -35,5 +35,7 @@ namespace MiraiNotes.Abstractions.Services
         string SelectedTaskListId { get; set; }
 
         bool AskBeforeDiscardChanges { get; set; }
+
+        string CurrentAppMigration { get; set; }
     }
 }

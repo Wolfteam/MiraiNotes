@@ -1,4 +1,6 @@
 ﻿using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using Serilog;
 
 namespace MiraiNotes.Shared.Services.Data
 {
@@ -12,9 +14,11 @@ namespace MiraiNotes.Shared.Services.Data
         public MiraiNotesDataService(
             IUserDataService userDataService,
             ITaskListDataService taskListDataService,
-            ITaskDataService taskDataService)
+            ITaskDataService taskDataService,
+            IAppSettingsService appSettings,
+            ILogger logger)
         {
-            MiraiNotesContext.Init();
+            MiraiNotesContext.Init(appSettings, logger.ForContext<MiraiNotesDataService>());
             UserService = userDataService;
             TaskListService = taskListDataService;
             TaskService = taskDataService;
