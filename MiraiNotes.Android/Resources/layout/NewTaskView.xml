@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -159,12 +159,14 @@
                     app:MvxBind="Visibility InvertedVisibility(Task.HasParentTask)"/>
 
                 <Button
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
                     android:drawableLeft="@drawable/ic_subdirectory_arrow_right_black_24dp"
-                    android:drawablePadding="5dp"
+                    android:drawablePadding="10dp"
                     android:text="Add a subtask"
+                    android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:background="?android:attr/selectableItemBackground"
                     app:MvxBind="Text [AddSubTask]; Visibility InvertedVisibility(Task.HasParentTask); Click AddSubTaskCommand;"/>
@@ -181,4 +183,3 @@
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
-
