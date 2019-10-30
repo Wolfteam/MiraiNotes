@@ -218,6 +218,7 @@
     <Compile Include="Views\Fragments\Dialogs\AccountDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\AddSubTaskDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\AskBeforeDiscardChangesDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\BaseBottomSheetDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\BaseDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\ChangeTaskStatusFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\DeleteAccountDialogFragment.cs" />
