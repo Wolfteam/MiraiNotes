@@ -42,9 +42,9 @@ namespace MiraiNotes.Shared.Services
             _telemetryService = telemetryService;
             _logger = logger;
 
-            _clientId = AppConstants.ClientId;
-            _clientSecret = AppConstants.ClientSecret;
-            _redirectUrl = AppConstants.RedirectUrl;
+            _clientId = Secrets.ClientId;
+            _clientSecret = Secrets.ClientSecret;
+            _redirectUrl = Secrets.RedirectUrl;
         }
 
         public string GetAuthorizationUrl()

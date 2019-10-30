@@ -7,24 +7,15 @@ namespace MiraiNotes.Shared.Utils
 {
     public class EncryptUtil
     {
-        // This size of the IV (in bytes) must = (keysize / 8).  Default keysize is 256, so the IV must be
-        // 32 bytes long.  Using a 16 character string here gives us 32 bytes when converted to a byte array.
-        private const string InitVector = "xxx";
-        // This constant is used to determine the keysize of the encryption algorithm
-        private const int KeySize = 256;
-
-        private const string Password = "xxx";
-
-
         //Encrypt
         public static string EncryptString(string plainText)
         {
             if (string.IsNullOrEmpty(plainText))
                 return plainText;
-            byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
+            byte[] initVectorBytes = Encoding.UTF8.GetBytes(Secrets.InitVector);
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(Password, null);
-            byte[] keyBytes = password.GetBytes(KeySize / 8);
+            PasswordDeriveBytes password = new PasswordDeriveBytes(Secrets.Password, null);
+            byte[] keyBytes = password.GetBytes(Secrets.KeySize / 8);
             RijndaelManaged symmetricKey = new RijndaelManaged
             {
                 Mode = CipherMode.CBC
@@ -45,10 +36,10 @@ namespace MiraiNotes.Shared.Utils
         {
             if (string.IsNullOrEmpty(cipherText))
                 return cipherText;
-            byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
+            byte[] initVectorBytes = Encoding.UTF8.GetBytes(Secrets.InitVector);
             byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(Password, null);
-            byte[] keyBytes = password.GetBytes(KeySize / 8);
+            PasswordDeriveBytes password = new PasswordDeriveBytes(Secrets.Password, null);
+            byte[] keyBytes = password.GetBytes(Secrets.KeySize / 8);
             RijndaelManaged symmetricKey = new RijndaelManaged
             {
                 Mode = CipherMode.CBC

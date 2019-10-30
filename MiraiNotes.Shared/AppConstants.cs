@@ -8,18 +8,6 @@ namespace MiraiNotes.Shared
         public const string BaseGoogleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         public const string BaseGoogleApprovalUrl = "https://accounts.google.com/o/oauth2/approval";
 
-        //Google secrets
-#if Android
-        public const string ClientId = "xxxx";
-        public const string ClientSecret = "xxxx";
-        public const string RedirectUrl = "xxxx";
-        public const string AppCenterSecret = "xxxx";
-#else
-        public const string ClientId = "xxxx";
-        public const string ClientSecret = "xxxx";
-        public const string RedirectUrl = "xxxx";
-#endif
-
         //Accent colors
         public const string AccentColorLightBlue = "#0077dd";
         public const string AccentColorLimeGreen = "#1be556";
