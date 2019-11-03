@@ -3,7 +3,7 @@
   <img height="120px" src="images/logo.png">
 </p>
 
-A simple UWP notes app that provides synchronization with Google Task and can be also used offline.
+A simple UWP / Android notes app that provides synchronization with Google Task and can be also used offline.
 
 ### Screenshots
 
@@ -14,8 +14,8 @@ A simple UWP notes app that provides synchronization with Google Task and can be
 
 #### Android
 <p align="center">
-  <img height="700" width="400" src="images/screenshot_2_android.png">
-  <img height="700" width="400" src="images/screenshot_1_android.png">
+  <img height="550" width="400" src="images/screenshot_2_android.png">
+  <img height="550" width="400" src="images/screenshot_1_android.png">
 </p>
 
 ### Features
@@ -32,6 +32,7 @@ A simple UWP notes app that provides synchronization with Google Task and can be
 * And many more...
 
 ### Installation
+#### UWP
 I currently don't have a developer account to publish this app in the Microsoft Store (WIP).... so to install this app:
 * Go into the Windows Settings -> Updates & Security ->For Developers
 * Select the **Sideload apps** checkbox
@@ -40,6 +41,9 @@ I currently don't have a developer account to publish this app in the Microsoft 
 * Right-click on the **Add-AppDevPackage.ps1** file. Choose **Run with PowerShell** and follow the prompts. You will be prompted to install my developer certificate and app
 ![Run with powershell](https://docs.microsoft.com/en-us/windows/uwp/packaging/images/packaging-screen7.jpg)
 * When the app package has been installed, the PowerShell window displays this message: **Your app was successfully installed**. After that just click the Start button to search for the app, and then launch it. 
+
+#### Android
+<img height="100" width="300" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" />
 
 ### Support
 If you have any bug report, suggestion, feature request, etc, please go into the [Issues section](https://github.com/Wolfteam/MiraiNotes/issues) and create a new issue. 
