@@ -87,12 +87,17 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <AotAssemblies>true</AotAssemblies>
+    <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
-    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
-    <AndroidDexTool>d8</AndroidDexTool>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <AndroidDexTool>dx</AndroidDexTool>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <MandroidI18n />
+    <BundleAssemblies>true</BundleAssemblies>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <AndroidPackageFormat>aab</AndroidPackageFormat>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android.Export" />
@@ -165,6 +170,7 @@
     <Compile Include="Interfaces\IItemTouchHelperAdapter.cs" />
     <Compile Include="Interfaces\IOnStartDragListener.cs" />
     <Compile Include="Interfaces\ITextProvider.cs" />
+    <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Listeners\ClickListener.cs" />
     <Compile Include="Interfaces\IItemTouchHelperViewHolder.cs" />
     <Compile Include="Interfaces\ISwipeButtonClickListener.cs" />

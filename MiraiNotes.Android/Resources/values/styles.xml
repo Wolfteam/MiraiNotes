@@ -23,6 +23,7 @@
 
   <style name="CustomMaterialButton" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
     <item name="android:theme">@style/Theme.MaterialComponents</item>
+    <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     <item name="android:textColor">?AccentColor</item>
     <item name="strokeColor">?AccentColor</item>
     <item name="backgroundTint">?AppBackground</item>
@@ -34,6 +35,7 @@
     <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:theme">@style/Theme.MaterialComponents</item>
+    <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     <item name="android:minWidth">0dp</item>
     <item name="android:insetLeft">0dp</item>
     <item name="android:insetTop">0dp</item>

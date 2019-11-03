@@ -20,7 +20,13 @@ namespace MiraiNotes.Android.Services
 
         public AppThemeType AppTheme
         {
-            get => (AppThemeType)GetInt(nameof(AppTheme));
+            get
+            {
+                var currentTheme = (AppThemeType)GetInt(nameof(AppTheme));
+                return currentTheme == AppThemeType.DEFAULT
+                    ? AppThemeType.LIGHT
+                    : currentTheme;
+            }
             set => SetInt(nameof(AppTheme), (int)value);
         }
 
