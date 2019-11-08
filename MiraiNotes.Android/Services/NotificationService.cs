@@ -141,7 +141,18 @@ namespace MiraiNotes.Android.Services
             NotifManager.Notify(notification.Id, notif);
         }
 
-        private NotificationCompat.Builder BuildSimpleNotification(TaskNotification notification)
+        public void ShowNotification(int id, string title, string content, bool ongoing)
+        {
+            var pendingIntent = GetIntentToMainActivity(id);
+
+            var notif = BuildSimpleNotification(title, content)
+                .SetOngoing(ongoing)
+                .SetContentIntent(pendingIntent)
+                .Build();
+            NotifManager.Notify(id, notif);
+        }
+
+        public NotificationCompat.Builder BuildSimpleNotification(string title, string content)
         {
             var iconDrawable = ContextCompat.GetDrawable(Application.Context, Resource.Drawable.ic_launcher);
             var bm = iconDrawable.ToBitmap();
@@ -158,54 +169,53 @@ namespace MiraiNotes.Android.Services
                 NotifManager.CreateNotificationChannel(generalChannel);
             }
 
-            var soundUri = RingtoneManager.GetDefaultUri(RingtoneType.Notification);
-
-            var audioAttributes = new AudioAttributes.Builder()
-                .SetContentType(AudioContentType.Sonification)
-                .SetUsage(AudioUsageKind.Alarm)
-                .SetLegacyStreamType(Stream.Alarm)
-                .Build();
-
-            //we use the main because we dont want to show the splash again..
-            var resultIntent = new Intent(Application.Context, typeof(MainActivity));
-            //resultIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTop | ActivityFlags.SingleTop);
-            //resultIntent.SetAction(Intent.ActionMain);
-            //resultIntent.AddCategory(Intent.CategoryLauncher);
-            //resultIntent.SetFlags(ActivityFlags.SingleTop);
-            //resultIntent.SetFlags(ActivityFlags.NewTask);
-
-            //var pendingIntent = PendingIntent.GetActivity(Application.Context, 1, resultIntent, PendingIntentFlags.UpdateCurrent);
-            var bundle = new Bundle();
-            bundle.PutString(nameof(NotificationService), $"{notification.Id}");
-            var pendingIntent = TaskStackBuilder.Create(Application.Context)
-                .AddNextIntent(resultIntent)
-                .GetPendingIntent(1, (int)PendingIntentFlags.UpdateCurrent, bundle);
-
             var builder = new NotificationCompat.Builder(Application.Context, GeneralChannelId)
-                .SetContentTitle(notification.Title)
-                .SetAutoCancel(true)
+                .SetContentTitle(title)
                 .SetSmallIcon(Resource.Drawable.ic_notification_logo)
                 .SetColor(Color.Red.ToArgb())
                 .SetLargeIcon(bm)
-                .SetContentIntent(pendingIntent);
+                .SetContentText(content);
 
-            if (!string.IsNullOrEmpty(notification.LargeContent))
-            {
-                builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.LargeContent));
-            }
-
-            if (!string.IsNullOrEmpty(notification.Content))
-            {
-                builder.SetContentText(notification.Content);
-            }
+            if (!string.IsNullOrEmpty(content))
+                builder.SetContentText(content);
 
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
             {
                 //This are deprecated for android O +
 #pragma warning disable CS0618 // Type or member is obsolete
+                var soundUri = RingtoneManager.GetDefaultUri(RingtoneType.Notification);
                 builder.SetSound(soundUri);
                 builder.SetPriority(NotificationCompat.PriorityDefault);
 #pragma warning restore CS0618 // Type or member is obsolete
+            }
+
+            return builder;
+        }
+
+        public PendingIntent GetIntentToMainActivity(int notificationId)
+        {
+            //we use the main because we dont want to show the splash again..
+            var resultIntent = new Intent(Application.Context, typeof(MainActivity));
+            var bundle = new Bundle();
+            bundle.PutString(nameof(NotificationService), $"{notificationId}");
+            var pendingIntent = TaskStackBuilder.Create(Application.Context)
+                .AddNextIntent(resultIntent)
+                .GetPendingIntent(1, (int)PendingIntentFlags.UpdateCurrent, bundle);
+
+            return pendingIntent;
+        }
+
+        private NotificationCompat.Builder BuildSimpleNotification(TaskNotification notification)
+        {
+            var pendingIntent = GetIntentToMainActivity(notification.Id);
+
+            var builder = BuildSimpleNotification(notification.Title, notification.Content)
+                .SetAutoCancel(true)
+                .SetContentIntent(pendingIntent);
+
+            if (!string.IsNullOrEmpty(notification.LargeContent))
+            {
+                builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.LargeContent));
             }
 
             return builder;
