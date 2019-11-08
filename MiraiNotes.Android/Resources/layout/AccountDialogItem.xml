@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -59,6 +59,7 @@
             android:layout_height="30dp"
             android:layout_marginEnd="15dp"
             android:background="@drawable/ic_done_black_24dp"
+            android:backgroundTint="@color/DarkGreenAccentColorLight"
             android:contentDescription="Change"
             android:foreground="?android:attr/selectableItemBackground"
             app:MvxBind="Click ChangeCurrentAccountCommand; Enabled InverseBoolean(IsActive); Clickable InverseBoolean(IsActive); Visibility InvertedVisibility(IsActive)"/>
@@ -67,6 +68,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/ic_delete_black_24dp"
+            android:backgroundTint="@color/VividRedAccentColorPrimary"
             android:contentDescription="Delete"
             android:foreground="?android:attr/selectableItemBackground"
             app:MvxBind="Click DeleteAccountCommand; Enabled CanBeDeleted; Clickable CanBeDeleted; Visibility Visibility(CanBeDeleted)"/>

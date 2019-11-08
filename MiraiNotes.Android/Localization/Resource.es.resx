@@ -558,4 +558,10 @@
   <data name="TaskListWasUpdated" xml:space="preserve">
     <value>Lista de tareas actualizada exitosamente</value>
   </data>
+  <data name="Syncing" xml:space="preserve">
+    <value>Sincronizando</value>
+  </data>
+  <data name="SyncRunning" xml:space="preserve">
+    <value>Sincronizando tus tareas y listas de tareas...</value>
+  </data>
 </root>

@@ -1105,6 +1105,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Syncing.
+        /// </summary>
+        public static string Syncing {
+            get {
+                return ResourceManager.GetString("Syncing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A manual full sync was successfully performed.
         /// </summary>
         public static string SyncManualCompleted {
@@ -1119,6 +1128,15 @@ namespace MiraiNotes.Android.Localization {
         public static string SyncResults {
             get {
                 return ResourceManager.GetString("SyncResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Syncing your task and tasklist....
+        /// </summary>
+        public static string SyncRunning {
+            get {
+                return ResourceManager.GetString("SyncRunning", resourceCulture);
             }
         }
         

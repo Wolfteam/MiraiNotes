@@ -538,4 +538,10 @@
   <data name="TaskListWasUpdated" xml:space="preserve">
     <value>Task list was succesfully updated</value>
   </data>
+  <data name="Syncing" xml:space="preserve">
+    <value>Syncing</value>
+  </data>
+  <data name="SyncRunning" xml:space="preserve">
+    <value>Syncing your task and tasklist...</value>
+  </data>
 </root>
