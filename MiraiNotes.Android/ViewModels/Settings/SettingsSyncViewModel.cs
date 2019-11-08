@@ -5,6 +5,7 @@ using MiraiNotes.Core.Models;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using MvvmCross.ViewModels;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,12 @@ namespace MiraiNotes.Android.ViewModels.Settings
     {
         #region Members
         private readonly IBackgroundTaskManagerService _backgroundTaskManager;
+        private readonly MvxInteraction _closeActivity = new MvxInteraction();
+        #endregion
+
+        #region Interactors
+        public IMvxInteraction CloseActivity
+            => _closeActivity;
         #endregion
 
         #region Properties
@@ -83,9 +90,14 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
                 AppSettings.SyncBackgroundTaskInterval = selectedInterval;
                 if (selectedInterval == SyncBgTaskIntervals.NEVER)
+                {
                     _backgroundTaskManager.UnregisterBackgroundTasks(BackgroundTaskType.SYNC);
+                }
                 else
+                {
                     _backgroundTaskManager.RegisterBackgroundTasks(BackgroundTaskType.SYNC);
+                    _closeActivity.Raise();
+                }
             }
         }
 

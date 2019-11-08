@@ -1,13 +1,13 @@
-﻿using Android.App.Job;
-using Android.Content;
-using Java.Lang;
+﻿using AndroidX.Work;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Background;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MvvmCross;
 using MvvmCross.Platforms.Android;
 using System;
+using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.Services
 {
@@ -34,8 +34,7 @@ namespace MiraiNotes.Android.Services
             switch (backgroundTask)
             {
                 case BackgroundTaskType.SYNC:
-                    long interval = (long)TimeSpan.FromMinutes((double)_appSettings.SyncBackgroundTaskInterval).TotalMilliseconds;
-                    RegisterTask(SyncId, interval);
+                    RegisterTask(SyncId, (long)_appSettings.SyncBackgroundTaskInterval);
                     break;
                 case BackgroundTaskType.MARK_AS_COMPLETED:
                 case BackgroundTaskType.ANY:
@@ -49,10 +48,10 @@ namespace MiraiNotes.Android.Services
             switch (backgroundTask)
             {
                 case BackgroundTaskType.SYNC:
-                    using (var syncTask = new SyncBackgroundTask.SyncTask(null))
-                    {
-                        await syncTask.Sync();
-                    }
+                    await Task.Delay(10);
+
+                    var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
+                    top.Activity.StartForegroundServiceCompat<SyncBackgroundService>();
                     break;
                 case BackgroundTaskType.ANY:
                 case BackgroundTaskType.MARK_AS_COMPLETED:
@@ -63,13 +62,11 @@ namespace MiraiNotes.Android.Services
 
         public void UnregisterBackgroundTasks(BackgroundTaskType backgroundTask = BackgroundTaskType.ANY)
         {
-            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-            var scheduler = (JobScheduler)top.Activity.GetSystemService(Context.JobSchedulerService);
             switch (backgroundTask)
             {
                 case BackgroundTaskType.ANY:
                 case BackgroundTaskType.SYNC:
-                    scheduler.Cancel(SyncId);
+                    WorkManager.Instance.CancelAllWorkByTag($"{SyncId}");
                     break;
                 case BackgroundTaskType.MARK_AS_COMPLETED:
                 default:
@@ -77,27 +74,18 @@ namespace MiraiNotes.Android.Services
             }
         }
 
-        private void RegisterTask(int id, long? runEach)
+        private void RegisterTask(int id, long runEach)
         {
-            var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-            var component = new ComponentName(top.Activity, Class.FromType(typeof(SyncBackgroundTask)));
-            var scheduler = (JobScheduler)top.Activity.GetSystemService(Context.JobSchedulerService);
-
-            //keep in mind that if the job id is already registered, it will be updated
-            var builder = new JobInfo.Builder(id, component)
-                .SetRequiredNetworkType(NetworkType.Any)
-                .SetPersisted(true)
-                .SetRequiresBatteryNotLow(true);
-
-            if (runEach.HasValue && runEach.Value > 0)
-                builder.SetPeriodic(runEach.Value);
-
-            var scheduleResult = scheduler.Schedule(builder.Build());
-
-            if (scheduleResult == JobScheduler.ResultSuccess)
-                _dialogService.ShowSucceedToast(_textProvider.Get("JobWasScheduled"));
-            else
-                _dialogService.ShowErrorToast(_textProvider.Get("JobCouldntBeScheduled"));
+            //var constraints = new Constraints.Builder()
+            //    .SetRequiresBatteryNotLow(true)
+            //    .Build();
+            var workRequest = PeriodicWorkRequest.Builder
+                .From<SyncBackgroundTask>(TimeSpan.FromMinutes(runEach))
+                //.SetConstraints(constraints)
+                .AddTag($"{id}")
+                .Build();
+            WorkManager.Instance.EnqueueUniquePeriodicWork($"{id}", ExistingPeriodicWorkPolicy.Replace, workRequest);
+            _dialogService.ShowSucceedToast(_textProvider.Get("JobWasScheduled"));
         }
     }
 }

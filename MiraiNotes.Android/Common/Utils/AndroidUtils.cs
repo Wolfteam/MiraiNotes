@@ -2,8 +2,10 @@
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
+using Android.OS;
 using Android.Views;
 using Android.Widget;
+using Java.Lang;
 using MiraiNotes.Android.Listeners;
 using System;
 using static Android.App.ActivityManager;
@@ -108,6 +110,25 @@ namespace MiraiNotes.Android.Common.Utils
         {
             var dmd = (float)AndroidUtil.DisplayMetricsDensity.Default;
             return px / ((float)context.Resources.DisplayMetrics.DensityDpi / dmd);
+        }
+
+        public static void StartForegroundServiceCompat<T>(this Context context, Bundle args = null) 
+            where T : Service
+        {
+            var intent = new Intent(context, typeof(T));
+            if (args != null)
+            {
+                intent.PutExtras(args);
+            }
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                context.StartForegroundService(intent);
+            }
+            else
+            {
+                context.StartService(intent);
+            }
         }
     }
 }
