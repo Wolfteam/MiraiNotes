@@ -112,6 +112,9 @@ namespace MiraiNotes.Android.Views.Fragments
                     case Resource.Id.Settings:
                         MainActivity.ViewModel.OnSettingsSelectedCommand.Execute();
                         break;
+                    case Resource.Id.ManageTaskLists:
+                        MainActivity.ViewModel.ManageTaskListsCommand.Execute();
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(menuItem.ItemId), menuItem.ItemId, "Invalid drawer menu item id");
                 }
@@ -169,9 +172,10 @@ namespace MiraiNotes.Android.Views.Fragments
             }
 
             var subMenu = menu.AddSubMenu(1, 100, 100, ViewModel.GetText("Others"));
-            subMenu.Add(1, Resource.Id.Accounts, 101, ViewModel.GetText("Accounts")).SetIcon(Resource.Drawable.ic_account_circle_black_24dp);
-            subMenu.Add(1, Resource.Id.Settings, 102, ViewModel.GetText("Settings")).SetIcon(Resource.Drawable.ic_settings_black_24dp);
-            subMenu.Add(1, Resource.Id.Logout, 103, ViewModel.GetText("Logout")).SetIcon(Resource.Drawable.ic_arrow_back_black_24dp);
+            subMenu.Add(1, Resource.Id.ManageTaskLists, 101, ViewModel.GetText("ManageTaskLists")).SetIcon(Resource.Drawable.ic_assignment_black_24dp);
+            subMenu.Add(1, Resource.Id.Accounts, 102, ViewModel.GetText("Accounts")).SetIcon(Resource.Drawable.ic_account_circle_black_24dp);
+            subMenu.Add(1, Resource.Id.Settings, 103, ViewModel.GetText("Settings")).SetIcon(Resource.Drawable.ic_settings_black_24dp);
+            subMenu.Add(1, Resource.Id.Logout, 104, ViewModel.GetText("Logout")).SetIcon(Resource.Drawable.ic_arrow_back_black_24dp);
 
             for (int i = 0, count = _navView.ChildCount; i < count; i++)
             {
