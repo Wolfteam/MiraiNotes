@@ -381,5 +381,12 @@ namespace MiraiNotes.Android
             //config.AssertConfigurationIsValid();
             return config.CreateMapper();
         }
+
+#if DEBUG
+        public static void RegisterMockServices()
+        {
+            Mvx.IoCProvider.RegisterType<IGoogleApiService, MockedGoogleApiService>();
+        }
+#endif
     }
 }

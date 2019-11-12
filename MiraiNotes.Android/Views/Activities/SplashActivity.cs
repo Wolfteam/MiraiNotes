@@ -1,5 +1,4 @@
 ﻿using Android.App;
-using Android.Content.PM;
 using MvvmCross.Droid.Support.V7.AppCompat;
 
 namespace MiraiNotes.Android.Views.Activities

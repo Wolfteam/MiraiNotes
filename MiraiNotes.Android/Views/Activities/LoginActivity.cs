@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Preferences;
+using Java.Interop;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments.Dialogs;
 using MvvmCross.Binding.BindingContext;
@@ -84,5 +85,13 @@ namespace MiraiNotes.Android.Views.Activities
             intent.SetData(AndroidUri.Parse(url));
             StartActivityForResult(intent, 0);
         }
+
+#if DEBUG
+        [Export(nameof(BypassSignIn))]
+        public void BypassSignIn()
+        {
+            ViewModel.BypassSignInCommand.Execute();
+        }
+#endif
     }
 }

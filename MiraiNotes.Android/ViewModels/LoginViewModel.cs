@@ -1,4 +1,3 @@
-using Microsoft.AppCenter.Crashes;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Utils;
@@ -7,6 +6,7 @@ using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
+using MvvmCross;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -61,6 +61,10 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxCommand LoginCommand { get; private set; }
         public IMvxCommand OnAuthCodeGrantedCommand { get; private set; }
         public IMvxCommand InitViewCommand { get; private set; }
+
+#if DEBUG
+        public IMvxAsyncCommand BypassSignInCommand { get; private set; }
+#endif
         #endregion
 
         public LoginViewModel(
@@ -94,6 +98,11 @@ namespace MiraiNotes.Android.ViewModels
             LoginCommand = new MvxCommand(OnLoginRequest);
             OnAuthCodeGrantedCommand = new MvxAsyncCommand<string>(OnCodeGranted);
             InitViewCommand = new MvxAsyncCommand(InitView);
+
+#if DEBUG
+            //This one is used for the UiTests
+            BypassSignInCommand = new MvxAsyncCommand(BypassSignIn);
+#endif
         }
 
         public void OnLoginRequest()
@@ -138,7 +147,7 @@ namespace MiraiNotes.Android.ViewModels
                     _userCredentialService.DefaultUsername,
                     response.Result.AccessToken);
 
-                var isSignedIn = await SignIn();
+                var isSignedIn = await SignIn(_googleApiService, _syncService);
                 if (!isSignedIn)
                 {
                     await _dataService
@@ -161,12 +170,12 @@ namespace MiraiNotes.Android.ViewModels
             ShowLoading = false;
         }
 
-        private async Task<bool> SignIn()
+        private async Task<bool> SignIn(IGoogleApiService googleApiService, ISyncService syncService)
         {
             Logger.Information(
                 $"{nameof(SignIn)}: Trying to get the user info from google");
 
-            var userResponse = await _googleApiService.GetUser();
+            var userResponse = await googleApiService.GetUser();
             if (!userResponse.Succeed)
             {
                 Logger.Error($"{nameof(SignIn)}: Couldnt get the google user. Error = {userResponse.Message}");
@@ -227,7 +236,7 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             Logger.Information($"{nameof(SignIn)}: Trying to get all the task lists that are remote...");
-            var syncResult = await _syncService.SyncDownTaskListsAsync(false);
+            var syncResult = await syncService.SyncDownTaskListsAsync(false);
 
             if (!syncResult.Succeed)
             {
@@ -237,7 +246,7 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             Logger.Information($"{nameof(SignIn)}: Trying to get all the tasks that are remote...");
-            syncResult = await _syncService.SyncDownTasksAsync(false);
+            syncResult = await syncService.SyncDownTasksAsync(false);
 
             if (!syncResult.Succeed)
             {
@@ -367,5 +376,16 @@ namespace MiraiNotes.Android.ViewModels
 
             return passwordMatches;
         }
+
+#if DEBUG
+        public async Task<bool> BypassSignIn()
+        {
+            App.RegisterMockServices();
+            var mockedGoogleApiService = Mvx.IoCProvider.Resolve<IGoogleApiService>();
+            var mockedSyncService = Mvx.IoCProvider.Resolve<ISyncService>();
+
+            return await SignIn(mockedGoogleApiService, mockedSyncService);
+        }
+#endif
     }
 }
