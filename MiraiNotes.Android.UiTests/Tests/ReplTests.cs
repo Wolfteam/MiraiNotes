@@ -3,7 +3,7 @@ using Xamarin.UITest;
 
 namespace MiraiNotes.Android.UiTests.Tests
 {
-    public class ReplTests : BaseTestFixture
+    public class ReplTests : BaseTest
     {
         public ReplTests(Platform platform) : base(platform)
         {

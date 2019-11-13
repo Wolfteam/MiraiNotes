@@ -1,11 +1,12 @@
 ﻿using MiraiNotes.Android.UiTests.Pages;
+using MiraiNotes.Android.UiTests.Pages.Dialogs;
 using NUnit.Framework;
 using Xamarin.UITest;
 
 namespace MiraiNotes.Android.UiTests
 {
     [TestFixture(Platform.Android)]
-    public class BaseTestFixture
+    public class BaseTest
     {
         protected IApp App
             => AppManager.App;
@@ -17,8 +18,10 @@ namespace MiraiNotes.Android.UiTests
         protected LoginPage LoginPage { get; private set; }
         protected TasksPage TasksPage { get; private set; }
         protected NewTaskPage NewTaskPage { get; private set; }
+        protected TaskMenuOptionsDialog TaskMenuOptionsDialog { get; private set; }
+        protected ManageTaskListsDialog ManageTaskListsDialog { get; private set; }
 
-        protected BaseTestFixture(Platform platform)
+        protected BaseTest(Platform platform)
         {
             AppManager.Platform = platform;
         }
@@ -31,19 +34,24 @@ namespace MiraiNotes.Android.UiTests
             LoginPage = new LoginPage();
             TasksPage = new TasksPage();
             NewTaskPage = new NewTaskPage();
+            TaskMenuOptionsDialog = new TaskMenuOptionsDialog();
+            ManageTaskListsDialog = new ManageTaskListsDialog();
 
-            Login();
-        }
-
-        public void Login()
-        {
-            //Arrange
-            App.WaitForElement(x => x.Marked("Login"));
-
-            //Act
             LoginPage.Login();
         }
 
+        protected void AddNewTaskList(string title)
+        {
+            //Arrange
+
+            //Act
+            TasksPage.OpenNewTaskListDialog();
+            string hint = TasksPage.GetHint();
+            TasksPage.AddNewTaskList(title);
+
+            //Assert
+            Assert.AreEqual(hint, "Title");
+        }
         //TODO: I SHOULD SET A DEFAULT LANGUAGE
     }
 }

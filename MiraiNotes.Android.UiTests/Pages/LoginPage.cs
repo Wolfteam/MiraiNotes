@@ -2,7 +2,7 @@
 
 namespace MiraiNotes.Android.UiTests.Pages
 {
-    public class LoginPage : BasePage<LoginPage>
+    public class LoginPage : BasePage
     {
         private readonly Query _loginButton;
         public override PlatformQuery Trait => new PlatformQuery
@@ -13,12 +13,6 @@ namespace MiraiNotes.Android.UiTests.Pages
         public LoginPage()
         {
             _loginButton = x => x.Button("Login");
-        }
-
-        public override LoginPage OpenDrawer(bool open = true)
-        {
-            OpenDrawer();
-            return this;
         }
 
         public void Login()

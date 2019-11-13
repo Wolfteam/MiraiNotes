@@ -35,17 +35,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppManager.cs" />
+    <Compile Include="Pages\BaseView.cs" />
+    <Compile Include="Pages\Dialogs\BaseDialog.cs" />
     <Compile Include="Extensions\AppPickerExtensions.cs" />
+    <Compile Include="Pages\Dialogs\ManageTaskListsDialog.cs" />
     <Compile Include="Pages\LoginPage.cs" />
     <Compile Include="Pages\NewTaskPage.cs" />
+    <Compile Include="Pages\Dialogs\TaskMenuOptionsDialog.cs" />
     <Compile Include="Pages\TasksPage.cs" />
-    <Compile Include="Tests\BaseTestFixture.cs" />
+    <Compile Include="Tests\BaseTest.cs" />
     <Compile Include="AppInitializer.cs" />
     <Compile Include="Pages\BasePage.cs" />
     <Compile Include="PlatformQuery.cs" />
     <Compile Include="Tests\LoginPageTests.cs" />
+    <Compile Include="Tests\ManageTaskListsDialogTests.cs" />
     <Compile Include="Tests\NewTaskPageTests.cs" />
     <Compile Include="Tests\ReplTests.cs" />
+    <Compile Include="Tests\TaskMenuOptionsDialogTests.cs" />
     <Compile Include="Tests\TasksPageTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -3,7 +3,7 @@ using Xamarin.UITest;
 
 namespace MiraiNotes.Android.UiTests.Tests
 {
-    public class LoginPageTests : BaseTestFixture
+    public class LoginPageTests : BaseTest
     {
         public LoginPageTests(Platform platform)
             : base(platform)
@@ -13,14 +13,6 @@ namespace MiraiNotes.Android.UiTests.Tests
         [Test]
         public void Login_MockedUser_NavigatesToTaskPage()
         {
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Logout_ShouldLogout(bool logout)
-        {
-            LoginPage.OpenDrawer();
-
         }
     }
 }
