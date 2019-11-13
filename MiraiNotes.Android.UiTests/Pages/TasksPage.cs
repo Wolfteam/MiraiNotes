@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.Android.UiTests.Extensions;
 using System;
+using System.Drawing;
 using System.Linq;
 using Xamarin.UITest.Queries;
 using Query = System.Func<Xamarin.UITest.Queries.AppQuery, Xamarin.UITest.Queries.AppQuery>;
@@ -169,6 +170,12 @@ namespace MiraiNotes.Android.UiTests.Pages
             App.WaitForNoElement(_addButton);
         }
 
+        public bool IsSubTaskTitleValid(string title)
+        {
+            var query = new AppQuery(QueryPlatform.Android).Marked("Title cannot be empty");
+            return IsTextInInputInvalid(title, query, _addButton, _uniqueEditTextInDialog, Color.Red);
+        }
+
         public TasksPage ShowMoveToDiffTaskListDialog()
         {
             SelectTaskMenuOption(TaskMenuOption_MoveToDiffTaskList);
@@ -294,9 +301,12 @@ namespace MiraiNotes.Android.UiTests.Pages
             App.WaitForNoElement(_noButton);
         }
 
-        public TasksPage ShowAccountDialog()
+        public TasksPage ShowAccountDialog(bool openFromImg)
         {
-            App.Tap(x => x.Marked("Accounts"));
+            if (openFromImg)
+                App.Tap(x => x.Class("CircleImageView"));
+            else
+                App.Tap(x => x.Marked("Accounts"));
             App.WaitForElement(_cancelButton);
             return this;
         }
@@ -317,12 +327,17 @@ namespace MiraiNotes.Android.UiTests.Pages
             return this;
         }
 
-        public void DeleteTaskList(bool deleteIt, int index = 0)
+        public TasksPage ShowDeleteTaskListDialog(int index = 0)
         {
             int deleteButtonIndex = 1;
             App.Tap(x => x.Class(MvxListViewClass).Child().Index(index).Descendant(MaterialButtonClass).Index(deleteButtonIndex));
             App.WaitForElement(_cancelButton);
 
+            return this;
+        }
+
+        public void DeleteTaskList(bool deleteIt)
+        {
             if (deleteIt)
                 App.Tap(_okButton);
             else
@@ -352,12 +367,17 @@ namespace MiraiNotes.Android.UiTests.Pages
             return GetAllTaskListFromManageTaskListsDialogDialog()[index].Text;
         }
 
-        public void EditTaskList(bool saveChanges, string newTitle, int index = 0)
+        public TasksPage ShowEditTaskListDialog(int index = 0)
         {
-            int deleteButtonIndex = 0;
-            App.Tap(x => x.Class(MvxListViewClass).Child().Index(index).Descendant(MaterialButtonClass).Index(deleteButtonIndex));
+            int editButtonIndex = 0;
+            App.Tap(x => x.Class(MvxListViewClass).Child().Index(index).Descendant(MaterialButtonClass).Index(editButtonIndex));
             App.WaitForElement(_cancelButton);
 
+            return this;
+        }
+
+        public void EditTaskList(bool saveChanges, string newTitle)
+        {
             App.ClearText(_uniqueEditTextInDialog);
             App.EnterText(_uniqueEditTextInDialog, newTitle);
 
@@ -378,6 +398,12 @@ namespace MiraiNotes.Android.UiTests.Pages
             return GetAllTaskListFromManageTaskListsDialogDialog().Any(t => t.Text == title);
         }
 
+        public bool IsTaskListTitleInvalid(string title)
+        {
+            var query = new AppQuery(QueryPlatform.Android).Marked("Title cannot be empty");
+            return IsTextInInputInvalid(title, query, _updateButton, _uniqueEditTextInDialog, Color.Red);
+        }
+
         private AppResult[] GetAllTaskListFromManageTaskListsDialogDialog()
         {
             return App.Query(x => x.Class(MvxListViewClass).Child().Descendant("AppCompatTextView"));
@@ -386,6 +412,27 @@ namespace MiraiNotes.Android.UiTests.Pages
         private void SelectTaskMenuOption(int index)
         {
             App.Tap(x => x.All(MaterialButtonClass).Index(index));
+        }
+
+        private bool IsTextInInputInvalid(string text, AppQuery query, Query okButton, Query input, Color desiredColor)
+        {
+            App.ClearText(input);
+            App.EnterText(input, text);
+
+            //If the text is empty we wont be able to see the button
+            if (App.Query(okButton).Any())
+                App.Tap(okButton);
+
+            //If the query to check the validator error doesnt return nothing, that means that is valid
+            if (!App.Query(x => query).Any())
+                return false;
+
+            var warningColor = GetColor(query);
+            bool areClose = ColorsAreClose(warningColor, desiredColor);
+
+            bool updateButtonIsVisible = App.Query(_updateButton).Any();
+
+            return !updateButtonIsVisible || !areClose;
         }
     }
 }

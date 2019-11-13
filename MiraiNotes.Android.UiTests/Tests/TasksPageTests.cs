@@ -10,6 +10,7 @@ namespace MiraiNotes.Android.UiTests.Tests
         {
         }
 
+        #region Fab
         [TestCase("Testing")]
         public void AddNewTaskList_ShouldNotContainTasks(string title)
         {
@@ -27,7 +28,9 @@ namespace MiraiNotes.Android.UiTests.Tests
 
             Assert.AreEqual(hint, "Title");
         }
+        #endregion
 
+        #region AppBar
         [TestCase("By name asc")]
         [TestCase("By name desc")]
         [TestCase("By updated date asc")]
@@ -44,8 +47,44 @@ namespace MiraiNotes.Android.UiTests.Tests
             int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
             Assert.True(initialNumberOfTask == finalNumberOfTask);
         }
+        #endregion
 
-        //TODO: DELETE A FRESH CREATED TASK
+        #region Drawer
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Logout_UserIsLoggedOut_ReturnsToLoginPage(bool logOut)
+        {
+            //Arrange
+            TasksPage.OpenDrawer();
+
+            //Act
+            TasksPage.ShowLogoutDialog().Logout(logOut);
+
+            //Assert
+            if (logOut)
+                Assert.DoesNotThrow(() => App.WaitForElement(LoginPage.Trait.Current));
+            else
+                Assert.DoesNotThrow(() => App.WaitForElement(TasksPage.Trait.Current));
+            Assert.True(!TasksPage.IsDrawerOpen());
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ShowAccountDialog_LoggedUserIsShown(bool openFromImg)
+        {
+            //Arrange
+            TasksPage.OpenDrawer();
+
+            //Act
+            bool accountIsShown = TasksPage.ShowAccountDialog(openFromImg).AccountIsShown();
+
+            //Assert
+            Assert.True(accountIsShown);
+            Assert.True(!TasksPage.IsDrawerOpen());
+        }
+        #endregion
+
+        #region Tasks Menu Option
         [TestCase(true)]
         [TestCase(false)]
         public void DeleteTask_TaskAlreadyExists_ShouldDeleteIt(bool delete)
@@ -64,6 +103,26 @@ namespace MiraiNotes.Android.UiTests.Tests
                 Assert.True(initialNumberOfTask - 1 == finalNumberOfTask);
             else
                 Assert.True(initialNumberOfTask == finalNumberOfTask);
+        }
+
+        [Test]
+        public void DeleteTask_FreshCreatedTask_MustBeDeleted()
+        {
+            //Arrange
+            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            TasksPage.GoToNewTaskPage();
+            NewTaskPage.AddNewTask("A Task", "This task will be deleted");
+
+            //Act
+            //E.g: initially you have 3 task, create another one and you will have 4, but the corresponding
+            //index will be equal to the initial number of tasks
+            TasksPage.ShowTaskMenuOptions(initialNumberOfTask)
+                .ShowDeleteTaskDialog()
+                .DeleteTask(true);
+
+            //Assert
+            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            Assert.True(initialNumberOfTask == finalNumberOfTask);
         }
 
         [TestCase(true)]
@@ -101,6 +160,19 @@ namespace MiraiNotes.Android.UiTests.Tests
             Assert.AreEqual(hint, "Title");
         }
 
+        [Test]
+        public void AddSubTask_EmptyTitle_MustShowAValidationError()
+        {
+            //Arrange
+            TasksPage.ShowTaskMenuOptions().ShowAddSubTaskDialog();
+
+            //Act
+            bool isInvalid = TasksPage.IsSubTaskTitleValid(string.Empty);
+
+            //Assert
+            Assert.True(isInvalid);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void MoveToDiffTaskList(bool moveIt)
@@ -120,7 +192,6 @@ namespace MiraiNotes.Android.UiTests.Tests
                 Assert.True(initialNumberOfTask == finalNumberOfTask);
         }
 
-        //TODO: HOW SHOULD I VALIDATE ADD REMINDER ?
         [TestCase(true)]
         [TestCase(false)]
         public void AddAReminder(bool addIt)
@@ -153,7 +224,9 @@ namespace MiraiNotes.Android.UiTests.Tests
             //Assert
             Assert.True(wasRemoved);
         }
+        #endregion
 
+        #region Task Swipe Actions
         [TestCase(true)]
         [TestCase(false)]
         public void SwipeTask_ToTheRight_ChangeTaskStatus(bool changeStatus)
@@ -189,39 +262,9 @@ namespace MiraiNotes.Android.UiTests.Tests
             else
                 Assert.True(initialNumberOfTask == finalNumberOfTask);
         }
+        #endregion    
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Logout_UserIsLoggedOut_ReturnsToLoginPage(bool logOut)
-        {
-            //Arrange
-            TasksPage.OpenDrawer();
-
-            //Act
-            TasksPage.ShowLogoutDialog().Logout(logOut);
-
-            //Assert
-            if (logOut)
-                Assert.DoesNotThrow(() => App.WaitForElement(LoginPage.Trait.Current));
-            else
-                Assert.DoesNotThrow(() => App.WaitForElement(TasksPage.Trait.Current));
-            Assert.True(!TasksPage.IsDrawerOpen());
-        }
-
-        [Test]
-        public void ShowAccountDialog_LoggedUserIsShown()
-        {
-            //Arrange
-            TasksPage.OpenDrawer();
-
-            //Act
-            bool accountIsShown = TasksPage.ShowAccountDialog().AccountIsShown();
-
-            //Assert
-            Assert.True(accountIsShown);
-            Assert.True(!TasksPage.IsDrawerOpen());
-        }
-
+        #region Manage Task Lists
         [TestCase(true)]
         [TestCase(false)]
         public void DeleteTaskList_TaskListIsNew_ShouldBeDeleted(bool deleteIt)
@@ -235,7 +278,7 @@ namespace MiraiNotes.Android.UiTests.Tests
             int initialNumberOfTaskLists = TasksPage.GetTaskListsCountFromManageTaskListsDialogDialog();
 
             //Act
-            TasksPage.DeleteTaskList(deleteIt, taskListIndex);
+            TasksPage.ShowDeleteTaskListDialog(taskListIndex).DeleteTaskList(deleteIt);
 
             //Assert
             if (deleteIt)
@@ -266,7 +309,7 @@ namespace MiraiNotes.Android.UiTests.Tests
             int taskListIndex = TasksPage.GetTaskListIndexFromManageTaskListsDialogDialog(title);
 
             //Act
-            TasksPage.EditTaskList(saveChanges, newTitle, taskListIndex);
+            TasksPage.ShowEditTaskListDialog(taskListIndex).EditTaskList(saveChanges, newTitle);
 
             //Assert
             if (saveChanges)
@@ -280,6 +323,21 @@ namespace MiraiNotes.Android.UiTests.Tests
             }
             Assert.True(TasksPage.TaskListExistsInManageTaskListsDialog(newTitle));
         }
-        //TODO: I SHOULD VALIDATE WHEN AN INPUT IS SHOWN AND THE TEXT IS EMPTY THAT A RED MSG APPEARS
+
+        [Test]
+        public void EditTaskList_EmptyTitle_MustShowAValidationError()
+        {
+            //Arrange
+            TasksPage.OpenDrawer()
+                .ShowTaskListsManageDialog()
+                .ShowEditTaskListDialog();
+
+            //Act
+            bool isInvalid = TasksPage.IsTaskListTitleInvalid(string.Empty);
+
+            //Assert
+            Assert.True(isInvalid);
+        }
+        #endregion
     }
 }

@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Drawing;
 using System.Linq;
 using Xamarin.UITest;
+using Xamarin.UITest.Queries;
 
 namespace MiraiNotes.Android.UiTests.Pages
 {
@@ -72,6 +74,27 @@ namespace MiraiNotes.Android.UiTests.Pages
         public void PressBackButton()
         {
             App.Back();
+        }
+
+        public Color GetColor(AppQuery baseQuery, int index = 0)
+        {
+            int colorValue = Convert.ToInt32(App.Query(x => baseQuery.Invoke("getCurrentTextColor"))[index]);
+
+            var color = Color.FromArgb(colorValue);
+            return color;
+        }
+
+        public bool ColorsAreClose(Color a, Color b, int threshold = 500)
+        {
+
+            var rDist = Math.Abs(a.R - b.R);
+            var gDist = Math.Abs(a.G - b.G);
+            var bDist = Math.Abs(a.B - b.B);
+
+            if (rDist + gDist + bDist > threshold)
+                return false;
+
+            return true;
         }
 
         public abstract TPage OpenDrawer(bool open = true);
