@@ -89,7 +89,15 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 var parameter = MoveTaskDialogViewModelParameter.Instance(Parameter.TaskList, selectedTaskList, Parameter.Task);
                 bool wasMoved = await NavigationService.Navigate<MoveTaskDialogViewModel, MoveTaskDialogViewModelParameter, bool>(parameter);
-                await NavigationService.Close(this, wasMoved);
+                if (wasMoved)
+                {
+                    await NavigationService.Close(this, true);
+                }
+                else
+                {
+                    CurrentTaskList = TaskLists.First(t => t.Id == Parameter.TaskList.Id);
+                    _hideDialog.Raise(false);
+                }
             });
         }
 
