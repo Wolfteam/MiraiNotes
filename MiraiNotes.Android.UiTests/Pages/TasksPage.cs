@@ -15,10 +15,10 @@ namespace MiraiNotes.Android.UiTests.Pages
         private readonly Query _cancelButton;
         private readonly Query _updateButton;
 
-        public override PlatformQuery Trait => new PlatformQuery
-        {
-            Android = x => x.Marked("AppFab")
-        };
+        private readonly Query _taskItemTitleId;
+        private readonly Query _taskItemContentId;
+
+        public override PlatformQuery Trait { get; }
 
         public TasksPage()
         {
@@ -31,6 +31,14 @@ namespace MiraiNotes.Android.UiTests.Pages
             _noButton = x => x.Button("No");
             _cancelButton = x => x.Button("Cancel");
             _updateButton = x => x.Button("Update");
+
+            _taskItemTitleId = x => x.Id("TaskItemTitle");
+            _taskItemContentId = x => x.Id("TaskItemContent");
+
+            Trait = new PlatformQuery
+            {
+                Android = _mainFabButton
+            };
         }
 
         public TasksPage OpenDrawer()
@@ -74,6 +82,13 @@ namespace MiraiNotes.Android.UiTests.Pages
             App.Tap(_addTaskButton);
         }
 
+        public void GoToNewTaskPage(int taskIndex)
+        {
+            App.Tap(x => x.Id(TaskRecyclerViewId).Child().Index(taskIndex).Child());
+
+            App.WaitForNoElement(x => x.Id(TaskRecyclerViewId));
+        }
+
         public void SortTasks(string by)
         {
             App.Tap(x => x.Id("SortTasks"));
@@ -83,9 +98,9 @@ namespace MiraiNotes.Android.UiTests.Pages
             App.Tap(x => x.Marked(by));
         }
 
-        public TasksPage SwipeTaskTo(bool toTheRight, bool tapButton = true, int index = 0)
+        public TasksPage SwipeTaskTo(bool toTheRight, bool tapButton = true, int taskIndex = 0)
         {
-            var rect = App.Query(x => x.Id(TaskRecyclerViewId).Child().Index(index)).First().Rect;
+            var rect = App.Query(x => x.Id(TaskRecyclerViewId).Child().Index(taskIndex)).First().Rect;
             if (toTheRight)
             {
                 App.DragCoordinates(rect.X, rect.CenterY, rect.Width, rect.CenterY);
@@ -124,18 +139,19 @@ namespace MiraiNotes.Android.UiTests.Pages
             App.WaitForNoElement(_yesButton);
         }
 
-        public int GetCurrentNumberOfTask()
+        public int GetCurrentNumberOfTasks()
         {
+            App.WaitForElement(x => x.Id(TaskRecyclerViewId));
             int tasks = App.Query(x => x.Id(TaskRecyclerViewId).Child()).Length;
             return tasks;
         }
 
-        public bool IsTextStrikeThrough(int index)
+        public bool IsTextStrikeThrough(int taskIndex)
         {
             var flag = App.Query(
                 x => x.Id(TaskRecyclerViewId)
                     .Child()
-                    .Index(index)
+                    .Index(taskIndex)
                     .Descendant()
                     .Class("AppCompatTextView")
                     .Invoke("getPaintFlags"))
@@ -195,6 +211,46 @@ namespace MiraiNotes.Android.UiTests.Pages
         {
             return App.Query(x => x.Id(TaskRecyclerViewId).Child().Index(taskIndex).Descendant("MvxRecyclerView").Child())
                 .Length;
+        }
+
+        public bool HasSubTasks(int taskIndex)
+            => App.Query(x => x.Id(TaskRecyclerViewId).Child().Index(taskIndex).Descendant("AppCompatImageButton"))
+                .Length > 0;
+
+        public bool HasACompletitionDateSet(int taskIndex)
+        {
+            return App.Query(
+                    x => x.Id(TaskRecyclerViewId)
+                        .Child()
+                        .Index(taskIndex)
+                        .Descendant()
+                        .Id("TaskItemCompletitionDateIcon"))
+                .Any();
+        }
+
+        public bool HasAReminderDateSet(int taskIndex)
+        {
+            return App.Query(
+                x => x.Id(TaskRecyclerViewId)
+                    .Child()
+                    .Index(taskIndex)
+                    .Descendant()
+                    .Id("TaskItemReminderIcon"))
+                .Any();
+        }
+
+        public string GetTaskTitle(int taskIndex)
+        {
+            var element = App.Query(_taskItemTitleId).ElementAt(taskIndex);
+
+            return element.Text;
+        }
+
+        public string GetTaskContent(int taskIndex)
+        {
+            var element = App.Query(_taskItemContentId).ElementAt(taskIndex);
+
+            return element.Text;
         }
     }
 }

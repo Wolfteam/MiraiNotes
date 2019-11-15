@@ -10,14 +10,14 @@ namespace MiraiNotes.Android.UiTests.Pages
         protected BasePage()
         {
             //AssertOnPage(TimeSpan.FromSeconds(30));
-            App.Screenshot("On " + this.GetType().Name);
+            //App.Screenshot("On " + this.GetType().Name);
         }
 
         /// <summary>
         /// Verifies that the trait is still present. Defaults to no wait.
         /// </summary>
         /// <param name="timeout">Time to wait before the assertion fails</param>
-        protected void AssertOnPage(TimeSpan? timeout = default)
+        public void AssertOnPage(TimeSpan? timeout = default)
         {
             var message = "Unable to verify on page: " + this.GetType().Name;
 
@@ -35,7 +35,7 @@ namespace MiraiNotes.Android.UiTests.Pages
         /// Verifies that the trait is no longer present. Defaults to a 5 second wait.
         /// </summary>
         /// <param name="timeout">Time to wait before the assertion fails</param>
-        protected void WaitForPageToLeave(TimeSpan? timeout = default)
+        public void WaitForPageToLeave(TimeSpan? timeout = default)
         {
             timeout = timeout ?? TimeSpan.FromSeconds(5);
             var message = "Unable to verify *not* on page: " + this.GetType().Name;

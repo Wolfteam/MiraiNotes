@@ -5,7 +5,7 @@ using Query = System.Func<Xamarin.UITest.Queries.AppQuery, Xamarin.UITest.Querie
 
 namespace MiraiNotes.Android.UiTests.Pages.Dialogs
 {
-    public class BaseDialog : BaseView
+    public abstract class BaseDialog : BasePage
     {
         protected bool IsTextInInputInvalid(string text, AppQuery query, Query okButton, Query input, Color desiredColor)
         {
@@ -20,7 +20,7 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
             if (!App.Query(x => query).Any())
                 return false;
 
-            var warningColor = GetColor(query);
+            var warningColor = GetTextColor(query);
             bool areClose = ColorsAreClose(warningColor, desiredColor);
 
             bool updateButtonIsVisible = App.Query(okButton).Any();

@@ -48,10 +48,10 @@
     <Compile Include="Pages\BasePage.cs" />
     <Compile Include="PlatformQuery.cs" />
     <Compile Include="Tests\LoginPageTests.cs" />
-    <Compile Include="Tests\ManageTaskListsDialogTests.cs" />
+    <Compile Include="Tests\Dialogs\ManageTaskListsDialogTests.cs" />
     <Compile Include="Tests\NewTaskPageTests.cs" />
     <Compile Include="Tests\ReplTests.cs" />
-    <Compile Include="Tests\TaskMenuOptionsDialogTests.cs" />
+    <Compile Include="Tests\Dialogs\TaskMenuOptionsDialogTests.cs" />
     <Compile Include="Tests\TasksPageTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

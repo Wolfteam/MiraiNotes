@@ -24,6 +24,10 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
 
         private readonly Query _uniqueEditTextInDialog;
 
+        private readonly AppQuery _moveTaskDialogId;
+
+        public override PlatformQuery Trait { get; }
+
         public TaskMenuOptionsDialog()
         {
             _uniqueEditTextInDialog = x => x.Class("TextInputEditText");
@@ -34,6 +38,13 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
             _cancelButton = x => x.Button("Cancel");
             _okButton = x => x.Button("Ok");
             _closeButton = x => x.Button("Close");
+
+            _moveTaskDialogId = BuildBaseAppQuery().Id("MoveTaskListView");
+
+            Trait = new PlatformQuery
+            {
+                Android = x => x.Id("TaskMenuOptionsDialogView")
+            };
         }
 
         public TaskMenuOptionsDialog ShowMainDialog(int index = 0)
@@ -107,7 +118,7 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
 
         public bool IsSubTaskTitleValid(string title)
         {
-            var query = new AppQuery(QueryPlatform.Android).Marked("Title cannot be empty");
+            var query = BuildBaseAppQuery().Marked("Title cannot be empty");
             return IsTextInInputInvalid(title, query, _addButton, _uniqueEditTextInDialog, Color.Red);
         }
 
@@ -119,10 +130,10 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
             return this;
         }
 
-        public void MoveToDiffTaskList(bool moveIt)
+        public void MoveToDiffTaskList(bool moveIt, int taskListIndex)
         {
-            var index = App.Query(x => x.Class(MvxListViewClass).Child()).Length;
-            App.Tap(x => x.Class(MvxListViewClass).Child().Index(index - 1));
+            App.Tap(x => _moveTaskDialogId.Child().Index(taskListIndex));
+
             App.WaitForElement(_yesButton);
 
             if (moveIt)
@@ -131,6 +142,21 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
                 App.Tap(_noButton);
 
             App.WaitForNoElement(_yesButton);
+        }
+
+        public int GetNumberOfTaskLists()
+        {
+            return App.Query(x => _moveTaskDialogId.Child()).Length;
+        }
+
+        public int GetSelectedTaskListIndex()
+        {
+            var colors = GetBackgroundColors(_moveTaskDialogId.Child());
+            
+            //if the tasklist doesnt have a bg, the returned colors is this
+            var noBgColor = Color.FromArgb(0, 0, 0, 0);
+
+            return colors.FindIndex(color => color != noBgColor);            
         }
 
         public TaskMenuOptionsDialog ShowAddReminderDialog()

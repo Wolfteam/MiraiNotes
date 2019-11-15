@@ -18,7 +18,7 @@ namespace MiraiNotes.Android.UiTests.Tests
             AddNewTaskList(title);
 
             //Assert
-            int tasks = TasksPage.GetCurrentNumberOfTask();
+            int tasks = TasksPage.GetCurrentNumberOfTasks();
             //since this is a new task list, it must contain 0 tasks
             Assert.True(tasks == 0);
         }
@@ -32,13 +32,13 @@ namespace MiraiNotes.Android.UiTests.Tests
         public void SorTask_By(string by)
         {
             //Arrange
-            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
 
             //Act
             TasksPage.SortTasks(by);
 
             //Assert
-            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             Assert.True(initialNumberOfTask == finalNumberOfTask);
         }
         #endregion
@@ -102,13 +102,13 @@ namespace MiraiNotes.Android.UiTests.Tests
         public void SwipeTask_ToTheLeft_DeleteTask(bool deleteIt)
         {
             //Arrange
-            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
 
             //Act
             TasksPage.SwipeTaskTo(false).DeleteTaskFromSwipedTask(deleteIt);
 
             //Assert
-            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             if (deleteIt)
                 Assert.True(initialNumberOfTask - 1 == finalNumberOfTask);
             else

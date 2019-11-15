@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Xamarin.UITest;
 
-namespace MiraiNotes.Android.UiTests.Tests
+namespace MiraiNotes.Android.UiTests.Tests.Dialogs
 {
     public class ManageTaskListsDialogTests : BaseTest
     {

@@ -13,6 +13,8 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
 
         private readonly Query _uniqueEditTextInDialog;
 
+        public override PlatformQuery Trait { get; }
+
         public ManageTaskListsDialog()
         {
             _uniqueEditTextInDialog = x => x.Class("TextInputEditText");
@@ -20,6 +22,11 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
             _cancelButton = x => x.Button("Cancel");
             _okButton = x => x.Button("Ok");
             _updateButton = x => x.Button("Update");
+
+            Trait = new PlatformQuery
+            {
+                Android = x => x.Class(MvxListViewClass)
+            };
         }
 
         public ManageTaskListsDialog ShowMainDialog()
@@ -102,7 +109,7 @@ namespace MiraiNotes.Android.UiTests.Pages.Dialogs
 
         public bool IsTaskListTitleInvalid(string title)
         {
-            var query = new AppQuery(QueryPlatform.Android).Marked("Title cannot be empty");
+            var query = BuildBaseAppQuery().Marked("Title cannot be empty");
             return IsTextInInputInvalid(title, query, _updateButton, _uniqueEditTextInDialog, Color.Red);
         }
 

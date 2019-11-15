@@ -14,8 +14,8 @@ namespace MiraiNotes.Android.UiTests.Extensions
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
 
         #region Android Configuration
-        private const string AndroidDatePickerClass = "DatePicker";
-        private const string AndroidTimePickerClass = "TimePicker";
+        public const string AndroidDatePickerClass = "DatePicker";
+        public const string AndroidTimePickerClass = "TimePicker";
         private const string AndroidDatePickerUpdateDateMethod = "updateDate";
         /// <summary>
         /// Gets the Android Set Minute method for the TimePicker class. As of API v 23 this is deprecated and should be replaced with "setMinute".

@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
+using System;
+using System.Linq;
 using Xamarin.UITest;
 
-namespace MiraiNotes.Android.UiTests.Tests
+namespace MiraiNotes.Android.UiTests.Tests.Dialogs
 {
     public class TaskMenuOptionsDialogTests : BaseTest
     {
@@ -15,7 +17,7 @@ namespace MiraiNotes.Android.UiTests.Tests
         public void DeleteTask_TaskAlreadyExists_ShouldDeleteIt(bool delete)
         {
             //Arrange
-            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
 
             //Act
             TaskMenuOptionsDialog.ShowMainDialog()
@@ -23,7 +25,7 @@ namespace MiraiNotes.Android.UiTests.Tests
                 .DeleteTask(delete);
 
             //Assert
-            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             if (delete)
                 Assert.True(initialNumberOfTask - 1 == finalNumberOfTask);
             else
@@ -34,9 +36,9 @@ namespace MiraiNotes.Android.UiTests.Tests
         public void DeleteTask_FreshCreatedTask_MustBeDeleted()
         {
             //Arrange
-            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             TasksPage.GoToNewTaskPage();
-            NewTaskPage.AddNewTask("A Task", "This task will be deleted");
+            NewTaskPage.AddEditNewTask("A Task", "This task will be deleted");
 
             //Act
             //E.g: initially you have 3 task, create another one and you will have 4, but the corresponding
@@ -46,7 +48,7 @@ namespace MiraiNotes.Android.UiTests.Tests
                 .DeleteTask(true);
 
             //Assert
-            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             Assert.True(initialNumberOfTask == finalNumberOfTask);
         }
 
@@ -100,26 +102,35 @@ namespace MiraiNotes.Android.UiTests.Tests
 
         [TestCase(true)]
         [TestCase(false)]
-        public void MoveToDiffTaskList(bool moveIt)
+        public void MoveToDiffTaskList_ShouldBeMoved(bool moveIt)
         {
             //Arrange
-            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int initialNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             TaskMenuOptionsDialog.ShowMainDialog().ShowMoveToDiffTaskListDialog();
+            int tasksListIndex = TaskMenuOptionsDialog.GetSelectedTaskListIndex();
+            int maxIndex = TaskMenuOptionsDialog.GetNumberOfTaskLists();
+            int selectedTaskListIndex = Enumerable.Range(0, maxIndex).First(value => value != tasksListIndex);
 
             //Act
-            TaskMenuOptionsDialog.MoveToDiffTaskList(moveIt);
+            TaskMenuOptionsDialog.MoveToDiffTaskList(moveIt, selectedTaskListIndex);
 
             //Assert
-            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTask();
+            int finalNumberOfTask = TasksPage.GetCurrentNumberOfTasks();
             if (moveIt)
+            {
                 Assert.True(initialNumberOfTask - 1 == finalNumberOfTask);
+            }
             else
+            {
+                ManageTaskListsDialog.AssertOnPage(TimeSpan.FromSeconds(10));
                 Assert.True(initialNumberOfTask == finalNumberOfTask);
+                Assert.True(tasksListIndex == TaskMenuOptionsDialog.GetSelectedTaskListIndex());
+            }
         }
 
         [TestCase(true)]
         [TestCase(false)]
-        public void AddAReminder(bool addIt)
+        public void AddAReminder_ShouldBeAdded(bool addIt)
         {
             //Arrange
             TaskMenuOptionsDialog.ShowMainDialog().ShowAddReminderDialog();
@@ -135,11 +146,11 @@ namespace MiraiNotes.Android.UiTests.Tests
         }
 
         [Test]
-        public void DeleteReminder()
+        public void DeleteReminder_ExistingReminder_MustBeRemoved()
         {
             //Arrange
             string reminderContainsText = "A reminder date was set";
-            AddAReminder(true);
+            AddAReminder_ShouldBeAdded(true);
 
             //Act
             bool wasRemoved = TaskMenuOptionsDialog.ShowMainDialog()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Xamarin.UITest;
@@ -33,7 +34,7 @@ namespace MiraiNotes.Android.UiTests.Pages
                 .ToString();
         }
 
-        public Color GetColor(AppQuery baseQuery, int index = 0)
+        public Color GetTextColor(AppQuery baseQuery, int index = 0)
         {
             int colorValue = Convert.ToInt32(App.Query(x => baseQuery.Invoke("getCurrentTextColor"))[index]);
 
@@ -52,6 +53,33 @@ namespace MiraiNotes.Android.UiTests.Pages
                 return false;
 
             return true;
+        }
+
+        public List<Color> GetBackgroundColors(AppQuery baseQuery)
+        {
+            var colorValues = App.Query(x => baseQuery.Invoke("getBackground").Invoke("getColor"))
+                .Select(value => Convert.ToInt32(value))
+                .ToList();
+
+            var colors = new List<Color>();
+            foreach (var colorValue in colorValues)
+            {
+                var color = Color.FromArgb(colorValue);
+                colors.Add(color);
+            }
+
+            return colors;
+        }
+
+        public Color GetBackgroundColor(AppQuery baseQuery)
+        {
+            var noBgColor = Color.FromArgb(0, 0, 0, 0);
+            return GetBackgroundColors(baseQuery).First(color => color != noBgColor);
+        }
+
+        public AppQuery BuildBaseAppQuery()
+        {
+            return new AppQuery(QueryPlatform.Android);
         }
     }
 }
