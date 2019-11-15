@@ -43,12 +43,14 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
                     <ImageView
+                        android:id="@+id/TaskItemReminderIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_access_alarm_black_24dp"
                         app:MvxBind="Visibility Visibility(HasAReminderDate)"/>
 
                     <TextView
+                        android:id="@+id/TaskItemTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="15dp"
@@ -61,6 +63,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/TaskItemContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -87,6 +90,7 @@
                     android:gravity="center_vertical"
                     app:MvxBind="Visibility Visibility(HasAToBeCompletedDate)">
                     <ImageView
+                        android:id="@+id/TaskItemCompletitionDateIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_calendar_24dp"

@@ -26,6 +26,7 @@
         app:MvxBind="Text [PickTaskList]"/>
 
     <MvvmCross.Platforms.Android.Binding.Views.MvxListView
+        android:id="@+id/MoveTaskListView"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
