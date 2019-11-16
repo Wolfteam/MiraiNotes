@@ -42,6 +42,7 @@
     <Compile Include="Pages\LoginPage.cs" />
     <Compile Include="Pages\NewTaskPage.cs" />
     <Compile Include="Pages\Dialogs\TaskMenuOptionsDialog.cs" />
+    <Compile Include="Pages\SettingsPage.cs" />
     <Compile Include="Pages\TasksPage.cs" />
     <Compile Include="Tests\BaseTest.cs" />
     <Compile Include="AppInitializer.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Tests\NewTaskPageTests.cs" />
     <Compile Include="Tests\ReplTests.cs" />
     <Compile Include="Tests\Dialogs\TaskMenuOptionsDialogTests.cs" />
+    <Compile Include="Tests\SettingsPageTests.cs" />
     <Compile Include="Tests\TasksPageTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

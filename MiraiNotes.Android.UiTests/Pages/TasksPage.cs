@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Drawing;
+using System.Linq;
+using Xamarin.UITest.Queries;
 using Query = System.Func<Xamarin.UITest.Queries.AppQuery, Xamarin.UITest.Queries.AppQuery>;
 
 namespace MiraiNotes.Android.UiTests.Pages
@@ -18,6 +20,8 @@ namespace MiraiNotes.Android.UiTests.Pages
         private readonly Query _taskItemTitleId;
         private readonly Query _taskItemContentId;
 
+        private readonly AppQuery _navView;
+
         public override PlatformQuery Trait { get; }
 
         public TasksPage()
@@ -35,6 +39,8 @@ namespace MiraiNotes.Android.UiTests.Pages
             _taskItemTitleId = x => x.Id("TaskItemTitle");
             _taskItemContentId = x => x.Id("TaskItemContent");
 
+            _navView = BuildBaseAppQuery().Id("AppNavView");
+
             Trait = new PlatformQuery
             {
                 Android = _mainFabButton
@@ -45,7 +51,7 @@ namespace MiraiNotes.Android.UiTests.Pages
         {
             //App.SwipeLeftToRight(0.99, 1000, true);
             App.Tap(x => x.Marked("Open"));
-
+            App.WaitForElement(x => _navView);
             return this;
         }
 
@@ -251,6 +257,19 @@ namespace MiraiNotes.Android.UiTests.Pages
             var element = App.Query(_taskItemContentId).ElementAt(taskIndex);
 
             return element.Text;
+        }
+
+        public void GoToSettings()
+        {
+            App.Tap(x => x.Text("Settings"));
+
+            App.WaitForNoElement(x => x.Id(TaskRecyclerViewId));
+        }
+
+        public Color GetNavigationViewBgColor()
+        {
+            var color = GetBackgroundColor(_navView);
+            return color;
         }
     }
 }

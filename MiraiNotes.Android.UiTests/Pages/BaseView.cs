@@ -13,9 +13,16 @@ namespace MiraiNotes.Android.UiTests.Pages
         public const string MvxListViewClass = "MvxListView";
         public const string MaterialButtonClass = "MaterialButton";
 
-        protected IApp App => AppManager.App;
-        protected bool OnAndroid => AppManager.Platform == Platform.Android;
-        protected bool OniOS => AppManager.Platform == Platform.iOS;
+        protected IApp App
+            => AppManager.App;
+        protected bool OnAndroid
+            => AppManager.Platform == Platform.Android;
+        protected bool OniOS
+            => AppManager.Platform == Platform.iOS;
+        protected Color DarkAppThemeColor
+            => Color.FromArgb(-14671580);
+        protected Color LightAppThemeColor
+            => Color.FromArgb(-1);
 
         public bool IsDrawerOpen()
         {
@@ -42,9 +49,16 @@ namespace MiraiNotes.Android.UiTests.Pages
             return color;
         }
 
+        public List<Color> GetTextColors(AppQuery baseQuery)
+        {
+            var colors = App.Query(x => baseQuery.Invoke("getCurrentTextColor"))
+                .Select(value => Color.FromArgb(Convert.ToInt32(value)))
+                .ToList();
+            return colors;
+        }
+
         public bool ColorsAreClose(Color a, Color b, int threshold = 500)
         {
-
             var rDist = Math.Abs(a.R - b.R);
             var gDist = Math.Abs(a.G - b.G);
             var bDist = Math.Abs(a.B - b.B);
@@ -80,6 +94,12 @@ namespace MiraiNotes.Android.UiTests.Pages
         public AppQuery BuildBaseAppQuery()
         {
             return new AppQuery(QueryPlatform.Android);
+        }
+
+        public Color GetAppBarBgColor()
+        {
+            var query = BuildBaseAppQuery().Class("AppBarLayout");
+            return GetBackgroundColor(query);
         }
     }
 }

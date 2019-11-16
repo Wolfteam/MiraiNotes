@@ -20,6 +20,7 @@ namespace MiraiNotes.Android.UiTests
         protected NewTaskPage NewTaskPage { get; private set; }
         protected TaskMenuOptionsDialog TaskMenuOptionsDialog { get; private set; }
         protected ManageTaskListsDialog ManageTaskListsDialog { get; private set; }
+        protected SettingsPage SettingsPage { get; private set; }
 
         protected BaseTest(Platform platform)
         {
@@ -36,6 +37,7 @@ namespace MiraiNotes.Android.UiTests
             NewTaskPage = new NewTaskPage();
             TaskMenuOptionsDialog = new TaskMenuOptionsDialog();
             ManageTaskListsDialog = new ManageTaskListsDialog();
+            SettingsPage = new SettingsPage();
 
             LoginPage.Login();
         }
