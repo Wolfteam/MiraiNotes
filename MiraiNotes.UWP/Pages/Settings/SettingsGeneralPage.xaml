@@ -13,7 +13,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     d:DesignWidth="400"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Settings, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -77,7 +76,7 @@
                 ItemsSource="{Binding AppThemes, Mode=OneWay}"
                 PlaceholderText="Pick a theme"
                 SelectedItem="{Binding CurrentAppTheme, Mode=TwoWay}"
-                SelectedValuePath="ItemID" />
+                SelectedValuePath="ItemId" />
         </StackPanel>
 
         <TextBlock
@@ -120,7 +119,7 @@
                 ItemsSource="{Binding TaskListSortTypes, Mode=OneWay}"
                 PlaceholderText="Pick a sorting order"
                 SelectedItem="{Binding CurrentTaskListSortOrder, Mode=TwoWay}"
-                SelectedValuePath="ItemID" />
+                SelectedValuePath="ItemId" />
         </StackPanel>
         <StackPanel Margin="5">
             <ComboBox
@@ -130,7 +129,7 @@
                 ItemsSource="{Binding TasksSortTypes}"
                 PlaceholderText="Pick a sorting order"
                 SelectedItem="{Binding CurrentTaskSortOrder, Mode=TwoWay}"
-                SelectedValuePath="ItemID" />
+                SelectedValuePath="ItemId" />
         </StackPanel>
 
         <!--<StackPanel Margin="5">
