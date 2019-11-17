@@ -34,5 +34,6 @@ CLASS="namespace MiraiNotes.Shared
         public const string Password = $Client_DB_PASSWORD;
     }
 }"
-# print the contents of the variable on screen
-echo $CLASS > ../MiraiNotes.Shared/Secrets.cs
+# print the contents of the variable on screen,
+# we use "" to keep the line breaks
+echo "$CLASS" > ../MiraiNotes.Shared/Secrets.cs
