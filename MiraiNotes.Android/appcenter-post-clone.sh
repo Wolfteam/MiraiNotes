@@ -70,6 +70,10 @@ CLASS="namespace MiraiNotes.Shared
         public const string Password = "\"$DB_PASSWORD\"";
     }
 }"
+
+echo "Saving Secrets.cs file into MiraiNotes.Shared"
+echo "$CLASS"
+
 # print the contents of the variable on screen,
 # we use "" to keep the line breaks
 echo "$CLASS" > ../MiraiNotes.Shared/Secrets.cs
