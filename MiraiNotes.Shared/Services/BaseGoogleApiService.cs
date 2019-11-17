@@ -57,7 +57,7 @@ namespace MiraiNotes.Shared.Services
                    "&include_granted_scopes=true";
         }
 
-#region Auth
+        #region Auth
 
         public async Task<ResponseDto<TokenResponseDto>> GetAccessTokenAsync(string approvalCode)
         {
@@ -113,9 +113,9 @@ namespace MiraiNotes.Shared.Services
 
         public abstract Task<ResponseDto<TokenResponseDto>> SignInWithGoogle();
 
-#endregion
+        #endregion
 
-#region User
+        #region User
 
         public async Task<ResponseDto<GoogleUserResponseDto>> GetUser()
         {
@@ -147,9 +147,9 @@ namespace MiraiNotes.Shared.Services
             return response;
         }
 
-#endregion
+        #endregion
 
-#region TaskList
+        #region TaskList
 
         public async Task<ResponseDto<GoogleTaskApiResponseModel<GoogleTaskListModel>>> GetAllTaskLists(
             int maxResults = 100,
@@ -266,9 +266,9 @@ namespace MiraiNotes.Shared.Services
             return response;
         }
 
-#endregion
+        #endregion
 
-#region Tasks
+        #region Tasks
 
         public async Task<EmptyResponseDto> ClearTasks(string taskListId)
         {
@@ -418,19 +418,19 @@ namespace MiraiNotes.Shared.Services
             return response;
         }
 
-#endregion
+        #endregion
 
-#region Helpers
+        #region Helpers
 
-        private void HandleException<T>(Exception ex, T response, [CallerMemberName] string methodName = "") 
-            where T: EmptyResponseDto
+        private void HandleException<T>(Exception ex, T response, [CallerMemberName] string methodName = "")
+            where T : EmptyResponseDto
         {
             response.Message = ex.Message;
             _logger.Error(ex, $"{methodName}: An unknown error occurred");
             _telemetryService.TrackError(ex);
         }
 
-        private async Task HandleApiException<T>(ApiException apiEx, T response, [CallerMemberName] string methodName = "") 
+        private async Task HandleApiException<T>(ApiException apiEx, T response, [CallerMemberName] string methodName = "")
             where T : EmptyResponseDto
         {
             try
@@ -465,6 +465,6 @@ namespace MiraiNotes.Shared.Services
             return msg;
         }
 
-#endregion
+        #endregion
     }
 }
