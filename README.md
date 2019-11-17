@@ -4,7 +4,7 @@
 </p>
 
 A simple UWP / Android notes app that provides synchronization with Google Task and can be also used offline.
-
+[![Build status](https://build.appcenter.ms/v0.1/apps/d4d94262-b60a-4baa-9806-aad439e25298/branches/develop/badge)](https://appcenter.ms)
 ### Screenshots
 
 #### UWP
