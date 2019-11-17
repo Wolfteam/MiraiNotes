@@ -43,7 +43,7 @@ I currently don't have a developer account to publish this app in the Microsoft 
 * When the app package has been installed, the PowerShell window displays this message: **Your app was successfully installed**. After that just click the Start button to search for the app, and then launch it. 
 
 #### Android
-<img height="100" width="300" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" />
+[<img height="100" width="300" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" />](https://play.google.com/store/apps/details?id=com.miraisoft.notes)
 
 ### Support
 If you have any bug report, suggestion, feature request, etc, please go into the [Issues section](https://github.com/Wolfteam/MiraiNotes/issues) and create a new issue. 
@@ -52,3 +52,44 @@ If you have any bug report, suggestion, feature request, etc, please go into the
 
 ### Donations
 I hope you are enjoying using this app, If you would like to support my work by buying me a coffee / beer, please send me an email
+
+### Building / Debugging
+* In the MiraiNotes.Shared project, you need to include a class called **Secrets**
+and that class must include something like this:
+
+````
+    public class Secrets
+    {
+        //Google secrets
+#if Android
+        public const string ClientId = "your android client id";
+        public const string ClientSecret = "leave this one empty";
+        public const string RedirectUrl = "the android redirect url, used by the login service";
+        public const string AppCenterSecret = "the android app center secret";
+#else
+        public const string ClientId = "your uwp client id";
+        public const string ClientSecret = "your uwp client secret";
+        public const string RedirectUrl = "the uwp redirect url, used by the login service";
+#endif
+
+        //DbSecrets
+        // This size of the IV (in bytes) must = (keysize / 8).  Default keysize is 256, so the IV must be
+        // 32 bytes long.  Using a 16 character string here gives us 32 bytes when converted to a byte array.
+        public const string InitVector = "your_initvector";
+        // This constant is used to determine the keysize of the encryption algorithm
+        public const int KeySize = 256;
+
+        public const string Password = "the db password";
+    }    
+ ````
+ 
+#### UWP
+* Just follow the above instructions (the ones in the Installation section) if you want to create a release package, otherwise just run in UwpDebug mode.
+
+#### Android
+* AOT does not work!
+* If for some reason, you want to compile the .aab file, you need to be in AndroidRelease mode, the .keystore file must be in the same folder as the android project. 
+Open a vs command prompt (visual studio currently doesnt support this format) and navigate to the MiraiNotes.Android folder. Run the following, replacing with the appropiate values:
+````
+msbuild /restore MiraiNotes.Android.csproj /t:SignAndroidPackage /p:Configuration=AndroidRelease /p:AndroidKeyStore=True /p:AndroidSigningKeyStore=your_keystore_file.keystore "/p:AndroidSigningStorePass=your_password" /p:AndroidSigningKeyAlias=your_keystore_file_alias "/p:AndroidSigningKeyPass=your_password"
+````
