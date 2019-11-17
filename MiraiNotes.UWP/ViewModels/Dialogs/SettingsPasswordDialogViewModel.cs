@@ -1,17 +1,18 @@
-﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.Interfaces;
 
 namespace MiraiNotes.UWP.ViewModels.Dialogs
 {
     public class SettingsPasswordDialogViewModel : ViewModelBase
     {
         #region Members
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
         private readonly IUserCredentialService _credentialService;
         private readonly IMiraiNotesDataService _dataService;
@@ -59,7 +60,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
 
         public SettingsPasswordDialogViewModel(
-            IApplicationSettingsService appSettings,
+            IAppSettingsService appSettings,
             ICustomDialogService dialogService,
             IUserCredentialService credentialService, 
             IMiraiNotesDataService dataService)
@@ -88,10 +89,10 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             }
 
             _credentialService.DeleteUserCredential(
-                PasswordVaultResourceType.SETTINGS_PASSWORD_RESOURCE, 
+                ResourceType.SETTINGS_PASSWORD_RESOURCE, 
                 response.Result.Email);
             _credentialService.SaveUserCredential(
-                PasswordVaultResourceType.SETTINGS_PASSWORD_RESOURCE,
+                ResourceType.SETTINGS_PASSWORD_RESOURCE,
                 response.Result.Email,
                 Password);
         }

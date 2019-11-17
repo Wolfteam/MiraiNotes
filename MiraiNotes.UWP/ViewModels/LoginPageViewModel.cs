@@ -1,15 +1,19 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Views;
-using MiraiNotes.Data.Models;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Models;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Dto.Google.Responses;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using Serilog;
-using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using IGoogleApiService = MiraiNotes.Abstractions.Services.IGoogleApiService;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -20,13 +24,13 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly ICustomDialogService _dialogService;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
-        private readonly IGoogleAuthService _googleAuthService;
+        private readonly IGoogleApiService _googleAuthService;
         private readonly IGoogleUserService _googleUserService;
 
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
         private readonly ISyncService _syncService;
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
 
         private bool _showLoading;
         private bool _showLoginButton;
@@ -35,14 +39,14 @@ namespace MiraiNotes.UWP.ViewModels
         #region Properties
         public bool ShowLoading
         {
-            get { return _showLoading; }
-            set { Set(ref _showLoading, value); }
+            get => _showLoading;
+            set => Set(ref _showLoading, value);
         }
 
         public bool ShowLoginButton
         {
-            get { return _showLoginButton; }
-            set { Set(ref _showLoginButton, value); }
+            get => _showLoginButton;
+            set => Set(ref _showLoginButton, value);
         }
         #endregion
 
@@ -58,12 +62,12 @@ namespace MiraiNotes.UWP.ViewModels
             ICustomDialogService dialogService,
             INavigationService navigationService,
             IUserCredentialService userCredentialService,
-            IGoogleAuthService googleAuthService,
+            IGoogleApiService googleAuthService,
             IGoogleUserService googleUserService,
             IMiraiNotesDataService dataService,
             INetworkService networkService,
             ISyncService syncService,
-            IApplicationSettingsService appSettings)
+            IAppSettingsService appSettings)
         {
             _logger = logger.ForContext<LoginPageViewModel>();
             _dialogService = dialogService;
@@ -95,14 +99,14 @@ namespace MiraiNotes.UWP.ViewModels
             var response = await _dataService
                 .UserService
                 .GetCurrentActiveUserAsync();
-            string loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+            var loggedUsername = _userCredentialService.GetCurrentLoggedUsername();
 
-            bool isUserLoggedIn = loggedUsername != _userCredentialService.DefaultUsername &&
-                !string.IsNullOrEmpty(loggedUsername);
+            var isUserLoggedIn = loggedUsername != _userCredentialService.DefaultUsername &&
+                                 !string.IsNullOrEmpty(loggedUsername);
 
             if (!response.Succeed || isUserLoggedIn && response.Result is null)
             {
-                string errorMsg = string.IsNullOrEmpty(response.Message)
+                var errorMsg = string.IsNullOrEmpty(response.Message)
                     ? $"Did you unninstall the app without signing out ?{Environment.NewLine}I will properly log you out now..."
                     : response.Message;
                 ShowLoading = false;
@@ -111,13 +115,14 @@ namespace MiraiNotes.UWP.ViewModels
                     "Error",
                     $"Coudln't retrieve the current logged user.{Environment.NewLine}Error = {errorMsg}");
                 _userCredentialService.DeleteUserCredential(
-                    PasswordVaultResourceType.ALL,
+                    ResourceType.ALL,
                     _userCredentialService.DefaultUsername);
 
                 _logger.Warning($"{nameof(InitViewAsync)}: Couldnt get a user in the db = {response.Succeed} " +
-                    $"or isUserLoggedIn and no user exists in db. {errorMsg}");
+                                $"or isUserLoggedIn and no user exists in db. {errorMsg}");
                 return;
             }
+
             ShowLoading = false;
 
             if (isUserLoggedIn && _appSettings.AskForPasswordWhenAppStarts)
@@ -129,9 +134,13 @@ namespace MiraiNotes.UWP.ViewModels
                     ShowLoginButton = true;
             }
             else if (isUserLoggedIn)
+            {
                 _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
+            }
             else
+            {
                 ShowLoginButton = true;
+            }
         }
 
         public async void SignInWithGoogleAsync()
@@ -153,7 +162,7 @@ namespace MiraiNotes.UWP.ViewModels
             ShowLoginButton = true;
         }
 
-        private async Task OnGoogleSignInResponse(Response<TokenResponse> response)
+        private async Task OnGoogleSignInResponse(ResponseDto<TokenResponseDto> response)
         {
             try
             {
@@ -170,25 +179,25 @@ namespace MiraiNotes.UWP.ViewModels
                 //We temporaly save and asociate the token to a default user 
                 //before doing any other network requst..
                 _userCredentialService.DeleteUserCredential(
-                    PasswordVaultResourceType.ALL,
+                    ResourceType.ALL,
                     _userCredentialService.DefaultUsername);
 
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                    ResourceType.LOGGED_USER_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     _userCredentialService.DefaultUsername);
 
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                    ResourceType.REFRESH_TOKEN_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     response.Result.RefreshToken);
 
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.TOKEN_RESOURCE,
+                    ResourceType.TOKEN_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     response.Result.AccessToken);
 
-                bool isSignedIn = await SignInAsync();
+                var isSignedIn = await SignInAsync();
                 if (!isSignedIn)
                 {
                     await _dataService
@@ -196,15 +205,16 @@ namespace MiraiNotes.UWP.ViewModels
                         .ChangeCurrentUserStatus(false);
 
                     _userCredentialService.DeleteUserCredential(
-                        PasswordVaultResourceType.ALL,
+                        ResourceType.ALL,
                         _userCredentialService.DefaultUsername);
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"{nameof(OnGoogleSignInResponse)}: An unknown error occurred while signing in the app");
+                _logger.Error(ex,
+                    $"{nameof(OnGoogleSignInResponse)}: An unknown error occurred while signing in the app");
                 _userCredentialService.DeleteUserCredential(
-                    PasswordVaultResourceType.ALL,
+                    ResourceType.ALL,
                     _userCredentialService.DefaultUsername);
                 await _dialogService.ShowErrorMessageDialogAsync(ex, "An unknown error occurred");
             }
@@ -212,8 +222,9 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            _logger.Information($"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
-            bool result = false;
+            _logger.Information(
+                $"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
+            var result = false;
             var user = await _googleUserService.GetUserInfoAsync();
             if (user == null)
             {
@@ -226,7 +237,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
 
             var now = DateTimeOffset.UtcNow;
-            Response<GoogleUser> userSaved;
+            ResponseDto<GoogleUser> userSaved;
             if (!response.Result)
             {
                 _logger.Information($"{nameof(SignInAsync)}: User doesnt exist in db. Creating a new one...");
@@ -271,6 +282,7 @@ namespace MiraiNotes.UWP.ViewModels
                     $"The user could not be saved / updated into the db. Error = {userSaved.Message}");
                 return result;
             }
+
             _logger.Information($"{nameof(SignInAsync)}: Trying to get all the task lists that are remote...");
             var syncResult = await _syncService.SyncDownTaskListsAsync(false);
 
@@ -292,17 +304,17 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                ResourceType.LOGGED_USER_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 false,
                 userSaved.Result.Email);
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                ResourceType.REFRESH_TOKEN_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 true,
                 userSaved.Result.Email);
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.TOKEN_RESOURCE,
+                ResourceType.TOKEN_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 true,
                 userSaved.Result.Email);
@@ -313,6 +325,7 @@ namespace MiraiNotes.UWP.ViewModels
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);
             return !result;
         }
+
         #endregion
     }
 }

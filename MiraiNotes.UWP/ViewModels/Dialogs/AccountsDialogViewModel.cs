@@ -1,20 +1,24 @@
-﻿using AutoMapper;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using MiraiNotes.Data.Models;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Delegates;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AutoMapper;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Dto.Google.Responses;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.Delegates;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using Serilog;
+using IGoogleApiService = MiraiNotes.Abstractions.Services.IGoogleApiService;
 
 namespace MiraiNotes.UWP.ViewModels.Dialogs
 {
@@ -24,14 +28,14 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         private readonly ILogger _logger;
         private readonly IMessenger _messenger;
         private readonly IMapper _mapper;
-        private readonly IGoogleAuthService _googleAuthService;
+        private readonly IGoogleApiService _googleAuthService;
         private readonly IGoogleUserService _googleUserService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly ICustomDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
         private readonly ISyncService _syncService;
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
         private ObservableCollection<GoogleUserViewModel> _accounts =
             new ObservableCollection<GoogleUserViewModel>();
 
@@ -65,14 +69,14 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             ILogger logger,
             IMessenger messenger,
             IMapper mapper,
-            IGoogleAuthService googleAuthService,
+            IGoogleApiService googleAuthService,
             IGoogleUserService googleUserService,
             IUserCredentialService userCredentialService,
             ICustomDialogService dialogService,
             IMiraiNotesDataService dataService,
             INetworkService networkService,
             ISyncService syncService,
-            IApplicationSettingsService appSettingsService)
+            IAppSettingsService appSettingsService)
         {
             _logger = logger;
             _messenger = messenger;
@@ -161,7 +165,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
         }
 
-        private async Task OnGoogleSignInResponse(Response<TokenResponse> response)
+        private async Task OnGoogleSignInResponse(ResponseDto<TokenResponseDto> response)
         {
             string currentUser = _userCredentialService.GetCurrentLoggedUsername();
             try
@@ -179,17 +183,17 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 //We temporaly save and asociate the token to a default user 
                 //before doing any other network requst..
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                    ResourceType.LOGGED_USER_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     _userCredentialService.DefaultUsername);
 
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                    ResourceType.REFRESH_TOKEN_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     response.Result.RefreshToken);
 
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.TOKEN_RESOURCE,
+                    ResourceType.TOKEN_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     response.Result.AccessToken);
 
@@ -210,11 +214,11 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                     .SetAsCurrentUser(currentUser);
 
                 _userCredentialService.DeleteUserCredential(
-                    PasswordVaultResourceType.ALL,
+                    ResourceType.ALL,
                     _userCredentialService.DefaultUsername);
 
                 _userCredentialService.SaveUserCredential(
-                    PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                    ResourceType.LOGGED_USER_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     currentUser);
                 _logger.Error(ex, $"{nameof(OnGoogleSignInResponse)}: An unknown error occurred while signing in the app");
@@ -256,7 +260,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
 
             var now = DateTimeOffset.UtcNow;
-            Response<GoogleUser> userSaveResponse;
+            ResponseDto<GoogleUser> userSaveResponse;
             if (!response.Result)
             {
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser
@@ -319,17 +323,17 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             }
 
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                ResourceType.LOGGED_USER_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 false,
                 userSaveResponse.Result.Email);
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                ResourceType.REFRESH_TOKEN_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 true,
                 userSaveResponse.Result.Email);
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.TOKEN_RESOURCE,
+                ResourceType.TOKEN_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 true,
                 userSaveResponse.Result.Email);
@@ -371,7 +375,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             }
 
             _userCredentialService.UpdateUserCredential(
-                PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                ResourceType.LOGGED_USER_RESOURCE,
                 _userCredentialService.DefaultUsername,
                 false,
                 userInDbResponse.Result.Email);
@@ -379,7 +383,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             bool isNetworkAvailable = _networkService.IsInternetAvailable();
             if (isNetworkAvailable && _appSettings.RunFullSyncAfterSwitchingAccounts)
             {
-                var syncResults = new List<EmptyResponse>
+                var syncResults = new List<EmptyResponseDto>
                 {
                     await _syncService.SyncDownTaskListsAsync(false),
                     await _syncService.SyncDownTasksAsync(false),
@@ -460,7 +464,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 defaultAccount.IsActive = true;
 
                 _userCredentialService.UpdateUserCredential(
-                    PasswordVaultResourceType.LOGGED_USER_RESOURCE,
+                    ResourceType.LOGGED_USER_RESOURCE,
                     _userCredentialService.DefaultUsername,
                     false,
                     defaultAccount.Email);
@@ -468,11 +472,11 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             }
 
             _userCredentialService.DeleteUserCredential(
-                PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                ResourceType.REFRESH_TOKEN_RESOURCE,
                 userInDbResponse.Result.Email);
 
             _userCredentialService.DeleteUserCredential(
-                PasswordVaultResourceType.TOKEN_RESOURCE,
+                ResourceType.TOKEN_RESOURCE,
                 userInDbResponse.Result.Email);
 
             var deleteResponse = await _dataService.UserService.RemoveAsync(account.ID);

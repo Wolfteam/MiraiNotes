@@ -1,24 +1,27 @@
-﻿using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.UWP.Interfaces;
+using IGoogleApiService = MiraiNotes.Abstractions.Services.IGoogleApiService;
 
 namespace MiraiNotes.UWP.Handlers
 {
     public class AuthorizationHandler : DelegatingHandler
     {
-        private readonly IUserCredentialService _userCredentialService;
-        private readonly IGoogleAuthService _googleAuthService;
         private readonly ICustomDialogService _dialogService;
+        private readonly IGoogleApiService _googleAuthService;
+        private readonly IUserCredentialService _userCredentialService;
 
-        public AuthorizationHandler(IUserCredentialService userCredentialService,
-                                    IGoogleAuthService googleAuthService,
-                                    ICustomDialogService dialogService)
+        public AuthorizationHandler(
+            IUserCredentialService userCredentialService,
+            IGoogleApiService googleAuthService,
+            ICustomDialogService dialogService)
         {
             _userCredentialService = userCredentialService;
             _googleAuthService = googleAuthService;
@@ -26,29 +29,28 @@ namespace MiraiNotes.UWP.Handlers
             InnerHandler = new HttpClientHandler();
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
             // Cloning the request, in case we need to send it again
             var clonedRequest = await CloneRequest(request);
             var response = await base.SendAsync(clonedRequest, cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                // Oh noes, user is not logged in - we got a 401
-                //that means its time to use our refresh token
                 try
                 {
-                    string currentLoggedUsername = _userCredentialService.GetCurrentLoggedUsername();
+                    var currentLoggedUsername = _userCredentialService.GetCurrentLoggedUsername();
                     if (string.IsNullOrEmpty(currentLoggedUsername))
                     {
                         await _dialogService.ShowMessageDialogAsync(
-                            "Error", 
+                            "Error",
                             "Could't retrieve the current logged username");
                         return response;
                     }
 
-                    string refreshToken = _userCredentialService.GetUserCredential(
-                        PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE,
+                    var refreshToken = _userCredentialService.GetUserCredential(
+                        ResourceType.REFRESH_TOKEN_RESOURCE,
                         currentLoggedUsername);
                     if (string.IsNullOrEmpty(refreshToken))
                     {
@@ -58,14 +60,16 @@ namespace MiraiNotes.UWP.Handlers
                         return response;
                     }
 
-                    var token = await _googleAuthService.GetNewTokenAsync(refreshToken);
-                    if (token is null)
+                    var tokenResponse = await _googleAuthService.GetNewTokenAsync(refreshToken);
+                    if (!tokenResponse.Succeed)
                     {
                         await _dialogService.ShowMessageDialogAsync(
-                            "Error", 
+                            "Error",
                             "Could't get a new token. Did you remove access to our app :C?");
                         return response;
                     }
+
+                    var token = tokenResponse.Result;
 
                     // we're now logged in again.
 
@@ -74,12 +78,12 @@ namespace MiraiNotes.UWP.Handlers
 
                     // Save the user to the app settings
                     _userCredentialService.UpdateUserCredential(
-                        PasswordVaultResourceType.REFRESH_TOKEN_RESOURCE, 
+                        ResourceType.REFRESH_TOKEN_RESOURCE,
                         currentLoggedUsername,
                         false,
                         token.RefreshToken);
                     _userCredentialService.UpdateUserCredential(
-                        PasswordVaultResourceType.TOKEN_RESOURCE,
+                        ResourceType.TOKEN_RESOURCE,
                         currentLoggedUsername,
                         false,
                         token.AccessToken);
@@ -95,7 +99,6 @@ namespace MiraiNotes.UWP.Handlers
                     // user cancelled auth, so lets return the original response
                     return response;
                 }
-            }
 
             return response;
         }
@@ -104,9 +107,7 @@ namespace MiraiNotes.UWP.Handlers
         {
             var result = new HttpRequestMessage(request.Method, request.RequestUri);
             foreach (var header in request.Headers)
-            {
                 result.Headers.Add(header.Key, header.Value);
-            }
 
             if (request.Content != null && request.Content.Headers.ContentType != null)
             {
@@ -114,12 +115,8 @@ namespace MiraiNotes.UWP.Handlers
                 var mediaType = request.Content.Headers.ContentType.MediaType;
                 result.Content = new StringContent(requestBody, Encoding.UTF8, mediaType);
                 foreach (var header in request.Content.Headers)
-                {
                     if (!header.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase))
-                    {
                         result.Content.Headers.Add(header.Key, header.Value);
-                    }
-                }
             }
 
             return result;

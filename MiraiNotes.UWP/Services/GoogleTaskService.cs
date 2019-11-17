@@ -1,13 +1,13 @@
-﻿using MiraiNotes.Shared.Helpers;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Helpers;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models.API;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models.GoogleApi;
+using MiraiNotes.Shared.Helpers;
+using MiraiNotes.UWP.Helpers;
+using MiraiNotes.UWP.Interfaces;
+using Newtonsoft.Json;
 
 namespace MiraiNotes.UWP.Services
 {

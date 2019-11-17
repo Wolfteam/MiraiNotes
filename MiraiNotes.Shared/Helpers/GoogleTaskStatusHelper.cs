@@ -1,5 +1,5 @@
-﻿using MiraiNotes.Shared.Models;
-using System;
+﻿using System;
+using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.Shared.Helpers
 {

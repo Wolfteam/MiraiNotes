@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notificaciones</value>
+  </data>
+  <data name="Synchronization" xml:space="preserve">
+    <value>Sincronización</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Acerca de</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ajustes</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>Ligero</value>
+  </data>
+  <data name="SortByNameAsc" xml:space="preserve">
+    <value>Por nombre asc</value>
+  </data>
+  <data name="SortByNameDesc" xml:space="preserve">
+    <value>Por nombre desc</value>
+  </data>
+  <data name="SortByUpdatedDateAsc" xml:space="preserve">
+    <value>Por fecha de actualización asc</value>
+  </data>
+  <data name="SortByUpdatedDateDesc" xml:space="preserve">
+    <value>Por fecha de actualización desc</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>Inglés</value>
+  </data>
+  <data name="Spanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="SettingsGeneral" xml:space="preserve">
+    <value>Modo de ordenamiento predeterminado, temas, etc.</value>
+  </data>
+  <data name="SettingsSync" xml:space="preserve">
+    <value>Intervalos de tareas en segundo plano.</value>
+  </data>
+  <data name="SettingsNotif" xml:space="preserve">
+    <value>Notificaciones toast</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>Github repo, información de contacto, donaciones.</value>
+  </data>
+  <data name="Never" xml:space="preserve">
+    <value>Nunca</value>
+  </data>
+  <data name="Sync12h" xml:space="preserve">
+    <value>Cada 12 horas</value>
+  </data>
+  <data name="Sync6h" xml:space="preserve">
+    <value>Cada 6 horas</value>
+  </data>
+  <data name="Sync3h" xml:space="preserve">
+    <value>Cada 3 horas</value>
+  </data>
+  <data name="Sync24h" xml:space="preserve">
+    <value>Cada 24 horas</value>
+  </data>
+  <data name="AppTheme" xml:space="preserve">
+    <value>Temas</value>
+  </data>
+  <data name="ChooseAppTheme" xml:space="preserve">
+    <value>Escoja un tema</value>
+  </data>
+  <data name="AccentColor" xml:space="preserve">
+    <value>Color de Acento</value>
+  </data>
+  <data name="ChooseAccentColor" xml:space="preserve">
+    <value>Escoja un color de acento</value>
+  </data>
+  <data name="TaskListAndTasks" xml:space="preserve">
+    <value>Lista de tareas y Tareas</value>
+  </data>
+  <data name="DefaultTasklistSortOrder" xml:space="preserve">
+    <value>Modo de ordenamiento por defecto de las listas de tareas</value>
+  </data>
+  <data name="DefaultTaskSortOrder" xml:space="preserve">
+    <value>Modo de ordenamiento por defecto de las tareas</value>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>Otros</value>
+  </data>
+  <data name="ChooseAppLanguage" xml:space="preserve">
+    <value>Escoja un idioma para la aplicación</value>
+  </data>
+  <data name="AskForPassword" xml:space="preserve">
+    <value>Solicitar una contraseña al iniciar la aplicación</value>
+  </data>
+  <data name="AboutSummary" xml:space="preserve">
+    <value>Esta aplicación utiliza Google Tasks para obtener / actualizar sus listas de tareas y tareas, también le permite interactuar con ellas sin conexión y sincronizarlas más tarde.</value>
+  </data>
+  <data name="AboutDonations" xml:space="preserve">
+    <value>Espero que esté disfrutando de esta aplicación, si desea comprarme un café / cerveza, ¡solo envíeme un correo electrónico!</value>
+  </data>
+  <data name="AboutSupport" xml:space="preserve">
+    <value>Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:</value>
+  </data>
+  <data name="Donations" xml:space="preserve">
+    <value>Donaciones</value>
+  </data>
+  <data name="Support" xml:space="preserve">
+    <value>Soporte</value>
+  </data>
+  <data name="ShowNotifAfterFullSync" xml:space="preserve">
+    <value>Mostrar una notificación después de una sincronización</value>
+  </data>
+  <data name="DefaultSyncInterval" xml:space="preserve">
+    <value>Intervalo de sincronización por defecto</value>
+  </data>
+  <data name="RunFullSyncWhenAppStarts" xml:space="preserve">
+    <value>Ejecutar una sincronización completa cuando la aplicación inicia</value>
+  </data>
+  <data name="RunFullSyncAfterSwitchingAccounts" xml:space="preserve">
+    <value>Ejecutar una sincronización completa después de cambiar de cuenta</value>
+  </data>
+  <data name="NewTaskList" xml:space="preserve">
+    <value>Nueva Lista de Tareas</value>
+  </data>
+  <data name="NewTask" xml:space="preserve">
+    <value>Nueva Tarea</value>
+  </data>
+  <data name="TypeYourPassword" xml:space="preserve">
+    <value>Introduce tu contraseña</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notas</value>
+  </data>
+  <data name="Accounts" xml:space="preserve">
+    <value>Cuentas</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Agregar</value>
+  </data>
+  <data name="UnknownErrorOccurred" xml:space="preserve">
+    <value>Un error inesperado ha ocurrido</value>
+  </data>
+  <data name="NetworkNotAvailable" xml:space="preserve">
+    <value>La red no esta disponible</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Usuario no encontrado</value>
+  </data>
+  <data name="DatabaseUnknownError" xml:space="preserve">
+    <value>Un error inesperado ha ocurrido al intentar consultar la base de datos</value>
+  </data>
+  <data name="DefaultAccountCantBeDeleted" xml:space="preserve">
+    <value>No puedes borrar la cuenta por defecto</value>
+  </data>
+  <data name="SyncUnknownError" xml:space="preserve">
+    <value>Un error inesperado de sincronización ha ocurrido</value>
+  </data>
+  <data name="AutomaticSyncWasPerformed" xml:space="preserve">
+    <value>Sincronización automática fue completada exitosamente</value>
+  </data>
+  <data name="NetworkNotAvailableForSync" xml:space="preserve">
+    <value>La red no esta disponible, la sincronización automática no será ejecutada</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Borrar</value>
+  </data>
+  <data name="DeleteThisAccountConfirmation" xml:space="preserve">
+    <value>¿ Estás seguro que deseas borrar esta cuenta ?</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Si</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="UnnistalledAppWithoutSigningOut" xml:space="preserve">
+    <value>¿ Desinstalaste la app sin cerrar sesión ? Cerrando sesión...</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmación</value>
+  </data>
+  <data name="WannaLogOut" xml:space="preserve">
+    <value>¿ Estás seguro que deseas cerrar sesión ?</value>
+  </data>
+  <data name="DeleteTaskConfirmation" xml:space="preserve">
+    <value>¿ Estás seguro que deseas borrar '{0}' ?</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Bienvenido a Mirai Notes</value>
+  </data>
+  <data name="InvalidTaskRemindOn" xml:space="preserve">
+    <value>La fecha de recordatorio debe ser al menos 2 minutos mayor a la fecha actual</value>
+  </data>
+  <data name="MoveTaskConfirmation" xml:space="preserve">
+    <value>Ya que estas moviendo una tarea existente a una lista de tareas diferente, cualquier cambio hecho aquí y que no haya sido salvado se perderá. ¿ Estás seguro que deseas continuar ?</value>
+  </data>
+  <data name="TaskWasCreated" xml:space="preserve">
+    <value>La tarea fue creada exitosamente dentro de {0}</value>
+  </data>
+  <data name="MarkTaskAsConfirmation" xml:space="preserve">
+    <value>¿ Marcar {0} como {1} ?</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completada</value>
+  </data>
+  <data name="Incompleted" xml:space="preserve">
+    <value>Incompleta</value>
+  </data>
+  <data name="TaskStatusChanged" xml:space="preserve">
+    <value>{0} fue marcada como {1}</value>
+  </data>
+  <data name="TaskWasMoved" xml:space="preserve">
+    <value>La tarea fue movida exitosamente desde: {0} hacia: {1}</value>
+  </data>
+  <data name="Completition" xml:space="preserve">
+    <value>Completación</value>
+  </data>
+  <data name="Reminder" xml:space="preserve">
+    <value>Recordatorio</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Guardar cambios</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Descartar cambios</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Tareas</value>
+  </data>
+  <data name="UpdateTask" xml:space="preserve">
+    <value>Editar Tarea</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Contrase</value>
+  </data>
+  <data name="TaskListWasCreated" xml:space="preserve">
+    <value>Lista de tareas creada exitosamente</value>
+  </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>El título no puede estar vacío</value>
+  </data>
+  <data name="TitleMaxLength" xml:space="preserve">
+    <value>El título no puede contener mas de {0} caracteres</value>
+  </data>
+  <data name="PasswordCantBeEmpty" xml:space="preserve">
+    <value>La contraseña no puede estar vacía</value>
+  </data>
+  <data name="PasswordIncorrect" xml:space="preserve">
+    <value>La contraseña es incorrecta</value>
+  </data>
+  <data name="ConfirmPasswordCantBeEmpty" xml:space="preserve">
+    <value>La contraseña de confirmación no puede estar vacía</value>
+  </data>
+  <data name="ConfirmPasswordMaxLength" xml:space="preserve">
+    <value>La contraseña de confirmación no puede tener mas de {0} caracteres</value>
+  </data>
+  <data name="PasswordMaxLength" xml:space="preserve">
+    <value>La contraseña no puede tener mas de {0} caracteres</value>
+  </data>
+  <data name="PasswordDoesntMatch" xml:space="preserve">
+    <value>La contraseña no coincide</value>
+  </data>
+  <data name="ConfirmPasswordDoesntMatch" xml:space="preserve">
+    <value>La contraseña de confirmación no coincide</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="SyncAutoCompleted" xml:space="preserve">
+    <value>Una sincronización automática ha sido completada exitosamente </value>
+  </data>
+  <data name="Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="SyncManualCompleted" xml:space="preserve">
+    <value>Una sincronización manual ha sido completada exitosamente </value>
+  </data>
+  <data name="SyncResults" xml:space="preserve">
+    <value>Resultados de la sincronización</value>
+  </data>
+  <data name="JobWasScheduled" xml:space="preserve">
+    <value>La tarea en segundo plano ha sido programada exitosamente</value>
+  </data>
+  <data name="JobCouldntBeScheduled" xml:space="preserve">
+    <value>La tarea en segundo plano no pudo ser programada</value>
+  </data>
+  <data name="Sync1h" xml:space="preserve">
+    <value>Cada hora</value>
+  </data>
+  <data name="Sync30m" xml:space="preserve">
+    <value>Cada 30 minutos</value>
+  </data>
+  <data name="FingerprintAuthFailed" xml:space="preserve">
+    <value>Huella no reconocida. Intente de nuevo.</value>
+  </data>
+  <data name="FingerprintAuthMsg" xml:space="preserve">
+    <value>Confirme la huella para confirmar</value>
+  </data>
+  <data name="AskForFingerprint" xml:space="preserve">
+    <value>Solicitar huella al iniciar la aplicación</value>
+  </data>
+  <data name="FingerprintIsNotAvailable" xml:space="preserve">
+    <value>El lector de huellas no se encuentra disponible</value>
+  </data>
+  <data name="SelectAnOption" xml:space="preserve">
+    <value>Seleciona una opción</value>
+  </data>
+  <data name="DeleteTask" xml:space="preserve">
+    <value>Borrar tarea</value>
+  </data>
+  <data name="AddSubTask" xml:space="preserve">
+    <value>Agregar una subtarea</value>
+  </data>
+  <data name="MoveToDifferentTaskList" xml:space="preserve">
+    <value>Mover a una lista diferente</value>
+  </data>
+  <data name="AddReminder" xml:space="preserve">
+    <value>Agregar un recordatorio</value>
+  </data>
+  <data name="MarkTaskAs" xml:space="preserve">
+    <value>Marcar como {0}</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Hoy</value>
+  </data>
+  <data name="OneDayAgo" xml:space="preserve">
+    <value>Hace un día</value>
+  </data>
+  <data name="XDayAgo" xml:space="preserve">
+    <value>Hace {0} días</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Mañana</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="OnThisDate" xml:space="preserve">
+    <value>En esta fecha</value>
+  </data>
+  <data name="AtThisHour" xml:space="preserve">
+    <value>A esta hora</value>
+  </data>
+  <data name="ReminderDateCannotBeEmpty" xml:space="preserve">
+    <value>La fecha del recordatorio no puede estar vacía</value>
+  </data>
+  <data name="ReminderHourCannotBeEmpty" xml:space="preserve">
+    <value>La hora del recordatorio no puede estar vacía</value>
+  </data>
+  <data name="InvalidReminderDate" xml:space="preserve">
+    <value>La fecha de recordatorio es inválida</value>
+  </data>
+  <data name="InvalidReminderHour" xml:space="preserve">
+    <value>La hora del recordatorio es inválida</value>
+  </data>
+  <data name="ReminderWasCreated" xml:space="preserve">
+    <value>El recordatorio fue creado exitosamente</value>
+  </data>
+  <data name="ReminderDateIsSetTo" xml:space="preserve">
+    <value>Una fecha de recordatorio estaba programada para el {0}</value>
+  </data>
+  <data name="TaskCouldntBeMarkedAsCompleted" xml:space="preserve">
+    <value>La tarea {0} no pudo ser marcada como completada</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="NewSubTask" xml:space="preserve">
+    <value>Nueva SubTarea</value>
+  </data>
+  <data name="PickTaskList" xml:space="preserve">
+    <value>Selecciona una lista de tareas</value>
+  </data>
+  <data name="MoveTaskConfirmationB" xml:space="preserve">
+    <value>¿ Estás seguro que deseas mover '{0}' hacia '{1}' ?</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Mover</value>
+  </data>
+  <data name="AddCompletitionDate" xml:space="preserve">
+    <value>Agregar una fecha de completación</value>
+  </data>
+  <data name="AddEditReminder" xml:space="preserve">
+    <value>Agregar / Editar un recordatorio</value>
+  </data>
+  <data name="AddEditCompletitionDate" xml:space="preserve">
+    <value>Agregar / Editar fecha de completación</value>
+  </data>
+  <data name="ToBeCompletedOnA" xml:space="preserve">
+    <value>Esta tarea esta marcada para completarse el {0}</value>
+  </data>
+  <data name="ToBeCompletedOnB" xml:space="preserve">
+    <value>Esta tarea esta marcada para completarse {0}</value>
+  </data>
+  <data name="ToBeCompletedOnC" xml:space="preserve">
+    <value>Esta tarea estaba marcada para ser completada el {0}</value>
+  </data>
+  <data name="NotesCannotBeEmpty" xml:space="preserve">
+    <value>Las notas no pueden estar vacías</value>
+  </data>
+  <data name="NotesMaxLength" xml:space="preserve">
+    <value>Las notas no puede contener mas de {0} caracteres</value>
+  </data>
+  <data name="SubTaskWasCreated" xml:space="preserve">
+    <value>La subtarea fue creada exitosamente</value>
+  </data>
+  <data name="SubTaskWasAdded" xml:space="preserve">
+    <value>La subtarea fue agregada pero debes guardar cambios</value>
+  </data>
+  <data name="AskBeforeDiscardChanges" xml:space="preserve">
+    <value>Preguntar antes de descartar cambios al crear / editar una tarea</value>
+  </data>
+  <data name="WannaDiscardChanges" xml:space="preserve">
+    <value>¿ Estás seguro que deseas descartar los cambios realizados ?</value>
+  </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Ordenar</value>
+  </data>
+  <data name="ManageTaskLists" xml:space="preserve">
+    <value>Administrar listas de tareas</value>
+  </data>
+  <data name="TaskListWasRemoved" xml:space="preserve">
+    <value>Lista de tareas borrada exitosamente</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="TaskListWasUpdated" xml:space="preserve">
+    <value>Lista de tareas actualizada exitosamente</value>
+  </data>
+  <data name="Syncing" xml:space="preserve">
+    <value>Sincronizando</value>
+  </data>
+  <data name="SyncRunning" xml:space="preserve">
+    <value>Sincronizando tus tareas y listas de tareas...</value>
+  </data>
+</root>

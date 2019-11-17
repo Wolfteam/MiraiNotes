@@ -1,21 +1,24 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
     public class SettingsPageViewModel : ViewModelBase
     {
         #region Members
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
         private readonly IDispatcherHelper _dispatcher;
         private readonly IMessenger _messenger;
@@ -76,22 +79,22 @@ namespace MiraiNotes.UWP.ViewModels
         {
             new ItemModel
             {
-                ItemID = TaskListSortType.BY_NAME_ASC.ToString(),
+                ItemId = TaskListSortType.BY_NAME_ASC.ToString(),
                 Text = "By name asc"
             },
             new ItemModel
             {
-                ItemID = TaskListSortType.BY_NAME_DESC.ToString(),
+                ItemId = TaskListSortType.BY_NAME_DESC.ToString(),
                 Text = "By name desc"
             },
             new ItemModel
             {
-                ItemID = TaskListSortType.BY_UPDATED_DATE_ASC.ToString(),
+                ItemId = TaskListSortType.BY_UPDATED_DATE_ASC.ToString(),
                 Text = "By updated date asc"
             },
             new ItemModel
             {
-                ItemID = TaskListSortType.BY_UPDATED_DATE_DESC.ToString(),
+                ItemId = TaskListSortType.BY_UPDATED_DATE_DESC.ToString(),
                 Text = "By updated date desc"
             }
         };
@@ -100,22 +103,22 @@ namespace MiraiNotes.UWP.ViewModels
         {
             new ItemModel
             {
-                ItemID = TaskSortType.BY_NAME_ASC.ToString(),
+                ItemId = TaskSortType.BY_NAME_ASC.ToString(),
                 Text = "By name asc"
             },
             new ItemModel
             {
-                ItemID = TaskSortType.BY_NAME_DESC.ToString(),
+                ItemId = TaskSortType.BY_NAME_DESC.ToString(),
                 Text = "By name desc"
             },
             new ItemModel
             {
-                ItemID = TaskSortType.BY_UPDATED_DATE_ASC.ToString(),
+                ItemId = TaskSortType.BY_UPDATED_DATE_ASC.ToString(),
                 Text = "By updated date asc"
             },
             new ItemModel
             {
-                ItemID = TaskSortType.BY_UPDATED_DATE_DESC.ToString(),
+                ItemId = TaskSortType.BY_UPDATED_DATE_DESC.ToString(),
                 Text = "By updated date desc"
             }
         };
@@ -124,27 +127,27 @@ namespace MiraiNotes.UWP.ViewModels
         {
             new ItemModel
             {
-                ItemID = SyncBgTaskIntervals.NEVER.ToString(),
+                ItemId = SyncBgTaskIntervals.NEVER.ToString(),
                 Text = "Never"
             },
             new ItemModel
             {
-                ItemID = SyncBgTaskIntervals.EACH_3_HOURS.ToString(),
+                ItemId = SyncBgTaskIntervals.EACH_3_HOURS.ToString(),
                 Text = "Each 3 hours"
             },
             new ItemModel
             {
-                ItemID = SyncBgTaskIntervals.EACH_6_HOURS.ToString(),
+                ItemId = SyncBgTaskIntervals.EACH_6_HOURS.ToString(),
                 Text = "Each 6 hours"
             },
             new ItemModel
             {
-                ItemID = SyncBgTaskIntervals.EACH_12_HOURS.ToString(),
+                ItemId = SyncBgTaskIntervals.EACH_12_HOURS.ToString(),
                 Text = "Each 12 hours"
             },
             new ItemModel
             {
-                ItemID = SyncBgTaskIntervals.EACH_24_HOURS.ToString(),
+                ItemId = SyncBgTaskIntervals.EACH_24_HOURS.ToString(),
                 Text = "Each 24 hours"
             }
         };
@@ -153,12 +156,12 @@ namespace MiraiNotes.UWP.ViewModels
         {
             new ItemModel
             {
-                ItemID = AppThemeType.DARK.ToString(),
+                ItemId = AppThemeType.DARK.ToString(),
                 Text = "Dark"
             },
             new ItemModel
             {
-                ItemID = AppThemeType.LIGHT.ToString(),
+                ItemId = AppThemeType.LIGHT.ToString(),
                 Text = "Light"
             }
         };
@@ -187,11 +190,11 @@ namespace MiraiNotes.UWP.ViewModels
             get
             {
                 var currentSelectedTheme = _appSettings.AppTheme;
-                return AppThemes.FirstOrDefault(i => i.ItemID == currentSelectedTheme.ToString());
+                return AppThemes.FirstOrDefault(i => i.ItemId == currentSelectedTheme.ToString());
             }
             set
             {
-                var selectedTheme = (AppThemeType)Enum.Parse(typeof(AppThemeType), value.ItemID);
+                var selectedTheme = (AppThemeType)Enum.Parse(typeof(AppThemeType), value.ItemId);
                 _appSettings.AppTheme = selectedTheme;
                 MiscellaneousUtils.ChangeCurrentTheme(selectedTheme, _appSettings.AppHexAccentColor);
             }
@@ -246,11 +249,11 @@ namespace MiraiNotes.UWP.ViewModels
             get
             {
                 var currentSelectedSortType = _appSettings.DefaultTaskListSortOrder;
-                return TaskListSortTypes.FirstOrDefault(i => i.ItemID == currentSelectedSortType.ToString());
+                return TaskListSortTypes.FirstOrDefault(i => i.ItemId == currentSelectedSortType.ToString());
             }
             set
             {
-                var selectedSortType = (TaskListSortType)Enum.Parse(typeof(TaskListSortType), value.ItemID);
+                var selectedSortType = (TaskListSortType)Enum.Parse(typeof(TaskListSortType), value.ItemId);
                 _appSettings.DefaultTaskListSortOrder = selectedSortType;
                 _messenger.Send(selectedSortType, $"{MessageType.DEFAULT_TASK_LIST_SORT_ORDER_CHANGED}");
             }
@@ -261,11 +264,11 @@ namespace MiraiNotes.UWP.ViewModels
             get
             {
                 var currentSelectedSortType = _appSettings.DefaultTaskSortOrder;
-                return TasksSortTypes.FirstOrDefault(i => i.ItemID == currentSelectedSortType.ToString());
+                return TasksSortTypes.FirstOrDefault(i => i.ItemId == currentSelectedSortType.ToString());
             }
             set
             {
-                var selectedSortType = (TaskSortType)Enum.Parse(typeof(TaskSortType), value.ItemID);
+                var selectedSortType = (TaskSortType)Enum.Parse(typeof(TaskSortType), value.ItemId);
                 _appSettings.DefaultTaskSortOrder = selectedSortType;
                 _messenger.Send(selectedSortType, $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}");
             }
@@ -290,11 +293,11 @@ namespace MiraiNotes.UWP.ViewModels
             get
             {
                 var currentInterval = _appSettings.SyncBackgroundTaskInterval;
-                return SyncBgTaskIntervalTypes.FirstOrDefault(s => s.ItemID == currentInterval.ToString());
+                return SyncBgTaskIntervalTypes.FirstOrDefault(s => s.ItemId == currentInterval.ToString());
             }
             set
             {
-                var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemID);
+                var selectedInterval = (SyncBgTaskIntervals)Enum.Parse(typeof(SyncBgTaskIntervals), value.ItemId);
                 _appSettings.SyncBackgroundTaskInterval = selectedInterval;
                 _backgroundTaskManagerService.RegisterBackgroundTasks(BackgroundTaskType.SYNC, true);
             }
@@ -327,7 +330,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         #region Constructors
         public SettingsPageViewModel(
-            IApplicationSettingsService appSettings,
+            IAppSettingsService appSettings,
             ICustomDialogService dialogService,
             IDispatcherHelper dispatcher,
             IMessenger messenger,

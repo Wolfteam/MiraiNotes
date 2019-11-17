@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="colorPrimary">#2c3e50</color>
+  <color name="colorPrimaryDark">#1B3147</color>
+  <color name="colorAccent">#3498db</color>
+
+
+
+  <color name="transparentBg">#26000000</color>
+
+  <color name="AppBackgroundDark">#202124</color>
+  <color name="AppBackgroundLight">#ffffff</color>
+  
+  
+  <color name="White">#ffffff</color>
+  <color name="Black">#000000</color>
+
+
+  <color name="LigthBlueAccentColorPrimary">#0077dd</color>
+  <color name="LigthBlueAccentColorLight">#60a5ff</color>
+  <color name="LigthBlueAccentColorDark">#004cab</color>
+
+  <color name="LimeGreenAccentColorPrimary">#1be556</color>
+  <color name="LimeGreenAccentColorLight">#6cff87</color>
+  <color name="LimeGreenAccentColorDark">#00b123</color>
+
+  <color name="PinkAccentColorPrimary">#ee0088</color>
+  <color name="PinkAccentColorLight">#ff5ab8</color>
+  <color name="PinkAccentColorDark">#b6005b</color>
+
+  <color name="DarkOrangeAccentColorPrimary">#cc4400</color>
+  <color name="DarkOrangeAccentColorLight">#ff7536</color>
+  <color name="DarkOrangeAccentColorDark">#940700</color>
+
+  <color name="VividRedAccentColorPrimary">#ee1122</color>
+  <color name="VividRedAccentColorLight">#ff5b4c</color>
+  <color name="VividRedAccentColorDark">#b30000</color>
+
+  <color name="DarkCyanAccentColorPrimary">#008899</color>
+  <color name="DarkCyanAccentColorLight">#52b8ca</color>
+  <color name="DarkCyanAccentColorDark">#005b6b</color>
+
+  <color name="DarkGreenAccentColorPrimary">#118833</color>
+  <color name="DarkGreenAccentColorLight">#51b95f</color>
+  <color name="DarkGreenAccentColorDark">#005a04</color>
+
+  <color name="DarkMagentaAccentColorPrimary">#881199</color>
+  <color name="DarkMagentaAccentColorLight">#bb4cca</color>
+  <color name="DarkMagentaAccentColorDark">#57006a</color>
+
+  <color name="MagentaAccentColorPrimary">#ff00e3</color>
+  <color name="MagentaAccentColorLight">#ff61ff</color>
+  <color name="MagentaAccentColorDark">#c700b0</color>
+
+  <color name="DarkGrayAccentColorPrimary">#777777</color>
+  <color name="DarkGrayAccentColorLight">#a6a6a6</color>
+  <color name="DarkGrayAccentColorDark">#4b4b4b</color>
+
+  <color name="OrangeAccentColorPrimary">#ffb900</color>
+  <color name="OrangeAccentColorLight">#ffeb4d</color>
+  <color name="OrangeAccentColorDark">#c78900</color>
+
+  <color name="YellowAccentColorPrimary">#f5ff00</color>
+  <color name="YellowAccentColorLight">#ffff59</color>
+  <color name="YellowAccentColorDark">#becc00</color>
+  
+  <color name="DarkBlueAccentColorPrimary">#0063b1</color>
+  <color name="DarkBlueAccentColorLight">#5590e3</color>
+  <color name="DarkBlueAccentColorDark">#003a81</color>
+  
+  <color name="VioletAccentColorPrimary">#8600ff</color>
+  <color name="VioletAccentColorLight">#bf4eff</color>
+  <color name="VioletAccentColorDark">#4800ca</color>
+  
+  <color name="LightGreyAccentColorPrimary">#a8a9aa</color>
+  <color name="LightGreyAccentColorLight">#d9dbdc</color>
+  <color name="LightGreyAccentColorDark">#797a7b</color>
+</resources>

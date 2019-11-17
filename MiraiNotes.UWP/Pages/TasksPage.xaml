@@ -13,6 +13,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Xaml.Interactions.Media"
     xmlns:uc="using:MiraiNotes.UWP.Controls"
+    xmlns:enums="using:MiraiNotes.Core.Enums"
     DataContext="{Binding Tasks, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -26,10 +27,10 @@
 
         <converters:TaskSortTypeToVisibilityConverter x:Key="TaskSortTypeToVisibilityConverter" />
 
-        <localModels:TaskSortType x:Key="TaskSortByNameAsc">BY_NAME_ASC</localModels:TaskSortType>
-        <localModels:TaskSortType x:Key="TaskSortByNameDesc">BY_NAME_DESC</localModels:TaskSortType>
-        <localModels:TaskSortType x:Key="TaskSortByUpdatedDateAsc">BY_UPDATED_DATE_ASC</localModels:TaskSortType>
-        <localModels:TaskSortType x:Key="TaskSortByUpdatedDateDesc">BY_UPDATED_DATE_DESC</localModels:TaskSortType>
+        <enums:TaskSortType x:Key="TaskSortByNameAsc">BY_NAME_ASC</enums:TaskSortType>
+        <enums:TaskSortType x:Key="TaskSortByNameDesc">BY_NAME_DESC</enums:TaskSortType>
+        <enums:TaskSortType x:Key="TaskSortByUpdatedDateAsc">BY_UPDATED_DATE_ASC</enums:TaskSortType>
+        <enums:TaskSortType x:Key="TaskSortByUpdatedDateDesc">BY_UPDATED_DATE_DESC</enums:TaskSortType>
     </Page.Resources>
 
     <Grid>
@@ -409,7 +410,7 @@
                                 <MenuFlyoutSubItem Text="By name">
                                     <MenuFlyoutItem
                                         Command="{Binding SortTasksCommand}"
-                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_ASC}"
+                                        CommandParameter="{StaticResource TaskSortByNameAsc}"
                                         Text="Asc">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByNameAsc}}" />
@@ -417,7 +418,7 @@
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem
                                         Command="{Binding SortTasksCommand}"
-                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_NAME_DESC}"
+                                        CommandParameter="{StaticResource TaskSortByNameDesc}"
                                         Text="Desc">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByNameDesc}}" />
@@ -428,7 +429,7 @@
                                 <MenuFlyoutSubItem Text="By updated date">
                                     <MenuFlyoutItem
                                         Command="{Binding SortTasksCommand}"
-                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_ASC}"
+                                        CommandParameter="{StaticResource TaskSortByUpdatedDateAsc}"
                                         Text="Asc">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByUpdatedDateAsc}}" />
@@ -436,7 +437,7 @@
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem
                                         Command="{Binding SortTasksCommand}"
-                                        CommandParameter="{x:Bind localModels:TaskSortType.BY_UPDATED_DATE_DESC}"
+                                        CommandParameter="{StaticResource TaskSortByUpdatedDateDesc}"
                                         Text="Desc">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE73E;" Visibility="{Binding CurrentTasksSortOrder, Mode=OneWay, Converter={StaticResource TaskSortTypeToVisibilityConverter}, ConverterParameter={StaticResource TaskSortByUpdatedDateDesc}}" />

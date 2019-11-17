@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/TaskMenuOptionsDialogView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:padding="10dp"
+    android:background="?AppBackground">
+
+    <View
+        android:layout_width="120dp"
+        android:layout_height="10dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="?AccentColorDark"
+        android:background="@drawable/rectangle"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="Select an option"
+        android:textStyle="bold"
+        android:textSize="@dimen/task_item_title"
+        app:MvxBind="Text [SelectAnOption]"/>
+
+    <android.support.design.button.MaterialButton
+        android:textColor="@color/VividRedAccentColorPrimary"
+        android:text="Delete task"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_delete_black_24dp"
+        app:iconTint="@color/VividRedAccentColorPrimary"
+        app:MvxBind="Text [DeleteTask]; Click DeleteTaskCommand"/>
+
+    <android.support.design.button.MaterialButton
+        android:textColor="@color/DarkGreenAccentColorLight"
+        android:text="Mark as completed"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_done_24dp"
+        app:iconTint="@color/DarkGreenAccentColorLight"
+        app:MvxBind="Text MarkAsTitle; Click ChangeTaskStatusCommand"/>
+
+    <android.support.design.button.MaterialButton
+        android:textColor="@color/LigthBlueAccentColorLight"
+        android:text="Add a subtask"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_delete_black_24dp"
+        app:iconTint="@color/LigthBlueAccentColorLight"
+        app:MvxBind="Text [AddSubTask]; Visibility Visibility(ShowAddSubTaskButton); Click AddSubTaskCommand"/>
+
+    <android.support.design.button.MaterialButton
+        android:textColor="?TextColor"
+        android:text="Move to a different task list"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_move_24dp"
+        app:iconTint="?TextColor"
+        app:MvxBind="Text [MoveToDifferentTaskList]; Click MoveTaskCommand"/>
+
+    <android.support.design.button.MaterialButton
+        android:textColor="@color/OrangeAccentColorLight"
+        android:text="Add a reminder"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_notifications_black_24dp"
+        app:iconTint="@color/OrangeAccentColorLight"
+        app:MvxBind="Text [AddReminder]; Click AddReminderCommand"/>
+</LinearLayout>

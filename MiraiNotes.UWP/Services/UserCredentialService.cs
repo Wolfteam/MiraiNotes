@@ -1,9 +1,8 @@
-﻿using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Windows.Security.Credentials;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.Services
 {
@@ -15,18 +14,18 @@ namespace MiraiNotes.UWP.Services
 
         #region Methods
         public string GetCurrentLoggedUsername()
-            => GetUserCredential(PasswordVaultResourceType.LOGGED_USER_RESOURCE, DefaultUsername);
+            => GetUserCredential(ResourceType.LOGGED_USER_RESOURCE, DefaultUsername);
 
-        public void SaveUserCredential(PasswordVaultResourceType resource, string username, string password)
+        public void SaveUserCredential(ResourceType resource, string username, string password)
         {
-            if (resource == PasswordVaultResourceType.ALL)
+            if (resource == ResourceType.ALL)
                 throw new ArgumentOutOfRangeException(nameof(resource), resource, $"Cant save a resource of type {resource}");
             SaveUserCredentials($"{resource}", username, password);
         }
 
-        public string GetUserCredential(PasswordVaultResourceType resource, string username)
+        public string GetUserCredential(ResourceType resource, string username)
         {
-            if (resource == PasswordVaultResourceType.ALL)
+            if (resource == ResourceType.ALL)
                 throw new ArgumentOutOfRangeException(nameof(resource), resource, $"Cant retrieve a resource of type {resource}");
 
             PasswordCredential credential = null;
@@ -50,9 +49,9 @@ namespace MiraiNotes.UWP.Services
             return credential?.Password;
         }
 
-        public void DeleteUserCredential(PasswordVaultResourceType resource, string username)
+        public void DeleteUserCredential(ResourceType resource, string username)
         {
-            if (resource == PasswordVaultResourceType.ALL)
+            if (resource == ResourceType.ALL)
             {
                 if (DefaultUsername != username)
                     DeleteUserCredentials(DefaultUsername);
@@ -82,9 +81,9 @@ namespace MiraiNotes.UWP.Services
             }
         }
 
-        public void UpdateUserCredential(PasswordVaultResourceType resource, string username, bool updateUsername, string newValue)
+        public void UpdateUserCredential(ResourceType resource, string username, bool updateUsername, string newValue)
         {
-            if (resource == PasswordVaultResourceType.ALL)
+            if (resource == ResourceType.ALL)
                 throw new ArgumentOutOfRangeException(nameof(resource), resource, $"Cant update a resource of type {resource}");
 
             //If i need to update the username of the secret

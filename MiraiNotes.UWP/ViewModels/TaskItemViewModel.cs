@@ -1,7 +1,7 @@
-﻿using MiraiNotes.Shared.Helpers;
-using MiraiNotes.Shared.Models;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Shared.Helpers;
 using Template10.Validation;
 
 namespace MiraiNotes.UWP.ViewModels
@@ -259,6 +259,8 @@ namespace MiraiNotes.UWP.ViewModels
                 RaisePropertyChanged(nameof(RemindOnTime));
             }
         }
+
+        public string RemindOnGUID { get; set; }
 
         public TimeSpan? RemindOnTime
         {

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/fab_margin"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/settings_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Default synchronization interval"
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text [DefaultSyncInterval]"/>
+
+            <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dialog"
+                android:gravity="center"
+                app:MvxBind="ItemsSource SyncBgTaskIntervalTypes; SelectedItem CurrentSyncBackgroundTaskInterval"
+                app:MvxItemTemplate="@layout/defaultspinneritem"
+                app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/settings_margin"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click RunSyncBackgroundTaskAfterStartCommand">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Run a full sync when the app starts"
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['RunFullSyncWhenAppStarts']"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:clickable="false"
+                app:MvxBind="Checked RunSyncBackgroundTaskAfterStart"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/settings_margin"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Click RunFullSyncAfterSwitchingAccountsCommand">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Run a full sync after switching accounts"
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text ['RunFullSyncAfterSwitchingAccounts']"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:clickable="false"
+                app:MvxBind="Checked RunFullSyncAfterSwitchingAccounts"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

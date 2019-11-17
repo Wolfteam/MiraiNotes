@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/fab_margin"
+    android:background="?AppBackground"
+    app:MvxBind="Visibility Visibility(IsDialogVisible)">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Accounts"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="5dp"
+        app:MvxBind="Text [Accounts]"/>
+    <MvvmCross.Platforms.Android.Binding.Views.MvxListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="?DividerColor"
+        android:dividerHeight="1px"
+        android:clickable="false"
+        android:focusableInTouchMode="true"
+        android:choiceMode="none"
+        app:MvxBind="ItemsSource Accounts;"
+        app:MvxItemTemplate="@layout/accountdialogitem">
+    </MvvmCross.Platforms.Android.Binding.Views.MvxListView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <android.support.design.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            style="@style/CustomMaterialButton"
+            app:MvxBind="Click NewAccountCommand; Text [Add]"/>
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"/>
+        <android.support.design.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            style="@style/CustomMaterialButton"
+            app:MvxBind="Click CloseCommand; Text [Cancel]"/>
+    </LinearLayout>
+</LinearLayout>

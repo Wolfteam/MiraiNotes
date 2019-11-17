@@ -1,10 +1,10 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.ViewModels.Dialogs
 {
@@ -48,7 +48,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         {
             var response = await _dataService.UserService.GetCurrentActiveUserAsync();
             string currentPassowrd = _credentialService.GetUserCredential(
-                PasswordVaultResourceType.SETTINGS_PASSWORD_RESOURCE,
+                ResourceType.SETTINGS_PASSWORD_RESOURCE,
                 response.Result.Email);
 
             if (currentPassowrd == Password)

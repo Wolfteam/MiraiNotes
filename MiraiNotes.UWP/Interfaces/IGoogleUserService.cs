@@ -1,5 +1,5 @@
-﻿using MiraiNotes.UWP.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using MiraiNotes.Core.Dto.Google.Responses;
 
 namespace MiraiNotes.UWP.Interfaces
 {
@@ -10,7 +10,7 @@ namespace MiraiNotes.UWP.Interfaces
         /// it returns null
         /// </summary>
         /// <returns><see cref="Task{GoogleUserModel}"/></returns>
-        Task<GoogleUserModel> GetUserInfoAsync();
+        Task<GoogleUserResponseDto> GetUserInfoAsync();
 
         /// <summary>
         /// Removes the local profile image of the user specified in <paramref name="googleUserId"/>

@@ -1,9 +1,10 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using MiraiNotes.UWP.Handlers;
 using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.Helpers
 {
@@ -33,7 +34,7 @@ namespace MiraiNotes.UWP.Helpers
                 return _httpClient;
 
             string token = _userCredentialService.GetUserCredential(
-                PasswordVaultResourceType.TOKEN_RESOURCE, 
+                ResourceType.TOKEN_RESOURCE, 
                 currentLoggedUsername);
 
             if (string.IsNullOrEmpty(token))

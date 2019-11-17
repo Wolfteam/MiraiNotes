@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/fab_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reminder"
+        android:textStyle="bold"
+        android:textSize="@dimen/font_size_big"
+        app:MvxBind="Text Title"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="@dimen/font_size_small"
+            android:textStyle="italic"
+            android:textAlignment="center"
+            android:drawableRight="@drawable/ic_close_black_24dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="A reminder date was set to the Sunday, September 29, 2019 19:20"
+            app:MvxBind="Text CurrentContentText; Click DeleteCurrentMomentCommand; Visibility StringToVisibility(CurrentContentText)"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="On this date:"
+            android:drawableLeft="@drawable/ic_calendar_24dp"
+            android:drawablePadding="5dp"
+            android:textSize="@dimen/font_size_medium"
+            app:MvxBind="Text [OnThisDate] + ':'"/>
+
+        <Button
+            android:id="@+id/TaskReminderDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Monday, January 1, 1999"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Text DateText"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?AccentColor"
+            app:MvxBind="Text Errors['DateText']; Visibility StringToVisibility(Errors['DateText'])"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="At this hour:"
+            android:drawableLeft="@drawable/ic_access_time_black_24dp"
+            android:drawablePadding="5dp"
+            android:textSize="@dimen/font_size_medium"
+            app:MvxBind="Text [AtThisHour] + ':'; Visibility Visibility(IsAReminderDate)"/>
+
+        <Button
+            android:id="@+id/TaskReminderTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="12:00 am"
+            android:background="?android:attr/selectableItemBackground"
+            app:MvxBind="Text HourText; Visibility Visibility(IsAReminderDate)"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?AccentColor"
+            app:MvxBind="Text Errors['HourText']; Visibility StringToVisibility(Errors['HourText'])"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <android.support.design.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ok"
+            style="@style/CustomMaterialButton"
+            app:MvxBind="Click OkCommand; Text OkText, Visibility Visibility(IsSaveButtonEnabled)"/>
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"/>
+        <android.support.design.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            style="@style/CustomMaterialButton"
+            app:MvxBind="Click CloseCommand; Text CancelText"/>
+    </LinearLayout>
+</LinearLayout>

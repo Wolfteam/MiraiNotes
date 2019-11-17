@@ -4,8 +4,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.DataService.Services;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Design;
 using MiraiNotes.UWP.Handlers;
@@ -18,6 +16,10 @@ using Serilog;
 using Serilog.Filters;
 using System.IO;
 using Windows.Storage;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Shared.Services.Data;
+using IGoogleApiService = MiraiNotes.UWP.Interfaces.IGoogleApiService;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -56,8 +58,8 @@ namespace MiraiNotes.UWP.ViewModels
         public AccountsDialogViewModel AccountsDialog
             => ServiceLocator.Current.GetInstance<AccountsDialogViewModel>();
 
-        public IApplicationSettingsService ApplicationSettingsService
-            => ServiceLocator.Current.GetInstance<IApplicationSettingsService>();
+        public IAppSettingsService AppSettingsService
+            => ServiceLocator.Current.GetInstance<IAppSettingsService>();
 
         public ISyncService SyncService
             => ServiceLocator.Current.GetInstance<ISyncService>();
@@ -77,8 +79,8 @@ namespace MiraiNotes.UWP.ViewModels
         public IUserCredentialService UserCredentialService
             => ServiceLocator.Current.GetInstance<IUserCredentialService>();
 
-        public ICustomToastNotificationManager ToastNotificationManager
-            => ServiceLocator.Current.GetInstance<ICustomToastNotificationManager>();
+        public INotificationService NotificationService
+            => ServiceLocator.Current.GetInstance<INotificationService>();
 
         public static bool IsAppRunning { get; set; }
         #endregion
@@ -133,11 +135,11 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<IHttpClientsFactory, HttpClientsFactory>();
 
             SimpleIoc.Default.Register<IApplicationSettingsServiceBase, ApplicationSettingsServiceBase>();
-            SimpleIoc.Default.Register<IApplicationSettingsService, ApplicationSettingsService>();
+            SimpleIoc.Default.Register<IAppSettingsService, AppSettingsService>();
 
             SimpleIoc.Default.Register<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
 
-            SimpleIoc.Default.Register<IGoogleAuthService, GoogleAuthService>();
+            SimpleIoc.Default.Register<Abstractions.Services.IGoogleApiService, GoogleAuthService>();
             SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
             SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
 
@@ -149,7 +151,7 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<ITaskDataService, TaskDataService>();
             SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
 
-            SimpleIoc.Default.Register<ICustomToastNotificationManager, CustomToastNotificationManager>();
+            SimpleIoc.Default.Register<INotificationService, NotificationService>();
 
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();
@@ -183,7 +185,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource(typeof(NavPageViewModel).Namespace))
                     .WriteTo.File(
-                        path: Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_app_.log"),
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_app_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
@@ -191,7 +193,7 @@ namespace MiraiNotes.UWP.ViewModels
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncService).Namespace}.{nameof(SyncService)}"))
                     .WriteTo.File(
-                        path: Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_sync_service_.log"),
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_sync_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
@@ -232,6 +234,14 @@ namespace MiraiNotes.UWP.ViewModels
                     .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MarkAsCompletedBackgroundTask).Namespace}.{nameof(MarkAsCompletedBackgroundTask)}"))
                     .WriteTo.File(
                         Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_background_tasks_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MiraiNotesDataService).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_data_main_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,

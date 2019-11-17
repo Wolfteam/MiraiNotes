@@ -8,7 +8,7 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
     xmlns:localDataTemplates="using:MiraiNotes.UWP.Controls.DataTemplates"
-    xmlns:localModels="using:MiraiNotes.UWP.Models"
+    xmlns:localModels="using:MiraiNotes.Core.Models"
     xmlns:localUtils="using:MiraiNotes.UWP.Utils"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"

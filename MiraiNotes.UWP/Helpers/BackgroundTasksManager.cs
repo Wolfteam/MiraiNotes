@@ -1,6 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Helpers;
+using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.BackgroundTasks;
-using MiraiNotes.UWP.Models;
 using System;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Background;

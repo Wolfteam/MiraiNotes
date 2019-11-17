@@ -1,0 +1,185 @@
+
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <include
+            layout="@layout/apptoolbar"/>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ProgressBar
+                    android:id="@+id/indeterminateBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:progressBackgroundTint="?AccentColor"
+                    android:progressBackgroundTintMode="multiply"
+                    android:indeterminateOnly="true"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    app:MvxBind="Visibility Visibility(ShowProgressBar)"/>
+
+                <TextView
+                    android:drawableLeft="@drawable/ic_edit_black_24dp"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?IconColor"
+                    android:layout_marginLeft="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp"
+                    android:focusedByDefault="true"
+                    android:text="New Task"
+                    android:textStyle="bold"
+                    app:MvxBind="Text Title"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:textColor="?AccentColor"
+                    android:textSize="@dimen/font_size_small"
+                    android:textStyle="italic"
+                    android:drawableLeft="@drawable/ic_calendar_24dp"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_vertical"
+                    android:text="This task was marked to be completed on Sunday, January 20, 2019"
+                    app:MvxBind="Text Task.FullToBeCompletedOnText; Visibility Visibility(Task.HasAToBeCompletedDate)"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:textColor="?AccentColor"
+                    android:textSize="@dimen/font_size_small"
+                    android:textStyle="italic"
+                    android:drawableLeft="@drawable/ic_notifications_black_24dp"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_vertical"
+                    android:text="Reminder: Sunday, January 20, 2019"
+                    app:MvxBind="Text Task.FullRemindOnText; Visibility Visibility(Task.HasAReminderDate)"/>
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/TaskTitle"
+                    android:layout_margin="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_note_black_24dp"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?IconColor"
+                    android:hint="Title"
+                    android:textColorHint="?TextColor"
+                    android:inputType="textShortMessage"
+                    android:background="@android:color/transparent"
+                    app:MvxBind="Text Task.Title; Error Errors['Title']; Hint [Title]"/>
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/TaskNotes"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_list_black_24dp"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?IconColor"
+                    android:inputType="textMultiLine"
+                    android:verticalScrollbarPosition="right"
+                    android:elegantTextHeight="true"
+                    android:scrollbars="vertical"
+                    android:hint="Notes"
+                    android:textColorHint="?TextColor"
+                    android:background="@android:color/transparent"
+                    app:MvxBind="Text Task.Notes; Error Errors['Notes']; Hint [Notes]"/>
+
+                <View
+                    style="@style/Divider"
+                    app:MvxBind="Visibility InvertedVisibility(Task.IsNew)"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:text="Add / Edit reminder"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:drawableStart="@drawable/ic_notifications_black_24dp"
+                    android:drawablePadding="10dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    app:MvxBind="Text [AddEditReminder]; Visibility InvertedVisibility(Task.IsNew); Click AddReminderCommand"/>
+
+                <View
+                    style="@style/Divider"/>
+
+                <Button
+                    android:id="@+id/CompletitionDateButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:text="Add / Edit completition date"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:drawableStart="@drawable/ic_calendar_24dp"
+                    android:drawablePadding="10dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    app:MvxBind="Text [AddEditCompletitionDate]; Click AddCompletitionDateCommand"/>
+
+                <View
+                    style="@style/Divider"
+                    app:MvxBind="Visibility InvertedVisibility(Task.IsNew)"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:text="Move"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:drawableStart="@drawable/ic_move_24dp"
+                    android:drawablePadding="10dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    app:MvxBind="Text [Move]; Visibility InvertedVisibility(Task.IsNew); Click MoveTaskCommand;"/>
+
+                <View
+                    style="@style/Divider"
+                    app:MvxBind="Visibility InvertedVisibility(Task.HasParentTask)"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:drawableLeft="@drawable/ic_subdirectory_arrow_right_black_24dp"
+                    android:drawablePadding="10dp"
+                    android:text="Add a subtask"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:background="?android:attr/selectableItemBackground"
+                    app:MvxBind="Text [AddSubTask]; Visibility InvertedVisibility(Task.HasParentTask); Click AddSubTaskCommand;"/>
+
+                <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    app:MvxItemTemplate="@layout/subtaskitem"
+                    app:MvxBind="ItemsSource Task.SubTasks;" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

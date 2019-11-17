@@ -1,19 +1,23 @@
-﻿using AutoMapper;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Views;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Extensions;
-using MiraiNotes.UWP.Helpers;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AutoMapper;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Views;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Extensions;
+using MiraiNotes.Shared.Utils;
+using MiraiNotes.UWP.Helpers;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -28,7 +32,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDispatcherHelper _dispatcher;
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
         private readonly IBackgroundTaskManagerService _backgroundTaskManager;
         private readonly IGoogleUserService _googleUserService;
 
@@ -165,7 +169,7 @@ namespace MiraiNotes.UWP.ViewModels
             IMapper mapper,
             IMiraiNotesDataService dataService,
             IDispatcherHelper dispatcher,
-            IApplicationSettingsService appSettings,
+            IAppSettingsService appSettings,
             IBackgroundTaskManagerService backgroundTaskManager,
             IGoogleUserService googleUserService)
         {
@@ -351,7 +355,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             if (selectedItem == null)
                 return;
-            SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemID);
+            SelectedItem = TaskLists.FirstOrDefault(t => t.TaskListID == selectedItem.ItemId);
         }
 
         public void OnNavigationViewSelectionChangeAsync(object selectedItem)
@@ -406,7 +410,7 @@ namespace MiraiNotes.UWP.ViewModels
                 if (string.IsNullOrEmpty(currentLoggedUsername))
                     currentLoggedUsername = _userCredentialService.DefaultUsername;
 
-                _userCredentialService.DeleteUserCredential(PasswordVaultResourceType.ALL, currentLoggedUsername);
+                _userCredentialService.DeleteUserCredential(ResourceType.ALL, currentLoggedUsername);
                 _navigationService.GoBack();
                 ShowLoading(false);
             }
@@ -496,7 +500,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            EmptyResponse response;
+            EmptyResponseDto response;
             //if the task is created but wasnt synced, we remove it from the db
             if (dbResponse.Result.LocalStatus == LocalStatus.CREATED)
             {

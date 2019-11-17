@@ -1,19 +1,20 @@
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Security.Authentication.Web;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Dto.Google.Responses;
+using MiraiNotes.Shared;
 
 namespace MiraiNotes.UWP.Services
 {
     public class GoogleAuthService : BaseGoogleAuthService
     {
-        public override async Task<Response<TokenResponse>> SignInWithGoogle()
+        public override async Task<ResponseDto<TokenResponseDto>> SignInWithGoogle()
         {
             var requestUri = new Uri(GetAuthorizationUrl());
-            var callbackUri = new Uri(ApprovalUrl);
-            var response = new Response<TokenResponse>();
+            var callbackUri = new Uri(AppConstants.BaseGoogleApprovalUrl);
+            var response = new ResponseDto<TokenResponseDto>();
             try
             {
                 var result = await WebAuthenticationBroker
@@ -40,16 +41,10 @@ namespace MiraiNotes.UWP.Services
                         }
 
                         // Gets the Authorization code
-                        string approvalCode = queryParams["approvalCode"];
-                        var tokenResponse = await GetTokenAsync(approvalCode);
-                        if (tokenResponse == null)
-                        {
-                            response.Message = "Couldn't get a token";
-                            break;
-                        }
+                        var approvalCode = queryParams["approvalCode"];
+                        var tokenResponse = await GetAccessTokenAsync(approvalCode);
 
-                        response.Result = tokenResponse;
-                        response.Succeed = true;
+                        response = tokenResponse;
                         break;
                     case WebAuthenticationStatus.UserCancel:
                         break;

@@ -1,0 +1,36 @@
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:padding="@dimen/fab_margin"
+    android:background="?AppBackground">
+
+    <View
+        android:layout_width="120dp"
+        android:layout_height="10dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="?AccentColorDark"
+        android:background="@drawable/rectangle"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage tasklists"
+        android:textStyle="bold"
+        android:textSize="@dimen/font_size_medium"
+        android:layout_marginBottom="5dp"
+        app:MvxBind="Text [ManageTaskLists]"/>
+
+    <MvvmCross.Platforms.Android.Binding.Views.MvxListView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:choiceMode="singleChoice"
+        android:nestedScrollingEnabled="true"
+        app:MvxItemTemplate="@layout/managetasklistsdialogitem"
+        app:MvxBind="ItemsSource TaskLists;"/>
+</LinearLayout>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight ="90dp"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="10dp"
+    app:cardBackgroundColor="?AppBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?android:attr/selectableItemBackground">
+
+            <View
+                android:layout_height="match_parent"
+                android:layout_width="10dp"
+                android:background="?AccentColor"
+                style="@style/VerticalDivider"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="5"
+                android:layout_marginStart="10dp">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:id="@+id/TaskItemReminderIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_access_alarm_black_24dp"
+                        app:MvxBind="Visibility Visibility(HasAReminderDate)"/>
+
+                    <TextView
+                        android:id="@+id/TaskItemTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/task_item_title"
+                        android:text="Task name"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        app:MvxBind="Text Title; StrikeThroughText IsCompleted" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/TaskItemContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:textSize="@dimen/task_item_content"
+                    android:text="Task content goes here"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    app:MvxBind="Text Notes;Visibility Visibility(HasNotes); StrikeThroughText IsCompleted" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2.5"
+                android:orientation="vertical"
+                android:gravity="center_vertical|end">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    app:MvxBind="Visibility Visibility(HasAToBeCompletedDate)">
+                    <ImageView
+                        android:id="@+id/TaskItemCompletitionDateIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_calendar_24dp"
+                        android:backgroundTint="?AccentColorDark"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="406 days ago"
+                        android:textSize="@dimen/font_size_small"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        app:MvxBind="Text ToBeCompletedOnText"/>
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/ShowSubTasks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textSize="@dimen/task_item_content"
+                    app:MvxBind="Click ShowSubTasksCommand; Visibility Visibility(HasSubTasks); ShowSubTasks ShowSubTasks"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:id="@+id/SubTaskRecyclerView"
+            android:scrollbars="vertical"
+            app:MvxItemTemplate="@layout/subtaskitem"
+            app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks); ItemClick SubTaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
+    </LinearLayout>
+</android.support.v7.widget.CardView>

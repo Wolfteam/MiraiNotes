@@ -1,21 +1,24 @@
-﻿using AutoMapper;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Views;
-using MiraiNotes.Data.Models;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Helpers;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AutoMapper;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Views;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Helpers;
+using MiraiNotes.Shared.Utils;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -30,7 +33,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDispatcherHelper _dispatcherHelper;
-        private readonly ICustomToastNotificationManager _toastManager;
+        private readonly INotificationService _notificationService;
 
 
         private string _taskOperationTitle;
@@ -125,7 +128,7 @@ namespace MiraiNotes.UWP.ViewModels
             IMapper mapper,
             IMiraiNotesDataService dataService,
             IDispatcherHelper dispatcherHelper,
-            ICustomToastNotificationManager toastManager)
+            INotificationService toastManager)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -134,7 +137,7 @@ namespace MiraiNotes.UWP.ViewModels
             _mapper = mapper;
             _dataService = dataService;
             _dispatcherHelper = dispatcherHelper;
-            _toastManager = toastManager;
+            _notificationService = toastManager;
 
             RegisterMessages();
             SetCommands();
@@ -335,22 +338,22 @@ namespace MiraiNotes.UWP.ViewModels
                 if (isNewTask)
                     entity.CreatedAt = DateTimeOffset.UtcNow;
                 entity.CompletedOn = CurrentTask.CompletedOn;
-                entity.GoogleTaskID = CurrentTask.IsNew 
-                    ? Guid.NewGuid().ToString() 
+                entity.GoogleTaskID = CurrentTask.IsNew
+                    ? Guid.NewGuid().ToString()
                     : CurrentTask.TaskID;
                 entity.IsDeleted = CurrentTask.IsDeleted;
                 entity.IsHidden = CurrentTask.IsHidden;
                 entity.Notes = CurrentTask.Notes;
                 entity.ParentTask = CurrentTask.ParentTask;
                 entity.Position = CurrentTask.Position;
-                entity.Status = CurrentTask.IsNew 
-                    ? GoogleTaskStatus.NEEDS_ACTION.GetString() 
+                entity.Status = CurrentTask.IsNew
+                    ? GoogleTaskStatus.NEEDS_ACTION.GetString()
                     : CurrentTask.Status;
                 entity.Title = CurrentTask.Title;
-                entity.LocalStatus = CurrentTask.IsNew 
-                    ? LocalStatus.CREATED 
-                    : entity.LocalStatus == LocalStatus.CREATED 
-                        ? LocalStatus.CREATED 
+                entity.LocalStatus = CurrentTask.IsNew
+                    ? LocalStatus.CREATED
+                    : entity.LocalStatus == LocalStatus.CREATED
+                        ? LocalStatus.CREATED
                         : LocalStatus.UPDATED;
                 entity.ToBeSynced = true;
                 entity.UpdatedAt = DateTimeOffset.UtcNow;
@@ -362,11 +365,12 @@ namespace MiraiNotes.UWP.ViewModels
             //a reminder guid, we set it up. I do this to avoid replacing the guid
             if (CurrentTask.RemindOn.HasValue && string.IsNullOrEmpty(entity.RemindOnGUID))
             {
-                //TODO: I SHOULD FIND A WORKAROUND FOR THE RemindOnGUID
-                entity.RemindOnGUID = Guid.NewGuid().ToString("N").Substring(0, 12);
+                //the 12 is because uwp toast notif. doesnt work with strings longer than that
+                //and the '-' is because hashcode can return a negative integer
+                entity.RemindOnGUID = string.Join("", $"{entity.GetHashCode()}".Take(12).Where(c => c != '-'));
             }
 
-            Response<GoogleTask> response;
+            ResponseDto<GoogleTask> response;
             var subTasksToSave = GetSubTasksToSave(isNewTask, moveToDifferentTaskList);
             var currentSts = GetCurrentSubTasks();
             //If we are creating a new task but in a different tasklist
@@ -431,15 +435,19 @@ namespace MiraiNotes.UWP.ViewModels
                     ? $"{CurrentTask.Notes.Substring(0, 15)}...."
                     : $"{CurrentTask.Notes}....";
 
-                _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
-                _toastManager.ScheduleTaskReminderToastNotification(
-                    response.Result.RemindOnGUID,
-                    _currentTaskList.TaskListID,
-                    CurrentTask.TaskID,
-                    _currentTaskList.Title,
-                    CurrentTask.Title,
-                    notes,
-                    CurrentTask.RemindOn.Value);
+                int id = int.Parse(response.Result.RemindOnGUID);
+
+                _notificationService.RemoveScheduledNotification(id);
+                _notificationService.ScheduleNotification(new TaskReminderNotification
+                {
+                    Id = id,
+                    TaskListId = _currentTaskList.TaskListID,
+                    TaskId = CurrentTask.TaskID,
+                    TaskListTitle = _currentTaskList.Title,
+                    TaskTitle = CurrentTask.Title,
+                    TaskBody = notes,
+                    DeliveryOn = CurrentTask.RemindOn.Value
+                });
             }
 
             _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
@@ -682,8 +690,8 @@ namespace MiraiNotes.UWP.ViewModels
             List<TaskItemViewModel> currentSubTasks)
         {
             ShowTaskProgressRing = true;
-            string taskListID = moveToDifferentTaskList 
-                ? SelectedTaskList.TaskListID 
+            string taskListID = moveToDifferentTaskList
+                ? SelectedTaskList.TaskListID
                 : _currentTaskList.TaskListID;
 
             if (moveToDifferentTaskList && !isNewTask)
@@ -707,15 +715,15 @@ namespace MiraiNotes.UWP.ViewModels
                     {
                         CompletedOn = subTask.CompletedOn,
                         CreatedAt = DateTimeOffset.UtcNow,
-                        GoogleTaskID = subTask.IsNew 
-                            ? Guid.NewGuid().ToString() 
+                        GoogleTaskID = subTask.IsNew
+                            ? Guid.NewGuid().ToString()
                             : subTask.TaskID,
                         IsDeleted = subTask.IsDeleted,
                         IsHidden = subTask.IsHidden,
                         LocalStatus = LocalStatus.CREATED,
                         Notes = subTask.Notes,
-                        ParentTask = isNewTask && moveToDifferentTaskList 
-                            ? subTask.ParentTask 
+                        ParentTask = isNewTask && moveToDifferentTaskList
+                            ? subTask.ParentTask
                             : CurrentTask.TaskID,
                         Position = lastStID,
                         Status = subTask.Status,
@@ -792,6 +800,12 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = true;
             if (!CurrentTask.IsNew)
             {
+                if (dateType == TaskNotificationDateType.REMINDER_DATE &&
+                    int.TryParse(CurrentTask.RemindOnGUID, out int id))
+                {
+                    _notificationService.RemoveScheduledNotification(id);
+                }
+
                 var response = await _dataService
                     .TaskService
                     .RemoveNotificationDate(CurrentTask.TaskID, dateType);
@@ -802,9 +816,6 @@ namespace MiraiNotes.UWP.ViewModels
                         "Error",
                         $"Could not remove the {message} date of {CurrentTask.Title}");
                 }
-
-                if (dateType == TaskNotificationDateType.REMINDER_DATE)
-                    _toastManager.RemoveScheduledToast(response.Result.RemindOnGUID);
 
                 CurrentTask = _mapper.Map<TaskItemViewModel>(response.Result);
             }

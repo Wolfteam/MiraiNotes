@@ -1,9 +1,9 @@
 ﻿using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using MiraiNotes.Core.Dto.Google.Responses;
 
 namespace MiraiNotes.UWP.Services
 {
@@ -18,7 +18,7 @@ namespace MiraiNotes.UWP.Services
             _httpClientsFactory = httpClientsFactory;
         }
 
-        public async Task<GoogleUserModel> GetUserInfoAsync()
+        public async Task<GoogleUserResponseDto> GetUserInfoAsync()
         {
             var httpClient = _httpClientsFactory.GetHttpClient();
             try
@@ -27,7 +27,7 @@ namespace MiraiNotes.UWP.Services
                 if (!response.IsSuccessStatusCode)
                     return null;
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var user = JsonConvert.DeserializeObject<GoogleUserModel>(responseBody);
+                var user = JsonConvert.DeserializeObject<GoogleUserResponseDto>(responseBody);
                 return user;
             }
             catch (Exception)

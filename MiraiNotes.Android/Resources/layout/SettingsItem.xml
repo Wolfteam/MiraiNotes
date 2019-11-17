@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:selectableItemBackground">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/transparent">
+        <ImageView
+            android:padding="10dp"
+            android:id="@+id/SettingsItemIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:layout_gravity="center"
+            android:tint="?AccentColor"
+            app:MvxBind="DrawableName  PageType, Converter=SettingsPageTypeToResourceDrawable"/>
+        <LinearLayout
+            android:layout_marginStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/SettingsItemIcon"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/SettingsItemHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="General"
+                android:textSize="@dimen/font_size_medium"
+                android:textStyle="bold"
+                app:MvxBind="Text Header"/>
+            <TextView
+                android:id="@+id/SettingsItemSubtitle"
+                android:layout_marginTop="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Default filters, theme etc..." 
+                android:textSize="@dimen/settings_font_size_content"
+                app:MvxBind="Text Content"/>
+        </LinearLayout>
+    </RelativeLayout>
+</FrameLayout>

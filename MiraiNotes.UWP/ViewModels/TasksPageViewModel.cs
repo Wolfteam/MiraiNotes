@@ -1,21 +1,25 @@
-﻿using AutoMapper;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Views;
-using MiraiNotes.Data.Models;
-using MiraiNotes.DataService.Interfaces;
-using MiraiNotes.Shared.Models;
-using MiraiNotes.UWP.Delegates;
-using MiraiNotes.UWP.Extensions;
-using MiraiNotes.UWP.Interfaces;
-using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AutoMapper;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Views;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Extensions;
+using MiraiNotes.Shared.Utils;
+using MiraiNotes.UWP.Delegates;
+using MiraiNotes.UWP.Extensions;
+using MiraiNotes.UWP.Interfaces;
+using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -31,7 +35,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IMiraiNotesDataService _dataService;
         private readonly ISyncService _syncService;
         private readonly IBackgroundTaskManagerService _bgTaskManagerService;
-        private readonly IApplicationSettingsService _appSettings;
+        private readonly IAppSettingsService _appSettings;
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -243,7 +247,7 @@ namespace MiraiNotes.UWP.ViewModels
             IMiraiNotesDataService dataService,
             ISyncService syncService,
             IBackgroundTaskManagerService bgTaskManagerService,
-            IApplicationSettingsService appSettings)
+            IAppSettingsService appSettings)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -519,7 +523,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             MarkAsSelectedAllTasks(false);
 
-            var task = Tasks.FirstOrDefault(t => t.TaskID == selectedItem.ItemID);
+            var task = Tasks.FirstOrDefault(t => t.TaskID == selectedItem.ItemId);
             task.IsSelected = true;
             TaskAutoSuggestBoxText = string.Empty;
         }

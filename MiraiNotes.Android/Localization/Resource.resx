@@ -1,0 +1,547 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+		Microsoft ResX Schema
+
+		Version 1.3
+
+		The primary goals of this format is to allow a simple XML format 
+		that is mostly human readable. The generation and parsing of the 
+		various data types are done through the TypeConverter classes 
+		associated with the data types.
+
+		Example:
+
+		... ado.net/XML headers & schema ...
+		<resheader name="resmimetype">text/microsoft-resx</resheader>
+		<resheader name="version">1.3</resheader>
+		<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+		<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+		<data name="Name1">this is my long string</data>
+		<data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+		<data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+			[base64 mime encoded serialized .NET Framework object]
+		</data>
+		<data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+			[base64 mime encoded string representing a byte array form of the .NET Framework object]
+		</data>
+
+		There are any number of "resheader" rows that contain simple 
+		name/value pairs.
+
+		Each data row contains a name, and value. The row also contains a 
+		type or mimetype. Type corresponds to a .NET class that support 
+		text/value conversion through the TypeConverter architecture. 
+		Classes that don't support this are serialized and stored with the 
+		mimetype set.
+
+		The mimetype is used for serialized objects, and tells the 
+		ResXResourceReader how to depersist the object. This is currently not 
+		extensible. For a given mimetype the value must be set accordingly:
+
+		Note - application/x-microsoft.net.object.binary.base64 is the format 
+		that the ResXResourceWriter will generate, however the reader can 
+		read any of the formats listed below.
+
+		mimetype: application/x-microsoft.net.object.binary.base64
+		value   : The object must be serialized with 
+			: System.Serialization.Formatters.Binary.BinaryFormatter
+			: and then encoded with base64 encoding.
+
+		mimetype: application/x-microsoft.net.object.soap.base64
+		value   : The object must be serialized with 
+			: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+			: and then encoded with base64 encoding.
+
+		mimetype: application/x-microsoft.net.object.bytearray.base64
+		value   : The object must be serialized into a byte array 
+			: using a System.ComponentModel.TypeConverter
+			: and then encoded with base64 encoding.
+	-->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="Synchronization" xml:space="preserve">
+    <value>Synchronization</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="SortByNameAsc" xml:space="preserve">
+    <value>By name asc</value>
+  </data>
+  <data name="SortByNameDesc" xml:space="preserve">
+    <value>By name desc</value>
+  </data>
+  <data name="SortByUpdatedDateAsc" xml:space="preserve">
+    <value>By updated date asc</value>
+  </data>
+  <data name="SortByUpdatedDateDesc" xml:space="preserve">
+    <value>By updated date desc</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Spanish" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="SettingsGeneral" xml:space="preserve">
+    <value>Default sort order, themes, etc.</value>
+  </data>
+  <data name="SettingsSync" xml:space="preserve">
+    <value>Background tasks intervals.</value>
+  </data>
+  <data name="SettingsNotif" xml:space="preserve">
+    <value>Toast notifications.</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>Github repo, contact information, donations.</value>
+  </data>
+  <data name="Never" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="Sync3h" xml:space="preserve">
+    <value>Each 3 hours</value>
+  </data>
+  <data name="Sync6h" xml:space="preserve">
+    <value>Each 6 hours</value>
+  </data>
+  <data name="Sync12h" xml:space="preserve">
+    <value>Each 12 hours</value>
+  </data>
+  <data name="Sync24h" xml:space="preserve">
+    <value>Each 24 hours</value>
+  </data>
+  <data name="AppTheme" xml:space="preserve">
+    <value>App Theme</value>
+  </data>
+  <data name="ChooseAppTheme" xml:space="preserve">
+    <value>Choose a base app color</value>
+  </data>
+  <data name="AccentColor" xml:space="preserve">
+    <value>Accent Color</value>
+  </data>
+  <data name="ChooseAccentColor" xml:space="preserve">
+    <value>Choose an accent color</value>
+  </data>
+  <data name="TaskListAndTasks" xml:space="preserve">
+    <value>Tasklist and Tasks</value>
+  </data>
+  <data name="DefaultTasklistSortOrder" xml:space="preserve">
+    <value>Default tasklist sort order</value>
+  </data>
+  <data name="DefaultTaskSortOrder" xml:space="preserve">
+    <value>Default task sort order</value>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>Others</value>
+  </data>
+  <data name="ChooseAppLanguage" xml:space="preserve">
+    <value>Choose an app language</value>
+  </data>
+  <data name="AskForPassword" xml:space="preserve">
+    <value>Ask for a password when the app starts</value>
+  </data>
+  <data name="AboutSummary" xml:space="preserve">
+    <value>This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later.</value>
+  </data>
+  <data name="AboutDonations" xml:space="preserve">
+    <value>I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.</value>
+  </data>
+  <data name="AboutSupport" xml:space="preserve">
+    <value>I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:</value>
+  </data>
+  <data name="Support" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="Donations" xml:space="preserve">
+    <value>Donations</value>
+  </data>
+  <data name="ShowNotifAfterFullSync" xml:space="preserve">
+    <value>Show a notification after full sync</value>
+  </data>
+  <data name="DefaultSyncInterval" xml:space="preserve">
+    <value>Default synchronization interval</value>
+  </data>
+  <data name="RunFullSyncWhenAppStarts" xml:space="preserve">
+    <value>Run a full sync when the app starts</value>
+  </data>
+  <data name="RunFullSyncAfterSwitchingAccounts" xml:space="preserve">
+    <value>Run a full sync after switching accounts</value>
+  </data>
+  <data name="NewTaskList" xml:space="preserve">
+    <value>New Task List</value>
+  </data>
+  <data name="NewTask" xml:space="preserve">
+    <value>New Task</value>
+  </data>
+  <data name="TypeYourPassword" xml:space="preserve">
+    <value>Type your password</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="Accounts" xml:space="preserve">
+    <value>Accounts</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="UnknownErrorOccurred" xml:space="preserve">
+    <value>An unknown error occurred</value>
+  </data>
+  <data name="NetworkNotAvailable" xml:space="preserve">
+    <value>Network is not available</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>User not found</value>
+  </data>
+  <data name="DatabaseUnknownError" xml:space="preserve">
+    <value>An unknown error occurred while consulting the database</value>
+  </data>
+  <data name="DefaultAccountCantBeDeleted" xml:space="preserve">
+    <value>You can not delete the default account</value>
+  </data>
+  <data name="SyncUnknownError" xml:space="preserve">
+    <value>An unknown synchronization error occurred</value>
+  </data>
+  <data name="AutomaticSyncWasPerformed" xml:space="preserve">
+    <value>An automatic full sync was successfully performed</value>
+  </data>
+  <data name="NetworkNotAvailableForSync" xml:space="preserve">
+    <value>Network is not available, a full sync will not be performed</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteThisAccountConfirmation" xml:space="preserve">
+    <value>Are you sure you wanna delete this account ?</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="UnnistalledAppWithoutSigningOut" xml:space="preserve">
+    <value>Did you uninstall the app without signing out ? I will properly log you out now...</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="WannaLogOut" xml:space="preserve">
+    <value>Are you sure you want to log out?</value>
+  </data>
+  <data name="DeleteTaskConfirmation" xml:space="preserve">
+    <value>Are you sure you wanna delete '{0}' ?</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome to Mirai Notes</value>
+  </data>
+  <data name="InvalidTaskRemindOn" xml:space="preserve">
+    <value>The date of the reminder must be at least 2 mins above the current time</value>
+  </data>
+  <data name="MoveTaskConfirmation" xml:space="preserve">
+    <value>Since you are moving an existing task to a different task list, any change made here that is not saved will be lost. Do you want to continue ?</value>
+  </data>
+  <data name="TaskWasCreated" xml:space="preserve">
+    <value>The task was successfully created into {0}</value>
+  </data>
+  <data name="MarkTaskAsConfirmation" xml:space="preserve">
+    <value>Mark {0} as {1} ?</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Incompleted" xml:space="preserve">
+    <value>Incompleted</value>
+  </data>
+  <data name="TaskStatusChanged" xml:space="preserve">
+    <value>{0} was marked as {1}</value>
+  </data>
+  <data name="TaskWasMoved" xml:space="preserve">
+    <value>Task successfully moved from: {0} to: {1}</value>
+  </data>
+  <data name="Completition" xml:space="preserve">
+    <value>Completition</value>
+  </data>
+  <data name="Reminder" xml:space="preserve">
+    <value>Reminder</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Discard changes</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Tasks</value>
+  </data>
+  <data name="UpdateTask" xml:space="preserve">
+    <value>Update Task</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="TaskListWasCreated" xml:space="preserve">
+    <value>Task list was succesfully created</value>
+  </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>Title cannot be empty</value>
+  </data>
+  <data name="TitleMaxLength" xml:space="preserve">
+    <value>Title cannot have more than {0} characters</value>
+  </data>
+  <data name="PasswordCantBeEmpty" xml:space="preserve">
+    <value>Password cannot be empty</value>
+  </data>
+  <data name="PasswordIncorrect" xml:space="preserve">
+    <value>Password is incorrect</value>
+  </data>
+  <data name="ConfirmPasswordCantBeEmpty" xml:space="preserve">
+    <value>Confirm password cannot be empty</value>
+  </data>
+  <data name="ConfirmPasswordMaxLength" xml:space="preserve">
+    <value>Confirm password max length is {0}</value>
+  </data>
+  <data name="PasswordMaxLength" xml:space="preserve">
+    <value>Password cannot have more than {0} characters</value>
+  </data>
+  <data name="PasswordDoesntMatch" xml:space="preserve">
+    <value>Password does not match</value>
+  </data>
+  <data name="ConfirmPasswordDoesntMatch" xml:space="preserve">
+    <value>Confirm password does not match</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="SyncAutoCompleted" xml:space="preserve">
+    <value>A automatic full sync was successfully performed</value>
+  </data>
+  <data name="Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="SyncManualCompleted" xml:space="preserve">
+    <value>A manual full sync was successfully performed</value>
+  </data>
+  <data name="SyncResults" xml:space="preserve">
+    <value>Sync results</value>
+  </data>
+  <data name="JobWasScheduled" xml:space="preserve">
+    <value>Background task was successfully scheduled</value>
+  </data>
+  <data name="JobCouldntBeScheduled" xml:space="preserve">
+    <value>Background task could not be scheduled</value>
+  </data>
+  <data name="Sync1h" xml:space="preserve">
+    <value>Each hour</value>
+  </data>
+  <data name="Sync30m" xml:space="preserve">
+    <value>Each 30 minutes</value>
+  </data>
+  <data name="FingerprintAuthFailed" xml:space="preserve">
+    <value>Fingerprint not recognized. Try again.</value>
+  </data>
+  <data name="FingerprintAuthMsg" xml:space="preserve">
+    <value>Confirm fingerprint to continue</value>
+  </data>
+  <data name="AskForFingerprint" xml:space="preserve">
+    <value>Ask for fingerprint when the app starts</value>
+  </data>
+  <data name="FingerprintIsNotAvailable" xml:space="preserve">
+    <value>Fingerprint is not available</value>
+  </data>
+  <data name="SelectAnOption" xml:space="preserve">
+    <value>Select an option</value>
+  </data>
+  <data name="DeleteTask" xml:space="preserve">
+    <value>Delete task</value>
+  </data>
+  <data name="AddSubTask" xml:space="preserve">
+    <value>Add a subtask</value>
+  </data>
+  <data name="MoveToDifferentTaskList" xml:space="preserve">
+    <value>Move to a different task list</value>
+  </data>
+  <data name="AddReminder" xml:space="preserve">
+    <value>Add a reminder</value>
+  </data>
+  <data name="MarkTaskAs" xml:space="preserve">
+    <value>Mark as {0}</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="OneDayAgo" xml:space="preserve">
+    <value>One day ago</value>
+  </data>
+  <data name="XDayAgo" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Tomorrow</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="OnThisDate" xml:space="preserve">
+    <value>On this date</value>
+  </data>
+  <data name="AtThisHour" xml:space="preserve">
+    <value>At this hour</value>
+  </data>
+  <data name="ReminderDateCannotBeEmpty" xml:space="preserve">
+    <value>Reminder date cannot be empty</value>
+  </data>
+  <data name="ReminderHourCannotBeEmpty" xml:space="preserve">
+    <value>Reminder hour cannot be empty</value>
+  </data>
+  <data name="InvalidReminderDate" xml:space="preserve">
+    <value>Invalid reminder date</value>
+  </data>
+  <data name="InvalidReminderHour" xml:space="preserve">
+    <value>Invalid reminder hour</value>
+  </data>
+  <data name="ReminderWasCreated" xml:space="preserve">
+    <value>Reminder was successfully created</value>
+  </data>
+  <data name="ReminderDateIsSetTo" xml:space="preserve">
+    <value>A reminder date was set to the {0}</value>
+  </data>
+  <data name="TaskCouldntBeMarkedAsCompleted" xml:space="preserve">
+    <value>Task {0} could not be marked as completed</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="NewSubTask" xml:space="preserve">
+    <value>New SubTask</value>
+  </data>
+  <data name="PickTaskList" xml:space="preserve">
+    <value>Pick a task list</value>
+  </data>
+  <data name="MoveTaskConfirmationB" xml:space="preserve">
+    <value>Are you sure you wanna move '{0}' to '{1}'  ?</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="AddCompletitionDate" xml:space="preserve">
+    <value>Add a completition date</value>
+  </data>
+  <data name="AddEditReminder" xml:space="preserve">
+    <value>Add / Edit a reminder</value>
+  </data>
+  <data name="AddEditCompletitionDate" xml:space="preserve">
+    <value>Add / Edit completition date</value>
+  </data>
+  <data name="ToBeCompletedOnA" xml:space="preserve">
+    <value>This task is marked to be completed on {0}</value>
+  </data>
+  <data name="ToBeCompletedOnB" xml:space="preserve">
+    <value>This task is marked to be completed {0}</value>
+  </data>
+  <data name="ToBeCompletedOnC" xml:space="preserve">
+    <value>This task was marked to be completed on {0}</value>
+  </data>
+  <data name="NotesCannotBeEmpty" xml:space="preserve">
+    <value>Notes cannot be empty</value>
+  </data>
+  <data name="NotesMaxLength" xml:space="preserve">
+    <value>Notes cannot have more than {0} characters</value>
+  </data>
+  <data name="SubTaskWasCreated" xml:space="preserve">
+    <value>Subtask was successfully created</value>
+  </data>
+  <data name="SubTaskWasAdded" xml:space="preserve">
+    <value>Subtask was added but you need to save changes</value>
+  </data>
+  <data name="AskBeforeDiscardChanges" xml:space="preserve">
+    <value>Ask before discard changes when creating / editing a task</value>
+  </data>
+  <data name="WannaDiscardChanges" xml:space="preserve">
+    <value>Are you sure you want to discard the changes made?</value>
+  </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="ManageTaskLists" xml:space="preserve">
+    <value>Manage tasklists</value>
+  </data>
+  <data name="TaskListWasRemoved" xml:space="preserve">
+    <value>Task list was succesfully removed</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="TaskListWasUpdated" xml:space="preserve">
+    <value>Task list was succesfully updated</value>
+  </data>
+  <data name="Syncing" xml:space="preserve">
+    <value>Syncing</value>
+  </data>
+  <data name="SyncRunning" xml:space="preserve">
+    <value>Syncing your task and tasklist...</value>
+  </data>
+</root>
