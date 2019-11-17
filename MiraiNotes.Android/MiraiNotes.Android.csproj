@@ -249,7 +249,6 @@
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="Services\SyncService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="Services\DialogService.cs" />
     <Compile Include="Services\GoogleApiService.cs" />

@@ -10,8 +10,7 @@ using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models.GoogleApi;
 using Serilog;
 
-//TODO: ONCE UWP IS USING REFIT, MOVE THIS TO THE SHARED PROJECT
-namespace MiraiNotes.Android.Services
+namespace MiraiNotes.Shared.Services
 {
     public class SyncService : ISyncService
     {
