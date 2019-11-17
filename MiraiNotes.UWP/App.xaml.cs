@@ -1,7 +1,6 @@
 ﻿using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Helpers;
-using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages;
 using MiraiNotes.UWP.Utils;
 using MiraiNotes.UWP.ViewModels;
@@ -171,7 +170,7 @@ namespace MiraiNotes.UWP
         {
             var vml = new ViewModelLocator();
             MiscellaneousUtils.ChangeCurrentTheme(
-                vml.AppSettingsService.AppTheme, 
+                vml.AppSettingsService.AppTheme,
                 vml.AppSettingsService.AppHexAccentColor);
         }
 

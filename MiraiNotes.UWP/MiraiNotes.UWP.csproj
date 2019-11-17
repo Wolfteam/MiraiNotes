@@ -124,24 +124,17 @@
     <Compile Include="Converters\NavigationViewSelectionChangedEventArgsConverter.cs" />
     <Compile Include="Converters\DatetimeOffsetToLocalDatetimeOffsetConverter.cs" />
     <Compile Include="Delegates\Delegates.cs" />
-    <Compile Include="Design\DesignGoogleTaskListService.cs" />
-    <Compile Include="Design\DesignGoogleTaskService.cs" />
+    <Compile Include="Design\DesignGoogleApiService.cs" />
     <Compile Include="Extensions\FocusExtension.cs" />
     <Compile Include="Handlers\AuthorizationHandler.cs" />
     <Compile Include="Helpers\BackgroundTasksManager.cs" />
     <Compile Include="Helpers\DispatcherHelperEx.cs" />
-    <Compile Include="Helpers\HttpClientExtensions.cs" />
-    <Compile Include="Helpers\HttpClientsFactory.cs" />
     <Compile Include="Helpers\MapperProvider.cs" />
     <Compile Include="Helpers\MappingProfile.cs" />
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Interfaces\IApplicationSettingsServiceBase.cs" />
     <Compile Include="Interfaces\ICustomDialogService.cs" />
     <Compile Include="Interfaces\IDispatcherHelper.cs" />
-    <Compile Include="Interfaces\IGoogleApiService.cs" />
-    <Compile Include="Interfaces\IGoogleTaskService.cs" />
-    <Compile Include="Interfaces\IGoogleUserService.cs" />
-    <Compile Include="Interfaces\IHttpClientsFactory.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -177,9 +170,7 @@
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\ApplicationSettingsServiceBase.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
-    <Compile Include="Services\BaseGoogleAuthService.cs" />
     <Compile Include="Services\NetworkService.cs" />
-    <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\MiscellaneousUtils.cs" />
     <Compile Include="ViewModels\Dialogs\AccountsDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\LoginPasswordDialogViewModel.cs" />
@@ -200,11 +191,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CustomDialogService.cs" />
     <Compile Include="Services\GoogleApiService.cs" />
-    <Compile Include="Services\GoogleAuthService.cs" />
-    <Compile Include="Interfaces\IGoogleTaskListService.cs" />
-    <Compile Include="Services\GoogleTaskService.cs" />
-    <Compile Include="Services\GoogleUserService.cs" />
-    <Compile Include="Services\GoogleTaskListService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\NavPageViewModel.cs" />

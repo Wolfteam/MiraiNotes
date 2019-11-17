@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.Abstractions.Data;
@@ -12,8 +9,11 @@ using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 using Serilog;
-using IGoogleApiService = MiraiNotes.Abstractions.Services.IGoogleApiService;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -24,8 +24,7 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly ICustomDialogService _dialogService;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
-        private readonly IGoogleApiService _googleAuthService;
-        private readonly IGoogleUserService _googleUserService;
+        private readonly IGoogleApiService _googleApiService;
 
         private readonly IMiraiNotesDataService _dataService;
         private readonly INetworkService _networkService;
@@ -62,8 +61,7 @@ namespace MiraiNotes.UWP.ViewModels
             ICustomDialogService dialogService,
             INavigationService navigationService,
             IUserCredentialService userCredentialService,
-            IGoogleApiService googleAuthService,
-            IGoogleUserService googleUserService,
+            IGoogleApiService googleApiService,
             IMiraiNotesDataService dataService,
             INetworkService networkService,
             ISyncService syncService,
@@ -73,8 +71,7 @@ namespace MiraiNotes.UWP.ViewModels
             _dialogService = dialogService;
             _navigationService = navigationService;
             _userCredentialService = userCredentialService;
-            _googleAuthService = googleAuthService;
-            _googleUserService = googleUserService;
+            _googleApiService = googleApiService;
             _dataService = dataService;
             _networkService = networkService;
             _syncService = syncService;
@@ -155,7 +152,7 @@ namespace MiraiNotes.UWP.ViewModels
             ShowLoginButton = false;
 
             _logger.Information($"{nameof(SignInWithGoogleAsync)}: Trying to sign in with google...");
-            var response = await _googleAuthService.SignInWithGoogle();
+            var response = await _googleApiService.SignInWithGoogle();
             await OnGoogleSignInResponse(response);
 
             ShowLoading = false;
@@ -225,13 +222,13 @@ namespace MiraiNotes.UWP.ViewModels
             _logger.Information(
                 $"{nameof(SignInAsync)}: Sign in the app started. Trying to get the user info from google");
             var result = false;
-            var user = await _googleUserService.GetUserInfoAsync();
-            if (user == null)
+            var userResponse = await _googleApiService.GetUser();
+            if (!userResponse.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
                 return result;
             }
-
+            var user = userResponse.Result;
             var response = await _dataService
                 .UserService
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
@@ -319,7 +316,7 @@ namespace MiraiNotes.UWP.ViewModels
                 true,
                 userSaved.Result.Email);
 
-            await _googleUserService.DownloadProfileImage(user.ImageUrl, user.ID);
+            await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
 
             //if you came this far, that means everything is ok!
             _navigationService.NavigateTo(ViewModelLocator.HOME_PAGE);

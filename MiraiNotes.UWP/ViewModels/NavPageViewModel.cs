@@ -34,7 +34,6 @@ namespace MiraiNotes.UWP.ViewModels
         private readonly IDispatcherHelper _dispatcher;
         private readonly IAppSettingsService _appSettings;
         private readonly IBackgroundTaskManagerService _backgroundTaskManager;
-        private readonly IGoogleUserService _googleUserService;
 
         private object _selectedItem;
 
@@ -170,8 +169,7 @@ namespace MiraiNotes.UWP.ViewModels
             IMiraiNotesDataService dataService,
             IDispatcherHelper dispatcher,
             IAppSettingsService appSettings,
-            IBackgroundTaskManagerService backgroundTaskManager,
-            IGoogleUserService googleUserService)
+            IBackgroundTaskManagerService backgroundTaskManager)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -182,7 +180,6 @@ namespace MiraiNotes.UWP.ViewModels
             _dispatcher = dispatcher;
             _appSettings = appSettings;
             _backgroundTaskManager = backgroundTaskManager;
-            _googleUserService = googleUserService;
 
             RegisterMessages();
             SetCommands();
@@ -269,7 +266,7 @@ namespace MiraiNotes.UWP.ViewModels
                         userInitials += part.Substring(0, 1);
                 });
                 CurrentUserInitials = userInitials;
-                CurrentUserProfileImagePath = _googleUserService.GetUserProfileImagePath(currentUser.Result.GoogleUserID);
+                CurrentUserProfileImagePath = MiscellaneousUtils.GetUserProfileImagePath(currentUser.Result.GoogleUserID);
             }
 
             _messenger.Send(false, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");

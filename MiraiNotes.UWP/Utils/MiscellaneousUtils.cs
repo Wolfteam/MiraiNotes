@@ -1,6 +1,9 @@
-﻿using System;
+﻿using MiraiNotes.Core.Enums;
+using MiraiNotes.Shared.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Storage;
@@ -9,7 +12,6 @@ using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
-using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.UWP.Utils
 {
@@ -126,27 +128,16 @@ namespace MiraiNotes.UWP.Utils
 
             // Set theme for window root.
             if (Window.Current.Content is FrameworkElement frameworkElement)
+            {
                 frameworkElement.RequestedTheme = (ElementTheme)appTheme;
+            }
         }
 
         public static Color GetColor(string hex)
         {
-            hex = hex.Replace("#", string.Empty);
-            if (hex.Length > 6)
-            {
-                byte a = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
-                byte r = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
-                byte g = (byte)(Convert.ToUInt32(hex.Substring(4, 2), 16));
-                byte b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
-                return Color.FromArgb(a, r, g, b);
-            }
-            else
-            {
-                var r = (byte)Convert.ToUInt32(hex.Substring(0, 2), 16);
-                var g = (byte)Convert.ToUInt32(hex.Substring(2, 2), 16);
-                var b = (byte)Convert.ToUInt32(hex.Substring(4, 2), 16);
-                return Color.FromArgb(255, r, g, b);
-            }
+            var color = ColorUtil.ToColor(hex);
+
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
         public static Color GetSystemAccentColor()
@@ -157,5 +148,22 @@ namespace MiraiNotes.UWP.Utils
 
         public static string BuildImageFilename(string id)
             => $"{id}_{USER_IMAGE_FILE_NAME}";
+
+        public static async Task DownloadProfileImage(string url, string googleUserId)
+        {
+            string filename = BuildImageFilename(googleUserId);
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var imageBytes = await client.GetByteArrayAsync(url);
+                    await SaveFile(filename, imageBytes);
+                }
+            }
+            catch (Exception)
+            {
+                //Http excep..
+            }
+        }
     }
 }
