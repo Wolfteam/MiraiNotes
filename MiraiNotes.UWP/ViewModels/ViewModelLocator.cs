@@ -4,6 +4,10 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Shared.Services;
+using MiraiNotes.Shared.Services.Data;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Design;
 using MiraiNotes.UWP.Handlers;
@@ -16,9 +20,6 @@ using Serilog;
 using Serilog.Filters;
 using System.IO;
 using Windows.Storage;
-using MiraiNotes.Abstractions.Data;
-using MiraiNotes.Abstractions.Services;
-using MiraiNotes.Shared.Services.Data;
 using IGoogleApiService = MiraiNotes.UWP.Interfaces.IGoogleApiService;
 
 namespace MiraiNotes.UWP.ViewModels
@@ -81,6 +82,9 @@ namespace MiraiNotes.UWP.ViewModels
 
         public INotificationService NotificationService
             => ServiceLocator.Current.GetInstance<INotificationService>();
+
+        public ITelemetryService TelemetryService
+            => ServiceLocator.Current.GetInstance<ITelemetryService>();
 
         public static bool IsAppRunning { get; set; }
         #endregion
@@ -152,6 +156,7 @@ namespace MiraiNotes.UWP.ViewModels
             SimpleIoc.Default.Register<IMiraiNotesDataService, MiraiNotesDataService>();
 
             SimpleIoc.Default.Register<INotificationService, NotificationService>();
+            SimpleIoc.Default.Register<ITelemetryService, TelemetryService>();
 
             SimpleIoc.Default.Register<LoginPageViewModel>();
             SimpleIoc.Default.Register<NavPageViewModel>();

@@ -10,13 +10,9 @@ namespace MiraiNotes.Shared.Services
     {
         public void Init()
         {
-#if Android
             if (AppCenter.Configured)
                 return;
             AppCenter.Start(Secrets.AppCenterSecret, typeof(Analytics), typeof(Crashes));
-#else
-            throw new NotImplementedException("You need to create a different app center project");
-#endif
         }
 
         public void TrackError(Exception ex)

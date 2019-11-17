@@ -39,6 +39,8 @@ namespace MiraiNotes.UWP
             //};
             //jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             //JsonConvert.DefaultSettings = () => jsonSettings;
+
+            new ViewModelLocator().TelemetryService.Init();
             this.Suspending += OnSuspending;
         }
 
