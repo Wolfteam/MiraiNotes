@@ -105,7 +105,7 @@ namespace MiraiNotes.UWP.ViewModels
             var config = new MapperConfiguration(cfg =>
             {
                 // Add all profiles in current assembly
-                cfg.AddProfiles(GetType().Assembly);
+                cfg.AddProfile<MappingProfile>();
                 cfg.ConstructServicesUsing(t =>
                 {
                     //ConstructServicesUsing gets called if you used it in the

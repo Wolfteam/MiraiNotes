@@ -19,7 +19,7 @@ namespace MiraiNotes.UWP.Helpers
             var mce = new MapperConfigurationExpression();
             mce.ConstructServicesUsing(_container.GetInstance);
 
-            mce.AddProfiles(typeof(MappingProfile).Assembly);
+            mce.AddProfile<MappingProfile>();
 
             var mc = new MapperConfiguration(mce);
             mc.AssertConfigurationIsValid();
