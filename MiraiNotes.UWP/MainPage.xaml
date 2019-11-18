@@ -75,11 +75,12 @@
                                     Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}"
                                     TextTrimming="CharacterEllipsis" />
                                 <Button
+                                    x:Name="ClosePaneButton"
                                     Grid.Column="1"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
                                     Background="Transparent"
-                                    Command="{Binding ClosePaneCommand}"
+                                    Click="ClosePaneButton_Click"
                                     IsTabStop="False"
                                     IsTapEnabled="False"
                                     Visibility="{Binding IsPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">

@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using AutoMapper;
+﻿using AutoMapper;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Views;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
@@ -19,6 +12,12 @@ using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Utils;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -28,13 +27,10 @@ namespace MiraiNotes.UWP.ViewModels
 
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
-        private readonly INavigationService _navigationService;
-        private readonly IUserCredentialService _userCredentialService;
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IDispatcherHelper _dispatcherHelper;
         private readonly INotificationService _notificationService;
-
+        public readonly IAppSettingsService AppSettings;
 
         private string _taskOperationTitle;
         private TaskListItemViewModel _currentTaskList;
@@ -48,6 +44,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         private TaskListItemViewModel _selectedTaskList;
 
+        private readonly List<string> _changedProperties = new List<string>();
+        public readonly Dictionary<string, string> InitialValues = new Dictionary<string, string>();
         #endregion
 
         #region Properties
@@ -123,21 +121,17 @@ namespace MiraiNotes.UWP.ViewModels
         public NewTaskPageViewModel(
             ICustomDialogService dialogService,
             IMessenger messenger,
-            INavigationService navigationService,
-            IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            IDispatcherHelper dispatcherHelper,
-            INotificationService toastManager)
+            INotificationService toastManager,
+            IAppSettingsService appSettings)
         {
             _dialogService = dialogService;
             _messenger = messenger;
-            _navigationService = navigationService;
-            _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dataService = dataService;
-            _dispatcherHelper = dispatcherHelper;
             _notificationService = toastManager;
+            AppSettings = appSettings;
 
             RegisterMessages();
             SetCommands();
@@ -214,7 +208,26 @@ namespace MiraiNotes.UWP.ViewModels
                 }
             });
 
-            ClosePaneCommand = new RelayCommand(CleanPanel);
+            ClosePaneCommand = new RelayCommand(async () =>
+            {
+                if (!AppSettings.AskBeforeDiscardChanges || !ChangesWereMade())
+                {
+                    CleanPanel();
+                    return;
+                }
+
+                var result = await _dialogService.ShowConfirmationDialogAsync(
+                    "Discard changes",
+                    "Are you sure you want to discard the changes made?");
+
+                if (result == true)
+                {
+                    CleanPanel();
+                    //Kinda hack to avoid that below msg gets delivered first
+                    await Task.Delay(100);
+                    _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_CHANGES_WERE_DISCARDED}");
+                }
+            });
 
             NewSubTaskCommand = new RelayCommand
                 (async () => await NewSubTaskAsync());
@@ -234,6 +247,9 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task InitView(string taskID)
         {
+            _changedProperties.Clear();
+            InitialValues.Clear();
+
             MinDate = DateTimeOffset.Now;
 
             ShowTaskProgressRing = true;
@@ -862,6 +878,33 @@ namespace MiraiNotes.UWP.ViewModels
                        .ToList();
         }
 
+        private void PropertyIsDirty(string property, bool isDirty)
+        {
+            if (isDirty && !_changedProperties.Contains(property))
+            {
+                _changedProperties.Add(property);
+            }
+            else if (!isDirty && _changedProperties.Contains(property))
+            {
+                _changedProperties.Remove(property);
+            }
+        }
+
+        public bool ChangesWereMade() =>
+            _changedProperties.Any();
+
+        public void TextChanged(string property, string newValue)
+        {
+            if (InitialValues.ContainsKey(property) &&
+                InitialValues[property] != newValue)
+            {
+                PropertyIsDirty(property, true);
+            }
+            else
+            {
+                PropertyIsDirty(property, false);
+            }
+        }
         #endregion
     }
 }

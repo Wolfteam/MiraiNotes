@@ -153,6 +153,18 @@
                 IsOn="{Binding AskForPasswordWhenAppStarts, Mode=TwoWay}"
                 OffContent="No"
                 OnContent="Yes" />
+
+            <ToggleSwitch
+                Header="Ask before discard changes when creating / editing a task"
+                IsOn="{Binding AskBeforeDiscardChanges, Mode=TwoWay}"
+                OffContent="No"
+                OnContent="Yes">
+                <ToggleSwitch.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ToggleSwitch.HeaderTemplate>
+            </ToggleSwitch>
         </StackPanel>
     </StackPanel>
 </Page>

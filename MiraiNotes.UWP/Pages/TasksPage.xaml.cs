@@ -1,18 +1,8 @@
-﻿using MiraiNotes.UWP.ViewModels;
+﻿using MiraiNotes.UWP.Controls;
+using MiraiNotes.UWP.Utils;
+using MiraiNotes.UWP.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -23,6 +13,9 @@ namespace MiraiNotes.UWP.Pages
     /// </summary>
     public sealed partial class TasksPage : Page
     {
+        private int _lastSelectedIndex;
+        private bool _selectionInProgress;
+
         public TasksPage()
         {
             this.InitializeComponent();
@@ -46,6 +39,52 @@ namespace MiraiNotes.UWP.Pages
         private void ShowInAppNotification(string message)
         {
             Task_InAppNotification.Show(message);
+        }
+
+        private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listView = sender as TasksListView;
+            var vm = (TasksPageViewModel)DataContext;
+
+            if (_selectionInProgress)
+                return;
+
+            try
+            {
+                if (listView.SelectedIndex == -1)
+                    return;
+
+                _selectionInProgress = true;
+
+                var navVm = Frame.DataContext as NavPageViewModel;
+
+                var parent = ((Frame.Parent as Border).Parent as Grid).Parent as Grid;
+                var newTaskPage = MiscellaneousUtils.FindControl<Grid>(parent, "MainSplitViewPane");
+                var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
+
+                if (navVm.IsPaneOpen
+                    && newTaskVm.AppSettings.AskBeforeDiscardChanges
+                    && newTaskVm.ChangesWereMade())
+                {
+                    vm.DesiredTaskIndex = listView.SelectedIndex;
+                    listView.SelectedIndex = _lastSelectedIndex;
+                    newTaskVm.ClosePaneCommand.Execute(null);
+                    return;
+                }
+
+                _lastSelectedIndex = listView.SelectedIndex;
+
+                vm.TaskListViewSelectedItemCommand.Execute(listView.SelectedItem);
+            }
+            catch (Exception)
+            {
+
+            }
+            finally
+            {
+                _selectionInProgress = false;
+            }
+
         }
     }
 }

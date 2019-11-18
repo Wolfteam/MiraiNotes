@@ -91,7 +91,7 @@ namespace MiraiNotes.UWP.ViewModels
         public ITelemetryService TelemetryService
             => ServiceLocator.Current.GetInstance<ITelemetryService>();
 
-        public Abstractions.Services.IGoogleApiService GoogleApiService
+        public IGoogleApiService GoogleApiService
             => ServiceLocator.Current.GetInstance<IGoogleApiService>();
 
         public static bool IsAppRunning { get; set; }

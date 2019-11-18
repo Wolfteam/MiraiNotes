@@ -7,13 +7,13 @@
     xmlns:converters="using:MiraiNotes.UWP.Converters"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:enums="using:MiraiNotes.Core.Enums"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:MiraiNotes.UWP.Pages"
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Xaml.Interactions.Media"
     xmlns:uc="using:MiraiNotes.UWP.Controls"
-    xmlns:enums="using:MiraiNotes.Core.Enums"
     DataContext="{Binding Tasks, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -68,15 +68,10 @@
                 IsTextScaleFactorEnabled="True"
                 ItemContainerStyle="{StaticResource TaskListViewItemStyle}"
                 ItemsSource="{Binding Tasks}"
+                SelectedIndex="{Binding SelectedTaskIndex, Mode=TwoWay}"
+                SelectionChanged="TaskListView_SelectionChanged"
                 SelectionMode="Extended"
                 Visibility="{Binding IsTaskListViewVisible, Mode=OneWay}">
-                <interactivity:Interaction.Behaviors>
-                    <core:EventTriggerBehavior EventName="SelectionChanged">
-                        <core:EventTriggerBehavior.Actions>
-                            <core:InvokeCommandAction Command="{Binding TaskListViewSelectedItemCommand}" CommandParameter="{Binding ElementName=TaskListView, Path=SelectedItem}" />
-                        </core:EventTriggerBehavior.Actions>
-                    </core:EventTriggerBehavior>
-                </interactivity:Interaction.Behaviors>
                 <uc:TasksListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
