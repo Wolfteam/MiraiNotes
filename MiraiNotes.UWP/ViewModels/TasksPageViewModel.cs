@@ -400,6 +400,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task GetAllTasksAsync(TaskListItemViewModel taskList)
         {
+            UpdateSelectedTasksText(0);
             if (taskList == null)
             {
                 OnNoTaskListAvailable();
