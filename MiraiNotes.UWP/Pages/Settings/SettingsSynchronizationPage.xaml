@@ -6,7 +6,6 @@
     xmlns:local="using:MiraiNotes.UWP.Pages.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignWidth="400"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding Settings, Source={StaticResource Locator}}"
     mc:Ignorable="d">
 
@@ -39,7 +38,7 @@
                 ItemsSource="{Binding SyncBgTaskIntervalTypes, Mode=OneWay}"
                 PlaceholderText="Pick a sync interval"
                 SelectedItem="{Binding CurrentSyncBackgroundTaskInterval, Mode=TwoWay}"
-                SelectedValuePath="ItemID" />
+                SelectedValuePath="ItemId" />
         </StackPanel>
         <StackPanel Margin="5">
             <ToggleSwitch

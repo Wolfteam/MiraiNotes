@@ -15,7 +15,6 @@ namespace MiraiNotes.Abstractions.Services
 
         Task<ResponseDto<TokenResponseDto>> SignInWithGoogle();
 
-#if Android
         Task<ResponseDto<GoogleUserResponseDto>> GetUser();
 
         Task<ResponseDto<GoogleTaskApiResponseModel<GoogleTaskListModel>>> GetAllTaskLists(
@@ -51,6 +50,5 @@ namespace MiraiNotes.Abstractions.Services
             string previous = null);
 
         Task<ResponseDto<GoogleTaskModel>> UpdateTask(string taskListId, string taskId, GoogleTaskModel task);
-#endif
     }
 }

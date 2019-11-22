@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using AutoMapper;
+﻿using AutoMapper;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -17,8 +11,14 @@ using MiraiNotes.Core.Enums;
 using MiraiNotes.UWP.Delegates;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
+using MiraiNotes.UWP.Utils;
 using Serilog;
-using IGoogleApiService = MiraiNotes.Abstractions.Services.IGoogleApiService;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels.Dialogs
 {
@@ -28,8 +28,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
         private readonly ILogger _logger;
         private readonly IMessenger _messenger;
         private readonly IMapper _mapper;
-        private readonly IGoogleApiService _googleAuthService;
-        private readonly IGoogleUserService _googleUserService;
+        private readonly IGoogleApiService _googleApiService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly ICustomDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
@@ -69,8 +68,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             ILogger logger,
             IMessenger messenger,
             IMapper mapper,
-            IGoogleApiService googleAuthService,
-            IGoogleUserService googleUserService,
+            IGoogleApiService googleApiService,
             IUserCredentialService userCredentialService,
             ICustomDialogService dialogService,
             IMiraiNotesDataService dataService,
@@ -81,8 +79,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             _logger = logger;
             _messenger = messenger;
             _mapper = mapper;
-            _googleAuthService = googleAuthService;
-            _googleUserService = googleUserService;
+            _googleApiService = googleApiService;
             _userCredentialService = userCredentialService;
             _dialogService = dialogService;
             _dataService = dataService;
@@ -143,7 +140,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             var accounts = new List<GoogleUserViewModel>();
             foreach (var user in response.Result)
             {
-                var vm = new GoogleUserViewModel(_googleUserService);
+                var vm = new GoogleUserViewModel();
                 accounts.Add(_mapper.Map(user, vm));
             }
             Accounts = new ObservableCollection<GoogleUserViewModel>(accounts);
@@ -159,7 +156,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
             _messenger.Send(new Tuple<bool, string>(true, "Adding a new account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
             _logger.Information($"{nameof(AddAccountAsync)}: Trying to sign in with google...");
-            var response = await _googleAuthService.SignInWithGoogle();
+            var response = await _googleApiService.SignInWithGoogle();
             await OnGoogleSignInResponse(response);
 
             _messenger.Send(new Tuple<bool, string>(false, null), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
@@ -228,13 +225,13 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
         private async Task<GoogleUserViewModel> SignInAsync()
         {
-            var user = await _googleUserService.GetUserInfoAsync();
-            if (user == null)
+            var userResponse = await _googleApiService.GetUser();
+            if (!userResponse.Succeed)
             {
                 await _dialogService.ShowMessageDialogAsync("Something happended...!", "User info not found");
                 return null;
             }
-
+            var user = userResponse.Result;
             var userExistsResponse = await _dataService.UserService
                 .ExistsAsync(u => u.GoogleUserID == user.ID);
 
@@ -261,7 +258,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
             var now = DateTimeOffset.UtcNow;
             ResponseDto<GoogleUser> userSaveResponse;
-            if (!response.Result)
+            if (!response.Succeed)
             {
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser
                 {
@@ -338,7 +335,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 true,
                 userSaveResponse.Result.Email);
 
-            await _googleUserService.DownloadProfileImage(user.ImageUrl, user.ID);
+            await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
 
             return _mapper.Map<GoogleUserViewModel>(userSaveResponse.Result);
         }
@@ -403,7 +400,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
             else if (!isNetworkAvailable)
             {
                 _messenger.Send(
-                    "Internet is not available, a full sync will not be performed", 
+                    "Internet is not available, a full sync will not be performed",
                     $"{MessageType.SHOW_IN_APP_NOTIFICATION}");
             }
             ChangeIsActiveStatus(false, id);

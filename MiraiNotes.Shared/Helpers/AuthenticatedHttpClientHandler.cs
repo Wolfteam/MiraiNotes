@@ -27,7 +27,6 @@ namespace MiraiNotes.Shared.Helpers
             _getGoogleAuthService = getGoogleAuthService;
             _getUserCredentialService = getUserCredentialService;
         }
-        //TODO: COMPLETE THIS SHIT
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -135,6 +134,7 @@ namespace MiraiNotes.Shared.Helpers
             }
             catch (Exception e)
             {
+                _logger.Error(e, $"{nameof(SendAsync)}: An unkown error occurred while trying to send request");
                 Debugger.Break();
             }
 

@@ -279,6 +279,16 @@ namespace MiraiNotes.UWP.ViewModels
             get => _appSettings.ShowCompletedTasks;
             set => _appSettings.ShowCompletedTasks = value;
         }
+
+        public bool AskBeforeDiscardChanges
+        {
+            get => _appSettings.AskBeforeDiscardChanges;
+            set
+            {
+                _appSettings.AskBeforeDiscardChanges = value;
+                RaisePropertyChanged(() => AskBeforeDiscardChanges);
+            }
+        }
         #endregion
 
         #region Synchronization Settings Properties

@@ -1,20 +1,8 @@
-﻿using GalaSoft.MvvmLight.Messaging;
-using MiraiNotes.UWP.Pages;
-using MiraiNotes.UWP.Pages.Settings;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+﻿using MiraiNotes.UWP.Pages;
+using MiraiNotes.UWP.Utils;
+using MiraiNotes.UWP.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -54,5 +42,23 @@ namespace MiraiNotes.UWP
         }
 
         private double CalculatePaneWidth(double actualWidth) => actualWidth * PANE_WIDTH_PERCENTAGE;
+
+        private void ClosePaneButton_Click(object sender, RoutedEventArgs e)
+        {
+            var vm = (NavPageViewModel)DataContext;
+
+            var newTaskPage = (MiscellaneousUtils.FindControl<SplitView>(this, "MainSplitView").Pane as Frame)
+                .Content as NewTaskPage;
+            var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
+
+            if (vm.IsPaneOpen
+                && newTaskVm.AppSettings.AskBeforeDiscardChanges
+                && newTaskVm.ChangesWereMade())
+            {
+                newTaskVm.ClosePaneCommand.Execute(null);
+                return;
+            }
+            vm.ClosePaneCommand.Execute(null);
+        }
     }
 }

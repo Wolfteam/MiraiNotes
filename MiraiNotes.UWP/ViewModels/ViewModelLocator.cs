@@ -5,7 +5,10 @@ using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using MiraiNotes.Abstractions.Data;
+using MiraiNotes.Abstractions.GoogleApi;
 using MiraiNotes.Abstractions.Services;
+using MiraiNotes.Shared;
+using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Services;
 using MiraiNotes.Shared.Services.Data;
 using MiraiNotes.UWP.BackgroundTasks;
@@ -15,12 +18,14 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Pages;
 using MiraiNotes.UWP.Services;
+using MiraiNotes.UWP.Utils;
 using MiraiNotes.UWP.ViewModels.Dialogs;
+using Refit;
 using Serilog;
 using Serilog.Filters;
+using System;
 using System.IO;
-using Windows.Storage;
-using IGoogleApiService = MiraiNotes.UWP.Interfaces.IGoogleApiService;
+using System.Net.Http;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -86,6 +91,9 @@ namespace MiraiNotes.UWP.ViewModels
         public ITelemetryService TelemetryService
             => ServiceLocator.Current.GetInstance<ITelemetryService>();
 
+        public IGoogleApiService GoogleApiService
+            => ServiceLocator.Current.GetInstance<IGoogleApiService>();
+
         public static bool IsAppRunning { get; set; }
         #endregion
 
@@ -95,57 +103,37 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
 
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-            var navigation = new NavigationService();
-            navigation.Configure(HOME_PAGE, typeof(MainPage));
-            navigation.Configure(LOGIN_PAGE, typeof(LoginPage));
 
-            var logger = SetupLogging();
-            SimpleIoc.Default.Register(() => logger);
-
-            var config = new MapperConfiguration(cfg =>
-            {
-                // Add all profiles in current assembly
-                cfg.AddProfiles(GetType().Assembly);
-                cfg.ConstructServicesUsing(t =>
-                {
-                    //ConstructServicesUsing gets called if you used it in the
-                    //mapping profile
-                    if (t == typeof(GoogleUserViewModel))
-                    {
-                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
-                    }
-                    return SimpleIoc.Default.GetInstance(t);
-                });
-            });
-
-            if (ViewModelBase.IsInDesignModeStatic)
-            {
-                SimpleIoc.Default.Register<IGoogleTaskListService, DesignGoogleTaskListService>();
-                SimpleIoc.Default.Register<IGoogleTaskService, DesignGoogleTaskService>();
-            }
-            else
-            {
-                SimpleIoc.Default.Register<IGoogleTaskListService, GoogleTaskListService>();
-                SimpleIoc.Default.Register<IGoogleTaskService, GoogleTaskService>();
-            }
+            SimpleIoc.Default.Register(SetupLogging);
             SimpleIoc.Default.Register<IMessenger, Messenger>();
             SimpleIoc.Default.Register<IDispatcherHelper, DispatcherHelperEx>();
             SimpleIoc.Default.Register<ICustomDialogService, CustomDialogService>();
-            SimpleIoc.Default.Register<INavigationService>(() => navigation);
+            SimpleIoc.Default.Register(SetupNavigation);
             SimpleIoc.Default.Register<IUserCredentialService, UserCredentialService>();
-            SimpleIoc.Default.Register(() => config.CreateMapper());
+            SimpleIoc.Default.Register(SetupMapper);
 
             SimpleIoc.Default.Register<AuthorizationHandler>();
-            SimpleIoc.Default.Register<IHttpClientsFactory, HttpClientsFactory>();
 
             SimpleIoc.Default.Register<IApplicationSettingsServiceBase, ApplicationSettingsServiceBase>();
             SimpleIoc.Default.Register<IAppSettingsService, AppSettingsService>();
-
             SimpleIoc.Default.Register<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
 
-            SimpleIoc.Default.Register<Abstractions.Services.IGoogleApiService, GoogleAuthService>();
-            SimpleIoc.Default.Register<IGoogleUserService, GoogleUserService>();
-            SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
+            if (ViewModelBase.IsInDesignModeStatic)
+                SimpleIoc.Default.Register<IGoogleApiService, DesignGoogleApiService>();
+            else
+                SimpleIoc.Default.Register<IGoogleApiService, GoogleApiService>();
+
+            var handler = new AuthenticatedHttpClientHandler(
+                Logger.ForContext<AuthenticatedHttpClientHandler>(),
+                () => GoogleApiService,
+                () => UserCredentialService);
+            var client = new HttpClient(handler)
+            {
+                BaseAddress = new Uri(AppConstants.BaseGoogleApiUrl)
+            };
+
+            var googleApiService = RestService.For<IGoogleApi>(client);
+            SimpleIoc.Default.Register(() => googleApiService);
 
             SimpleIoc.Default.Register<INetworkService, NetworkService>();
             SimpleIoc.Default.Register<ISyncService, SyncService>();
@@ -180,65 +168,57 @@ namespace MiraiNotes.UWP.ViewModels
         public static bool IsAppDependenciesRegistered()
             => ServiceLocator.IsLocationProviderSet;
 
+        private INavigationService SetupNavigation()
+        {
+            var navigation = new NavigationService();
+            navigation.Configure(HOME_PAGE, typeof(MainPage));
+            navigation.Configure(LOGIN_PAGE, typeof(LoginPage));
+            return navigation;
+        }
 
         private ILogger SetupLogging()
         {
             const string fileOutputTemplate = "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
+            string basePath = Path.Combine(MiscellaneousUtils.GetApplicationPath(), "Logs");
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource(typeof(NavPageViewModel).Namespace))
                     .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_app_.log"),
+                        Path.Combine(basePath, "vm_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
                 .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncService).Namespace}.{nameof(SyncService)}"))
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_sync_service_.log"),
+                        Path.Combine(basePath, "sync_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
                 .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskListDataService).Namespace}.{nameof(TaskListDataService)}"))
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskListDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_tasklist_data_service_.log"),
+                        Path.Combine(basePath, "data_tasklist_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
                 .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskDataService).Namespace}.{nameof(TaskDataService)}"))
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_task_data_service_.log"),
+                        Path.Combine(basePath, "data_task_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
                 .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(UserDataService).Namespace}.{nameof(UserDataService)}"))
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(UserDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_user_data_service_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncBackgroundTask).Namespace}.{nameof(SyncBackgroundTask)}"))
-                    .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_background_tasks_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MarkAsCompletedBackgroundTask).Namespace}.{nameof(MarkAsCompletedBackgroundTask)}"))
-                    .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_background_tasks_.log"),
+                        Path.Combine(basePath, "data_user_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
@@ -246,14 +226,58 @@ namespace MiraiNotes.UWP.ViewModels
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MiraiNotesDataService).FullName}"))
                     .WriteTo.File(
-                        Path.Combine(ApplicationData.Current.LocalFolder.Path, "Logs", "mirai_notes_data_main_service_.log"),
+                        Path.Combine(basePath, "data_main_service_.log"),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
                         shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncBackgroundTask).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "bg_sync_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MarkAsCompletedBackgroundTask).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "bg_marktaskascompleted_.log"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate,
+                        shared: true))
+                .WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(AuthenticatedHttpClientHandler).FullName}"))
+                    .WriteTo.File(
+                        Path.Combine(basePath, "auth_http_handler_.txt"),
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: fileOutputTemplate))
                 .CreateLogger();
             Log.Logger = logger;
             return logger;
+        }
+
+        private IMapper SetupMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                // Add all profiles in current assembly
+                cfg.AddProfile<MappingProfile>();
+                cfg.ConstructServicesUsing(t =>
+                {
+                    //ConstructServicesUsing gets called if you used it in the
+                    //mapping profile
+                    if (t == typeof(GoogleUserViewModel))
+                    {
+                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
+                    }
+                    return SimpleIoc.Default.GetInstance(t);
+                });
+            });
+
+            return config.CreateMapper();
         }
     }
 }

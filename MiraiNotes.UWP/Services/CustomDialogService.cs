@@ -1,4 +1,5 @@
-﻿using MiraiNotes.UWP.Interfaces;
+﻿using MiraiNotes.Abstractions.Services;
+using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Pages.Dialogs;
 using System;
@@ -11,6 +12,13 @@ namespace MiraiNotes.UWP.Services
 {
     public class CustomDialogService : ICustomDialogService
     {
+        private readonly IAppSettingsService _appSettings;
+
+        public CustomDialogService(IAppSettingsService appSettings)
+        {
+            _appSettings = appSettings;
+        }
+
         public async Task ShowErrorMessageDialogAsync(Exception error, string title)
         {
             await ShowMessageDialogAsync(title, error.Message, "Ok");
@@ -29,9 +37,9 @@ namespace MiraiNotes.UWP.Services
                 Content = message,
                 CloseButtonText = buttonText,
                 BorderBrush = GetBorderBrush(),
-                Background = GetBackgroundBrush(),
+                RequestedTheme = (ElementTheme)_appSettings.AppTheme
             };
-            
+
             await dialog.ShowAsync();
         }
 
@@ -52,14 +60,15 @@ namespace MiraiNotes.UWP.Services
             {
                 Title = title,
                 Content = message,
-                BorderBrush = GetBorderBrush(),
-                Background = GetBackgroundBrush(),
                 //IsPrimaryButtonEnabled = true,
                 PrimaryButtonText = yesButtonText,
                 //IsSecondaryButtonEnabled = true,
                 SecondaryButtonText = noButtonText,
-                CloseButtonText = cancelButtonText
+                CloseButtonText = cancelButtonText,
+                RequestedTheme = (ElementTheme)_appSettings.AppTheme
             };
+            dialog.BorderBrush = GetBorderBrush();
+
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.None)
@@ -93,13 +102,14 @@ namespace MiraiNotes.UWP.Services
             var dialog = new ContentDialog
             {
                 Content = inputTextBox,
-                BorderBrush = GetBorderBrush(),
-                Background = GetBackgroundBrush(),
                 Title = title,
                 IsSecondaryButtonEnabled = true,
                 PrimaryButtonText = okButtonText,
-                SecondaryButtonText = cancelButtonText
+                SecondaryButtonText = cancelButtonText,
+                RequestedTheme = (ElementTheme)_appSettings.AppTheme
             };
+
+            dialog.BorderBrush = GetBorderBrush();
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
@@ -138,11 +148,13 @@ namespace MiraiNotes.UWP.Services
                 Content = inputTextBox,
                 Title = title,
                 IsSecondaryButtonEnabled = true,
-                BorderBrush = GetBorderBrush(),
-                Background = GetBackgroundBrush(),
                 PrimaryButtonText = okButtonText,
-                SecondaryButtonText = cancelButtonText
+                SecondaryButtonText = cancelButtonText,
+                RequestedTheme = (ElementTheme)_appSettings.AppTheme
             };
+
+            dialog.BorderBrush = GetBorderBrush();
+
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
@@ -180,14 +192,12 @@ namespace MiraiNotes.UWP.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dialogType), dialogType, "The provided dialog type doesnt exists");
             }
+            dialog.RequestedTheme = (ElementTheme)_appSettings.AppTheme;
             result = await dialog.ShowAsync();
             if (result == ContentDialogResult.None)
                 return false;
             return result == ContentDialogResult.Primary;
         }
-
-        private AcrylicBrush GetBackgroundBrush()
-            => Application.Current.Resources["ContentDialogBackground"] as AcrylicBrush;
 
         private SolidColorBrush GetBorderBrush()
             => Application.Current.Resources["SystemControlBackgroundAccentBrush"] as SolidColorBrush;

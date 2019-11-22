@@ -63,10 +63,13 @@ namespace MiraiNotes.UWP.ViewModels
         private ObservableCollection<TaskListItemViewModel> _taskLists =
             new ObservableCollection<TaskListItemViewModel>();
 
+        private int _selectedTaskIndex;
+
         private bool _showMoveTaskFlyoutProgressBar;
 
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
 
+        public int DesiredTaskIndex = -1;
         #endregion
 
         #region Properties
@@ -75,6 +78,12 @@ namespace MiraiNotes.UWP.ViewModels
         {
             get { return _tasks; }
             set { _tasks = value; }
+        }
+
+        public int SelectedTaskIndex
+        {
+            get => _selectedTaskIndex;
+            set => Set(ref _selectedTaskIndex, value);
         }
 
         public SmartObservableCollection<ItemModel> TaskAutoSuggestBoxItems
@@ -299,6 +308,15 @@ namespace MiraiNotes.UWP.ViewModels
                 this,
                 $"{MessageType.DEFAULT_TASK_SORT_ORDER_CHANGED}",
                 SortTasks);
+            _messenger.Register<string>(
+                this,
+                $"{MessageType.TASK_CHANGES_WERE_DISCARDED}",
+                taskId =>
+                {
+                    if (DesiredTaskIndex != -1)
+                        SelectedTaskIndex = DesiredTaskIndex;
+                    DesiredTaskIndex = -1;
+                });
         }
 
         private void SetCommands()
@@ -382,6 +400,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         public async Task GetAllTasksAsync(TaskListItemViewModel taskList)
         {
+            UpdateSelectedTasksText(0);
             if (taskList == null)
             {
                 OnNoTaskListAvailable();
@@ -1140,8 +1159,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         private void UpdateSelectedTasksText(int selectedTasks)
         {
-            SelectedTasksText = selectedTasks > 0 
-                ? $"You have selected {selectedTasks} task(s)" 
+            SelectedTasksText = selectedTasks > 0
+                ? $"You have selected {selectedTasks} task(s)"
                 : string.Empty;
         }
 

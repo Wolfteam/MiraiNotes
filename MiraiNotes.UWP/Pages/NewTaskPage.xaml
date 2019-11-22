@@ -163,6 +163,7 @@
                     MaxLength="50"
                     PlaceholderText="Enter your task title here"
                     Text="{Binding CurrentTask.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextChanged="TaskTitle_TextBox_TextChanged"
                     TextWrapping="NoWrap" />
                 <TextBlock
                     Style="{StaticResource ValidationErrorLabelStyle}"
@@ -194,6 +195,7 @@
                         PlaceholderText="Enter your task text here"
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         Text="{Binding CurrentTask.Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        TextChanged="TaskBody_TextBox_TextChanged"
                         TextWrapping="Wrap" />
                     <TextBlock
                         Grid.Row="1"

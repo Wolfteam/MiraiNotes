@@ -59,7 +59,12 @@ namespace MiraiNotes.UWP.Services
         }
 
         public bool AskForFingerPrintWhenAppStarts { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string SelectedTaskListId { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public string SelectedTaskListId
+        {
+            get => _settings[nameof(SelectedTaskListId)] as string;
+            set => _settings[nameof(SelectedTaskListId)] = value;
+        }
+
         public string CurrentAppMigration
         {
             get => _settings[nameof(CurrentAppMigration)] as string;
@@ -101,7 +106,12 @@ namespace MiraiNotes.UWP.Services
             get => (bool)(_settings[nameof(ShowToastNotificationForCompletedTasks)] ?? false);
             set => _settings[nameof(ShowToastNotificationForCompletedTasks)] = value;
         }
-        public bool AskBeforeDiscardChanges { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+        public bool AskBeforeDiscardChanges
+        {
+            get => (bool)(_settings[nameof(AskBeforeDiscardChanges)] ?? false);
+            set => _settings[nameof(AskBeforeDiscardChanges)] = value;
+        }
         #endregion
 
         public void ResetAppSettings()
