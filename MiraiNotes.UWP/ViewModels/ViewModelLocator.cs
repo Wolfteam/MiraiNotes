@@ -24,6 +24,7 @@ using Refit;
 using Serilog;
 using Serilog.Filters;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 
@@ -180,83 +181,36 @@ namespace MiraiNotes.UWP.ViewModels
         {
             const string fileOutputTemplate = "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
             string basePath = Path.Combine(MiscellaneousUtils.GetApplicationPath(), "Logs");
+            var logs = new Dictionary<string, string>
+            {
+                {typeof(NavPageViewModel).Namespace, "vm_.log" },
+                {$"{typeof(SyncService).FullName}", "sync_service_.log" },
+                {$"{typeof(TaskListDataService).FullName}", "data_tasklist_service_.log" },
+                {$"{typeof(TaskDataService).FullName}", "data_task_service_.log" },
+                {$"{typeof(UserDataService).FullName}", "data_user_service_.log" },
+                {$"{typeof(MiraiNotesDataService).FullName}", "data_main_service_.log" },
+                {$"{typeof(SyncBackgroundTask).FullName}",  "bg_sync_.log"},
+                {$"{typeof(MarkAsCompletedBackgroundTask).FullName}",  "bg_marktaskascompleted_.log"},
+                {$"{typeof(AuthenticatedHttpClientHandler).FullName}", "auth_http_handler_.txt" }
+            };
 
-            var logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource(typeof(NavPageViewModel).Namespace))
+            var loggerConfig = new LoggerConfiguration()
+                .MinimumLevel.Verbose();
+
+            foreach (var kvp in logs)
+            {
+                loggerConfig.WriteTo.Logger(l => l
+                    .Filter.ByIncludingOnly(Matching.FromSource(kvp.Key))
                     .WriteTo.File(
-                        Path.Combine(basePath, "vm_.log"),
+                        Path.Combine(basePath, kvp.Value),
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
                         outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncService).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "sync_service_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskListDataService).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "data_tasklist_service_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(TaskDataService).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "data_task_service_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(UserDataService).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "data_user_service_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MiraiNotesDataService).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "data_main_service_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(SyncBackgroundTask).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "bg_sync_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(MarkAsCompletedBackgroundTask).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "bg_marktaskascompleted_.log"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate,
-                        shared: true))
-                .WriteTo.Logger(l => l
-                    .Filter.ByIncludingOnly(Matching.FromSource($"{typeof(AuthenticatedHttpClientHandler).FullName}"))
-                    .WriteTo.File(
-                        Path.Combine(basePath, "auth_http_handler_.txt"),
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: fileOutputTemplate))
-                .CreateLogger();
-            Log.Logger = logger;
-            return logger;
+                        shared: true));
+            }
+
+            Log.Logger = loggerConfig.CreateLogger();
+            return Log.Logger;
         }
 
         private IMapper SetupMapper()
