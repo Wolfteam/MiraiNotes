@@ -116,7 +116,7 @@ namespace MiraiNotes.Android
             var externalFolder = Application.Context.GetExternalFilesDir(null).AbsolutePath;
             var basePath = Path.Combine(externalFolder, "Logs");
 
-            var logger = new LoggerConfiguration().MinimumLevel
+            var loggerConfig = new LoggerConfiguration().MinimumLevel
                 .Verbose();
             var logs = new Dictionary<string, string>
             {
@@ -157,7 +157,7 @@ namespace MiraiNotes.Android
 
             foreach (var kvp in logs)
             {
-                logger.WriteTo.Logger(l => l
+                loggerConfig.WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(Matching.FromSource(kvp.Key))
                     .WriteTo.File(
                         Path.Combine(basePath, kvp.Value),
@@ -168,7 +168,7 @@ namespace MiraiNotes.Android
 
             //for some reason, .log format doesnt work.. but no problem
             //i can use .txt or .json
-            Log.Logger = logger.WriteTo.AndroidLog()
+            Log.Logger = loggerConfig.WriteTo.AndroidLog()
                 //Sets the Tag field.
                 .Enrich.WithProperty(Constants.SourceContextPropertyName, "MiraiSoft")
                 .CreateLogger();

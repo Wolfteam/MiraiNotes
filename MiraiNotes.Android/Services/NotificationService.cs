@@ -136,6 +136,11 @@ namespace MiraiNotes.Android.Services
 
         public void ShowNotification(TaskNotification notification)
         {
+            //This avoid replacing an existing notification
+            if (notification.Id == 0)
+            {
+                notification.Id  = (int)DateTime.Now.Ticks;
+            }
             var builder = BuildSimpleNotification(notification);
             var notif = builder.Build();
             NotifManager.Notify(notification.Id, notif);
