@@ -76,12 +76,12 @@ namespace MiraiNotes.Android.Services
 
         private void RegisterTask(int id, long runEach)
         {
-            //var constraints = new Constraints.Builder()
-            //    .SetRequiresBatteryNotLow(true)
-            //    .Build();
+            var constraints = new Constraints.Builder()
+                .SetRequiredNetworkType(NetworkType.Connected)
+                .Build();
             var workRequest = PeriodicWorkRequest.Builder
                 .From<SyncBackgroundTask>(TimeSpan.FromMinutes(runEach))
-                //.SetConstraints(constraints)
+                .SetConstraints(constraints)
                 .AddTag($"{id}")
                 .Build();
             WorkManager.Instance.EnqueueUniquePeriodicWork($"{id}", ExistingPeriodicWorkPolicy.Replace, workRequest);
