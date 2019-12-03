@@ -258,7 +258,11 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
             var now = DateTimeOffset.UtcNow;
             ResponseDto<GoogleUser> userSaveResponse;
+
             if (!response.Succeed)
+                throw new Exception($"Couldnt check if userId = {user.ID} exists on db");
+
+            if (!response.Result)
             {
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser
                 {
