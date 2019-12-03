@@ -9,6 +9,6 @@ namespace MiraiNotes.UWP.ViewModels
         /// Used to open a specific task inside a task list.
         /// Stores the taskListID and taskID provided from a launched or navigated args
         /// </summary>
-        public static Tuple<string, string> InitDetails { get; set; }
+        public static Tuple<int, int> InitDetails { get; set; }
     }
 }

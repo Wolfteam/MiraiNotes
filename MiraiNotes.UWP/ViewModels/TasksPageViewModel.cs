@@ -443,11 +443,9 @@ namespace MiraiNotes.UWP.ViewModels
             CurrentTaskList = taskList;
 
             //If we have something in the init details, lets select that task
-            if (InitDetails is null == false &&
-                !string.IsNullOrEmpty(InitDetails.Item1) &&
-                !string.IsNullOrEmpty(InitDetails.Item2))
+            if (InitDetails != null)
             {
-                var selectedTask = Tasks.FirstOrDefault(t => t.TaskID == InitDetails.Item2);
+                var selectedTask = Tasks.FirstOrDefault(t => t.Id == InitDetails.Item2);
                 if (selectedTask is null == false)
                     selectedTask.IsSelected = true;
                 InitDetails = null;
@@ -1201,13 +1199,18 @@ namespace MiraiNotes.UWP.ViewModels
             TaskListItemViewModel taskList,
             GoogleTask task)
         {
+            if (!TasksHelper.CanReAddReminder(task.RemindOn.Value))
+            {
+                return;
+            }
+
             string notes = TasksHelper.GetNotesForNotification(task.Notes);
             _notificationService.RemoveScheduledNotification(notificationId);
             _notificationService.ScheduleNotification(new TaskReminderNotification
             {
                 Id = notificationId,
-                TaskListId = taskList.TaskListID,
-                TaskId = task.GoogleTaskID,
+                TaskListId = taskList.Id,
+                TaskId = task.ID,
                 TaskListTitle = taskList.Title,
                 TaskTitle = task.Title,
                 TaskBody = notes,

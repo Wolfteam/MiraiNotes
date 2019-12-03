@@ -173,8 +173,7 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task InitView(bool onFullSync = false)
         {
-            string selectedTaskListID = null;
-
+            int selectedTaskListID;
             if (!onFullSync && AppSettings.RunSyncBackgroundTaskAfterStart)
             {
                 _dialogService.ShowSnackBar("Running a full sync...");
@@ -183,15 +182,16 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             //If we have something in the init params, lets select that task list
-            selectedTaskListID = !onFullSync && InitParams != null
+            selectedTaskListID = !onFullSync && InitParams != null 
                 ? InitParams.TaskListId
-                : AppSettings.SelectedTaskListId;
+                : AppSettings.SelectedDbTaskListId;
 
             TaskLists.Clear();
             var dbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(
-                    tl => tl.User.IsActive && tl.LocalStatus != LocalStatus.DELETED,
+                    tl => tl.User.IsActive && 
+                        tl.LocalStatus != LocalStatus.DELETED,
                     includeProperties: nameof(GoogleTaskList.Tasks));
 
             if (!dbResponse.Succeed)
@@ -209,6 +209,7 @@ namespace MiraiNotes.Android.ViewModels
                 taskList.NumberOfTasks = dbResponse.Result
                     .First(tl => tl.GoogleTaskListID == taskList.GoogleId)
                     .Tasks
+                    .Where(t => t.LocalStatus != LocalStatus.DELETED)
                     .Count();
             }
 
@@ -216,11 +217,11 @@ namespace MiraiNotes.Android.ViewModels
 
             SortTaskLists(AppSettings.DefaultTaskListSortOrder);
 
-            SelectedTaskList = TaskLists.Any(tl => tl.GoogleId == selectedTaskListID)
-                ? TaskLists.First(tl => tl.GoogleId == selectedTaskListID)
+            SelectedTaskList = TaskLists.Any(tl => tl.Id == selectedTaskListID)
+                ? TaskLists.First(tl => tl.Id == selectedTaskListID)
                 : TaskLists.FirstOrDefault();
 
-            AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
+            AppSettings.SelectedDbTaskListId = SelectedTaskList.Id;
 
             TaskListsWereLoaded(Parameter.OrientationChanged);
         }
@@ -254,7 +255,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             var taskList = TaskLists[position];
             SelectedTaskList = taskList;
-            AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
+            AppSettings.SelectedDbTaskListId = SelectedTaskList.Id;
 
             var parameter = TasksViewModelParameter.Instance(InitParams, taskList);
             var tasks = new List<Task>
@@ -296,7 +297,7 @@ namespace MiraiNotes.Android.ViewModels
         private void OnTaskListDeleted(TaskListDeletedMsg msg)
         {
             bool dontSetSelectedTaskList = true;
-            if (AppSettings.SelectedTaskListId == msg.TaskList.GoogleId)
+            if (AppSettings.SelectedDbTaskListId == msg.TaskList.Id)
             {
                 var deletedTaskList = TaskLists.FirstOrDefault(tl => tl.GoogleId == msg.TaskList.GoogleId);
                 if (deletedTaskList == null)
@@ -312,7 +313,7 @@ namespace MiraiNotes.Android.ViewModels
                     SelectedTaskList = TaskLists[removedIndex + 1];
                 }
 
-                AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
+                AppSettings.SelectedDbTaskListId = SelectedTaskList.Id;
                 dontSetSelectedTaskList = false;
             }
             TaskLists.RemoveAll(tl => tl.GoogleId == msg.TaskList.GoogleId);
@@ -337,7 +338,7 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             SelectedTaskList = msg.TaskList;
-            AppSettings.SelectedTaskListId = SelectedTaskList.GoogleId;
+            AppSettings.SelectedDbTaskListId = SelectedTaskList.Id;
             TaskListsWereLoaded(dontSetSelectedTaskList);
         }
     }

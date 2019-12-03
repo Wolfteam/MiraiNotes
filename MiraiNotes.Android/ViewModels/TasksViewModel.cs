@@ -205,11 +205,11 @@ namespace MiraiNotes.Android.ViewModels
             IsBusy = false;
 
             //If we have something in the init params, lets select that task
-            if (InitParams != null && Tasks.Any(t => t.GoogleId == InitParams.TaskId))
+            if (InitParams != null && Tasks.Any(t => t.Id == InitParams.TaskId))
             {
-                string taskId = InitParams.TaskId;
+                var task = Tasks.First(t => t.Id == InitParams.TaskId);
                 InitParams = null;
-                await OnTaskSelected(taskId);
+                await OnTaskSelected(task.GoogleId);
             }
         }
 

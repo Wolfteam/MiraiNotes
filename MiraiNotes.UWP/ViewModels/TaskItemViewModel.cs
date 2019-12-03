@@ -20,6 +20,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         #endregion
 
+        public int Id { get; set; }
+
         public string TaskID
         {
             get => _taskID;

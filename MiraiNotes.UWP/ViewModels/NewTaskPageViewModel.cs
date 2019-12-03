@@ -457,8 +457,8 @@ namespace MiraiNotes.UWP.ViewModels
                 _notificationService.ScheduleNotification(new TaskReminderNotification
                 {
                     Id = id,
-                    TaskListId = _currentTaskList.TaskListID,
-                    TaskId = CurrentTask.TaskID,
+                    TaskListId = _currentTaskList.Id,
+                    TaskId = CurrentTask.Id,
                     TaskListTitle = _currentTaskList.Title,
                     TaskTitle = CurrentTask.Title,
                     TaskBody = notes,
@@ -666,7 +666,9 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             var movedTask = moveResponse.Result;
-            if (TasksHelper.HasReminderId(movedTask?.RemindOnGUID, out int id))
+            if (movedTask != null && 
+                TasksHelper.HasReminderId(movedTask.RemindOnGUID, out int id) && 
+                TasksHelper.CanReAddReminder(movedTask.RemindOn.Value))
             {
                 string notes = TasksHelper.GetNotesForNotification(movedTask.Notes);
 
@@ -674,8 +676,8 @@ namespace MiraiNotes.UWP.ViewModels
                 _notificationService.ScheduleNotification(new TaskReminderNotification
                 {
                     Id = id,
-                    TaskListId = SelectedTaskList.TaskListID,
-                    TaskId = movedTask.GoogleTaskID,
+                    TaskListId = SelectedTaskList.Id,
+                    TaskId = movedTask.ID,
                     TaskListTitle = SelectedTaskList.Title,
                     TaskTitle = movedTask.Title,
                     TaskBody = notes,

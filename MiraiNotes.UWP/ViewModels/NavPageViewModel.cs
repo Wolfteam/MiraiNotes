@@ -274,7 +274,7 @@ namespace MiraiNotes.UWP.ViewModels
 
         private async Task InitViewAsync(bool onFullSync = false)
         {
-            string selectedTaskListID = null;
+            int selectedTaskListID;
 
             if (!onFullSync && _appSettings.RunSyncBackgroundTaskAfterStart)
             {
@@ -283,13 +283,9 @@ namespace MiraiNotes.UWP.ViewModels
             }
 
             //If we have something in the init details, lets select that task list
-            if (!onFullSync &&
-                InitDetails is null == false &&
-                !string.IsNullOrEmpty(InitDetails.Item1) &&
-                !string.IsNullOrEmpty(InitDetails.Item2))
-                selectedTaskListID = InitDetails.Item1;
-            else
-                selectedTaskListID = _appSettings.SelectedTaskListId;
+            selectedTaskListID = !onFullSync && InitDetails != null
+                ? selectedTaskListID = InitDetails.Item1
+                : selectedTaskListID = _appSettings.SelectedDbTaskListId;
 
             _messenger.Send(true, $"{MessageType.SHOW_CONTENT_FRAME_PROGRESS_RING}");
 
@@ -323,8 +319,8 @@ namespace MiraiNotes.UWP.ViewModels
             //with that, the progress ring animation doesnt gets swallowed 
             await Task.Delay(500);
 
-            var taskList = TaskLists.Any(tl => tl.TaskListID == selectedTaskListID)
-                ? TaskLists.FirstOrDefault(tl => tl.TaskListID == selectedTaskListID)
+            var taskList = TaskLists.Any(tl => tl.Id == selectedTaskListID)
+                ? TaskLists.FirstOrDefault(tl => tl.Id == selectedTaskListID)
                 : TaskLists.FirstOrDefault();
 
             SelectedItem = taskList;
@@ -333,7 +329,7 @@ namespace MiraiNotes.UWP.ViewModels
             if (SelectedItem is null)
                 OnNavigationViewSelectionChangeAsync(SelectedItem);
             else
-                _appSettings.SelectedTaskListId = taskList.TaskListID;
+                _appSettings.SelectedDbTaskListId = taskList.Id;
         }
 
         public void OnTaskListAutoSuggestBoxTextChange(string currentText)
@@ -372,7 +368,7 @@ namespace MiraiNotes.UWP.ViewModels
             else if (selectedItem is TaskListItemViewModel taskList)
             {
                 CurrentTaskList = taskList;
-                _appSettings.SelectedTaskListId = taskList.TaskListID;
+                _appSettings.SelectedDbTaskListId = taskList.Id;
                 _messenger.Send(taskList, $"{MessageType.NAVIGATIONVIEW_SELECTION_CHANGED}");
             }
 
@@ -383,7 +379,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             TaskLists.Add(taskList);
             SelectedItem = taskList;
-            _appSettings.SelectedTaskListId = taskList.TaskListID;
+            _appSettings.SelectedDbTaskListId = taskList.Id;
         }
 
         public async Task LogoutAsync()
@@ -538,7 +534,7 @@ namespace MiraiNotes.UWP.ViewModels
                 {
                     var taskListToSelect = TaskLists[removedIndex - 1];
                     SelectedItem = taskListToSelect;
-                    _appSettings.SelectedTaskListId = taskListToSelect.TaskListID;
+                    _appSettings.SelectedDbTaskListId = taskListToSelect.Id;
                 }
                 else
                 {

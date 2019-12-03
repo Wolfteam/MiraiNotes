@@ -210,8 +210,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 _notificationService.ScheduleNotification(new TaskReminderNotification
                 {
                     Id = id,
-                    TaskListId = taskList.GoogleId,
-                    TaskId = task.GoogleId,
+                    TaskListId = taskList.Id,
+                    TaskId = task.Id,
                     TaskListTitle = taskList.Title,
                     TaskTitle = task.Title,
                     TaskBody = notes,

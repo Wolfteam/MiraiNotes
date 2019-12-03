@@ -2,7 +2,6 @@
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Core.Models.GoogleApi;
-using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.ViewModels;
 
 namespace MiraiNotes.UWP.Helpers

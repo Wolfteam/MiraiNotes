@@ -72,10 +72,10 @@ namespace MiraiNotes.Android.Services
             set => SetInt(nameof(AppLanguage), (int)value);
         }
 
-        public string SelectedTaskListId
+        public int SelectedDbTaskListId
         {
-            get => GetString(nameof(SelectedTaskListId));
-            set => SetString(nameof(SelectedTaskListId), value);
+            get => GetInt(nameof(SelectedDbTaskListId));
+            set => SetInt(nameof(SelectedDbTaskListId), value);
         }
 
         public bool AskBeforeDiscardChanges

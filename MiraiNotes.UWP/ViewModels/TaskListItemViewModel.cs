@@ -7,6 +7,8 @@ namespace MiraiNotes.UWP.ViewModels
     {
         private string _title;
 
+        public int Id { get; set; }
+
         public string TaskListID { get; set; }
 
         public string Title

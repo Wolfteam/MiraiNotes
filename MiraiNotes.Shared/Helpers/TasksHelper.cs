@@ -1,4 +1,6 @@
-﻿namespace MiraiNotes.Shared.Helpers
+﻿using System;
+
+namespace MiraiNotes.Shared.Helpers
 {
     public class TasksHelper
     {
@@ -15,6 +17,13 @@
                 return false;
 
             return int.TryParse(remindOnGuid, out id);
+        }
+
+        public static bool CanReAddReminder(DateTimeOffset date)
+        {
+            if (date < DateTime.Now)
+                return false;
+            return true;
         }
     }
 }

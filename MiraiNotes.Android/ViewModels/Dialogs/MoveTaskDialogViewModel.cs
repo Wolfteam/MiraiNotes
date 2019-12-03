@@ -66,7 +66,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 .TaskService
                 .MoveAsync(selectedTaskList.GoogleId, task.GoogleId, null, null);
 
-            if (moveResponse.Succeed && task.HasSubTasks)
+            if (moveResponse.Succeed)
             {
                 var movedTask = moveResponse.Result;
 
@@ -133,13 +133,18 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             TaskListItemViewModel taskList,
             GoogleTask task)
         {
+            if (!TasksHelper.CanReAddReminder(task.RemindOn.Value))
+            {
+                return;
+            }
+
             string notes = TasksHelper.GetNotesForNotification(task.Notes);
             _notificationService.RemoveScheduledNotification(notificationId);
             _notificationService.ScheduleNotification(new TaskReminderNotification
             {
                 Id = notificationId,
-                TaskListId = taskList.GoogleId,
-                TaskId = task.GoogleTaskID,
+                TaskListId = taskList.Id,
+                TaskId = task.ID,
                 TaskListTitle = taskList.Title,
                 TaskTitle = task.Title,
                 TaskBody = notes,
