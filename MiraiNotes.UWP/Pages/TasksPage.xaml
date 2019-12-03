@@ -172,7 +172,7 @@
                                     <CommandBar.PrimaryCommands>
                                         <AppBarButton
                                             Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
-                                            CommandParameter="{Binding TaskID}"
+                                            CommandParameter="{Binding}"
                                             Icon="Delete"
                                             Label="Delete"
                                             ToolTipService.ToolTip="Delete this task" />

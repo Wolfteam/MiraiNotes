@@ -2,6 +2,7 @@
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -14,6 +15,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
+        private readonly INotificationService _notificationService;
 
         public DeleteTaskDialogViewModel(
             ITextProvider textProvider,
@@ -23,11 +25,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IAppSettingsService appSettings,
             ITelemetryService telemetryService,
             IMiraiNotesDataService dataService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            INotificationService notificationService)
             : base(textProvider, messenger, logger.ForContext<DeleteTaskDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;
             _dialogService = dialogService;
+            _notificationService = notificationService;
         }
 
         public override void Prepare(TaskItemViewModel parameter)
@@ -61,6 +65,18 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             var deleteResponse = await _dataService
                 .TaskService
                 .RemoveTaskAsync(Parameter.GoogleId);
+
+            if (TasksHelper.HasReminderId(Parameter.RemindOnGUID, out int id))
+            {
+                _notificationService.RemoveScheduledNotification(id);
+            }
+
+            if (Parameter.HasSubTasks)
+            {
+                foreach (var st in Parameter.SubTasks)
+                    if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stReminderId))
+                        _notificationService.RemoveScheduledNotification(stReminderId);
+            }
 
             Messenger.Publish(new ShowProgressOverlayMsg(this, false));
 

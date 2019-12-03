@@ -8,6 +8,7 @@ using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -203,10 +204,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 task.RemindOn = response.Result.RemindOn;
                 task.RemindOnGUID = response.Result.RemindOnGUID;
 
-                string notes = task.Notes.Length > 15
-                    ? $"{task.Notes.Substring(0, 15)}...."
-                    : $"{task.Notes}....";
-
+                string notes = TasksHelper.GetNotesForNotification(task.Notes);
                 int id = int.Parse(guid);
                 _notificationService.RemoveScheduledNotification(id);
                 _notificationService.ScheduleNotification(new TaskReminderNotification

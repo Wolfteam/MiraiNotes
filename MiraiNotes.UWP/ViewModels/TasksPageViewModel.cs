@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using AutoMapper;
+﻿using AutoMapper;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Views;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Extensions;
+using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Utils;
 using MiraiNotes.UWP.Delegates;
-using MiraiNotes.UWP.Extensions;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
-using MiraiNotes.UWP.Utils;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MiraiNotes.UWP.ViewModels
 {
@@ -29,13 +27,11 @@ namespace MiraiNotes.UWP.ViewModels
 
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
-        private readonly INavigationService _navigationService;
-        private readonly IUserCredentialService _userCredentialService;
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly ISyncService _syncService;
         private readonly IBackgroundTaskManagerService _bgTaskManagerService;
         private readonly IAppSettingsService _appSettings;
+        private readonly INotificationService _notificationService;
 
         private TaskListItemViewModel _currentTaskList;
 
@@ -250,23 +246,19 @@ namespace MiraiNotes.UWP.ViewModels
         public TasksPageViewModel(
             ICustomDialogService dialogService,
             IMessenger messenger,
-            INavigationService navigationService,
-            IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            ISyncService syncService,
             IBackgroundTaskManagerService bgTaskManagerService,
-            IAppSettingsService appSettings)
+            IAppSettingsService appSettings,
+            INotificationService notificationService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
-            _navigationService = navigationService;
-            _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dataService = dataService;
-            _syncService = syncService;
             _bgTaskManagerService = bgTaskManagerService;
             _appSettings = appSettings;
+            _notificationService = notificationService;
 
             RegisterMessages();
             SetCommands();
@@ -335,8 +327,8 @@ namespace MiraiNotes.UWP.ViewModels
             NewTaskListCommand = new RelayCommand
                 (async () => await SaveNewTaskListAsync());
 
-            DeleteTaskCommand = new RelayCommand<string>
-                (async (taskID) => await DeleteTaskAsync(taskID));
+            DeleteTaskCommand = new RelayCommand<TaskItemViewModel>
+                (async (task) => await DeleteTaskAsync(task));
 
             DeleteSelectedTasksCommand = new RelayCommand
                 (async () => await DeleteSelectedTasksAsync());
@@ -853,7 +845,7 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public async Task DeleteTaskAsync(string taskID)
+        public async Task DeleteTaskAsync(TaskItemViewModel task)
         {
             bool deleteTask = await _dialogService.ShowConfirmationDialogAsync(
                 "Confirmation",
@@ -868,7 +860,20 @@ namespace MiraiNotes.UWP.ViewModels
 
             var deleteResponse = await _dataService
                 .TaskService
-                .RemoveTaskAsync(taskID);
+                .RemoveTaskAsync(task.TaskID);
+
+            if (TasksHelper.HasReminderId(task.RemindOnGUID, out int id))
+            {
+                _notificationService.RemoveScheduledNotification(id);
+            }
+
+            if (task.HasSubTasks)
+            {
+                foreach (var st in task.SubTasks)
+                    if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stReminderId))
+                        _notificationService.RemoveScheduledNotification(stReminderId);
+            }
+
 
             ShowTaskListViewProgressRing = false;
             _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
@@ -882,9 +887,9 @@ namespace MiraiNotes.UWP.ViewModels
             else
             {
                 _isSelectionInProgress = true;
-                Tasks.RemoveAll(t => t.TaskID == taskID);
+                Tasks.RemoveAll(t => t.TaskID == task.TaskID);
                 _isSelectionInProgress = false;
-                _messenger.Send(taskID, $"{MessageType.TASK_DELETED_FROM_CONTENT_FRAME}");
+                _messenger.Send(task.TaskID, $"{MessageType.TASK_DELETED_FROM_CONTENT_FRAME}");
             }
         }
 
@@ -916,6 +921,19 @@ namespace MiraiNotes.UWP.ViewModels
             var deleteResponse = await _dataService
                 .TaskService
                 .RemoveTaskAsync(tasksToDelete.Select(t => t.TaskID));
+
+            foreach (var task in tasksToDelete)
+            {
+                if (TasksHelper.HasReminderId(task.RemindOnGUID, out int id))
+                    _notificationService.RemoveScheduledNotification(id);
+
+                if (task.HasSubTasks)
+                {
+                    foreach (var st in task.SubTasks)
+                        if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stReminderId))
+                            _notificationService.RemoveScheduledNotification(stReminderId);
+                }
+            }
 
             ShowTaskListViewProgressRing = false;
             _messenger.Send(false, $"{MessageType.SHOW_PANE_FRAME_PROGRESS_RING}");
@@ -964,10 +982,16 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
+            if (TasksHelper.HasReminderId(selectedTask.RemindOnGUID, out int id))
+                ReAddReminderDate(id, selectedTaskList, dbResponse.Result);
+
             if (selectedTask.HasSubTasks)
             {
                 selectedTask.SubTasks.ForEach(st => st.ParentTask = dbResponse.Result.GoogleTaskID);
-                await MoveSubTasksAsync(selectedTaskList.TaskListID, selectedTask.SubTasks);
+                var subTaskMoved = await MoveSubTasksAsync(selectedTaskList.TaskListID, selectedTask.SubTasks);
+                foreach (var st in subTaskMoved)
+                    if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stNotifId))
+                        ReAddReminderDate(stNotifId, selectedTaskList, st);
             }
 
             ShowTaskListViewProgressRing = false;
@@ -1016,11 +1040,17 @@ namespace MiraiNotes.UWP.ViewModels
                     tasksNotMoved.Add(task.Title);
                 else
                 {
+                    if (TasksHelper.HasReminderId(task.RemindOnGUID, out int id))
+                        ReAddReminderDate(id, selectedTaskList, moveResponse.Result);
+
                     tasksMoved.Add(task.TaskID);
                     if (task.HasSubTasks)
                     {
                         task.SubTasks.ForEach(s => s.ParentTask = moveResponse.Result.GoogleTaskID);
-                        await MoveSubTasksAsync(selectedTaskList.TaskListID, task.SubTasks);
+                        var subTaskMoved = await MoveSubTasksAsync(selectedTaskList.TaskListID, task.SubTasks);
+                        foreach (var st in subTaskMoved)
+                            if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stNotifId))
+                                ReAddReminderDate(stNotifId, selectedTaskList, st);
                     }
                 }
             }
@@ -1050,17 +1080,19 @@ namespace MiraiNotes.UWP.ViewModels
                 .Invoke($"Moved {selectedTasks.Count()} task(s) to {selectedTaskList.Title}");
         }
 
-        public async Task MoveSubTasksAsync(string taskListID, IEnumerable<TaskItemViewModel> subTasks)
+        public async Task<List<GoogleTask>> MoveSubTasksAsync(string taskListID, IEnumerable<TaskItemViewModel> subTasks)
         {
-            var stList = new List<string>();
+            var stList = new List<GoogleTask>();
             foreach (var st in subTasks)
             {
                 var moveResponse = await _dataService
                     .TaskService
-                    .MoveAsync(taskListID, st.TaskID, st.ParentTask, stList.LastOrDefault());
+                    .MoveAsync(taskListID, st.TaskID, st.ParentTask, stList.LastOrDefault()?.GoogleTaskID);
                 if (moveResponse.Succeed)
-                    stList.Add(moveResponse.Result.GoogleTaskID);
+                    stList.Add(moveResponse.Result);
             }
+
+            return stList;
         }
 
         public void SortTasks(TaskSortType sortType)
@@ -1164,6 +1196,24 @@ namespace MiraiNotes.UWP.ViewModels
                 : string.Empty;
         }
 
+        private void ReAddReminderDate(
+            int notificationId,
+            TaskListItemViewModel taskList,
+            GoogleTask task)
+        {
+            string notes = TasksHelper.GetNotesForNotification(task.Notes);
+            _notificationService.RemoveScheduledNotification(notificationId);
+            _notificationService.ScheduleNotification(new TaskReminderNotification
+            {
+                Id = notificationId,
+                TaskListId = taskList.TaskListID,
+                TaskId = task.GoogleTaskID,
+                TaskListTitle = taskList.Title,
+                TaskTitle = task.Title,
+                TaskBody = notes,
+                DeliveryOn = task.RemindOn.Value
+            });
+        }
         #endregion
     }
 }

@@ -3,6 +3,9 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Core.Entities;
+using MiraiNotes.Core.Models;
+using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -17,6 +20,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
+        private readonly INotificationService _notificationService;
 
         public MoveTaskDialogViewModel(
             ITextProvider textProvider,
@@ -26,11 +30,13 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ITelemetryService telemetryService,
             IAppSettingsService appSettings,
             IMiraiNotesDataService dataService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            INotificationService notificationService)
             : base(textProvider, messenger, logger.ForContext<MoveTaskDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;
             _dialogService = dialogService;
+            _notificationService = notificationService;
         }
 
         public override void Prepare(MoveTaskDialogViewModelParameter parameter)
@@ -62,6 +68,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             if (moveResponse.Succeed && task.HasSubTasks)
             {
+                var movedTask = moveResponse.Result;
+
+                //If this task had a reminder, we need to recreate it
+                if (TasksHelper.HasReminderId(movedTask.RemindOnGUID, out int id))
+                {
+                    ReAddReminderDate(id, selectedTaskList, movedTask);
+                }
+
                 foreach (var st in task.SubTasks)
                 {
                     st.ParentTask = moveResponse.Result.GoogleTaskID;
@@ -102,8 +116,35 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                         $"{nameof(MoveSubTasksAsync)}: An error occurred while trying to move subtaskId = {st.GoogleId}. " +
                         $"Error = {moveResponse.Message}");
                 }
+                else
+                {
+                    var movedTask = moveResponse.Result;
+                    if (TasksHelper.HasReminderId(movedTask.RemindOnGUID, out int id))
+                    {
+                        ReAddReminderDate(id, Parameter.NewTaskList, movedTask);
+                    }
+                }
             }
         }
 
+
+        private void ReAddReminderDate(
+            int notificationId,
+            TaskListItemViewModel taskList,
+            GoogleTask task)
+        {
+            string notes = TasksHelper.GetNotesForNotification(task.Notes);
+            _notificationService.RemoveScheduledNotification(notificationId);
+            _notificationService.ScheduleNotification(new TaskReminderNotification
+            {
+                Id = notificationId,
+                TaskListId = taskList.GoogleId,
+                TaskId = task.GoogleTaskID,
+                TaskListTitle = taskList.Title,
+                TaskTitle = task.Title,
+                TaskBody = notes,
+                DeliveryOn = task.RemindOn.Value
+            });
+        }
     }
 }
