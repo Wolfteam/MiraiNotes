@@ -4,17 +4,27 @@ using MiraiNotes.Android.Models.Parameters;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
+using MvvmCross.ViewModels;
 using Serilog;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
     public class TaskMenuOptionsViewModel : BaseViewModel<TaskMenuOptionsViewModelParameter>
     {
+        #region Members
         private TaskListItemViewModel _taskList;
         private TaskItemViewModel _task;
         private string _markAsTitle;
         private bool _showAddSubTaskButton;
+        private MvxInteraction<TaskItemViewModel> _shareTask = new MvxInteraction<TaskItemViewModel>();
+        #endregion
 
+        #region Interactors
+        public IMvxInteraction<TaskItemViewModel> ShareTask
+            => _shareTask;
+
+        #endregion
+        #region Properties
         public string MarkAsTitle
         {
             get => _markAsTitle;
@@ -26,12 +36,16 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             get => _showAddSubTaskButton;
             set => SetProperty(ref _showAddSubTaskButton, value);
         }
+        #endregion
 
+        #region Commands
         public IMvxAsyncCommand DeleteTaskCommand { get; private set; }
         public IMvxAsyncCommand ChangeTaskStatusCommand { get; private set; }
         public IMvxAsyncCommand AddSubTaskCommand { get; private set; }
         public IMvxAsyncCommand MoveTaskCommand { get; private set; }
         public IMvxAsyncCommand AddReminderCommand { get; private set; }
+        public IMvxAsyncCommand ShareCommand { get; private set; } 
+        #endregion
 
         public TaskMenuOptionsViewModel(
             ITextProvider textProvider,
@@ -89,6 +103,12 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 var parameter = TaskDateViewModelParameter.Instance(_taskList, _task, Core.Enums.TaskNotificationDateType.REMINDER_DATE);
                 await NavigationService.Close(this);
                 await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, bool>(parameter);
+            });
+
+            ShareCommand = new MvxAsyncCommand(async() =>
+            {
+                _shareTask.Raise(Parameter.Task);
+                await NavigationService.Close(this);
             });
         }
     }

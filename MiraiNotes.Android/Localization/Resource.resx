@@ -544,4 +544,7 @@
   <data name="SyncRunning" xml:space="preserve">
     <value>Syncing your task and tasklist...</value>
   </data>
+  <data name="Share" xml:space="preserve">
+    <value>Share</value>
+  </data>
 </root>

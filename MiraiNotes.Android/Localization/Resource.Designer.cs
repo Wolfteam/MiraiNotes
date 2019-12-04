@@ -943,6 +943,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Share.
+        /// </summary>
+        public static string Share {
+            get {
+                return ResourceManager.GetString("Share", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show a notification after full sync.
         /// </summary>
         public static string ShowNotifAfterFullSync {
