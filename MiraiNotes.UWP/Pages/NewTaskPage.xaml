@@ -120,7 +120,7 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Orientation="Horizontal"
-                    Visibility="{Binding CurrentTask.IsReminderDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    Visibility="{Binding CurrentTask.HasAReminderDate, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ToolTipService.ToolTip>
                         <TextBlock>
                             <Run Text="A reminder has been set to" />

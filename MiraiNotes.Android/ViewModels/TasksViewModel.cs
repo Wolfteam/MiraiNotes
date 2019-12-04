@@ -8,6 +8,7 @@ using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
@@ -27,6 +28,7 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
+        private readonly IBackgroundTaskManagerService _backgroundTaskManager;
 
         private TaskListItemViewModel _currentTaskList;
         private MvxObservableCollection<TaskItemViewModel> _tasks = new MvxObservableCollection<TaskItemViewModel>();
@@ -64,7 +66,7 @@ namespace MiraiNotes.Android.ViewModels
 
         #region Commands
         public IMvxAsyncCommand<TaskItemViewModel> TaskSelectedCommand { get; private set; }
-        public IMvxAsyncCommand RefreshTasksCommand { get; private set; }
+        public IMvxCommand RefreshTasksCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskListCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskCommand { get; private set; }
         public IMvxAsyncCommand<TaskItemViewModel> ShowMenuOptionsDialogCommand { get; private set; }
@@ -81,12 +83,14 @@ namespace MiraiNotes.Android.ViewModels
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            ITelemetryService telemetryService)
+            ITelemetryService telemetryService,
+            IBackgroundTaskManagerService backgroundTaskManager)
             : base(textProvider, messenger, logger.ForContext<TasksViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
+            _backgroundTaskManager = backgroundTaskManager;
         }
 
         public override void Prepare(TasksViewModelParameter parameter)
@@ -109,7 +113,7 @@ namespace MiraiNotes.Android.ViewModels
             base.SetCommands();
             TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.GoogleId));
             
-            RefreshTasksCommand = new MvxAsyncCommand(Refresh);
+            RefreshTasksCommand = new MvxCommand(Refresh);
             
             AddNewTaskListCommand = new MvxAsyncCommand(
                 () => NavigationService.Navigate<AddEditTaskListDialogViewModel, TaskListItemViewModel, AddEditTaskListDialogViewModelResult>(null));
@@ -408,12 +412,13 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        private async Task Refresh()
+        private void Refresh()
         {
-            IsBusy = true;
-            await Task.Delay(2000);
-            // do refresh work here
-            IsBusy = false;
+            var parameter = new BackgroundTaskParameter
+            {
+                SyncOnlyTaskListId = _currentTaskList.Id
+            };
+            _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC, parameter);
         }
 
         private void SortTasks(TaskSortType sortType)

@@ -283,9 +283,6 @@ namespace MiraiNotes.UWP.ViewModels
             }
         }
 
-        public bool IsReminderDateSet
-            => RemindOn != null;
-
         public bool HasAReminderDate
             => RemindOn != null;
 

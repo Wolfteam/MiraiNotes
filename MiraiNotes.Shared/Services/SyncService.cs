@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Dto;
@@ -9,6 +5,10 @@ using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models.GoogleApi;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MiraiNotes.Shared.Services
 {
@@ -499,108 +499,11 @@ namespace MiraiNotes.Shared.Services
             var tasks = new List<Task>
             {
                 //Here we save the tasks that were created locally
-                Task.Run(async () =>
-                {
-                    var tasksToCreate = tasksToBeSyncedDbResponse.Result
-                        .Where(t => t.LocalStatus == LocalStatus.CREATED)
-                        .ToList();
-
-                    if (!tasksToCreate.Any())
-                        return;
-                    _logger.Information(
-                        $"{nameof(SyncUpTasksAsync)}: Trying to save remotely {tasksToCreate.Count} tasks");
-
-                    var parentTasks = tasksToCreate
-                        .Where(t => t.ParentTask == null)
-                        .OrderBy(t => t.Position)
-                        .ToList();
-
-                    foreach (var task in parentTasks)
-                    {
-                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to save remotely parent taskId = {task.ID}");
-                        string localID = task.GoogleTaskID;
-                        var result = await SaveUpTask(task);
-                        syncUpResults.Add(result);
-
-                        if (!result.Succeed)
-                            continue;
-
-                        foreach (var st in tasksToCreate
-                            .Where(st => st.ParentTask == localID))
-                        {
-                            _logger.Information(
-                                $"{nameof(SyncUpTasksAsync)}: TaskId = {st.ID} is a subtask of taskId = {task.ID}");
-                            st.ParentTask = task.GoogleTaskID;
-                        }
-                    }
-
-                    var subTasks = tasksToCreate
-                        .Where(t => t.ParentTask != null)
-                        .OrderBy(t => t.Position)
-                        .ToList();
-                    foreach (var task in subTasks)
-                    {
-                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to save remotely subtaskId = {task.ID}");
-                        string localID = task.GoogleTaskID;
-                        var result = await SaveUpTask(task);
-                        syncUpResults.Add(result);
-
-                        if (!result.Succeed)
-                            continue;
-
-                                                ////If this is a sub task and there are sts whose position depends in the current one
-                        ////we need to update them
-                        //else if (tasksToCreate.Any(st => st.Position == localID))
-                        //{
-                        //    //In theory this should only affect 1 st
-                        //    foreach (var st in tasksToCreate
-                        //        .Where(st => st.Position == localID))
-                        //    {
-                        //        st.Position = task.GoogleTaskID;
-                        //    }
-                        //}
-                    }
-                }),
-
+                SaveUpTasks(tasksToBeSyncedDbResponse.Result, syncUpResults),
                 //Here we save the tasks that were deleted locally
-                Task.Run(async () =>
-                {
-                    var tasksToDelete = tasksToBeSyncedDbResponse.Result
-                        .Where(t => t.LocalStatus == LocalStatus.DELETED)
-                        .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
-                        .ToList();
-
-                    if (!tasksToDelete.Any())
-                        return;
-                    _logger.Information(
-                        $"{nameof(SyncUpTasksAsync)}: Trying to delete remotely {tasksToDelete.Count} tasks");
-
-                    foreach (var task in tasksToDelete)
-                    {
-                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to delete remotely taskId = {task.ID}");
-                        syncUpResults.Add(await DeleteUpTask(task));
-                    }
-                }),
-
+                DeleteUpTasks(tasksToBeSyncedDbResponse.Result, syncUpResults),
                 //Here we update the tasks that were updated locally
-                Task.Run(async () =>
-                {
-                    var tasksToUpdate = tasksToBeSyncedDbResponse.Result
-                        .Where(t => t.LocalStatus == LocalStatus.UPDATED)
-                        .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
-                        .ToList();
-
-                    if (!tasksToUpdate.Any())
-                        return;
-                    _logger.Information(
-                        $"{nameof(SyncUpTasksAsync)}: Trying to update remotely {tasksToUpdate.Count} tasks");
-
-                    foreach (var task in tasksToUpdate)
-                    {
-                        _logger.Information($"{nameof(SyncUpTasksAsync)}: Trying to update remotely taskId = {task.ID}");
-                        syncUpResults.Add(await UpdateUpTask(task));
-                    }
-                })
+                UpdateUpTasks(tasksToBeSyncedDbResponse.Result, syncUpResults),
             };
 
             await Task.WhenAll(tasks);
@@ -618,6 +521,136 @@ namespace MiraiNotes.Shared.Services
 
             _logger.Information($"{nameof(SyncUpTasksAsync)}: Completed successfully");
             return syncUpResult;
+        }
+
+        public async Task<EmptyResponseDto> SyncTaskListAsync(int taskListId)
+        {
+            _logger.Information($"{nameof(SyncTaskListAsync)}: Trying to sync task list = {taskListId}");
+
+            if (!_networkService.IsInternetAvailable())
+            {
+                _logger.Warning($"{nameof(SyncTaskListAsync)}: Network is not available");
+                return new EmptyResponseDto
+                {
+                    Message = "Network is not available",
+                    Succeed = false
+                };
+            }
+
+            var dbResponse = await _dataService
+                .TaskListService
+                .FirstOrDefaultAsNoTrackingAsync(tl => tl.ID == taskListId);
+
+            if (!dbResponse.Succeed)
+            {
+                _logger.Error(
+                    $"{nameof(SyncTaskListAsync)}: Couldn't get taskListId = {taskListId} from db. " +
+                    $"Error = {dbResponse.Message}");
+                return dbResponse;
+            }
+
+            var taskList = dbResponse.Result;
+            if (taskList.LocalStatus == LocalStatus.CREATED)
+            {
+                _logger.Information(
+                    $"{nameof(SyncTaskListAsync)}: TaskListId = {taskListId} is locally created, " +
+                    $"trying to create it remotely...");
+                return await SaveUpTaskList(taskList);
+            }
+            else if (taskList.LocalStatus == LocalStatus.DELETED)
+            {
+                _logger.Information(
+                    $"{nameof(SyncTaskListAsync)}: TaskListId = {taskListId} is locally deleted, " +
+                    $"trying to delete it remotely...");
+                return await DeleteUpTaskList(taskList);
+            }
+            else
+            {
+                _logger.Information(
+                    $"{nameof(SyncTaskListAsync)}: TaskListId = {taskListId} has a status = {taskList.LocalStatus}, " +
+                    $"trying to update it remotely...");
+                //we just update the tasklist
+                return await UpdateUpTaskList(taskList);
+            }
+        }
+
+        public async Task<EmptyResponseDto> SyncTasksAsync(int taskListId)
+        {
+            _logger.Information($"{nameof(SyncTasksAsync)}: Trying to sync tasks associated to tasklist = {taskListId}");
+            var syncResult = new EmptyResponseDto
+            {
+                Message = string.Empty,
+                Succeed = false
+            };
+
+            if (!_networkService.IsInternetAvailable())
+            {
+                syncResult.Message = "Network is not available";
+                _logger.Warning($"{nameof(SyncTasksAsync)}: Network is not available");
+                return syncResult;
+            }
+
+            var tasksToBeSyncedDbResponse = await _dataService
+                .TaskService
+                .GetAsNoTrackingAsync(
+                    task => task.TaskListID == taskListId,
+                    includeProperties: nameof(GoogleTask.TaskList));
+
+            if (!tasksToBeSyncedDbResponse.Succeed)
+            {
+                _logger.Error(
+                    $"{nameof(SyncTasksAsync)}: Couldn't get taskListId = {taskListId} from db. " +
+                    $"Error = {tasksToBeSyncedDbResponse.Message}");
+                return tasksToBeSyncedDbResponse;
+            }
+
+            var syncResults = new List<EmptyResponseDto>();
+            var tasks = new List<Task>
+            {
+                //Here we save the tasks that were created locally
+                SaveUpTasks(tasksToBeSyncedDbResponse.Result, syncResults),
+                //Here we save the tasks that were deleted locally
+                DeleteUpTasks(tasksToBeSyncedDbResponse.Result, syncResults),
+                //Here we update the tasks that were updated locally
+                UpdateUpTasks(tasksToBeSyncedDbResponse.Result, syncResults, LocalStatus.UPDATED, LocalStatus.DEFAULT),
+            };
+
+            await Task.WhenAll(tasks);
+
+            if (syncResults.Any(r => !r.Succeed))
+            {
+                syncResult.Message = string.Join(
+                    $".{Environment.NewLine}",
+                    syncResults.Where(r => !r.Succeed).Select(r => r.Message));
+            }
+            else
+            {
+                syncResult.Succeed = true;
+            }
+
+            _logger.Information($"{nameof(SyncTasksAsync)}: Completed successfully");
+            return syncResult;
+        }
+
+        public async Task<List<EmptyResponseDto>> PerformSyncOnlyOn(int taskListId)
+        {
+            return new List<EmptyResponseDto>
+            {
+                await SyncTaskListAsync(taskListId),
+                await SyncTasksAsync(taskListId)
+            };
+        }
+
+        public async Task<List<EmptyResponseDto>> PerformFullSync(bool isInBackground)
+        {
+            var syncResults = new List<EmptyResponseDto>
+            {
+                await SyncDownTaskListsAsync(isInBackground),
+                await SyncDownTasksAsync(isInBackground),
+                await SyncUpTaskListsAsync(isInBackground),
+                await SyncUpTasksAsync(isInBackground)
+            };
+            return syncResults;
         }
         #endregion
 
@@ -871,6 +904,124 @@ namespace MiraiNotes.Shared.Services
             }
 
             return result;
+        }
+
+        private async Task SaveUpTasks(IEnumerable<GoogleTask> tasksToBeSynced, List<EmptyResponseDto> syncResults)
+        {
+            var tasksToCreate = tasksToBeSynced
+                .Where(t => t.LocalStatus == LocalStatus.CREATED)
+                .ToList();
+
+            if (!tasksToCreate.Any())
+            {
+                _logger.Information($"{nameof(SaveUpTasks)}: There are no local tasks with created status");
+                return;
+            }
+            _logger.Information(
+                $"{nameof(SyncUpTasksAsync)}: Trying to save remotely {tasksToCreate.Count} tasks");
+
+            var parentTasks = tasksToCreate
+                .Where(t => t.ParentTask == null)
+                .OrderBy(t => t.Position)
+                .ToList();
+
+            foreach (var task in parentTasks)
+            {
+                _logger.Information($"{nameof(SaveUpTasks)}: Trying to save remotely parent taskId = {task.ID}");
+                string localID = task.GoogleTaskID;
+                var result = await SaveUpTask(task);
+                syncResults.Add(result);
+
+                if (!result.Succeed)
+                    continue;
+
+                foreach (var st in tasksToCreate
+                    .Where(st => st.ParentTask == localID))
+                {
+                    _logger.Information(
+                        $"{nameof(SaveUpTasks)}: TaskId = {st.ID} is a subtask of taskId = {task.ID}");
+                    st.ParentTask = task.GoogleTaskID;
+                }
+            }
+
+            var subTasks = tasksToCreate
+                .Where(t => t.ParentTask != null)
+                .OrderBy(t => t.Position)
+                .ToList();
+            foreach (var task in subTasks)
+            {
+                _logger.Information($"{nameof(SaveUpTasks)}: Trying to save remotely subtaskId = {task.ID}");
+                string localID = task.GoogleTaskID;
+                var result = await SaveUpTask(task);
+                syncResults.Add(result);
+
+                if (!result.Succeed)
+                    continue;
+
+                ////If this is a sub task and there are sts whose position depends in the current one
+                ////we need to update them
+                //else if (tasksToCreate.Any(st => st.Position == localID))
+                //{
+                //    //In theory this should only affect 1 st
+                //    foreach (var st in tasksToCreate
+                //        .Where(st => st.Position == localID))
+                //    {
+                //        st.Position = task.GoogleTaskID;
+                //    }
+                //}
+            }
+        }
+
+        private async Task DeleteUpTasks(IEnumerable<GoogleTask> taskToBeSynced, List<EmptyResponseDto> syncResults)
+        {
+            var tasksToDelete = taskToBeSynced
+                .Where(t => t.LocalStatus == LocalStatus.DELETED)
+                .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
+                .ToList();
+
+            if (!tasksToDelete.Any())
+            {
+                _logger.Information($"{nameof(DeleteUpTasks)}: There are no local tasks with deleted status");
+                return;
+            }
+            _logger.Information(
+                $"{nameof(DeleteUpTasks)}: Trying to delete remotely {tasksToDelete.Count} tasks");
+
+            foreach (var task in tasksToDelete)
+            {
+                _logger.Information($"{nameof(DeleteUpTasks)}: Trying to delete remotely taskId = {task.ID}");
+                syncResults.Add(await DeleteUpTask(task));
+            }
+        }
+
+        private async Task UpdateUpTasks(
+            IEnumerable<GoogleTask> taskToBeSynced, 
+            List<EmptyResponseDto> syncResults, 
+            params LocalStatus[] filterBy)
+        {
+            if (filterBy.Length == 0)
+            {
+                filterBy = new[] { LocalStatus.UPDATED };
+            }
+
+            var tasksToUpdate = taskToBeSynced
+                .Where(t => filterBy.Contains(t.LocalStatus))
+                .OrderBy(t => t.ParentTask).ThenBy(t => t.Position)
+                .ToList();
+
+            if (!tasksToUpdate.Any())
+            {
+                _logger.Information($"{nameof(UpdateUpTasks)}: There are no local tasks with updated status");
+                return;
+            }
+            _logger.Information(
+                $"{nameof(UpdateUpTasks)}: Trying to update remotely {tasksToUpdate.Count} tasks");
+
+            foreach (var task in tasksToUpdate)
+            {
+                _logger.Information($"{nameof(UpdateUpTasks)}: Trying to update remotely taskId = {task.ID}");
+                syncResults.Add(await UpdateUpTask(task));
+            }
         }
         #endregion
     }

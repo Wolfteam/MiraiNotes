@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MiraiNotes.UWP.BackgroundTasks;
 using MiraiNotes.UWP.Helpers;
 using System;
@@ -35,13 +36,21 @@ namespace MiraiNotes.UWP.Services
 
         public void StartBackgroundTask(BackgroundTaskType backgroundTask)
         {
+            StartBackgroundTask(backgroundTask, null);
+        }
+
+        public void StartBackgroundTask(BackgroundTaskType backgroundTask, BackgroundTaskParameter parameter)
+        {
             //TODO: HANDLE MULTIPLE BG TASK START, YOU COULD DO IT BY USING APP SETTINGS
             switch (backgroundTask)
             {
                 case BackgroundTaskType.ANY:
                     throw new ArgumentOutOfRangeException("Its not allowed to start all the bg tasks at the same time");
                 case BackgroundTaskType.SYNC:
-                    new SyncBackgroundTask().Run(null);
+                    if (parameter is null)
+                        new SyncBackgroundTask().Run(null);
+                    else
+                        new SyncBackgroundTask(parameter.SyncOnlyTaskListId).Run(null);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"Cant start the provided bg task = {backgroundTask}");
