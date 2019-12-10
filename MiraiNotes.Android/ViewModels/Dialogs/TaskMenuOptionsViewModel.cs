@@ -1,6 +1,7 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -93,9 +94,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             MoveTaskCommand = new MvxAsyncCommand(async () =>
             {
-                var parameter = MoveToTaskListDialogViewModelParameter.Instance(_taskList, _task);
+                var parameter = TaskListsDialogViewModelParameter.MoveTo(_taskList, _task);
                 await NavigationService.Close(this);
-                await NavigationService.Navigate<MoveToTaskListDialogViewModel, MoveToTaskListDialogViewModelParameter, bool>(parameter);
+                await NavigationService
+                    .Navigate<TaskListsDialogViewModel, TaskListsDialogViewModelParameter, TaskListsDialogViewModelResult>(parameter);
             });
 
             AddReminderCommand = new MvxAsyncCommand(async () =>

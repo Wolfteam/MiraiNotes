@@ -186,13 +186,14 @@
     <Compile Include="Models\Parameters\AddSubTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MoveTaskDialogViewModelParameter.cs" />
-    <Compile Include="Models\Parameters\MoveToTaskListDialogViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\TaskListsDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
     <Compile Include="Models\Results\AddEditTaskListDialogViewModelResult.cs" />
     <Compile Include="Models\Results\NewTaskViewModelResult.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskDateViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TasksViewModelParameter.cs" />
+    <Compile Include="Models\Results\TaskListsDialogViewModelResult.cs" />
     <Compile Include="Services\BackgroundTaskManagerService.cs" />
     <Compile Include="Services\ValidatorFactory.cs" />
     <Compile Include="ViewModels\Dialogs\AccountDialogViewModel.cs" />
@@ -206,7 +207,7 @@
     <Compile Include="ViewModels\Dialogs\LogoutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ManageTaskListsDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\MoveTaskDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\MoveToTaskListDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\TaskListsDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\AddEditTaskListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\TaskMenuOptionsViewModel.cs" />
@@ -233,7 +234,7 @@
     <Compile Include="Views\Fragments\Dialogs\LogoutDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\ManageTaskListsDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\MoveTaskDialogFragment.cs" />
-    <Compile Include="Views\Fragments\Dialogs\MoveToTaskListDialogFragment.cs" />
+    <Compile Include="Views\Fragments\Dialogs\TaskListsDialogFragment.cs" />
     <Compile Include="Views\Fragments\Dialogs\PasswordDialogFragment.cs" />
     <Compile Include="Interfaces\IAndroidAppSettings.cs" />
     <Compile Include="Interfaces\IDialogService.cs" />
@@ -740,12 +741,12 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\MoveToTaskListDialog.xml">
+    <AndroidResource Include="Resources\layout\TaskListsDialog.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\MoveToTaskListDialogItem.xml">
+    <AndroidResource Include="Resources\layout\TaskListDialogItem.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -781,6 +782,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\ic_share_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_swap_horiz_black_24dp.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

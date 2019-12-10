@@ -32,6 +32,6 @@
         android:layout_height="wrap_content"
         android:choiceMode="singleChoice"
         android:nestedScrollingEnabled="true"
-        app:MvxItemTemplate="@layout/movetotasklistdialogitem"
+        app:MvxItemTemplate="@layout/tasklistdialogitem"
         app:MvxBind="ItemsSource TaskLists; SelectedItem CurrentTaskList; ItemClick TaskListSelectedCommand;"/>
 </LinearLayout>

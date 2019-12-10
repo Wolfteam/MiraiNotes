@@ -156,6 +156,46 @@
 
                 <View
                     style="@style/Divider"
+                    app:MvxBind="Visibility Visibility(Task.IsNew)"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:paddingBottom="10dp"
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground"
+                    app:MvxBind="Visibility Visibility(Task.IsNew); Click ChangeSelectedTaskListCommand">
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Change tasklist"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawableStart="@drawable/ic_swap_horiz_black_24dp"
+                        android:drawablePadding="10dp"
+                        android:clickable="false"
+                        android:background="@android:color/transparent"
+                        app:MvxBind="Text [ChangeTaskList];"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="-15dp"
+                        android:textColor="?AccentColor"
+                        android:textSize="@dimen/font_size_small"
+                        android:textStyle="italic"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:text="Task will be saved into: Task list 1"
+                        app:MvxBind="Text SelectedTaskListText;"/>
+                </LinearLayout>
+
+                <View
+                    style="@style/Divider"
                     app:MvxBind="Visibility InvertedVisibility(Task.HasParentTask)"/>
 
                 <Button

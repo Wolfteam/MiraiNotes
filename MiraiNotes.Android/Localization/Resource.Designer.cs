@@ -232,6 +232,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Change tasklist.
+        /// </summary>
+        public static string ChangeTaskList {
+            get {
+                return ResourceManager.GetString("ChangeTaskList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose an accent color.
         /// </summary>
         public static string ChooseAccentColor {
@@ -1236,6 +1245,15 @@ namespace MiraiNotes.Android.Localization {
         public static string TaskWasMoved {
             get {
                 return ResourceManager.GetString("TaskWasMoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task will be saved into: {0}.
+        /// </summary>
+        public static string TaskWillBeSavedInto {
+            get {
+                return ResourceManager.GetString("TaskWillBeSavedInto", resourceCulture);
             }
         }
         

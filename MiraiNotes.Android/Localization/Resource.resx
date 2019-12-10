@@ -550,4 +550,10 @@
   <data name="UseDarkAmoledTheme" xml:space="preserve">
     <value>Use dark amoled theme</value>
   </data>
+  <data name="ChangeTaskList" xml:space="preserve">
+    <value>Change tasklist</value>
+  </data>
+  <data name="TaskWillBeSavedInto" xml:space="preserve">
+    <value>Task will be saved into: {0}</value>
+  </data>
 </root>

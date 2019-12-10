@@ -182,7 +182,7 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             //If we have something in the init params, lets select that task list
-            selectedTaskListID = !onFullSync && InitParams != null 
+            selectedTaskListID = !onFullSync && InitParams != null
                 ? InitParams.TaskListId
                 : AppSettings.SelectedDbTaskListId;
 
@@ -190,7 +190,7 @@ namespace MiraiNotes.Android.ViewModels
             var dbResponse = await _dataService
                 .TaskListService
                 .GetAsNoTrackingAsync(
-                    tl => tl.User.IsActive && 
+                    tl => tl.User.IsActive &&
                         tl.LocalStatus != LocalStatus.DELETED,
                     includeProperties: nameof(GoogleTaskList.Tasks));
 
@@ -268,16 +268,19 @@ namespace MiraiNotes.Android.ViewModels
 
         private void UpdateNumberOfTasks(RefreshNumberOfTasksMsg msg)
         {
-            if (msg.WasAdded)
-                SelectedTaskList.NumberOfTasks += msg.AffectedItems;
-            else
-                SelectedTaskList.NumberOfTasks -= msg.AffectedItems;
+            if (msg.UpdateCurrentTaskList)
+            {
+                if (msg.WasAdded)
+                    SelectedTaskList.NumberOfTasks += msg.AffectedItems;
+                else
+                    SelectedTaskList.NumberOfTasks -= msg.AffectedItems;
 
-            if (SelectedTaskList.NumberOfTasks < 0)
-                SelectedTaskList.NumberOfTasks = 0;
+                if (SelectedTaskList.NumberOfTasks < 0)
+                    SelectedTaskList.NumberOfTasks = 0;
 
-            int position = TaskLists.IndexOf(SelectedTaskList);
-            _refreshNumberOfTasks.Raise(position);
+                int position = TaskLists.IndexOf(SelectedTaskList);
+                _refreshNumberOfTasks.Raise(position);
+            }
 
             if (msg.TaskWasMoved && TaskLists.Any(tl => tl.GoogleId == msg.MovedToTaskListId))
             {

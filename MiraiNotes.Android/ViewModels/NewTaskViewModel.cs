@@ -40,7 +40,6 @@ namespace MiraiNotes.Android.ViewModels
         private string _selectedTaskId;
         private bool _showProgressBar;
         private TaskItemViewModel _task = Mvx.IoCProvider.Resolve<TaskItemViewModel>();
-        private MvxObservableCollection<TaskListItemViewModel> _taskLists = new MvxObservableCollection<TaskListItemViewModel>();
         private TaskListItemViewModel _selectedTaskList;
 
         private ObservableDictionary<string, string> _errors = new ObservableDictionary<string, string>();
@@ -62,17 +61,8 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _task, value);
         }
 
-        public MvxObservableCollection<TaskListItemViewModel> TaskLists
-        {
-            get => _taskLists;
-            set => SetProperty(ref _taskLists, value);
-        }
-
-        public TaskListItemViewModel SelectedTaskList
-        {
-            get => _selectedTaskList;
-            set => SetProperty(ref _selectedTaskList, value);
-        }
+        public string SelectedTaskListText 
+            => TextProvider.Get("TaskWillBeSavedInto", _selectedTaskList.Title);
 
         public ObservableDictionary<string, string> Errors
         {
@@ -89,6 +79,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand AddSubTaskCommand { get; private set; }
         public IMvxAsyncCommand MoveTaskCommand { get; private set; }
         public IMvxAsyncCommand AddCompletitionDateCommand { get; private set; }
+        public IMvxAsyncCommand ChangeSelectedTaskListCommand { get; private set; }
         #endregion
 
         public NewTaskViewModel(
@@ -114,7 +105,9 @@ namespace MiraiNotes.Android.ViewModels
         {
             base.Prepare(parameter);
 
-            _currentTaskList = parameter.TaskList;
+            _currentTaskList = 
+                _selectedTaskList = 
+                    parameter.TaskList;
             _selectedTaskId = parameter.TaskId;
 
             Title = string.IsNullOrEmpty(_selectedTaskId)
@@ -125,8 +118,6 @@ namespace MiraiNotes.Android.ViewModels
         public override async Task Initialize()
         {
             await base.Initialize();
-
-            await LoadTaskLists();
 
             await InitView(_selectedTaskId);
         }
@@ -186,9 +177,10 @@ namespace MiraiNotes.Android.ViewModels
 
             MoveTaskCommand = new MvxAsyncCommand(async () =>
             {
-                var parameter = MoveToTaskListDialogViewModelParameter.Instance(_currentTaskList, Task);
-                bool wasMoved = await NavigationService.Navigate<MoveToTaskListDialogViewModel, MoveToTaskListDialogViewModelParameter, bool>(parameter);
-                if (wasMoved)
+                var parameter = TaskListsDialogViewModelParameter.MoveTo(_currentTaskList, Task);
+                var showResult = await NavigationService
+                    .Navigate<TaskListsDialogViewModel, TaskListsDialogViewModelParameter, TaskListsDialogViewModelResult>(parameter);
+                if (showResult?.WasMoved == true)
                 {
                     var result = NewTaskViewModelResult.Deleted(Task);
                     await NavigationService.Close(this, result);
@@ -198,6 +190,20 @@ namespace MiraiNotes.Android.ViewModels
             AddCompletitionDateCommand = new MvxAsyncCommand(() =>
             {
                 return AddDate(TaskNotificationDateType.TO_BE_COMPLETED_DATE);
+            });
+
+            ChangeSelectedTaskListCommand = new MvxAsyncCommand(async() =>
+            {
+                bool sameTaskList = _selectedTaskList.GoogleId == _currentTaskList.GoogleId;
+                var parameter = TaskListsDialogViewModelParameter.SelectTaskList(sameTaskList ? _currentTaskList : _selectedTaskList);
+                var showResult = await NavigationService
+                    .Navigate<TaskListsDialogViewModel, TaskListsDialogViewModelParameter, TaskListsDialogViewModelResult>(parameter);
+
+                if (showResult?.WasSelected == true)
+                {
+                    _selectedTaskList = showResult.TaskList;
+                    await RaisePropertyChanged(() => SelectedTaskListText);
+                }
             });
         }
 
@@ -211,34 +217,6 @@ namespace MiraiNotes.Android.ViewModels
             };
 
             SubscriptionTokens.AddRange(tokens);
-        }
-
-        private async Task LoadTaskLists()
-        {
-            ShowProgressBar = true;
-
-            var dbResponse = await _dataService
-                .TaskListService
-                .GetAsNoTrackingAsync(
-                    tl => tl.LocalStatus != LocalStatus.DELETED &&
-                          tl.User.IsActive,
-                    tl => tl.OrderBy(t => t.Title));
-
-            if (!dbResponse.Succeed)
-            {
-                ShowProgressBar = false;
-                Logger.Error(
-                    $"{nameof(LoadTaskLists)}: An error occurred while trying to retrieve all the task lists. " +
-                    $"Error = {dbResponse.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                return;
-            }
-
-            TaskLists = _mapper.Map<MvxObservableCollection<TaskListItemViewModel>>(dbResponse.Result);
-
-            SelectedTaskList = TaskLists
-                .FirstOrDefault(t => t.GoogleId == _currentTaskList.GoogleId);
-            ShowProgressBar = false;
         }
 
         public async Task InitView(string taskId)
@@ -288,7 +266,7 @@ namespace MiraiNotes.Android.ViewModels
             if (Errors.Any())
                 return;
 
-            if (SelectedTaskList?.GoogleId == null || _currentTaskList?.GoogleId == null)
+            if (_selectedTaskList?.GoogleId == null || _currentTaskList?.GoogleId == null)
             {
                 Logger.Error(
                     $"{nameof(SaveChanges)}: An error occurred while trying to { (isNewTask ? "save" : "update")} " +
@@ -300,7 +278,7 @@ namespace MiraiNotes.Android.ViewModels
             //If the task list selected in the combo is not the same as the one in the 
             //navigation view, its because we are trying to save/update a 
             //task into a different task list
-            bool moveToDifferentTaskList = SelectedTaskList.GoogleId != _currentTaskList.GoogleId;
+            bool moveToDifferentTaskList = _selectedTaskList.GoogleId != _currentTaskList.GoogleId;
 
             //If we are updating a task but also moving it into a different tasklist
             if (moveToDifferentTaskList && !isNewTask)
@@ -417,13 +395,13 @@ namespace MiraiNotes.Android.ViewModels
         {
             var response = await _dataService
                 .TaskService
-                .AddAsync(SelectedTaskList.GoogleId, entity);
+                .AddAsync(_selectedTaskList.GoogleId, entity);
 
             if (!response.Succeed)
             {
                 ShowProgressBar = false;
                 Logger.Error(
-                    $"{nameof(SaveChanges)}: An error occurred while trying to seve the task into {SelectedTaskList.Title}." +
+                    $"{nameof(SaveChanges)}: An error occurred while trying to seve the task into {_selectedTaskList.Title}." +
                     $"Error = {response.Message}");
                 _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return;
@@ -438,15 +416,15 @@ namespace MiraiNotes.Android.ViewModels
                 true,
                 Enumerable.Empty<TaskItemViewModel>().ToList());
 
-            _dialogService.ShowSnackBar(GetText("TaskWasCreated", SelectedTaskList.Title));
+            _dialogService.ShowSnackBar(GetText("TaskWasCreated", _selectedTaskList.Title));
 
             Task = _mapper.Map<TaskItemViewModel>(response.Result);
             Task.SubTasks = new MvxObservableCollection<TaskItemViewModel>(sts);
 
             int itemsAdded = 1 + subTasksToSave.Count;
-            var result = NewTaskViewModelResult.Created(Task, itemsAdded);
+            Messenger.Publish(new RefreshNumberOfTasksMsg(this, itemsAdded, _selectedTaskList.GoogleId, false));
 
-            //TODO: I SHOULD DO SOMETHING HERE WHEN MOVING THE TASK
+            var result = NewTaskViewModelResult.Nothing(Task);
             await NavigationService.Close(this, result);
         }
 
@@ -458,7 +436,7 @@ namespace MiraiNotes.Android.ViewModels
         {
             ShowProgressBar = true;
             string taskListId = moveToDifferentTaskList
-                ? SelectedTaskList.GoogleId
+                ? _selectedTaskList.GoogleId
                 : _currentTaskList.GoogleId;
 
             var orderedSubTasks = subTasksToSave.OrderBy(st => st.CreatedAt).ToList();

@@ -570,4 +570,10 @@
   <data name="UseDarkAmoledTheme" xml:space="preserve">
     <value>Usar el tema oscuro para pantallas amoled</value>
   </data>
+  <data name="ChangeTaskList" xml:space="preserve">
+    <value>Cambiar lista de tareas</value>
+  </data>
+  <data name="TaskWillBeSavedInto" xml:space="preserve">
+    <value>La tarea será guardada en : {0}</value>
+  </data>
 </root>

@@ -131,7 +131,7 @@ namespace MiraiNotes.Android
                 {$"{typeof(ChangeTaskStatusDialogViewModel).FullName}",  "vm_changetaskstatus_dialog.txt"},
                 {$"{typeof(DeleteTaskDialogViewModel).FullName}",  "vm_deletetask_dialog.txt"},
                 {$"{typeof(MoveTaskDialogViewModel).FullName}", "vm_movetask_dialog.txt" },
-                {$"{typeof(MoveToTaskListDialogViewModel).FullName}",  "vm_movetotasklist_dialog.txt"},
+                {$"{typeof(TaskListsDialogViewModel).FullName}",  "vm_tasklists_dialog.txt"},
                 {$"{typeof(PasswordDialogViewModel).FullName}", "vm_password_dialog.txt" },
                 {$"{typeof(AddEditTaskListDialogViewModel).FullName}",  "vm_add_edit_tasklists_dialog.txt"},
                 {$"{typeof(TaskMenuOptionsViewModel).FullName}", "vm_taskmenuoptions_dialog.txt" },
