@@ -197,7 +197,7 @@
     <value>This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later.</value>
   </data>
   <data name="AboutDonations" xml:space="preserve">
-    <value>I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.</value>
+    <value>I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email !</value>
   </data>
   <data name="AboutSupport" xml:space="preserve">
     <value>I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:</value>
@@ -546,5 +546,8 @@
   </data>
   <data name="Share" xml:space="preserve">
     <value>Share</value>
+  </data>
+  <data name="UseDarkAmoledTheme" xml:space="preserve">
+    <value>Use dark amoled theme</value>
   </data>
 </root>

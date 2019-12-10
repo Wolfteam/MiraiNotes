@@ -197,6 +197,13 @@
     <item name="TextInvertedColor">@color/White</item>
   </style>
 
+  <style name="BlackTheme">
+    <item name="android:colorPrimaryDark">@android:color/black</item>
+    <item name="android:navigationBarColor">@android:color/black</item>
+    <item name="android:windowBackground">@android:color/black</item>
+    <item name="AppBackground">@android:color/black</item>
+  </style>
+
   <!--Accent themes-->
 
   <!--LightBlue-->

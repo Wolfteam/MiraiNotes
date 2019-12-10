@@ -83,6 +83,12 @@ namespace MiraiNotes.Android.Services
             get => GetBoolean(nameof(AskBeforeDiscardChanges));
             set => SetBoolean(nameof(AskBeforeDiscardChanges), value);
         }
+
+        public bool UseDarkAmoledTheme
+        {
+            get => GetBoolean(nameof(UseDarkAmoledTheme));
+            set => SetBoolean(nameof(UseDarkAmoledTheme), value);
+        }
         #endregion
 
         #region Synchronization

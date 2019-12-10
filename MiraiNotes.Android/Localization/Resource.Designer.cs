@@ -70,7 +70,7 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email..
+        ///   Looks up a localized string similar to I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email !.
         /// </summary>
         public static string AboutDonations {
             get {
@@ -1353,6 +1353,15 @@ namespace MiraiNotes.Android.Localization {
         public static string UpdateTask {
             get {
                 return ResourceManager.GetString("UpdateTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use dark amoled theme.
+        /// </summary>
+        public static string UseDarkAmoledTheme {
+            get {
+                return ResourceManager.GetString("UseDarkAmoledTheme", resourceCulture);
             }
         }
         

@@ -77,6 +77,8 @@ namespace MiraiNotes.UWP.Services
             get => _settings[nameof(CurrentAppMigration)] as string;
             set => _settings[nameof(CurrentAppMigration)] = value;
         }
+
+        public bool UseDarkAmoledTheme { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         #endregion
 
 

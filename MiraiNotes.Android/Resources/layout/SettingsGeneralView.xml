@@ -39,6 +39,34 @@
                 app:MvxBind="ItemsSource AppThemes; SelectedItem SelectedAppTheme"
                 app:MvxItemTemplate="@layout/defaultspinneritem"
                 app:MvxDropDownItemTemplate="@layout/defaultspinneritem"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:background="?android:attr/selectableItemBackground"
+                app:MvxBind="Visibility Visibility(CanUseDarkAmoledTheme); Click UseDarkAmoledThemeCommand">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="wrap_content"
+                    android:text="Use dark amoled theme"
+                    android:textSize="@dimen/settings_font_size_content"
+                    app:MvxBind="Text ['UseDarkAmoledTheme']"/>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:layout_gravity="center_vertical"
+                    android:clickable="false"
+                    app:MvxBind="Checked UseDarkAmoledTheme"/>
+            </LinearLayout>
         </LinearLayout>
 
         <View

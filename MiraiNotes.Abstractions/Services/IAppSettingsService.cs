@@ -37,5 +37,7 @@ namespace MiraiNotes.Abstractions.Services
         bool AskBeforeDiscardChanges { get; set; }
 
         string CurrentAppMigration { get; set; }
+
+        bool UseDarkAmoledTheme { get; set; }
     }
 }

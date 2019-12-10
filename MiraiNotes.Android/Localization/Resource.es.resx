@@ -567,4 +567,7 @@
   <data name="Share" xml:space="preserve">
     <value>Compartir</value>
   </data>
+  <data name="UseDarkAmoledTheme" xml:space="preserve">
+    <value>Usar el tema oscuro para pantallas amoled</value>
+  </data>
 </root>

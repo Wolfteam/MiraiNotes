@@ -56,11 +56,11 @@ namespace MiraiNotes.Android.Views.Activities
             {
                 if (_changeThemeRequest != null)
                     _changeThemeRequest.Requested -= (sender, args)
-                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.RestartActivity);
+                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
 
                 _changeThemeRequest = value;
                 _changeThemeRequest.Requested += (sender, args)
-                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.RestartActivity);
+                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
             }
         }
         public IMvxInteraction ChangeLanguageRequest

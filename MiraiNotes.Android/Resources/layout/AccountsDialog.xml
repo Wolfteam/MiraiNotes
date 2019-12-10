@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/fab_margin"
-    android:background="?AppBackground"
     app:MvxBind="Visibility Visibility(IsDialogVisible)">
     <TextView
         android:layout_width="match_parent"
