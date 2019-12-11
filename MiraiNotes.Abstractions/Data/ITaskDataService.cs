@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
@@ -7,8 +9,22 @@ using MiraiNotes.Core.Enums;
 
 namespace MiraiNotes.Abstractions.Data
 {
-    public interface ITaskDataService : IRepository<GoogleTask>
+    public interface ITaskDataService
     {
+        Task<ResponseDto<GoogleTask>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> predicate);
+
+        Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "");
+
+        Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "");
+
+        Task<EmptyResponseDto> RemoveAsync(GoogleTask entity);
+
+        Task<EmptyResponseDto> RemoveAsync(Expression<Func<GoogleTask, bool>> filter);
+
+        Task<EmptyResponseDto> RemoveRangeAsync(IEnumerable<GoogleTask> entities);
+
+        Task<ResponseDto<GoogleTask>> UpdateAsync(GoogleTask entity);
+
         /// <summary>
         /// Adds a task to the task list indicated by <paramref name="taskListID"/>
         /// </summary>
