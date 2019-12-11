@@ -30,6 +30,7 @@ namespace MiraiNotes.Android.ViewModels
         private readonly MvxInteraction<TaskSortType> _updateTaskSortOrder = new MvxInteraction<TaskSortType>();
 
         private bool _showProgressOverlay;
+        private string _overlayText;
         #endregion
 
         #region Interactors
@@ -54,6 +55,12 @@ namespace MiraiNotes.Android.ViewModels
         {
             get => _showProgressOverlay;
             set => SetProperty(ref _showProgressOverlay, value);
+        }
+
+        public string OverlayText
+        {
+            get => _overlayText;
+            set => SetProperty(ref _overlayText, value);
         }
 
         public NotificationAction InitParams { get; set; }
@@ -133,6 +140,7 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<ShowProgressOverlayMsg>(msg =>
                 {
                     ShowProgressOverlay = msg.Show;
+                    OverlayText = !string.IsNullOrEmpty(msg.Msg) ? msg.Msg : $"{TextProvider.Get("Loading")}...";
                 }),
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => _updateTaskSortOrder.Raise(msg.NewSortOrder))
             };

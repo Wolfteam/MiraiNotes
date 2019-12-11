@@ -576,4 +576,10 @@
   <data name="TaskWillBeSavedInto" xml:space="preserve">
     <value>La tarea será guardada en : {0}</value>
   </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Cargando</value>
+  </data>
+  <data name="TaskListCantBeDeleted" xml:space="preserve">
+    <value>No puedes borrar esta lista de tareas</value>
+  </data>
 </root>

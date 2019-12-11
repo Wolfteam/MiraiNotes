@@ -98,7 +98,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             if (msg.Delete && TaskLists.Count == 1)
             {
-                _dialogService.ShowWarningToast("You cant delete the last task list");
+                _dialogService.ShowWarningToast(this["TaskListCantBeDeleted"]);
                 return;
             }
 

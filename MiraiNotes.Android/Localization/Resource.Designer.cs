@@ -556,6 +556,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading.
+        /// </summary>
+        public static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Logout.
         /// </summary>
         public static string Logout {
@@ -1182,6 +1191,15 @@ namespace MiraiNotes.Android.Localization {
         public static string TaskListAndTasks {
             get {
                 return ResourceManager.GetString("TaskListAndTasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You cant delete this task list.
+        /// </summary>
+        public static string TaskListCantBeDeleted {
+            get {
+                return ResourceManager.GetString("TaskListCantBeDeleted", resourceCulture);
             }
         }
         

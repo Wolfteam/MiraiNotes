@@ -6,10 +6,13 @@ namespace MiraiNotes.Android.Common.Messages
     {
         public bool Show { get; }
 
-        public ShowProgressOverlayMsg(object sender, bool show = true) 
+        public string Msg { get; set; }
+
+        public ShowProgressOverlayMsg(object sender, bool show = true, string msg = null) 
             : base(sender)
         {
             Show = show;
+            Msg = msg;
         }
     }
 }

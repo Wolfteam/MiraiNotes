@@ -143,7 +143,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             try
             {
                 IsDialogVisible = false;
-                Messenger.Publish(new ShowProgressOverlayMsg(this));
+                Messenger.Publish(new ShowProgressOverlayMsg(this, msg: $"{this["Syncing"]}..."));
                 var response = await _googleApiService.GetAccessTokenAsync(code);
 
                 if (!response.Succeed)

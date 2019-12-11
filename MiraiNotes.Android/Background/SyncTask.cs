@@ -62,7 +62,8 @@ namespace MiraiNotes.Android.Background
                     return;
                 }
 
-                await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this)));
+                string msg = $"{_textProvider.Get("Syncing")}...";
+                await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this, msg: msg)));
 
                 bool syncOnlyOneTaskList = _taskListId.HasValue;
                 if (syncOnlyOneTaskList)

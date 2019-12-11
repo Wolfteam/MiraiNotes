@@ -556,4 +556,10 @@
   <data name="TaskWillBeSavedInto" xml:space="preserve">
     <value>Task will be saved into: {0}</value>
   </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="TaskListCantBeDeleted" xml:space="preserve">
+    <value>You cant delete this task list</value>
+  </data>
 </root>
