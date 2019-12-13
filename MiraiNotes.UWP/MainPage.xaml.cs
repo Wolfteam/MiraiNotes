@@ -46,18 +46,18 @@ namespace MiraiNotes.UWP
         private void ClosePaneButton_Click(object sender, RoutedEventArgs e)
         {
             var vm = (NavPageViewModel)DataContext;
+            //TODO: IMPROVE THIS
+            //var newTaskPage = (MiscellaneousUtils.FindControl<SplitView>(this, "MainSplitView").Pane as Frame)
+            //    .Content as NewTaskPage;
+            //var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
 
-            var newTaskPage = (MiscellaneousUtils.FindControl<SplitView>(this, "MainSplitView").Pane as Frame)
-                .Content as NewTaskPage;
-            var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
-
-            if (vm.IsPaneOpen
-                && newTaskVm.AppSettings.AskBeforeDiscardChanges
-                && newTaskVm.ChangesWereMade())
-            {
-                newTaskVm.ClosePaneCommand.Execute(null);
-                return;
-            }
+            //if (vm.IsPaneOpen
+            //    && newTaskVm.AppSettings.AskBeforeDiscardChanges
+            //    && newTaskVm.ChangesWereMade())
+            //{
+            //    newTaskVm.ClosePaneCommand.Execute(null);
+            //    return;
+            //}
             vm.ClosePaneCommand.Execute(null);
         }
     }

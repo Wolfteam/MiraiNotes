@@ -258,7 +258,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
             var now = DateTimeOffset.UtcNow;
             ResponseDto<GoogleUser> userSaveResponse;
-            if (!response.Succeed)
+            if (!response.Result)
             {
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser
                 {
