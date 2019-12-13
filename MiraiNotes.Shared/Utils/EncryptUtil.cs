@@ -14,8 +14,7 @@ namespace MiraiNotes.Shared.Utils
                 return plainText;
             byte[] initVectorBytes = Encoding.UTF8.GetBytes(Secrets.InitVector);
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(Secrets.Password, null);
-            byte[] keyBytes = password.GetBytes(Secrets.KeySize / 8);
+            byte[] keyBytes = GetKeyBytes();
             RijndaelManaged symmetricKey = new RijndaelManaged
             {
                 Mode = CipherMode.CBC
@@ -38,8 +37,7 @@ namespace MiraiNotes.Shared.Utils
                 return cipherText;
             byte[] initVectorBytes = Encoding.UTF8.GetBytes(Secrets.InitVector);
             byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(Secrets.Password, null);
-            byte[] keyBytes = password.GetBytes(Secrets.KeySize / 8);
+            byte[] keyBytes = GetKeyBytes();
             RijndaelManaged symmetricKey = new RijndaelManaged
             {
                 Mode = CipherMode.CBC
@@ -53,6 +51,17 @@ namespace MiraiNotes.Shared.Utils
 
                 return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
             }
+        }
+
+        private static byte[] GetKeyBytes()
+        {
+            //for some reason, when i compile uwp with native code, it throws an exception
+#if Android
+            var password = new PasswordDeriveBytes(Secrets.Password, null);
+#else
+            var password = new Rfc2898DeriveBytes(Secrets.Password, Encoding.UTF8.GetBytes(Secrets.Salt));
+#endif
+            return password.GetBytes(Secrets.KeySize / 8);
         }
     }
 }
