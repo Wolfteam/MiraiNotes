@@ -13,7 +13,8 @@ namespace MiraiNotes.UWP.Converters
             int maxCharsAllowed = int.Parse((string)(parameter ?? "0"));
 
             string text = ((string)value)
-                .Replace("\n", " ")
+                .Replace(Environment.NewLine, " ")
+                .Replace("\r", " ")
                 .Trim();
             return text.Length > maxCharsAllowed ?
                 $"{text.Substring(0, maxCharsAllowed)}...." :

@@ -33,6 +33,7 @@
                     x:Name="NavigationView"
                     AlwaysShowHeader="True"
                     Background="{ThemeResource PageBackground}"
+                    Header="I need to set this in order to make the header template work..."
                     IsBackButtonVisible="Collapsed"
                     IsBackEnabled="False"
                     IsSettingsVisible="False"
@@ -56,7 +57,7 @@
 
                     <NavigationView.HeaderTemplate>
                         <DataTemplate>
-                            <Grid Background="{ThemeResource PageBackground}">
+                            <Grid Background="{ThemeResource PageBackground}" DataContext="{Binding ElementName=MainContentPage, Path=DataContext}">
                                 <Grid.Style>
                                     <Style TargetType="Grid">
                                         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -72,7 +73,7 @@
                                     HorizontalAlignment="Center"
                                     FontSize="30"
                                     FontWeight="Bold"
-                                    Text="{Binding ElementName=MainContentPage, Path=DataContext.CurrentTaskList.Title, Mode=OneWay}"
+                                    Text="{Binding CurrentTaskList.Title, Mode=OneWay}"
                                     TextTrimming="CharacterEllipsis" />
                                 <Button
                                     x:Name="ClosePaneButton"
@@ -182,7 +183,7 @@
                         </SplitView>
                     </NavigationView.Content>
                     <NavigationView.PaneFooter>
-                        <StackPanel>
+                        <StackPanel HorizontalAlignment="Stretch">
                             <StackPanel.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -195,19 +196,22 @@
                             </StackPanel.Resources>
                             <MenuFlyoutSeparator Background="{ThemeResource SystemAccentColor}" />
                             <Button HorizontalContentAlignment="Stretch" Command="{Binding LogoutCommand}">
-                                <Grid Height="40" Margin="-9,0,0,0">
+                                <Grid Height="40">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <PersonPicture
-                                        Height="35"
+                                        Height="30"
                                         DisplayName="{Binding CurrentUserName, Mode=OneWay}"
                                         Initials="{Binding CurrentUserInitials, Mode=OneWay}"
                                         ProfilePicture="{Binding CurrentUserProfileImagePath, Mode=OneWay}"
                                         ToolTipService.ToolTip="{Binding CurrentUserName}" />
-                                    <TextBlock Grid.Column="1" Text="Sign out" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="10,0,0,0"
+                                        Text="Sign out" />
 
                                     <Button
                                         Grid.Column="2"
@@ -218,13 +222,16 @@
                                 </Grid>
                             </Button>
                             <Button Command="{Binding OpenSettingsCommand}" ToolTipService.ToolTip="Settings">
-                                <Grid Height="40" Margin="-9,0,0,0">
+                                <Grid Height="40">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="30" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <SymbolIcon Grid.Column="0" Symbol="Setting" />
-                                    <TextBlock Grid.Column="1" Text="Settings" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="15,0,0,0"
+                                        Text="Settings" />
                                 </Grid>
                             </Button>
                         </StackPanel>

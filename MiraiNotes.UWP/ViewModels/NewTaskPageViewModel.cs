@@ -468,6 +468,8 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
             UpdateTaskOperationTitle(isNewTask, CurrentTask.HasParentTask);
+            
+            _changedProperties.Clear();
         }
 
         public async Task DeleteTaskAsync()
@@ -693,7 +695,6 @@ namespace MiraiNotes.UWP.ViewModels
                     new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID),
                     $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
 
-            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             var subTasks = GetSubTasksToSave(false, true);
 
@@ -702,6 +703,10 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = false;
 
             await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
+
+            _changedProperties.Clear();
+
+            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             _messenger.Send(
                 $"Task sucessfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}",

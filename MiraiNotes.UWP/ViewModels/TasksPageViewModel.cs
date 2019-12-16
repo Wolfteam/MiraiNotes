@@ -41,7 +41,7 @@ namespace MiraiNotes.UWP.ViewModels
         private SmartObservableCollection<ItemModel> _taskAutoSuggestBoxItems =
             new SmartObservableCollection<ItemModel>();
 
-        private bool _isTaskListTitleVisible;
+        private bool _isTaskListTitleVisible = true;
         private bool _isTaskListViewVisible;
         private bool _isAutoSuggestBoxEnabled;
         private bool _canAddMoreTaskList;

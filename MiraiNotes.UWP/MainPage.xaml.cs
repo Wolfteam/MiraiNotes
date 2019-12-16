@@ -1,5 +1,4 @@
 ﻿using MiraiNotes.UWP.Pages;
-using MiraiNotes.UWP.Utils;
 using MiraiNotes.UWP.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -47,7 +46,7 @@ namespace MiraiNotes.UWP
         {
             var vm = (NavPageViewModel)DataContext;
 
-            var newTaskPage = (MiscellaneousUtils.FindControl<SplitView>(this, "MainSplitView").Pane as Frame)
+            var newTaskPage = (MainSplitView.Pane as Frame)
                 .Content as NewTaskPage;
             var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
 

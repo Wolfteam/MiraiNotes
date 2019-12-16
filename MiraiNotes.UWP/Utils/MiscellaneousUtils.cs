@@ -171,7 +171,6 @@ namespace MiraiNotes.UWP.Utils
         {
             if (parent == null)
                 return null;
-
             if (parent.GetType() == typeof(T) && ((T)parent).Name == ControlName)
             {
                 return (T)parent;

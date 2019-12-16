@@ -290,18 +290,30 @@
                     Icon="Save"
                     IsEnabled="{Binding CurrentTask.IsValid, Mode=OneWay}"
                     Label="Save"
-                    ToolTipService.ToolTip="Save your task changes" />
+                    ToolTipService.ToolTip="Save your task changes. (Ctrl + S)">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="S" Modifiers="Control" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <AppBarButton
                     Command="{Binding ClosePaneCommand}"
                     Icon="Cancel"
                     Label="Cancel"
-                    ToolTipService.ToolTip="Discard your task changes" />
+                    ToolTipService.ToolTip="Discard your task changes. (Ctrl + X)">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="X" Modifiers="Control" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <AppBarButton
                     Command="{Binding DeleteTaskCommand}"
                     Icon="Delete"
                     IsEnabled="{Binding CurrentTask.IsNew, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                     Label="Delete"
-                    ToolTipService.ToolTip="Delete this task." />
+                    ToolTipService.ToolTip="Delete this task. (Ctrl + D)">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="D" Modifiers="Control" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
                 <AppBarButton
