@@ -163,7 +163,7 @@
     <value>Intervalos de tareas en segundo plano.</value>
   </data>
   <data name="SettingsNotif" xml:space="preserve">
-    <value>Notificaciones toast</value>
+    <value>Notificaciones toast.</value>
   </data>
   <data name="SettingsAbout" xml:space="preserve">
     <value>Github repo, información de contacto, donaciones.</value>
@@ -397,13 +397,13 @@
     <value>Cerrar</value>
   </data>
   <data name="SyncAutoCompleted" xml:space="preserve">
-    <value>Una sincronización automática ha sido completada exitosamente </value>
+    <value>Una sincronización automática ha sido completada exitosamente</value>
   </data>
   <data name="Manual" xml:space="preserve">
     <value>Manual</value>
   </data>
   <data name="SyncManualCompleted" xml:space="preserve">
-    <value>Una sincronización manual ha sido completada exitosamente </value>
+    <value>Una sincronización manual ha sido completada exitosamente</value>
   </data>
   <data name="SyncResults" xml:space="preserve">
     <value>Resultados de la sincronización</value>
@@ -581,5 +581,23 @@
   </data>
   <data name="TaskListCantBeDeleted" xml:space="preserve">
     <value>No puedes borrar esta lista de tareas</value>
+  </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Modo de selección</value>
+  </data>
+  <data name="XItemsSelected" xml:space="preserve">
+    <value>{0} tarea(s) seleccionada(s)</value>
+  </data>
+  <data name="DeleteSelectedTasks" xml:space="preserve">
+    <value>Borrar las tareas seleccionadas</value>
+  </data>
+  <data name="MarkSelectedTasksAsCompleted" xml:space="preserve">
+    <value>Marcar como completadas las tareas seleccionadas</value>
+  </data>
+  <data name="MoveSelectedTasks" xml:space="preserve">
+    <value>Mover las tareas seleccionadas</value>
+  </data>
+  <data name="SelectUnselectAllTasks" xml:space="preserve">
+    <value>Seleccionar / Deseleccionar todas las tareas</value>
   </data>
 </root>

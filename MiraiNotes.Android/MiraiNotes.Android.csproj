@@ -114,6 +114,7 @@
     <Compile Include="Common\Messages\TaskDateUpdatedMsg.cs" />
     <Compile Include="Common\Messages\TaskMovedMsg.cs" />
     <Compile Include="Common\Messages\TaskSavedMsg.cs" />
+    <Compile Include="Common\Messages\TaskSelectectionModeChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskSortOrderChangedMsg.cs" />
     <Compile Include="Common\Messages\TaskStatusChangedMsg.cs" />
     <Compile Include="Common\ResxTextProvider.cs" />
@@ -755,6 +756,16 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\ic_swap_horiz_black_24dp.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\menu_selection_mode.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ic_select_all_black_24dp.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

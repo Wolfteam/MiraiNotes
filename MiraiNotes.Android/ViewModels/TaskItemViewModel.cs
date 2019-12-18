@@ -27,7 +27,8 @@ namespace MiraiNotes.Android.ViewModels
         private DateTimeOffset? _toBeCompletedOn;
         private MvxObservableCollection<TaskItemViewModel> _subTasks = new MvxObservableCollection<TaskItemViewModel>();
         private DateTimeOffset? _remindOn;
-
+        private bool _isSelected;
+        private bool _canBeSelected;
         #endregion
 
         #region Properties
@@ -152,7 +153,36 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public bool IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected == value)
+                    return;
+                SetProperty(ref _isSelected, value);
+                if (!HasParentTask)
+                {
+                    foreach (var st in SubTasks)
+                    {
+                        st.IsSelected = value;
+                    }
+                }
+
+                Messenger.Publish(new TaskSelectectionModeChangedMsg(this));
+            }
+        }
+
+        public bool CanBeSelected
+        {
+            get => _canBeSelected;
+            set
+            {
+                if (_canBeSelected == value)
+                    return;
+                SetProperty(ref _canBeSelected, value);
+            }
+        }
 
         public bool HasAToBeCompletedDate
             => ToBeCompletedOn.HasValue;

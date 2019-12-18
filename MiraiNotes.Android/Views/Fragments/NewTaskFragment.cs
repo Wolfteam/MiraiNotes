@@ -27,7 +27,7 @@ namespace MiraiNotes.Android.Views.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
-            SetActionBarTitle(true);
+            IsActionBarBackButtonEnabled(true);
 
             //lines below are used to place the icon to the top, otherwise it will appear at the center
             //of the edittext

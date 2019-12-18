@@ -23,6 +23,11 @@
             android:gravity="center_vertical"
             android:background="?android:attr/selectableItemBackground">
 
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:MvxBind="Checked IsSelected; Visibility Visibility(CanBeSelected)"/>
+
             <View
                 android:layout_height="match_parent"
                 android:layout_width="10dp"

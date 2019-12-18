@@ -394,6 +394,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete selected tasks.
+        /// </summary>
+        public static string DeleteSelectedTasks {
+            get {
+                return ResourceManager.GetString("DeleteSelectedTasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete task.
         /// </summary>
         public static string DeleteTask {
@@ -592,6 +601,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mark selected tasks as completed.
+        /// </summary>
+        public static string MarkSelectedTasksAsCompleted {
+            get {
+                return ResourceManager.GetString("MarkSelectedTasksAsCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mark as {0}.
         /// </summary>
         public static string MarkTaskAs {
@@ -615,6 +633,15 @@ namespace MiraiNotes.Android.Localization {
         public static string Move {
             get {
                 return ResourceManager.GetString("Move", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move selected tasks.
+        /// </summary>
+        public static string MoveSelectedTasks {
+            get {
+                return ResourceManager.GetString("MoveSelectedTasks", resourceCulture);
             }
         }
         
@@ -912,6 +939,24 @@ namespace MiraiNotes.Android.Localization {
         public static string SelectAnOption {
             get {
                 return ResourceManager.GetString("SelectAnOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection mode.
+        /// </summary>
+        public static string SelectionMode {
+            get {
+                return ResourceManager.GetString("SelectionMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select / Unselect all tasks.
+        /// </summary>
+        public static string SelectUnselectAllTasks {
+            get {
+                return ResourceManager.GetString("SelectUnselectAllTasks", resourceCulture);
             }
         }
         
@@ -1443,6 +1488,15 @@ namespace MiraiNotes.Android.Localization {
         public static string XDayAgo {
             get {
                 return ResourceManager.GetString("XDayAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} task(s) selected.
+        /// </summary>
+        public static string XItemsSelected {
+            get {
+                return ResourceManager.GetString("XItemsSelected", resourceCulture);
             }
         }
         

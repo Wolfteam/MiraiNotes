@@ -35,6 +35,8 @@ namespace MiraiNotes.Android.ViewModels
         private bool _isBusy;
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
         private readonly MvxInteraction _resetSwipedItems = new MvxInteraction();
+
+        public bool IsInSelectionMode;
         #endregion
 
         #region Interactions
@@ -72,6 +74,8 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand<TaskItemViewModel> ShowMenuOptionsDialogCommand { get; private set; }
         public IMvxAsyncCommand<int> SwipeToDeleteCommand { get; private set; }
         public IMvxAsyncCommand<int> SwipeToChangeTaskStatusCommand { get; private set; }
+        public IMvxCommand<bool> StartSelectionModeCommand { get; private set; }
+        public IMvxCommand<bool> SelectAllTasksCommand { get; private set; }
         #endregion
 
         public TasksViewModel(
@@ -98,7 +102,7 @@ namespace MiraiNotes.Android.ViewModels
             base.Prepare(parameter);
             InitParams = parameter.NotificationAction;
             _currentTaskList = parameter.TaskList;
-            Title = GetText("Tasks");
+            SetTitle(true);
         }
 
         public override async Task Initialize()
@@ -111,17 +115,27 @@ namespace MiraiNotes.Android.ViewModels
         public override void SetCommands()
         {
             base.SetCommands();
-            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.GoogleId));
-            
+            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>(async (task) =>
+            {
+                if (IsInSelectionMode)
+                {
+                    OnTaskSelectedInSelectionMode(task);
+                    return;
+                }
+                await OnTaskSelected(task.GoogleId);
+            });
+
             RefreshTasksCommand = new MvxCommand(Refresh);
-            
+
             AddNewTaskListCommand = new MvxAsyncCommand(
                 () => NavigationService.Navigate<AddEditTaskListDialogViewModel, TaskListItemViewModel, AddEditTaskListDialogViewModelResult>(null));
-            
+
             AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
-            
+
             ShowMenuOptionsDialogCommand = new MvxAsyncCommand<TaskItemViewModel>((task) =>
             {
+                if (IsInSelectionMode)
+                    return Task.CompletedTask;
                 var parameter = TaskMenuOptionsViewModelParameter.Instance(_currentTaskList, task);
                 return NavigationService.Navigate<TaskMenuOptionsViewModel, TaskMenuOptionsViewModelParameter>(parameter);
             });
@@ -137,6 +151,17 @@ namespace MiraiNotes.Android.ViewModels
                 var vm = Tasks.ElementAt(position);
                 return NavigationService.Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(vm);
             });
+
+            StartSelectionModeCommand = new MvxCommand<bool>((isInSelectionMode) =>
+            {
+                ChangeAllTasksSelectedStatus(false, isInSelectionMode);
+                SetTitle(!isInSelectionMode);
+            });
+
+            SelectAllTasksCommand = new MvxCommand<bool>(selectThemAll =>
+            {
+                ChangeAllTasksSelectedStatus(selectThemAll, IsInSelectionMode);
+            });
         }
 
         public override void RegisterMessages()
@@ -150,7 +175,20 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder)),
                 Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate)),
                 Messenger.Subscribe<TaskMovedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask, msg.NewTaskListId)),
-                Messenger.Subscribe<SubTaskSelectedMsg>(async msg => await OnSubTaskSelected(msg))
+                Messenger.Subscribe<SubTaskSelectedMsg>(async msg =>
+                {
+                    if (IsInSelectionMode)
+                    {
+                        OnTaskSelectedInSelectionMode(msg.SubTask);
+                        return;
+                    }
+                    await OnSubTaskSelected(msg);
+                }),
+                Messenger.Subscribe<TaskSelectectionModeChangedMsg>(msg =>
+                {
+                    if (IsInSelectionMode)
+                        SetTitle(false);
+                })
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -400,6 +438,23 @@ namespace MiraiNotes.Android.ViewModels
             Messenger.Publish(new RefreshNumberOfTasksMsg(this, affectedItems, taskListId));
         }
 
+        private void SetTitle(bool useDefault)
+        {
+            if (useDefault)
+            {
+                Title = GetText("Tasks");
+                return;
+            }
+
+            var selectedTasks = Tasks.Where(t => t.IsSelected).ToList();
+            int itemsSelected = selectedTasks.Count + Tasks
+                .SelectMany(t => t.SubTasks)
+                .Where(st => st.IsSelected)
+                .Count();
+
+            Title = GetText("XItemsSelected", $"{itemsSelected}");
+        }
+
         private async Task OnSubTaskSelected(SubTaskSelectedMsg msg)
         {
             if (msg.ShowMenuOptions)
@@ -454,6 +509,27 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             CurrentTasksSortOrder = sortType;
+        }
+
+        private void OnTaskSelectedInSelectionMode(TaskItemViewModel task)
+        {
+            task.IsSelected = !task.IsSelected;
+            SetTitle(false);
+        }
+
+        private void ChangeAllTasksSelectedStatus(bool isSelected, bool isInSelectionMode)
+        {
+            foreach (var task in Tasks)
+            {
+                task.IsSelected = isSelected;
+                task.CanBeSelected = isInSelectionMode;
+
+                foreach (var st in task.SubTasks)
+                {
+                    st.IsSelected = isSelected;
+                    st.CanBeSelected = isInSelectionMode;
+                }
+            }
         }
     }
 }

@@ -562,4 +562,22 @@
   <data name="TaskListCantBeDeleted" xml:space="preserve">
     <value>You cant delete this task list</value>
   </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Selection mode</value>
+  </data>
+  <data name="XItemsSelected" xml:space="preserve">
+    <value>{0} task(s) selected</value>
+  </data>
+  <data name="DeleteSelectedTasks" xml:space="preserve">
+    <value>Delete selected tasks</value>
+  </data>
+  <data name="MarkSelectedTasksAsCompleted" xml:space="preserve">
+    <value>Mark selected tasks as completed</value>
+  </data>
+  <data name="MoveSelectedTasks" xml:space="preserve">
+    <value>Move selected tasks</value>
+  </data>
+  <data name="SelectUnselectAllTasks" xml:space="preserve">
+    <value>Select / Unselect all tasks</value>
+  </data>
 </root>

@@ -31,6 +31,8 @@ namespace MiraiNotes.Android.ViewModels
 
         private bool _showProgressOverlay;
         private string _overlayText;
+
+        public bool IsInSelectionMode;
         #endregion
 
         #region Interactors
