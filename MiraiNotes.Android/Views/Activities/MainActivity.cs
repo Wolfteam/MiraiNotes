@@ -278,6 +278,12 @@ namespace MiraiNotes.Android.Views.Activities
                         tasksFragment.ViewModel.DeleteSelectedTasksCommand.Execute();
                     }
                     break;
+                case Resource.Id.MarkAsCompletedSelectedTasks:
+                    {
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.MarkSelectedTasksAsCompletedCommand.Execute();
+                    }
+                    break;
                 default:
                     return false;
             }

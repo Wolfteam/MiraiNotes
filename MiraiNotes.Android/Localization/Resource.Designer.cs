@@ -619,6 +619,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you wanna mark {0} task(s) as completed.
+        /// </summary>
+        public static string MarkMultipleTasksAsCompletedConfirmation {
+            get {
+                return ResourceManager.GetString("MarkMultipleTasksAsCompletedConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mark selected tasks as completed.
         /// </summary>
         public static string MarkSelectedTasksAsCompleted {
@@ -880,6 +889,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You need to select at least one task.
+        /// </summary>
+        public static string PleaseSelectAtLeastOneTask {
+            get {
+                return ResourceManager.GetString("PleaseSelectAtLeastOneTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reminder.
         /// </summary>
         public static string Reminder {
@@ -957,6 +975,24 @@ namespace MiraiNotes.Android.Localization {
         public static string SelectAnOption {
             get {
                 return ResourceManager.GetString("SelectAnOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected tasks are already marked as completed.
+        /// </summary>
+        public static string SelectedTasksAreAlreadyCompleted {
+            get {
+                return ResourceManager.GetString("SelectedTasksAreAlreadyCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected tasks were marked as completed.
+        /// </summary>
+        public static string SelectedTasksWereMarkedAsCompleted {
+            get {
+                return ResourceManager.GetString("SelectedTasksWereMarkedAsCompleted", resourceCulture);
             }
         }
         

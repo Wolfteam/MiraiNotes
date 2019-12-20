@@ -154,12 +154,16 @@
     <Compile Include="Listeners\SwipeButton.cs" />
     <Compile Include="Models\NotificationAction.cs" />
     <Compile Include="Models\Parameters\AddSubTaskDialogViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\BaseSelectionParameter.cs" />
+    <Compile Include="Models\Parameters\ChangeTaskStatusDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\DeleteTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MoveTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskListsDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\NewTaskViewModelParameter.cs" />
     <Compile Include="Models\Results\AddEditTaskListDialogViewModelResult.cs" />
+    <Compile Include="Models\Results\ChangeTaskStatusDialogViewModelResult.cs" />
+    <Compile Include="Models\Results\DeleteTaskDialogViewModelResult.cs" />
     <Compile Include="Models\Results\NewTaskViewModelResult.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskDateViewModelParameter.cs" />

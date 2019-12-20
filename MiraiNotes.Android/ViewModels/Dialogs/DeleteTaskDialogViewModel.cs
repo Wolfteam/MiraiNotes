@@ -3,19 +3,20 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class DeleteTaskDialogViewModel : BaseConfirmationDialogViewModel<DeleteTaskDialogViewModelParameter, bool>
+    public class DeleteTaskDialogViewModel 
+        : BaseConfirmationDialogViewModel<DeleteTaskDialogViewModelParameter, DeleteTaskDialogViewModelResult>
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
@@ -42,7 +43,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             base.Prepare(parameter);
 
-            if (!parameter.IsMultipleDeletes)
+            if (!parameter.IsMultipleTasks)
             {
                 Title = GetText("Confirmation");
                 ContentText = GetText("DeleteTaskConfirmation", Parameter.Task.Title);
@@ -60,7 +61,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             base.SetCommands();
             OkCommand = new MvxAsyncCommand(DeleteMultipleTasks);
-            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
+            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, DeleteTaskDialogViewModelResult.Nothing()));
         }
 
         private async Task<bool> DeleteTask(TaskItemViewModel task)
@@ -97,7 +98,6 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 Logger.Error(
                     $"{nameof(DeleteTask)}: Couldn't delete the selected task." +
                     $"Error = {deleteResponse.Message}");
-                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
                 return false;
             }
 
@@ -108,7 +108,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private async Task DeleteMultipleTasks()
         {
             var results = new List<bool>();
-            if (Parameter.IsMultipleDeletes)
+            if (Parameter.IsMultipleTasks)
             {
                 foreach (var task in Parameter.Tasks)
                 {
@@ -123,9 +123,19 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             }
 
             if (results.Any(r => !r))
-                await NavigationService.Close(this, false);
+            {
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
+                var result = Parameter.IsMultipleTasks
+                    ? DeleteTaskDialogViewModelResult.Partial()
+                    : DeleteTaskDialogViewModelResult.Deleted(false);
+
+                await NavigationService.Close(this, result);
+            }
             else
-                await NavigationService.Close(this, true);
+            {
+                var result = DeleteTaskDialogViewModelResult.Deleted(true);
+                await NavigationService.Close(this, result);
+            }
         }
     }
 }

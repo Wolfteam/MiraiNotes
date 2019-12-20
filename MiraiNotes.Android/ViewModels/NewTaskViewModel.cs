@@ -152,15 +152,16 @@ namespace MiraiNotes.Android.ViewModels
                 ShowProgressBar = true;
 
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(Task);
-                bool deleted = await NavigationService
-                    .Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
-
-                var result = NewTaskViewModelResult.Deleted(Task);
+                var deleteResult = await NavigationService.Navigate<
+                    DeleteTaskDialogViewModel, 
+                    DeleteTaskDialogViewModelParameter, 
+                    DeleteTaskDialogViewModelResult>(parameter);
 
                 ShowProgressBar = false;
 
-                if (deleted)
+                if (deleteResult?.IsDeleted == true)
                 {
+                    var result = NewTaskViewModelResult.Deleted(Task);
                     await NavigationService.Close(this, result);
                 }
             });

@@ -2,6 +2,7 @@
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
@@ -359,7 +360,10 @@ namespace MiraiNotes.Android.ViewModels
             DeleteSubTaskCommand = new MvxAsyncCommand(async() =>
             {
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(this);
-                await NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
+                await NavigationService.Navigate<
+                    DeleteTaskDialogViewModel, 
+                    DeleteTaskDialogViewModelParameter, 
+                    DeleteTaskDialogViewModelResult>(parameter);
             });
 
             ShowMenuOptionsDialogCommand = new MvxCommand<TaskItemViewModel>(

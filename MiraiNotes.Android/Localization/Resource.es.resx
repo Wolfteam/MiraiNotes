@@ -606,4 +606,16 @@
   <data name="DeleteXTasks" xml:space="preserve">
     <value>Borrar {0} tarea(s)</value>
   </data>
+  <data name="MarkMultipleTasksAsCompletedConfirmation" xml:space="preserve">
+    <value>¿ Estás seguro que deseas marcar {0} tarea(s) como completada(s) ?</value>
+  </data>
+  <data name="SelectedTasksWereMarkedAsCompleted" xml:space="preserve">
+    <value>Las tareas seleccionadas fueron marcadas como completadas</value>
+  </data>
+  <data name="PleaseSelectAtLeastOneTask" xml:space="preserve">
+    <value>Debes seleccionar al menos una tarea</value>
+  </data>
+  <data name="SelectedTasksAreAlreadyCompleted" xml:space="preserve">
+    <value>Las tareas seleccionadas ya se encuentran marcadas como completadas</value>
+  </data>
 </root>

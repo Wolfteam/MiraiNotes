@@ -586,4 +586,16 @@
   <data name="DeleteXTasks" xml:space="preserve">
     <value>Delete {0} task(s)</value>
   </data>
+  <data name="MarkMultipleTasksAsCompletedConfirmation" xml:space="preserve">
+    <value>Are you sure you wanna mark {0} task(s) as completed</value>
+  </data>
+  <data name="SelectedTasksWereMarkedAsCompleted" xml:space="preserve">
+    <value>Selected tasks were marked as completed</value>
+  </data>
+  <data name="PleaseSelectAtLeastOneTask" xml:space="preserve">
+    <value>You need to select at least one task</value>
+  </data>
+  <data name="SelectedTasksAreAlreadyCompleted" xml:space="preserve">
+    <value>Selected tasks are already marked as completed</value>
+  </data>
 </root>

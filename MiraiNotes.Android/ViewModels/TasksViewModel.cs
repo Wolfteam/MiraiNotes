@@ -77,6 +77,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxCommand<bool> StartSelectionModeCommand { get; private set; }
         public IMvxCommand<bool> SelectAllTasksCommand { get; private set; }
         public IMvxAsyncCommand DeleteSelectedTasksCommand { get; private set; }
+        public IMvxAsyncCommand MarkSelectedTasksAsCompletedCommand { get; private set; }
         #endregion
 
         public TasksViewModel(
@@ -145,13 +146,20 @@ namespace MiraiNotes.Android.ViewModels
             {
                 var vm = Tasks.ElementAt(position);
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(vm);
-                return NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
+                return NavigationService.Navigate<
+                    DeleteTaskDialogViewModel,
+                    DeleteTaskDialogViewModelParameter,
+                    DeleteTaskDialogViewModelResult>(parameter);
             });
 
             SwipeToChangeTaskStatusCommand = new MvxAsyncCommand<int>((position) =>
             {
                 var vm = Tasks.ElementAt(position);
-                return NavigationService.Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(vm);
+                var parameter = ChangeTaskStatusDialogViewModelParameter.ChangeTaskStatus(vm);
+                return NavigationService.Navigate<
+                    ChangeTaskStatusDialogViewModel,
+                    ChangeTaskStatusDialogViewModelParameter,
+                    ChangeTaskStatusDialogViewModelResult>(parameter);
             });
 
             StartSelectionModeCommand = new MvxCommand<bool>((isInSelectionMode) =>
@@ -175,9 +183,47 @@ namespace MiraiNotes.Android.ViewModels
 
                 selectedTasks.AddRange(selectedSubTasks);
 
+                if (!selectedTasks.Any())
+                {
+                    _dialogService.ShowInfoToast(GetText("PleaseSelectAtLeastOneTask"));
+                    return;
+                }
+
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(selectedTasks);
-                bool wereDeleted = await NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
-                if (wereDeleted)
+                var result = await NavigationService.Navigate<
+                    DeleteTaskDialogViewModel,
+                    DeleteTaskDialogViewModelParameter,
+                    DeleteTaskDialogViewModelResult>(parameter);
+
+                if (result?.IsDeleted == true || result?.IsPartiallyDeleted == true)
+                    Messenger.Publish(new ChangeTasksSelectionModeMsg(this, false));
+            });
+
+            MarkSelectedTasksAsCompletedCommand = new MvxAsyncCommand(async () =>
+            {
+                var selectedTasks = Tasks.Where(t => t.IsSelected).ToList();
+                var selectedSubTasks = Tasks.SelectMany(t => t.SubTasks).Where(st => st.IsSelected);
+                selectedTasks.AddRange(selectedSubTasks);
+
+                if (!selectedTasks.Any())
+                {
+                    _dialogService.ShowInfoToast(GetText("PleaseSelectAtLeastOneTask"));
+                    return;
+                }
+
+                if (selectedTasks.All(st => st.TaskStatus == GoogleTaskStatus.COMPLETED))
+                {
+                    _dialogService.ShowInfoToast(GetText("SelectedTasksAreAlreadyCompleted"));
+                    return;
+                }
+
+                var parameter = ChangeTaskStatusDialogViewModelParameter.ChangeTaskStatus(selectedTasks);
+                var result = await NavigationService.Navigate<
+                    ChangeTaskStatusDialogViewModel,
+                    ChangeTaskStatusDialogViewModelParameter,
+                    ChangeTaskStatusDialogViewModelResult>(parameter);
+
+                if (result?.StatusChanged == true || result?.PartiallyChanged == true)
                     Messenger.Publish(new ChangeTasksSelectionModeMsg(this, false));
             });
         }
