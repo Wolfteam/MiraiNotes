@@ -76,6 +76,7 @@ namespace MiraiNotes.Android.ViewModels
         public IMvxAsyncCommand<int> SwipeToChangeTaskStatusCommand { get; private set; }
         public IMvxCommand<bool> StartSelectionModeCommand { get; private set; }
         public IMvxCommand<bool> SelectAllTasksCommand { get; private set; }
+        public IMvxAsyncCommand DeleteSelectedTasksCommand { get; private set; }
         #endregion
 
         public TasksViewModel(
@@ -143,7 +144,8 @@ namespace MiraiNotes.Android.ViewModels
             SwipeToDeleteCommand = new MvxAsyncCommand<int>((position) =>
             {
                 var vm = Tasks.ElementAt(position);
-                return NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(vm);
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(vm);
+                return NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
             });
 
             SwipeToChangeTaskStatusCommand = new MvxAsyncCommand<int>((position) =>
@@ -161,6 +163,22 @@ namespace MiraiNotes.Android.ViewModels
             SelectAllTasksCommand = new MvxCommand<bool>(selectThemAll =>
             {
                 ChangeAllTasksSelectedStatus(selectThemAll, IsInSelectionMode);
+            });
+
+            DeleteSelectedTasksCommand = new MvxAsyncCommand(async () =>
+            {
+                var selectedTasks = Tasks.Where(t => t.IsSelected).ToList();
+                var ids = selectedTasks.Select(t => t.GoogleId);
+                var selectedSubTasks = Tasks
+                    .SelectMany(t => t.SubTasks)
+                    .Where(st => st.IsSelected && !ids.Contains(st.ParentTask));
+
+                selectedTasks.AddRange(selectedSubTasks);
+
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(selectedTasks);
+                bool wereDeleted = await NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
+                if (wereDeleted)
+                    Messenger.Publish(new ChangeTasksSelectionModeMsg(this, false));
             });
         }
 
@@ -430,10 +448,9 @@ namespace MiraiNotes.Android.ViewModels
             }
             else
             {
-                Tasks
-                    .FirstOrDefault(t => t.GoogleId == parentTask)?
-                    .SubTasks?
-                    .RemoveAll(st => st.GoogleId == taskId);
+                var parent = Tasks.FirstOrDefault(t => t.GoogleId == parentTask);
+                parent?.SubTasks?.RemoveAll(st => st.GoogleId == taskId);
+                parent?.SubTaskWasRemoved();
             }
             Messenger.Publish(new RefreshNumberOfTasksMsg(this, affectedItems, taskListId));
         }

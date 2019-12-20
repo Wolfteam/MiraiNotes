@@ -2,16 +2,20 @@
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Shared.Helpers;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class DeleteTaskDialogViewModel : BaseConfirmationDialogViewModel<TaskItemViewModel, bool>
+    public class DeleteTaskDialogViewModel : BaseConfirmationDialogViewModel<DeleteTaskDialogViewModelParameter, bool>
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
@@ -34,11 +38,20 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             _notificationService = notificationService;
         }
 
-        public override void Prepare(TaskItemViewModel parameter)
+        public override void Prepare(DeleteTaskDialogViewModelParameter parameter)
         {
             base.Prepare(parameter);
-            Title = GetText("Confirmation");
-            ContentText = GetText("DeleteTaskConfirmation", Parameter.Title);
+
+            if (!parameter.IsMultipleDeletes)
+            {
+                Title = GetText("Confirmation");
+                ContentText = GetText("DeleteTaskConfirmation", Parameter.Task.Title);
+            }
+            else
+            {
+                Title = $"{GetText("Confirmation")} - {GetText("DeleteXTasks", $"{parameter.Tasks.Count}")}";
+                ContentText = GetText("DeleteMultipleTasksConfirmation");
+            }
             OkText = GetText("Yes");
             CancelText = GetText("No");
         }
@@ -46,34 +59,33 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public override void SetCommands()
         {
             base.SetCommands();
-            OkCommand = new MvxAsyncCommand(DeleteTask);
+            OkCommand = new MvxAsyncCommand(DeleteMultipleTasks);
             CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
         }
 
-        private async Task DeleteTask()
+        private async Task<bool> DeleteTask(TaskItemViewModel task)
         {
-            if (Parameter.HasParentTask && Parameter.IsNew || 
-                Parameter.IsNew)
+            if (task.HasParentTask && task.IsNew ||
+                task.IsNew)
             {
-                Messenger.Publish(new TaskDeletedMsg(this, Parameter.GoogleId, Parameter.ParentTask));
-                await NavigationService.Close(this, true);
-                return;
+                Messenger.Publish(new TaskDeletedMsg(this, task.GoogleId, task.ParentTask));
+                return true;
             }
 
             Messenger.Publish(new ShowProgressOverlayMsg(this));
 
             var deleteResponse = await _dataService
                 .TaskService
-                .RemoveTaskAsync(Parameter.GoogleId);
+                .RemoveTaskAsync(task.GoogleId);
 
-            if (TasksHelper.HasReminderId(Parameter.RemindOnGUID, out int id))
+            if (TasksHelper.HasReminderId(task.RemindOnGUID, out int id))
             {
                 _notificationService.RemoveScheduledNotification(id);
             }
 
-            if (Parameter.HasSubTasks)
+            if (task.HasSubTasks)
             {
-                foreach (var st in Parameter.SubTasks)
+                foreach (var st in task.SubTasks)
                     if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stReminderId))
                         _notificationService.RemoveScheduledNotification(stReminderId);
             }
@@ -86,12 +98,34 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     $"{nameof(DeleteTask)}: Couldn't delete the selected task." +
                     $"Error = {deleteResponse.Message}");
                 _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                await NavigationService.Close(this, false);
-                return;
+                return false;
             }
 
-            Messenger.Publish(new TaskDeletedMsg(this, Parameter.GoogleId, Parameter.ParentTask));
-            await NavigationService.Close(this, true);
+            Messenger.Publish(new TaskDeletedMsg(this, task.GoogleId, task.ParentTask));
+            return true;
+        }
+
+        private async Task DeleteMultipleTasks()
+        {
+            var results = new List<bool>();
+            if (Parameter.IsMultipleDeletes)
+            {
+                foreach (var task in Parameter.Tasks)
+                {
+                    bool result = await DeleteTask(task);
+                    results.Add(result);
+                }
+            }
+            else
+            {
+                bool result = await DeleteTask(Parameter.Task);
+                results.Add(result);
+            }
+
+            if (results.Any(r => !r))
+                await NavigationService.Close(this, false);
+            else
+                await NavigationService.Close(this, true);
         }
     }
 }

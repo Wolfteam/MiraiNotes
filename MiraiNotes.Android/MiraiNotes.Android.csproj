@@ -93,6 +93,7 @@
     <Compile Include="Common\Messages\AppThemeChangedMsg.cs" />
     <Compile Include="Common\Messages\AppLanguageChangedMessage.cs" />
     <Compile Include="Common\Messages\ActiveAccountChangedMsg.cs" />
+    <Compile Include="Common\Messages\ChangeTasksSelectionModeMsg.cs" />
     <Compile Include="Common\Messages\DeleteTaskRequestMsg.cs" />
     <Compile Include="Common\Messages\HideKeyboardMsg.cs" />
     <Compile Include="Common\Messages\LoginRequestMsg.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Listeners\SwipeButton.cs" />
     <Compile Include="Models\NotificationAction.cs" />
     <Compile Include="Models\Parameters\AddSubTaskDialogViewModelParameter.cs" />
+    <Compile Include="Models\Parameters\DeleteTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MenuViewModelParameter.cs" />
     <Compile Include="Models\Parameters\MoveTaskDialogViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskListsDialogViewModelParameter.cs" />

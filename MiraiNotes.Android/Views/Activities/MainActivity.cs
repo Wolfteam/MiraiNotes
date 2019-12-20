@@ -29,6 +29,7 @@ namespace MiraiNotes.Android.Views.Activities
         private IMvxInteraction _hideKeyboardRequest;
         private IMvxInteraction _changeLanguageRequest;
         private IMvxInteraction<TaskSortType> _updateTaskSortOrderRequest;
+        private IMvxInteraction<bool> _changeTasksSelectionModeRequest;
         private bool _lockDrawerRequest;
         private TaskSortType _selectedTaskSortType;
         private bool _allTasksAreSelected;
@@ -106,6 +107,21 @@ namespace MiraiNotes.Android.Views.Activities
                         => SetSelectedTaskSortType(args.Value);
             }
         }
+        public IMvxInteraction<bool> ChangeTasksSelectionModeRequest
+        {
+            get => _changeTasksSelectionModeRequest;
+            set
+            {
+                if (_changeTasksSelectionModeRequest != null)
+                    _changeTasksSelectionModeRequest.Requested -= (sender, args)
+                        => StartSelectionMode(args.Value);
+
+                _changeTasksSelectionModeRequest = value;
+                _changeTasksSelectionModeRequest.Requested += (sender, args)
+                        => StartSelectionMode(args.Value);
+            }
+        }
+
 
         public DrawerLayout DrawerLayout { get; private set; }
         public override int LayoutId
@@ -139,6 +155,7 @@ namespace MiraiNotes.Android.Views.Activities
             set.Bind(this).For(v => v.HideKeyboardRequest).To(vm => vm.HideKeyboard).OneWay();
             set.Bind(this).For(v => v.LockDrawerRequest).To(vm => vm.ShowProgressOverlay).OneWay();
             set.Bind(this).For(v => v.UpdateTaskSortOrderRequest).To(vm => vm.UpdateTaskSortOrder).OneWay();
+            set.Bind(this).For(v => v.ChangeTasksSelectionModeRequest).To(vm => vm.ChangeTasksSelectionMode).OneWay();
             set.Apply();
 
             _selectedTaskSortType = ViewModel.AppSettings.DefaultTaskSortOrder;
@@ -236,14 +253,6 @@ namespace MiraiNotes.Android.Views.Activities
                 case Resource.Id.ManageTaskLists:
                     ViewModel.ManageTaskListsCommand.Execute();
                     break;
-                case Resource.Id.SelectionMode:
-                    StartSelectionMode(true);
-                    break;
-                case Resource.Id.SelectAllTasks:
-                    _allTasksAreSelected = !_allTasksAreSelected;
-                    var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
-                    tasksFragment.ViewModel.SelectAllTasksCommand.Execute(_allTasksAreSelected);
-                    break;
                 case Resource.Id.SortByNameAsc:
                 case Resource.Id.SortByNameDesc:
                 case Resource.Id.SortByUpdatedDateAsc:
@@ -251,6 +260,23 @@ namespace MiraiNotes.Android.Views.Activities
                     item.SetChecked(true);
                     var sortType = GetSelectedTaskSortType(id);
                     ViewModel.TaskSortOrderChangedCommand.Execute(sortType);
+                    break;
+                //Below cases are only visible on selection mode
+                case Resource.Id.SelectionMode:
+                    StartSelectionMode(true);
+                    break;
+                case Resource.Id.SelectAllTasks:
+                    {
+                        _allTasksAreSelected = !_allTasksAreSelected;
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.SelectAllTasksCommand.Execute(_allTasksAreSelected);
+                    }
+                    break;
+                case Resource.Id.DeleteSelectedTasks:
+                    {
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.DeleteSelectedTasksCommand.Execute();
+                    }
                     break;
                 default:
                     return false;

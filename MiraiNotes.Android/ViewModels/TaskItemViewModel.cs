@@ -1,6 +1,7 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
@@ -355,11 +356,19 @@ namespace MiraiNotes.Android.ViewModels
             SubTaskSelectedCommand = new MvxCommand<TaskItemViewModel>(
                 (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask)));
 
-            DeleteSubTaskCommand = new MvxAsyncCommand(() =>
-                NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(this));
+            DeleteSubTaskCommand = new MvxAsyncCommand(async() =>
+            {
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(this);
+                await NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
+            });
 
             ShowMenuOptionsDialogCommand = new MvxCommand<TaskItemViewModel>(
                 (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask, true)));
+        }
+
+        public void SubTaskWasRemoved()
+        {
+            RaisePropertyChanged(() => HasSubTasks);
         }
     }
 }

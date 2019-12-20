@@ -151,8 +151,9 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Publish(new HideKeyboardMsg(this));
                 ShowProgressBar = true;
 
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(Task);
                 bool deleted = await NavigationService
-                    .Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(Task);
+                    .Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
 
                 var result = NewTaskViewModelResult.Deleted(Task);
 

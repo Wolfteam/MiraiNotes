@@ -600,4 +600,10 @@
   <data name="SelectUnselectAllTasks" xml:space="preserve">
     <value>Seleccionar / Deseleccionar todas las tareas</value>
   </data>
+  <data name="DeleteMultipleTasksConfirmation" xml:space="preserve">
+    <value>¿ Estás seguro que deseas borrar las tareas seleccionadas ?</value>
+  </data>
+  <data name="DeleteXTasks" xml:space="preserve">
+    <value>Borrar {0} tarea(s)</value>
+  </data>
 </root>

@@ -394,6 +394,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you wanna delete the selected tasks?.
+        /// </summary>
+        public static string DeleteMultipleTasksConfirmation {
+            get {
+                return ResourceManager.GetString("DeleteMultipleTasksConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete selected tasks.
         /// </summary>
         public static string DeleteSelectedTasks {
@@ -426,6 +435,15 @@ namespace MiraiNotes.Android.Localization {
         public static string DeleteThisAccountConfirmation {
             get {
                 return ResourceManager.GetString("DeleteThisAccountConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete {0} task(s).
+        /// </summary>
+        public static string DeleteXTasks {
+            get {
+                return ResourceManager.GetString("DeleteXTasks", resourceCulture);
             }
         }
         

@@ -75,8 +75,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             base.SetCommands();
             DeleteTaskCommand = new MvxAsyncCommand(async () =>
             {
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(_task);
                 await NavigationService.Close(this);
-                await NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(_task);
+                await NavigationService.Navigate<DeleteTaskDialogViewModel, DeleteTaskDialogViewModelParameter, bool>(parameter);
             });
 
             ChangeTaskStatusCommand = new MvxAsyncCommand(async () =>

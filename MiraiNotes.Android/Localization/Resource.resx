@@ -580,4 +580,10 @@
   <data name="SelectUnselectAllTasks" xml:space="preserve">
     <value>Select / Unselect all tasks</value>
   </data>
+  <data name="DeleteMultipleTasksConfirmation" xml:space="preserve">
+    <value>Are you sure you wanna delete the selected tasks?</value>
+  </data>
+  <data name="DeleteXTasks" xml:space="preserve">
+    <value>Delete {0} task(s)</value>
+  </data>
 </root>
