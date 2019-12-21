@@ -1,6 +1,8 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
@@ -27,7 +29,8 @@ namespace MiraiNotes.Android.ViewModels
         private DateTimeOffset? _toBeCompletedOn;
         private MvxObservableCollection<TaskItemViewModel> _subTasks = new MvxObservableCollection<TaskItemViewModel>();
         private DateTimeOffset? _remindOn;
-
+        private bool _isSelected;
+        private bool _canBeSelected;
         #endregion
 
         #region Properties
@@ -152,7 +155,36 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        public bool IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected == value)
+                    return;
+                SetProperty(ref _isSelected, value);
+                if (!HasParentTask)
+                {
+                    foreach (var st in SubTasks)
+                    {
+                        st.IsSelected = value;
+                    }
+                }
+
+                Messenger.Publish(new TaskSelectectionModeChangedMsg(this));
+            }
+        }
+
+        public bool CanBeSelected
+        {
+            get => _canBeSelected;
+            set
+            {
+                if (_canBeSelected == value)
+                    return;
+                SetProperty(ref _canBeSelected, value);
+            }
+        }
 
         public bool HasAToBeCompletedDate
             => ToBeCompletedOn.HasValue;
@@ -325,11 +357,22 @@ namespace MiraiNotes.Android.ViewModels
             SubTaskSelectedCommand = new MvxCommand<TaskItemViewModel>(
                 (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask)));
 
-            DeleteSubTaskCommand = new MvxAsyncCommand(() =>
-                NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(this));
+            DeleteSubTaskCommand = new MvxAsyncCommand(async() =>
+            {
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(this);
+                await NavigationService.Navigate<
+                    DeleteTaskDialogViewModel, 
+                    DeleteTaskDialogViewModelParameter, 
+                    DeleteTaskDialogViewModelResult>(parameter);
+            });
 
             ShowMenuOptionsDialogCommand = new MvxCommand<TaskItemViewModel>(
                 (subTask) => Messenger.Publish(new SubTaskSelectedMsg(this, subTask, true)));
+        }
+
+        public void SubTaskWasRemoved()
+        {
+            RaisePropertyChanged(() => HasSubTasks);
         }
     }
 }

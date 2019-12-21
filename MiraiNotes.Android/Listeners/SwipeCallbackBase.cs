@@ -28,8 +28,12 @@ namespace MiraiNotes.Android.Listeners
         public bool AnItemIsOpen 
             => _swipedPos != -1;
 
+        public bool IsSwipeEnabled = true;
+
+        private static readonly int _swipDirs = ItemTouchHelper.Left | ItemTouchHelper.Right;
+
         public SwipeCallbackBase(Context context, RecyclerView recyclerView)
-            : base(0, ItemTouchHelper.Left | ItemTouchHelper.Right)
+            :base(ItemTouchHelper.ActionStateIdle, _swipDirs)
         {
             Context = context;
             _recyclerView = recyclerView;
@@ -74,6 +78,19 @@ namespace MiraiNotes.Android.Listeners
                 }
             }
             return false;
+        }
+
+        public override int GetSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+        {
+            if (IsSwipeEnabled)
+                return _swipDirs;
+            return ItemTouchHelper.ActionStateIdle;
+        }
+
+        public override int GetDragDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+        {
+            //Drag is not allowed
+            return ItemTouchHelper.ActionStateIdle;
         }
 
         public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)

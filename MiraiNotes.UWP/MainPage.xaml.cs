@@ -1,5 +1,4 @@
 ﻿using MiraiNotes.UWP.Pages;
-using MiraiNotes.UWP.Utils;
 using MiraiNotes.UWP.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -46,18 +45,18 @@ namespace MiraiNotes.UWP
         private void ClosePaneButton_Click(object sender, RoutedEventArgs e)
         {
             var vm = (NavPageViewModel)DataContext;
-            //TODO: IMPROVE THIS
-            //var newTaskPage = (MiscellaneousUtils.FindControl<SplitView>(this, "MainSplitView").Pane as Frame)
-            //    .Content as NewTaskPage;
-            //var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
 
-            //if (vm.IsPaneOpen
-            //    && newTaskVm.AppSettings.AskBeforeDiscardChanges
-            //    && newTaskVm.ChangesWereMade())
-            //{
-            //    newTaskVm.ClosePaneCommand.Execute(null);
-            //    return;
-            //}
+            var newTaskPage = (MainSplitView.Pane as Frame)
+                .Content as NewTaskPage;
+            var newTaskVm = newTaskPage.DataContext as NewTaskPageViewModel;
+
+            if (vm.IsPaneOpen
+                && newTaskVm.AppSettings.AskBeforeDiscardChanges
+                && newTaskVm.ChangesWereMade())
+            {
+                newTaskVm.ClosePaneCommand.Execute(null);
+                return;
+            }
             vm.ClosePaneCommand.Execute(null);
         }
     }

@@ -29,8 +29,10 @@ namespace MiraiNotes.Android.Views.Activities
         private IMvxInteraction _hideKeyboardRequest;
         private IMvxInteraction _changeLanguageRequest;
         private IMvxInteraction<TaskSortType> _updateTaskSortOrderRequest;
+        private IMvxInteraction<bool> _changeTasksSelectionModeRequest;
         private bool _lockDrawerRequest;
         private TaskSortType _selectedTaskSortType;
+        private bool _allTasksAreSelected;
 
         public const string InitParamsKey = "InitParams";
 
@@ -56,11 +58,11 @@ namespace MiraiNotes.Android.Views.Activities
             {
                 if (_changeThemeRequest != null)
                     _changeThemeRequest.Requested -= (sender, args)
-                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.RestartActivity);
+                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
 
                 _changeThemeRequest = value;
                 _changeThemeRequest.Requested += (sender, args)
-                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.RestartActivity);
+                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
             }
         }
         public IMvxInteraction ChangeLanguageRequest
@@ -105,6 +107,21 @@ namespace MiraiNotes.Android.Views.Activities
                         => SetSelectedTaskSortType(args.Value);
             }
         }
+        public IMvxInteraction<bool> ChangeTasksSelectionModeRequest
+        {
+            get => _changeTasksSelectionModeRequest;
+            set
+            {
+                if (_changeTasksSelectionModeRequest != null)
+                    _changeTasksSelectionModeRequest.Requested -= (sender, args)
+                        => StartSelectionMode(args.Value);
+
+                _changeTasksSelectionModeRequest = value;
+                _changeTasksSelectionModeRequest.Requested += (sender, args)
+                        => StartSelectionMode(args.Value);
+            }
+        }
+
 
         public DrawerLayout DrawerLayout { get; private set; }
         public override int LayoutId
@@ -138,6 +155,7 @@ namespace MiraiNotes.Android.Views.Activities
             set.Bind(this).For(v => v.HideKeyboardRequest).To(vm => vm.HideKeyboard).OneWay();
             set.Bind(this).For(v => v.LockDrawerRequest).To(vm => vm.ShowProgressOverlay).OneWay();
             set.Bind(this).For(v => v.UpdateTaskSortOrderRequest).To(vm => vm.UpdateTaskSortOrder).OneWay();
+            set.Bind(this).For(v => v.ChangeTasksSelectionModeRequest).To(vm => vm.ChangeTasksSelectionMode).OneWay();
             set.Apply();
 
             _selectedTaskSortType = ViewModel.AppSettings.DefaultTaskSortOrder;
@@ -147,39 +165,69 @@ namespace MiraiNotes.Android.Views.Activities
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            MenuInflater.Inflate(Resource.Menu.menu_main, menu);
+            var fragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+            if (!ViewModel.IsInSelectionMode)
+            {
+                fragment?.IsActionBarBackButtonEnabled(false);
+                MenuInflater.Inflate(Resource.Menu.menu_main, menu);
+            }
+            else
+            {
+                fragment?.IsActionBarBackButtonEnabled(true);
+                MenuInflater.Inflate(Resource.Menu.menu_selection_mode, menu);
+            }
             return true;
         }
 
         public override bool OnPrepareOptionsMenu(IMenu menu)
         {
-            var accountsOption = menu.FindItem(Resource.Id.Accounts);
-            accountsOption?.SetTitle(ViewModel.GetText("Accounts"));
+            if (!ViewModel.IsInSelectionMode)
+            {
+                var accountsOption = menu.FindItem(Resource.Id.Accounts);
+                accountsOption?.SetTitle(ViewModel.GetText("Accounts"));
 
-            var settingsOption = menu.FindItem(Resource.Id.Settings);
-            settingsOption?.SetTitle(ViewModel.GetText("Settings"));
+                var settingsOption = menu.FindItem(Resource.Id.Settings);
+                settingsOption?.SetTitle(ViewModel.GetText("Settings"));
 
-            var logoutOption = menu.FindItem(Resource.Id.Logout);
-            logoutOption?.SetTitle(ViewModel.GetText("Logout"));
+                var logoutOption = menu.FindItem(Resource.Id.Logout);
+                logoutOption?.SetTitle(ViewModel.GetText("Logout"));
 
-            var fullSyncOption = menu.FindItem(Resource.Id.FullSync);
-            fullSyncOption?.SetTitle(ViewModel.GetText("Synchronization"));
+                var fullSyncOption = menu.FindItem(Resource.Id.FullSync);
+                fullSyncOption?.SetTitle(ViewModel.GetText("Synchronization"));
 
-            var sortOption = menu.FindItem(Resource.Id.SortTasks);
-            sortOption?.SetTitle(ViewModel.GetText("Sort"));
+                var sortOption = menu.FindItem(Resource.Id.SortTasks);
+                sortOption?.SetTitle(ViewModel.GetText("Sort"));
 
-            var manageTaskLists = menu.FindItem(Resource.Id.ManageTaskLists);
-            manageTaskLists?.SetTitle(ViewModel.GetText("ManageTaskLists"));
+                var manageTaskLists = menu.FindItem(Resource.Id.ManageTaskLists);
+                manageTaskLists?.SetTitle(ViewModel.GetText("ManageTaskLists"));
 
-            var sortMenu = sortOption?.SubMenu;
+                var selectionMode = menu.FindItem(Resource.Id.SelectionMode);
+                selectionMode?.SetTitle(ViewModel.GetText("SelectionMode"));
 
-            var resourceId = GetSelectedResourceId(_selectedTaskSortType);
-            sortMenu?.FindItem(Resource.Id.SortByNameAsc)?.SetTitle(ViewModel.GetText("SortByNameAsc"));
-            sortMenu?.FindItem(Resource.Id.SortByNameDesc)?.SetTitle(ViewModel.GetText("SortByNameDesc"));
-            sortMenu?.FindItem(Resource.Id.SortByUpdatedDateAsc)?.SetTitle(ViewModel.GetText("SortByUpdatedDateAsc"));
-            sortMenu?.FindItem(Resource.Id.SortByUpdatedDateDesc)?.SetTitle(ViewModel.GetText("SortByUpdatedDateDesc"));
+                var sortMenu = sortOption?.SubMenu;
 
-            sortMenu?.FindItem(resourceId)?.SetChecked(true);
+                var resourceId = GetSelectedResourceId(_selectedTaskSortType);
+                sortMenu?.FindItem(Resource.Id.SortByNameAsc)?.SetTitle(ViewModel.GetText("SortByNameAsc"));
+                sortMenu?.FindItem(Resource.Id.SortByNameDesc)?.SetTitle(ViewModel.GetText("SortByNameDesc"));
+                sortMenu?.FindItem(Resource.Id.SortByUpdatedDateAsc)?.SetTitle(ViewModel.GetText("SortByUpdatedDateAsc"));
+                sortMenu?.FindItem(Resource.Id.SortByUpdatedDateDesc)?.SetTitle(ViewModel.GetText("SortByUpdatedDateDesc"));
+
+                sortMenu?.FindItem(resourceId)?.SetChecked(true);
+            }
+            else
+            {
+                var deleteSelectedTasksOptions = menu.FindItem(Resource.Id.DeleteSelectedTasks);
+                deleteSelectedTasksOptions?.SetTitle(ViewModel.GetText("DeleteSelectedTasks"));
+
+                var markSelectedTasksAsCompletedOption = menu.FindItem(Resource.Id.MarkAsCompletedSelectedTasks);
+                markSelectedTasksAsCompletedOption?.SetTitle(ViewModel.GetText("MarkSelectedTasksAsCompleted"));
+
+                var moveSelectedTasksOption = menu.FindItem(Resource.Id.MoveSelectedTasks);
+                moveSelectedTasksOption?.SetTitle(ViewModel.GetText("MoveSelectedTasks"));
+
+                var selectAllTasksOption = menu.FindItem(Resource.Id.SelectAllTasks);
+                selectAllTasksOption?.SetTitle(ViewModel.GetText("SelectUnselectAllTasks"));
+            }
 
             return base.OnPrepareOptionsMenu(menu);
         }
@@ -197,7 +245,7 @@ namespace MiraiNotes.Android.Views.Activities
                     ViewModel.OnSettingsSelectedCommand.Execute();
                     break;
                 case Resource.Id.Logout:
-                    ViewModel.LogoutCommand.Execute(null);
+                    ViewModel.LogoutCommand.Execute();
                     break;
                 case Resource.Id.FullSync:
                     ViewModel.SyncCommand.Execute();
@@ -212,6 +260,35 @@ namespace MiraiNotes.Android.Views.Activities
                     item.SetChecked(true);
                     var sortType = GetSelectedTaskSortType(id);
                     ViewModel.TaskSortOrderChangedCommand.Execute(sortType);
+                    break;
+                //Below cases are only visible on selection mode
+                case Resource.Id.SelectionMode:
+                    StartSelectionMode(true);
+                    break;
+                case Resource.Id.SelectAllTasks:
+                    {
+                        _allTasksAreSelected = !_allTasksAreSelected;
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.SelectAllTasksCommand.Execute(_allTasksAreSelected);
+                    }
+                    break;
+                case Resource.Id.DeleteSelectedTasks:
+                    {
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.DeleteSelectedTasksCommand.Execute();
+                    }
+                    break;
+                case Resource.Id.MarkAsCompletedSelectedTasks:
+                    {
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.MarkSelectedTasksAsCompletedCommand.Execute();
+                    }
+                    break;
+                case Resource.Id.MoveSelectedTasks:
+                    {
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.MoveSelectedTasksCommand.Execute();
+                    }
                     break;
                 default:
                     return false;
@@ -238,6 +315,10 @@ namespace MiraiNotes.Android.Views.Activities
                 fragment.ViewModel.ChangesWereMade())
             {
                 fragment.ViewModel.CloseCommand.Execute();
+            }
+            else if (ViewModel.IsInSelectionMode)
+            {
+                StartSelectionMode(false);
             }
             else
             {
@@ -276,38 +357,26 @@ namespace MiraiNotes.Android.Views.Activities
 
         private TaskSortType GetSelectedTaskSortType(int resourceId)
         {
-            switch (resourceId)
+            return resourceId switch
             {
-                case Resource.Id.SortByNameAsc:
-                    return TaskSortType.BY_NAME_ASC;
-                case Resource.Id.SortByNameDesc:
-                    return TaskSortType.BY_NAME_DESC;
-                case Resource.Id.SortByUpdatedDateAsc:
-                    return TaskSortType.BY_UPDATED_DATE_ASC;
-                case Resource.Id.SortByUpdatedDateDesc:
-                    return TaskSortType.BY_UPDATED_DATE_DESC;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(resourceId), resourceId, "The provided resource id does not exists");
-            }
+                Resource.Id.SortByNameAsc => TaskSortType.BY_NAME_ASC,
+                Resource.Id.SortByNameDesc => TaskSortType.BY_NAME_DESC,
+                Resource.Id.SortByUpdatedDateAsc => TaskSortType.BY_UPDATED_DATE_ASC,
+                Resource.Id.SortByUpdatedDateDesc => TaskSortType.BY_UPDATED_DATE_DESC,
+                _ => throw new ArgumentOutOfRangeException(nameof(resourceId), resourceId, "The provided resource id does not exists"),
+            };
         }
 
         private int GetSelectedResourceId(TaskSortType sortType)
         {
-            switch (sortType)
+            return sortType switch
             {
-                case TaskSortType.BY_NAME_ASC:
-                    return Resource.Id.SortByNameAsc;
-                case TaskSortType.BY_NAME_DESC:
-                    return Resource.Id.SortByNameDesc;
-                case TaskSortType.BY_UPDATED_DATE_ASC:
-                    return Resource.Id.SortByUpdatedDateAsc;
-                case TaskSortType.BY_UPDATED_DATE_DESC:
-                    return Resource.Id.SortByUpdatedDateDesc;
-                case TaskSortType.CUSTOM_ASC:
-                case TaskSortType.CUSTOM_DESC:
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(sortType), sortType, "The TaskSortType doesnt have a default sort type");
-            }
+                TaskSortType.BY_NAME_ASC => Resource.Id.SortByNameAsc,
+                TaskSortType.BY_NAME_DESC => Resource.Id.SortByNameDesc,
+                TaskSortType.BY_UPDATED_DATE_ASC => Resource.Id.SortByUpdatedDateAsc,
+                TaskSortType.BY_UPDATED_DATE_DESC => Resource.Id.SortByUpdatedDateDesc,
+                _ => throw new ArgumentOutOfRangeException(nameof(sortType), sortType, "The TaskSortType doesnt have a default sort type"),
+            };
         }
 
         private void SetSelectedTaskSortType(TaskSortType sortType)
@@ -316,6 +385,23 @@ namespace MiraiNotes.Android.Views.Activities
             //when clicked
             InvalidateOptionsMenu();
             _selectedTaskSortType = sortType;
+        }
+
+        private void StartSelectionMode(bool isInSelectionMode)
+        {
+            LockDrawer(isInSelectionMode);
+            ViewModel.IsInSelectionMode = isInSelectionMode;
+            if (SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) is TasksFragment f)
+            {
+                f.ViewModel.IsInSelectionMode = isInSelectionMode;
+                f.ViewModel.StartSelectionModeCommand.Execute(isInSelectionMode);
+                f.ShowMainFab(!isInSelectionMode);
+                f.EnableSwipeToRefresh(!isInSelectionMode);
+                f.ResetSwipedItems();
+                f.SwipeCallback.IsSwipeEnabled = !isInSelectionMode;
+            }
+            _allTasksAreSelected = false;
+            InvalidateOptionsMenu();
         }
     }
 }

@@ -115,7 +115,7 @@ namespace MiraiNotes.UWP
                     switch (actionType)
                     {
                         case NotificationActionType.OPEN_TASK:
-                            BaseViewModel.InitDetails = new Tuple<string, string>(queryParams["taskListID"], queryParams["taskID"]);
+                            BaseViewModel.InitDetails = new Tuple<int, int>(int.Parse(queryParams["taskListID"]), int.Parse(queryParams["taskID"]));
                             break;
                         case NotificationActionType.MARK_AS_COMPLETED:
                         default:

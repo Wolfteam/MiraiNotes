@@ -12,7 +12,7 @@ namespace MiraiNotes.Android.Background
 
         public override Result DoWork()
         {
-            new SyncTask(false).Sync().GetAwaiter().GetResult();
+            new SyncTask(false, null).Sync().GetAwaiter().GetResult();
             return Result.InvokeSuccess();
         }
     }

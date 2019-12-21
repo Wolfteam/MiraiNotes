@@ -8,6 +8,7 @@ using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Extensions;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
@@ -27,12 +28,15 @@ namespace MiraiNotes.Android.ViewModels
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
         private readonly IMiraiNotesDataService _dataService;
+        private readonly IBackgroundTaskManagerService _backgroundTaskManager;
 
         private TaskListItemViewModel _currentTaskList;
         private MvxObservableCollection<TaskItemViewModel> _tasks = new MvxObservableCollection<TaskItemViewModel>();
         private bool _isBusy;
         private TaskSortType _currentTasksSortOrder = TaskSortType.BY_NAME_ASC;
         private readonly MvxInteraction _resetSwipedItems = new MvxInteraction();
+
+        public bool IsInSelectionMode;
         #endregion
 
         #region Interactions
@@ -64,12 +68,17 @@ namespace MiraiNotes.Android.ViewModels
 
         #region Commands
         public IMvxAsyncCommand<TaskItemViewModel> TaskSelectedCommand { get; private set; }
-        public IMvxAsyncCommand RefreshTasksCommand { get; private set; }
+        public IMvxCommand RefreshTasksCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskListCommand { get; private set; }
         public IMvxAsyncCommand AddNewTaskCommand { get; private set; }
         public IMvxAsyncCommand<TaskItemViewModel> ShowMenuOptionsDialogCommand { get; private set; }
         public IMvxAsyncCommand<int> SwipeToDeleteCommand { get; private set; }
         public IMvxAsyncCommand<int> SwipeToChangeTaskStatusCommand { get; private set; }
+        public IMvxCommand<bool> StartSelectionModeCommand { get; private set; }
+        public IMvxCommand<bool> SelectAllTasksCommand { get; private set; }
+        public IMvxAsyncCommand DeleteSelectedTasksCommand { get; private set; }
+        public IMvxAsyncCommand MarkSelectedTasksAsCompletedCommand { get; private set; }
+        public IMvxAsyncCommand MoveSelectedTasksCommand { get; private set; }
         #endregion
 
         public TasksViewModel(
@@ -81,12 +90,14 @@ namespace MiraiNotes.Android.ViewModels
             IDialogService dialogService,
             IMiraiNotesDataService dataService,
             IAppSettingsService appSettings,
-            ITelemetryService telemetryService)
+            ITelemetryService telemetryService,
+            IBackgroundTaskManagerService backgroundTaskManager)
             : base(textProvider, messenger, logger.ForContext<TasksViewModel>(), navigationService, appSettings, telemetryService)
         {
             _mapper = mapper;
             _dialogService = dialogService;
             _dataService = dataService;
+            _backgroundTaskManager = backgroundTaskManager;
         }
 
         public override void Prepare(TasksViewModelParameter parameter)
@@ -94,7 +105,7 @@ namespace MiraiNotes.Android.ViewModels
             base.Prepare(parameter);
             InitParams = parameter.NotificationAction;
             _currentTaskList = parameter.TaskList;
-            Title = GetText("Tasks");
+            SetTitle(true);
         }
 
         public override async Task Initialize()
@@ -107,17 +118,27 @@ namespace MiraiNotes.Android.ViewModels
         public override void SetCommands()
         {
             base.SetCommands();
-            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>((task) => OnTaskSelected(task.GoogleId));
-            
-            RefreshTasksCommand = new MvxAsyncCommand(Refresh);
-            
+            TaskSelectedCommand = new MvxAsyncCommand<TaskItemViewModel>(async (task) =>
+            {
+                if (IsInSelectionMode)
+                {
+                    OnTaskSelectedInSelectionMode(task);
+                    return;
+                }
+                await OnTaskSelected(task.GoogleId);
+            });
+
+            RefreshTasksCommand = new MvxCommand(Refresh);
+
             AddNewTaskListCommand = new MvxAsyncCommand(
                 () => NavigationService.Navigate<AddEditTaskListDialogViewModel, TaskListItemViewModel, AddEditTaskListDialogViewModelResult>(null));
-            
+
             AddNewTaskCommand = new MvxAsyncCommand(() => OnTaskSelected(string.Empty));
-            
+
             ShowMenuOptionsDialogCommand = new MvxAsyncCommand<TaskItemViewModel>((task) =>
             {
+                if (IsInSelectionMode)
+                    return Task.CompletedTask;
                 var parameter = TaskMenuOptionsViewModelParameter.Instance(_currentTaskList, task);
                 return NavigationService.Navigate<TaskMenuOptionsViewModel, TaskMenuOptionsViewModelParameter>(parameter);
             });
@@ -125,14 +146,37 @@ namespace MiraiNotes.Android.ViewModels
             SwipeToDeleteCommand = new MvxAsyncCommand<int>((position) =>
             {
                 var vm = Tasks.ElementAt(position);
-                return NavigationService.Navigate<DeleteTaskDialogViewModel, TaskItemViewModel, bool>(vm);
+                var parameter = DeleteTaskDialogViewModelParameter.Delete(vm);
+                return NavigationService.Navigate<
+                    DeleteTaskDialogViewModel,
+                    DeleteTaskDialogViewModelParameter,
+                    DeleteTaskDialogViewModelResult>(parameter);
             });
 
             SwipeToChangeTaskStatusCommand = new MvxAsyncCommand<int>((position) =>
             {
                 var vm = Tasks.ElementAt(position);
-                return NavigationService.Navigate<ChangeTaskStatusDialogViewModel, TaskItemViewModel, bool>(vm);
+                var parameter = ChangeTaskStatusDialogViewModelParameter.ChangeTaskStatus(vm);
+                return NavigationService.Navigate<
+                    ChangeTaskStatusDialogViewModel,
+                    ChangeTaskStatusDialogViewModelParameter,
+                    ChangeTaskStatusDialogViewModelResult>(parameter);
             });
+
+            StartSelectionModeCommand = new MvxCommand<bool>((isInSelectionMode) =>
+            {
+                ChangeAllTasksSelectedStatus(false, isInSelectionMode);
+                SetTitle(!isInSelectionMode);
+            });
+
+            SelectAllTasksCommand = new MvxCommand<bool>
+                (selectThemAll => ChangeAllTasksSelectedStatus(selectThemAll, IsInSelectionMode));
+
+            DeleteSelectedTasksCommand = new MvxAsyncCommand(DeleteSelectedTasks);
+
+            MarkSelectedTasksAsCompletedCommand = new MvxAsyncCommand(MarkSelectedTasksAsCompleted);
+
+            MoveSelectedTasksCommand = new MvxAsyncCommand(MoveSelectedTasks);
         }
 
         public override void RegisterMessages()
@@ -146,7 +190,20 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => SortTasks(msg.NewSortOrder)),
                 Messenger.Subscribe<TaskDateUpdatedMsg>(msg => OnTaskDateUpdated(msg.Task, msg.IsAReminderDate)),
                 Messenger.Subscribe<TaskMovedMsg>(msg => OnTaskDeleted(msg.TaskId, msg.ParentTask, msg.HasParentTask, msg.NewTaskListId)),
-                Messenger.Subscribe<SubTaskSelectedMsg>(async msg => await OnSubTaskSelected(msg))
+                Messenger.Subscribe<SubTaskSelectedMsg>(async msg =>
+                {
+                    if (IsInSelectionMode)
+                    {
+                        OnTaskSelectedInSelectionMode(msg.SubTask);
+                        return;
+                    }
+                    await OnSubTaskSelected(msg);
+                }),
+                Messenger.Subscribe<TaskSelectectionModeChangedMsg>(msg =>
+                {
+                    if (IsInSelectionMode)
+                        SetTitle(false);
+                })
             };
 
             SubscriptionTokens.AddRange(subscriptions);
@@ -205,11 +262,11 @@ namespace MiraiNotes.Android.ViewModels
             IsBusy = false;
 
             //If we have something in the init params, lets select that task
-            if (InitParams != null && Tasks.Any(t => t.GoogleId == InitParams.TaskId))
+            if (InitParams != null && Tasks.Any(t => t.Id == InitParams.TaskId))
             {
-                string taskId = InitParams.TaskId;
+                var task = Tasks.First(t => t.Id == InitParams.TaskId);
                 InitParams = null;
-                await OnTaskSelected(taskId);
+                await OnTaskSelected(task.GoogleId);
             }
         }
 
@@ -388,12 +445,28 @@ namespace MiraiNotes.Android.ViewModels
             }
             else
             {
-                Tasks
-                    .FirstOrDefault(t => t.GoogleId == parentTask)?
-                    .SubTasks?
-                    .RemoveAll(st => st.GoogleId == taskId);
+                var parent = Tasks.FirstOrDefault(t => t.GoogleId == parentTask);
+                parent?.SubTasks?.RemoveAll(st => st.GoogleId == taskId);
+                parent?.SubTaskWasRemoved();
             }
             Messenger.Publish(new RefreshNumberOfTasksMsg(this, affectedItems, taskListId));
+        }
+
+        private void SetTitle(bool useDefault)
+        {
+            if (useDefault)
+            {
+                Title = GetText("Tasks");
+                return;
+            }
+
+            var selectedTasks = Tasks.Where(t => t.IsSelected).ToList();
+            int itemsSelected = selectedTasks.Count + Tasks
+                .SelectMany(t => t.SubTasks)
+                .Where(st => st.IsSelected)
+                .Count();
+
+            Title = GetText("XItemsSelected", $"{itemsSelected}");
         }
 
         private async Task OnSubTaskSelected(SubTaskSelectedMsg msg)
@@ -408,12 +481,13 @@ namespace MiraiNotes.Android.ViewModels
             }
         }
 
-        private async Task Refresh()
+        private void Refresh()
         {
-            IsBusy = true;
-            await Task.Delay(2000);
-            // do refresh work here
-            IsBusy = false;
+            var parameter = new BackgroundTaskParameter
+            {
+                SyncOnlyTaskListId = _currentTaskList.Id
+            };
+            _backgroundTaskManager.StartBackgroundTask(BackgroundTaskType.SYNC, parameter);
         }
 
         private void SortTasks(TaskSortType sortType)
@@ -449,6 +523,118 @@ namespace MiraiNotes.Android.ViewModels
             }
 
             CurrentTasksSortOrder = sortType;
+        }
+
+        private void OnTaskSelectedInSelectionMode(TaskItemViewModel task)
+        {
+            task.IsSelected = !task.IsSelected;
+            SetTitle(false);
+        }
+
+        private void ChangeAllTasksSelectedStatus(bool isSelected, bool isInSelectionMode)
+        {
+            foreach (var task in Tasks)
+            {
+                task.IsSelected = isSelected;
+                task.CanBeSelected = isInSelectionMode;
+
+                foreach (var st in task.SubTasks)
+                {
+                    st.IsSelected = isSelected;
+                    st.CanBeSelected = isInSelectionMode;
+                }
+            }
+        }
+
+        private async Task DeleteSelectedTasks()
+        {
+            var selectedTasks = GetSelectedTasks(true);
+
+            if (!selectedTasks.Any())
+            {
+                _dialogService.ShowInfoToast(GetText("PleaseSelectAtLeastOneTask"));
+                return;
+            }
+
+            var parameter = DeleteTaskDialogViewModelParameter.Delete(selectedTasks);
+            var result = await NavigationService.Navigate<
+                DeleteTaskDialogViewModel,
+                DeleteTaskDialogViewModelParameter,
+                DeleteTaskDialogViewModelResult>(parameter);
+
+            if (result?.IsDeleted == true || result?.IsPartiallyDeleted == true)
+                Messenger.Publish(new ChangeTasksSelectionModeMsg(this, false));
+        }
+
+        private async Task MarkSelectedTasksAsCompleted()
+        {
+            var selectedTasks = GetSelectedTasks(false);
+
+            if (!selectedTasks.Any())
+            {
+                _dialogService.ShowInfoToast(GetText("PleaseSelectAtLeastOneTask"));
+                return;
+            }
+
+            if (selectedTasks.All(st => st.TaskStatus == GoogleTaskStatus.COMPLETED))
+            {
+                _dialogService.ShowInfoToast(GetText("SelectedTasksAreAlreadyCompleted"));
+                return;
+            }
+
+            var parameter = ChangeTaskStatusDialogViewModelParameter.ChangeTaskStatus(selectedTasks);
+            var result = await NavigationService.Navigate<
+                ChangeTaskStatusDialogViewModel,
+                ChangeTaskStatusDialogViewModelParameter,
+                ChangeTaskStatusDialogViewModelResult>(parameter);
+
+            if (result?.StatusChanged == true || result?.PartiallyChanged == true)
+                Messenger.Publish(new ChangeTasksSelectionModeMsg(this, false));
+        }
+
+        private async Task MoveSelectedTasks()
+        {
+            var selectedTasks = GetSelectedTasks(true);
+
+            if (!selectedTasks.Any())
+            {
+                _dialogService.ShowInfoToast(GetText("PleaseSelectAtLeastOneTask"));
+                return;
+            }
+
+            var parameter = TaskListsDialogViewModelParameter.MoveTo(_currentTaskList, selectedTasks);
+            var result = await NavigationService.Navigate<
+                TaskListsDialogViewModel,
+                TaskListsDialogViewModelParameter,
+                TaskListsDialogViewModelResult>(parameter);
+
+            if (result?.WasMoved == true || result?.WasPartiallyMoved == true)
+                Messenger.Publish(new ChangeTasksSelectionModeMsg(this, false));
+        }
+
+        private List<TaskItemViewModel> GetSelectedTasks(bool excludeSubTasksFromSelectedTasks)
+        {
+            //Some methods (e.g: move a task), already takes care of the subtask, 
+            //thats why we dont need to bring them into the selected tasks
+            if (excludeSubTasksFromSelectedTasks)
+            {
+                var selectedTasks = Tasks.Where(t => t.IsSelected).ToList();
+                var ids = selectedTasks.Select(t => t.GoogleId);
+                var selectedSubTasks = Tasks
+                    .SelectMany(t => t.SubTasks)
+                    .Where(st => st.IsSelected && !ids.Contains(st.ParentTask));
+
+                selectedTasks.AddRange(selectedSubTasks);
+
+                return selectedTasks;
+            }
+            else
+            {
+                var selectedTasks = Tasks.Where(t => t.IsSelected).ToList();
+                var selectedSubTasks = Tasks.SelectMany(t => t.SubTasks).Where(st => st.IsSelected);
+                selectedTasks.AddRange(selectedSubTasks);
+                return selectedTasks;
+            }
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿using AndroidX.Work;
+﻿using Android.OS;
+using AndroidX.Work;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Background;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 using MvvmCross;
 using MvvmCross.Platforms.Android;
 using System;
@@ -45,13 +47,24 @@ namespace MiraiNotes.Android.Services
 
         public async void StartBackgroundTask(BackgroundTaskType backgroundTask)
         {
+            await Task.Delay(1);
+            StartBackgroundTask(backgroundTask, null);
+        }
+
+        public async void StartBackgroundTask(BackgroundTaskType backgroundTask, BackgroundTaskParameter parameter)
+        {
             switch (backgroundTask)
             {
                 case BackgroundTaskType.SYNC:
                     await Task.Delay(10);
-
                     var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-                    top.Activity.StartForegroundServiceCompat<SyncBackgroundService>();
+                    Bundle bundle = null;
+                    if (parameter != null)
+                    {
+                        bundle = new Bundle();
+                        bundle.PutInt(SyncBackgroundService.TaskListIdToSyncKey, parameter.SyncOnlyTaskListId);
+                    }
+                    top.Activity.StartForegroundServiceCompat<SyncBackgroundService>(bundle);
                     break;
                 case BackgroundTaskType.ANY:
                 case BackgroundTaskType.MARK_AS_COMPLETED:
@@ -76,12 +89,12 @@ namespace MiraiNotes.Android.Services
 
         private void RegisterTask(int id, long runEach)
         {
-            //var constraints = new Constraints.Builder()
-            //    .SetRequiresBatteryNotLow(true)
-            //    .Build();
+            var constraints = new Constraints.Builder()
+                .SetRequiredNetworkType(NetworkType.Connected)
+                .Build();
             var workRequest = PeriodicWorkRequest.Builder
                 .From<SyncBackgroundTask>(TimeSpan.FromMinutes(runEach))
-                //.SetConstraints(constraints)
+                .SetConstraints(constraints)
                 .AddTag($"{id}")
                 .Build();
             WorkManager.Instance.EnqueueUniquePeriodicWork($"{id}", ExistingPeriodicWorkPolicy.Replace, workRequest);

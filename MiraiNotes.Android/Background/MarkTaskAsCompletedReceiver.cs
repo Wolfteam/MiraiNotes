@@ -43,7 +43,7 @@ namespace MiraiNotes.Android.Background
         public class MarkAsCompletedTask : Java.Lang.Thread
         {
             private readonly TaskReminderNotification _notification;
-            
+
             private ILogger _logger;
             private ITelemetryService _telemetryService;
 
@@ -73,17 +73,25 @@ namespace MiraiNotes.Android.Background
                     var notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
                     var textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
                     var messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
-                    _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<MarkTaskAsCompletedReceiver>();
+                    _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<MarkAsCompletedTask>();
                     _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
 
                     if (!isAppInForeground)
                         _telemetryService.Init();
 
                     _logger.Information($"Marking taskId = {_notification.TaskId} as completed...");
-
-                    var response = await dataService.TaskService.ChangeTaskStatusAsync(
-                        _notification.TaskId,
-                        GoogleTaskStatus.COMPLETED);
+                    //if i pass the notifaction in the lambda, the task crashes..
+                    int taskId = _notification.TaskId;
+                    var taskResponse = await dataService.TaskService
+                        .FirstOrDefaultAsNoTrackingAsync(t => t.ID == taskId);
+                    if (!taskResponse.Succeed)
+                    {
+                        _logger.Error($"Couldnt retrieve taskId = {_notification.Id}. Error = {taskResponse.Message}");
+                        return;
+                    }
+                    var googleTaskId = taskResponse.Result.GoogleTaskID;
+                    var response = await dataService.TaskService
+                        .ChangeTaskStatusAsync(googleTaskId, GoogleTaskStatus.COMPLETED);
 
                     if (response.Succeed)
                     {
@@ -93,11 +101,11 @@ namespace MiraiNotes.Android.Background
                         {
                             var task = response.Result;
                             var msg = new TaskStatusChangedMsg(
-                                this, 
-                                task.GoogleTaskID, 
-                                task.ParentTask, 
-                                task.CompletedOn, 
-                                task.UpdatedAt, 
+                                this,
+                                task.GoogleTaskID,
+                                task.ParentTask,
+                                task.CompletedOn,
+                                task.UpdatedAt,
                                 task.Status);
                             messenger.Publish(msg);
                         }

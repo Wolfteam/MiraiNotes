@@ -457,8 +457,8 @@ namespace MiraiNotes.UWP.ViewModels
                 _notificationService.ScheduleNotification(new TaskReminderNotification
                 {
                     Id = id,
-                    TaskListId = _currentTaskList.TaskListID,
-                    TaskId = CurrentTask.TaskID,
+                    TaskListId = _currentTaskList.Id,
+                    TaskId = CurrentTask.Id,
                     TaskListTitle = _currentTaskList.Title,
                     TaskTitle = CurrentTask.Title,
                     TaskBody = notes,
@@ -468,6 +468,8 @@ namespace MiraiNotes.UWP.ViewModels
 
             _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_SAVED}");
             UpdateTaskOperationTitle(isNewTask, CurrentTask.HasParentTask);
+            
+            _changedProperties.Clear();
         }
 
         public async Task DeleteTaskAsync()
@@ -486,6 +488,18 @@ namespace MiraiNotes.UWP.ViewModels
             var deleteResponse = await _dataService
                 .TaskService
                 .RemoveTaskAsync(CurrentTask.TaskID);
+
+            if (TasksHelper.HasReminderId(CurrentTask.RemindOnGUID, out int id))
+            {
+                _notificationService.RemoveScheduledNotification(id);
+            }
+
+            if (CurrentTask.HasSubTasks)
+            {
+                foreach (var st in CurrentTask.SubTasks)
+                    if (TasksHelper.HasReminderId(st.RemindOnGUID, out int stReminderId))
+                        _notificationService.RemoveScheduledNotification(stReminderId);
+            }
 
             ShowTaskProgressRing = false;
 
@@ -653,6 +667,27 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
+            var movedTask = moveResponse.Result;
+            if (movedTask != null && 
+                TasksHelper.HasReminderId(movedTask.RemindOnGUID, out int id) && 
+                TasksHelper.CanReAddReminder(movedTask.RemindOn.Value))
+            {
+                string notes = TasksHelper.GetNotesForNotification(movedTask.Notes);
+
+                _notificationService.RemoveScheduledNotification(id);
+                _notificationService.ScheduleNotification(new TaskReminderNotification
+                {
+                    Id = id,
+                    TaskListId = SelectedTaskList.Id,
+                    TaskId = movedTask.ID,
+                    TaskListTitle = SelectedTaskList.Title,
+                    TaskTitle = movedTask.Title,
+                    TaskBody = notes,
+                    DeliveryOn = movedTask.RemindOn.Value
+                });
+            }
+
+
             if (!CurrentTask.HasParentTask)
                 _messenger.Send(CurrentTask.TaskID, $"{MessageType.TASK_DELETED_FROM_PANE_FRAME}");
             else
@@ -660,7 +695,6 @@ namespace MiraiNotes.UWP.ViewModels
                     new KeyValuePair<string, string>(CurrentTask.ParentTask, CurrentTask.TaskID),
                     $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");
 
-            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             var subTasks = GetSubTasksToSave(false, true);
 
@@ -669,6 +703,10 @@ namespace MiraiNotes.UWP.ViewModels
             ShowTaskProgressRing = false;
 
             await SaveSubTasksAsync(subTasks, false, true, Enumerable.Empty<TaskItemViewModel>().ToList());
+
+            _changedProperties.Clear();
+
+            _messenger.Send(false, $"{MessageType.OPEN_PANE}");
 
             _messenger.Send(
                 $"Task sucessfully moved from: {_currentTaskList.Title} to: {SelectedTaskList.Title}",
@@ -785,6 +823,11 @@ namespace MiraiNotes.UWP.ViewModels
             var deleteResponse = await _dataService
                 .TaskService
                 .RemoveTaskAsync(subTask.TaskID);
+
+            if (TasksHelper.HasReminderId(subTask.RemindOnGUID, out int id))
+            {
+                _notificationService.RemoveScheduledNotification(id);
+            }
 
             ShowTaskProgressRing = false;
             if (!deleteResponse.Succeed)

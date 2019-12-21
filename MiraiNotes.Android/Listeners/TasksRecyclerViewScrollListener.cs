@@ -7,30 +7,22 @@ namespace MiraiNotes.Android.Listeners
     public class TasksRecyclerViewScrollListener : RecyclerView.OnScrollListener
     {
         private readonly FloatingActionButton _fab;
-        private readonly Action _onScrolled;
+        private readonly Func<bool> _canScroll;
 
-        public TasksRecyclerViewScrollListener(FloatingActionButton fab, Action onScrolled = null)
+        public TasksRecyclerViewScrollListener(FloatingActionButton fab, Func<bool> canScroll)
         {
             _fab = fab;
-            _onScrolled = onScrolled;
+            _canScroll = canScroll;
         }
 
         public override void OnScrolled(RecyclerView recyclerView, int dx, int dy)
         {
+            if (!_canScroll.Invoke())
+                return;
             if (dy < 0 && !_fab.IsShown)
                 _fab.Show();
             else if (dy > 0 && _fab.IsShown)
                 _fab.Hide();
-        }
-
-        public override void OnScrollStateChanged(RecyclerView recyclerView, int newState)
-        {
-            base.OnScrollStateChanged(recyclerView, newState);
-
-            if (newState == RecyclerView.ScrollStateDragging)
-            {
-                _onScrolled?.Invoke();
-            }
         }
     }
 }

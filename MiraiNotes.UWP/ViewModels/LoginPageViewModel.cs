@@ -235,6 +235,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             var now = DateTimeOffset.UtcNow;
             ResponseDto<GoogleUser> userSaved;
+            if (!response.Succeed)
+                throw new Exception($"Couldnt check if userId = {user.ID} exists on db");
+
             if (!response.Result)
             {
                 _logger.Information($"{nameof(SignInAsync)}: User doesnt exist in db. Creating a new one...");

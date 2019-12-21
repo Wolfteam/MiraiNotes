@@ -161,18 +161,20 @@
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
                                                 FontSize="12"
-                                                Text="{Binding Notes, Mode=OneWay, Converter={StaticResource StringDelimiterConverter}, ConverterParameter=10}" />
+                                                MaxLines="1"
+                                                Text="{Binding Notes, Mode=OneWay, Converter={StaticResource StringDelimiterConverter}, ConverterParameter=100}" />
                                         </Grid>
                                     </StackPanel>
                                 </Grid>
                                 <CommandBar
                                     Grid.Column="1"
+                                    VerticalAlignment="Center"
                                     Background="Transparent"
                                     DefaultLabelPosition="Collapsed">
                                     <CommandBar.PrimaryCommands>
                                         <AppBarButton
                                             Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.DeleteTaskCommand}"
-                                            CommandParameter="{Binding TaskID}"
+                                            CommandParameter="{Binding}"
                                             Icon="Delete"
                                             Label="Delete"
                                             ToolTipService.ToolTip="Delete this task" />
@@ -481,6 +483,9 @@
                         IsEnabled="{Binding IsTaskListViewVisible, Mode=OneWay}"
                         Label="Move selected tasks"
                         ToolTipService.ToolTip="Moves the selected tasks to a different task list">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
+                        </AppBarButton.Icon>
                         <AppBarButton.Flyout>
                             <Flyout Opened="TaskList_ComboBox_DropDownOpened">
                                 <ComboBox
@@ -513,9 +518,6 @@
                                 </ComboBox>
                             </Flyout>
                         </AppBarButton.Flyout>
-                        <AppBarButton.Icon>
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
-                        </AppBarButton.Icon>
                     </AppBarButton>
                 </CommandBar.SecondaryCommands>
             </CommandBar>

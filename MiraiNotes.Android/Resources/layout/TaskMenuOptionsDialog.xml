@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     android:id="@+id/TaskMenuOptionsDialogView"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -66,4 +66,12 @@
         app:icon="@drawable/ic_notifications_black_24dp"
         app:iconTint="@color/OrangeAccentColorLight"
         app:MvxBind="Text [AddReminder]; Click AddReminderCommand"/>
+
+    <android.support.design.button.MaterialButton
+        android:textColor="@color/PinkAccentColorDark"
+        android:text="Share"
+        style="@style/TaskMenuOptionButton"
+        app:icon="@drawable/ic_share_black_24dp"
+        app:iconTint="@color/PinkAccentColorDark"
+        app:MvxBind="Text [Share]; Click ShareCommand"/>
 </LinearLayout>

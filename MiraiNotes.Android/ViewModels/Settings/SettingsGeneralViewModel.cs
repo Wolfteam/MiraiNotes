@@ -128,7 +128,22 @@ namespace MiraiNotes.Android.ViewModels.Settings
                     return;
                 AppSettings.AppTheme = selectedTheme;
                 RaisePropertyChanged(() => SelectedAppTheme);
-                Messenger.Publish(new AppThemeChangedMsg(this, selectedTheme, AppSettings.AppHexAccentColor));
+                RaisePropertyChanged(() => CanUseDarkAmoledTheme);
+                Messenger.Publish(new AppThemeChangedMsg(this, selectedTheme, AppSettings.AppHexAccentColor, AppSettings.UseDarkAmoledTheme));
+            }
+        }
+
+        public bool CanUseDarkAmoledTheme 
+            => AppSettings.AppTheme == AppThemeType.DARK;
+
+        public bool UseDarkAmoledTheme
+        {
+            get => AppSettings.UseDarkAmoledTheme;
+            set
+            {
+                AppSettings.UseDarkAmoledTheme = value;
+                RaisePropertyChanged(() => UseDarkAmoledTheme);
+                Messenger.Publish(new AppThemeChangedMsg(this, AppSettings.AppTheme, AppSettings.AppHexAccentColor, value));
             }
         }
 
@@ -146,7 +161,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 if (AppSettings.AppHexAccentColor == selectedColor)
                     return;
                 AppSettings.AppHexAccentColor = selectedColor;
-                Messenger.Publish(new AppThemeChangedMsg(this, AppSettings.AppTheme, selectedColor));
+                Messenger.Publish(new AppThemeChangedMsg(this, AppSettings.AppTheme, selectedColor, AppSettings.UseDarkAmoledTheme));
                 //AccentColorChanged = true;
                 //RaisePropertyChanged(() => SelectedAccentColor);
             }
@@ -251,6 +266,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
         public IMvxAsyncCommand AskForPasswordWhenAppStartsCommand { get; private set; }
         public IMvxAsyncCommand AskForFingerPrintWhenAppStartsCommand { get; private set; }
         public IMvxCommand AskBeforeDiscardChangesCommand { get; private set; }
+        public IMvxCommand UseDarkAmoledThemeCommand { get; private set; }
         #endregion
 
         public SettingsGeneralViewModel(
@@ -299,7 +315,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
                 }
                 Messenger.Publish(new HideKeyboardMsg(this));
             });
-            AskForFingerPrintWhenAppStartsCommand = new MvxAsyncCommand(async() =>
+            AskForFingerPrintWhenAppStartsCommand = new MvxAsyncCommand(async () =>
             {
                 var value = !AskForFingerPrintWhenAppStarts;
                 var fingerprintAvailability = await _fingerprintService.GetAvailabilityAsync();
@@ -317,6 +333,8 @@ namespace MiraiNotes.Android.ViewModels.Settings
             });
             AskBeforeDiscardChangesCommand = new MvxCommand(
                 () => AskBeforeDiscardChanges = !AskBeforeDiscardChanges);
+            UseDarkAmoledThemeCommand = new MvxCommand(
+                () => UseDarkAmoledTheme = !UseDarkAmoledTheme);
         }
     }
 }

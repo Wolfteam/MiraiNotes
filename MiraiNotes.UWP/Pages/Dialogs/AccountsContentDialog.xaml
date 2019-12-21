@@ -38,12 +38,14 @@
                 <StackPanel
                     Grid.Column="1"
                     Margin="10,0,0,0"
+                    VerticalAlignment="Center"
                     Orientation="Vertical">
                     <TextBlock FontWeight="Bold" Text="{Binding Fullname, Mode=OneWay}" />
                     <TextBlock FontWeight="SemiLight" Text="{Binding Email, Mode=OneWay}" />
                 </StackPanel>
                 <CommandBar
                     Grid.Column="2"
+                    VerticalAlignment="Center"
                     Background="Transparent"
                     DefaultLabelPosition="Collapsed">
                     <CommandBar.PrimaryCommands>

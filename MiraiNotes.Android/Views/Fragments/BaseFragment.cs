@@ -75,7 +75,7 @@ namespace MiraiNotes.Android.Views.Fragments
                 _drawerToggle.SyncState();
         }
 
-        public void SetActionBarTitle(bool isBackEnabled)
+        public void IsActionBarBackButtonEnabled(bool isBackEnabled)
         {
             _drawerToggle.DrawerIndicatorEnabled = !isBackEnabled;
             _drawerToggle.ToolbarNavigationClickListener = new ClickListener((v) =>
@@ -85,6 +85,10 @@ namespace MiraiNotes.Android.Views.Fragments
             //ParentActivity.SupportActionBar.Title = title;
             ParentActivity.SupportActionBar.SetDisplayHomeAsUpEnabled(isBackEnabled);
             ParentActivity.SupportActionBar.SetHomeButtonEnabled(isBackEnabled);
+
+            //this will reset the clicklistener and the original icon
+            if (!isBackEnabled)
+                _drawerToggle.SyncState();
         }
     }
 }

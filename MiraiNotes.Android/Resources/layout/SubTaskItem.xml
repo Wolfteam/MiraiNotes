@@ -10,6 +10,11 @@
     android:paddingHorizontal="10dp"
     android:background="?android:attr/selectableItemBackground">
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:MvxBind="Checked IsSelected; Visibility Visibility(CanBeSelected)"/>
+
     <TextView
         android:id="@+id/SubTaskItemTitle"
         android:layout_width="0dp"
@@ -29,5 +34,5 @@
         android:src="@drawable/ic_close_black_24dp"
         android:background="?android:attr/selectableItemBackground"
         android:layout_gravity="right|center_vertical"
-        app:MvxBind="Click DeleteSubTaskCommand"/>
+        app:MvxBind="Visibility InvertedVisibility(CanBeSelected); Click DeleteSubTaskCommand"/>
 </LinearLayout>

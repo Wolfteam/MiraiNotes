@@ -123,8 +123,8 @@ namespace MiraiNotes.UWP.Services
         }
 
         private ToastContent GenerateTaskReminderToastContent(
-            string taskListID,
-            string taskID,
+            int taskListID,
+            int taskID,
             string taskListTitle,
             string taskTitle,
             string taskBody)

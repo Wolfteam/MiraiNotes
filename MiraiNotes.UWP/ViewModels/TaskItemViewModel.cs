@@ -20,6 +20,8 @@ namespace MiraiNotes.UWP.ViewModels
 
         #endregion
 
+        public int Id { get; set; }
+
         public string TaskID
         {
             get => _taskID;
@@ -280,9 +282,6 @@ namespace MiraiNotes.UWP.ViewModels
                 }
             }
         }
-
-        public bool IsReminderDateSet
-            => RemindOn != null;
 
         public bool HasAReminderDate
             => RemindOn != null;

@@ -4,6 +4,8 @@ using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Dto.Google.Responses;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Services;
+using MiraiNotes.UWP.Controls;
+using MiraiNotes.UWP.Controls.Authentication;
 using Serilog;
 using System;
 using System.Linq;
@@ -29,11 +31,11 @@ namespace MiraiNotes.UWP.Services
             var response = new ResponseDto<TokenResponseDto>();
             try
             {
-                var result = await WebAuthenticationBroker
-                    .AuthenticateAsync(WebAuthenticationOptions.None, requestUri, callbackUri);
+                var result = await CustomWebAuthenticationBroker
+                    .AuthenticateAsync(WebAuthenticationOptions.None, requestUri, callbackUri, false);
                 switch (result.ResponseStatus)
                 {
-                    case WebAuthenticationStatus.Success:
+                    case CustomWebAuthenticationStatus.Success:
                         var queryParams = result.ResponseData
                             .Split('&')
                             .ToDictionary(
@@ -58,9 +60,9 @@ namespace MiraiNotes.UWP.Services
 
                         response = tokenResponse;
                         break;
-                    case WebAuthenticationStatus.UserCancel:
+                    case CustomWebAuthenticationStatus.UserCancel:
                         break;
-                    case WebAuthenticationStatus.ErrorHttp:
+                    case CustomWebAuthenticationStatus.ErrorHttp:
                         response.Message = $"Http error, {result.ResponseErrorDetail}";
                         break;
                     default:

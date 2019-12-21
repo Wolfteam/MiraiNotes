@@ -68,8 +68,14 @@
     app:showAsAction="never" />
 
   <item
-    android:id="@+id/Logout"
+    android:id="@+id/SelectionMode"
     android:orderInCategory="105"
+    android:icon="@drawable/ic_edit_black_24dp"
+    app:showAsAction="never" />
+
+  <item
+    android:id="@+id/Logout"
+    android:orderInCategory="106"
     android:title="Logout"
     android:icon="@drawable/ic_arrow_back_black_24dp"
     app:showAsAction="never" />

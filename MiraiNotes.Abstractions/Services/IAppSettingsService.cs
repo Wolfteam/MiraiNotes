@@ -32,10 +32,12 @@ namespace MiraiNotes.Abstractions.Services
 
         AppLanguageType AppLanguage { get; set; }
 
-        string SelectedTaskListId { get; set; }
+        int SelectedDbTaskListId { get; set; }
 
         bool AskBeforeDiscardChanges { get; set; }
 
         string CurrentAppMigration { get; set; }
+
+        bool UseDarkAmoledTheme { get; set; }
     }
 }

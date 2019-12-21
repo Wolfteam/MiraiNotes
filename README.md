@@ -33,7 +33,9 @@ A simple UWP / Android notes app that provides synchronization with Google Task 
 
 ### Installation
 #### UWP
-I currently don't have a developer account to publish this app in the Microsoft Store (WIP).... so to install this app:
+[<img height="100" width="300" src="https://www.nexiahome.com/wp-content/uploads/2016/03/windows-store-button-300x78.png" />](https://www.microsoft.com/es-ec/p/mirai-notes/9npzxkvtsp6l?activetab=pivot:overviewtab)
+
+#### Manual Installation
 * Go into the Windows Settings -> Updates & Security ->For Developers
 * Select the **Sideload apps** checkbox
 * Download the latest version of the app in the [Release section](https://github.com/Wolfteam/MiraiNotes/releases) 

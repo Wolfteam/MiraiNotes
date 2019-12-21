@@ -116,8 +116,11 @@
     </Compile>
     <Compile Include="BackgroundTasks\MarkAsCompletedBackgroundTask.cs" />
     <Compile Include="BackgroundTasks\SyncBackgroundTask.cs" />
+    <Compile Include="Controls\Authentication\CustomWebAuthenticationBroker.cs" />
     <Compile Include="Controls\DataTemplates\AccentColorTemplateSelector.cs" />
     <Compile Include="Controls\TasksListView.cs" />
+    <Compile Include="Controls\Authentication\CustomWebAuthenticationResult.cs" />
+    <Compile Include="Controls\Authentication\CustomWebAuthenticationStatus.cs" />
     <Compile Include="Converters\AutoSuggestQueryParameterConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />

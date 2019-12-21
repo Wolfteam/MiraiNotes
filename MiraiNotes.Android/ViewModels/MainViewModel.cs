@@ -28,8 +28,12 @@ namespace MiraiNotes.Android.ViewModels
         private readonly MvxInteraction _appLanguageChanged = new MvxInteraction();
         private readonly MvxInteraction _hideKeyboard = new MvxInteraction();
         private readonly MvxInteraction<TaskSortType> _updateTaskSortOrder = new MvxInteraction<TaskSortType>();
+        private readonly MvxInteraction<bool> _changeTasksSelectionMode = new MvxInteraction<bool>();
 
         private bool _showProgressOverlay;
+        private string _overlayText;
+
+        public bool IsInSelectionMode;
         #endregion
 
         #region Interactors
@@ -47,6 +51,9 @@ namespace MiraiNotes.Android.ViewModels
 
         public IMvxInteraction<TaskSortType> UpdateTaskSortOrder
             => _updateTaskSortOrder;
+
+        public IMvxInteraction<bool> ChangeTasksSelectionMode
+            => _changeTasksSelectionMode;
         #endregion
 
         #region Properties
@@ -54,6 +61,12 @@ namespace MiraiNotes.Android.ViewModels
         {
             get => _showProgressOverlay;
             set => SetProperty(ref _showProgressOverlay, value);
+        }
+
+        public string OverlayText
+        {
+            get => _overlayText;
+            set => SetProperty(ref _overlayText, value);
         }
 
         public NotificationAction InitParams { get; set; }
@@ -133,8 +146,10 @@ namespace MiraiNotes.Android.ViewModels
                 Messenger.Subscribe<ShowProgressOverlayMsg>(msg =>
                 {
                     ShowProgressOverlay = msg.Show;
+                    OverlayText = !string.IsNullOrEmpty(msg.Msg) ? msg.Msg : $"{TextProvider.Get("Loading")}...";
                 }),
-                Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => _updateTaskSortOrder.Raise(msg.NewSortOrder))
+                Messenger.Subscribe<TaskSortOrderChangedMsg>(msg => _updateTaskSortOrder.Raise(msg.NewSortOrder)),
+                Messenger.Subscribe<ChangeTasksSelectionModeMsg>(msg => _changeTasksSelectionMode.Raise(msg.IsInSelectionMode))
             };
 
             SubscriptionTokens.AddRange(tokens);

@@ -18,6 +18,7 @@ namespace MiraiNotes.Android.Background
     public class SyncTask
     {
         private readonly bool _startedManually;
+        private readonly int? _taskListId;
         private ISyncService _syncService;
         private IMvxMainThreadAsyncDispatcher _dispatcher;
         private ILogger _logger;
@@ -27,9 +28,10 @@ namespace MiraiNotes.Android.Background
         private IDialogService _dialogService;
         private INotificationService _notificationService;
 
-        public SyncTask(bool startedManually)
+        public SyncTask(bool startedManually, int? taskListId)
         {
             _startedManually = startedManually;
+            _taskListId = taskListId;
         }
 
         public async Task Sync()
@@ -60,15 +62,19 @@ namespace MiraiNotes.Android.Background
                     return;
                 }
 
-                await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this)));
+                string msg = $"{_textProvider.Get("Syncing")}...";
+                await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this, msg: msg)));
 
-                var syncResults = new List<EmptyResponseDto>
-                {
-                    await _syncService.SyncDownTaskListsAsync(true),
-                    await _syncService.SyncDownTasksAsync(true),
-                    await _syncService.SyncUpTaskListsAsync(true),
-                    await _syncService.SyncUpTasksAsync(true)
-                };
+                bool syncOnlyOneTaskList = _taskListId.HasValue;
+                if (syncOnlyOneTaskList)
+                    _logger.Information($"{nameof(Sync)}: We will perform a partial sync for the " +
+                        $"tasklistId = {_taskListId.Value} and its associated tasks");
+                else 
+                    _logger.Information($"{nameof(Sync)}: We will perform a full sync");
+
+                var syncResults = !syncOnlyOneTaskList
+                    ? await _syncService.PerformFullSync(true)
+                    : await _syncService.PerformSyncOnlyOn(_taskListId.Value);
 
                 if (syncResults.Any(r => !r.Succeed))
                 {

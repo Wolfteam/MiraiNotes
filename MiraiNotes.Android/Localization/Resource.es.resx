@@ -163,7 +163,7 @@
     <value>Intervalos de tareas en segundo plano.</value>
   </data>
   <data name="SettingsNotif" xml:space="preserve">
-    <value>Notificaciones toast</value>
+    <value>Notificaciones toast.</value>
   </data>
   <data name="SettingsAbout" xml:space="preserve">
     <value>Github repo, información de contacto, donaciones.</value>
@@ -397,13 +397,13 @@
     <value>Cerrar</value>
   </data>
   <data name="SyncAutoCompleted" xml:space="preserve">
-    <value>Una sincronización automática ha sido completada exitosamente </value>
+    <value>Una sincronización automática ha sido completada exitosamente</value>
   </data>
   <data name="Manual" xml:space="preserve">
     <value>Manual</value>
   </data>
   <data name="SyncManualCompleted" xml:space="preserve">
-    <value>Una sincronización manual ha sido completada exitosamente </value>
+    <value>Una sincronización manual ha sido completada exitosamente</value>
   </data>
   <data name="SyncResults" xml:space="preserve">
     <value>Resultados de la sincronización</value>
@@ -502,7 +502,7 @@
     <value>Selecciona una lista de tareas</value>
   </data>
   <data name="MoveTaskConfirmationB" xml:space="preserve">
-    <value>¿ Estás seguro que deseas mover '{0}' hacia '{1}' ?</value>
+    <value>¿ Estás seguro que deseas mover '{0}' a '{1}' ?</value>
   </data>
   <data name="Move" xml:space="preserve">
     <value>Mover</value>
@@ -563,5 +563,68 @@
   </data>
   <data name="SyncRunning" xml:space="preserve">
     <value>Sincronizando tus tareas y listas de tareas...</value>
+  </data>
+  <data name="Share" xml:space="preserve">
+    <value>Compartir</value>
+  </data>
+  <data name="UseDarkAmoledTheme" xml:space="preserve">
+    <value>Usar el tema oscuro para pantallas amoled</value>
+  </data>
+  <data name="ChangeTaskList" xml:space="preserve">
+    <value>Cambiar lista de tareas</value>
+  </data>
+  <data name="TaskWillBeSavedInto" xml:space="preserve">
+    <value>La tarea será guardada en : {0}</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Cargando</value>
+  </data>
+  <data name="TaskListCantBeDeleted" xml:space="preserve">
+    <value>No puedes borrar esta lista de tareas</value>
+  </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Modo de selección</value>
+  </data>
+  <data name="XItemsSelected" xml:space="preserve">
+    <value>{0} tarea(s) seleccionada(s)</value>
+  </data>
+  <data name="DeleteSelectedTasks" xml:space="preserve">
+    <value>Borrar las tareas seleccionadas</value>
+  </data>
+  <data name="MarkSelectedTasksAsCompleted" xml:space="preserve">
+    <value>Marcar como completadas las tareas seleccionadas</value>
+  </data>
+  <data name="MoveSelectedTasks" xml:space="preserve">
+    <value>Mover las tareas seleccionadas</value>
+  </data>
+  <data name="SelectUnselectAllTasks" xml:space="preserve">
+    <value>Seleccionar / Deseleccionar todas las tareas</value>
+  </data>
+  <data name="DeleteMultipleTasksConfirmation" xml:space="preserve">
+    <value>¿ Estás seguro que deseas borrar las tareas seleccionadas ?</value>
+  </data>
+  <data name="DeleteXTasks" xml:space="preserve">
+    <value>Borrar {0} tarea(s)</value>
+  </data>
+  <data name="MarkMultipleTasksAsCompletedConfirmation" xml:space="preserve">
+    <value>¿ Estás seguro que deseas marcar {0} tarea(s) como completada(s) ?</value>
+  </data>
+  <data name="SelectedTasksWereMarkedAsCompleted" xml:space="preserve">
+    <value>Las tareas seleccionadas fueron marcadas como completadas</value>
+  </data>
+  <data name="PleaseSelectAtLeastOneTask" xml:space="preserve">
+    <value>Debes seleccionar al menos una tarea</value>
+  </data>
+  <data name="SelectedTasksAreAlreadyCompleted" xml:space="preserve">
+    <value>Las tareas seleccionadas ya se encuentran marcadas como completadas</value>
+  </data>
+  <data name="SelectedTasksWereMoved" xml:space="preserve">
+    <value>Las tareas seleccionadas fueron exitosamente movidas a {0}</value>
+  </data>
+  <data name="XTasks" xml:space="preserve">
+    <value>{0} tarea(s)</value>
+  </data>
+  <data name="MoveTaskConfirmationC" xml:space="preserve">
+    <value>¿ Estás seguro que deseas mover {0} a '{1}' ?</value>
   </data>
 </root>

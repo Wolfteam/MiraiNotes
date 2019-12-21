@@ -8,11 +8,18 @@ namespace MiraiNotes.Android
         public AppThemeType AppTheme { get; }
         public string AccentColor { get; }
         public bool RestartActivity { get; }
+        public bool UseDarkAmoledTheme { get; }
 
-        public AppThemeChangedMsg(object sender, AppThemeType appTheme, string accentColor, bool restartActivity = true) : base(sender)
+        public AppThemeChangedMsg(
+            object sender, 
+            AppThemeType appTheme, 
+            string accentColor, 
+            bool useDarkAmoledTheme,
+            bool restartActivity = true) : base(sender)
         {
             AppTheme = appTheme;
             AccentColor = accentColor;
+            UseDarkAmoledTheme = useDarkAmoledTheme;
             RestartActivity = restartActivity;
         }
     }

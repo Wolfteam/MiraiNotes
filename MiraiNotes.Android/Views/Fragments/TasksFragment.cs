@@ -35,6 +35,8 @@ namespace MiraiNotes.Android.Views.Fragments
         private View _fabBgLayout;
         private MvxRecyclerView _taskRecyclerView;
         private TasksAdapter _tasksAdapter;
+        private MvxSwipeRefreshLayout _swipeRefreshLayout;
+
 
         public SwipeCallback SwipeCallback;
         private const int MoveTaskButtonId = 1;
@@ -65,9 +67,9 @@ namespace MiraiNotes.Android.Views.Fragments
             set.Bind(this).For(v => v.ResetSwipedItemsRequest).To(vm => vm.ResetSwipedItems);
             set.Apply();
 
-            var swipeRefreshLayout = view.FindViewById<MvxSwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout);
-            swipeRefreshLayout.SetDistanceToTriggerSync(600);
-            swipeRefreshLayout.SetSlingshotDistance(200);
+            _swipeRefreshLayout = view.FindViewById<MvxSwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout);
+            _swipeRefreshLayout.SetDistanceToTriggerSync(600);
+            _swipeRefreshLayout.SetSlingshotDistance(200);
 
             _mainFab = view.FindViewById<FloatingActionButton>(Resource.Id.AppFab);
 
@@ -104,7 +106,7 @@ namespace MiraiNotes.Android.Views.Fragments
             _taskRecyclerView = view.FindViewById<MvxRecyclerView>(Resource.Id.TaskRecyclerView);
             _taskRecyclerView.Adapter = _tasksAdapter;
             _taskRecyclerView.AddItemDecoration(new DividerItemDecoration(ParentActivity, LinearLayoutManager.Vertical));
-            _taskRecyclerView.AddOnScrollListener(new TasksRecyclerViewScrollListener(_mainFab));
+            _taskRecyclerView.AddOnScrollListener(new TasksRecyclerViewScrollListener(_mainFab, () => !ViewModel.IsInSelectionMode));
 
             string delete = ViewModel.GetText("Delete");
             var white = Color.White;
@@ -188,6 +190,19 @@ namespace MiraiNotes.Android.Views.Fragments
         public void ResetSwipedItems()
         {
             SwipeCallback.ResetView();
+        }
+
+        public void ShowMainFab(bool show)
+        {
+            if (show)
+                _mainFab.Show();
+            else
+                _mainFab.Hide();
+        }
+
+        public void EnableSwipeToRefresh(bool enabled)
+        {
+            _swipeRefreshLayout.Enabled = enabled;
         }
     }
 }

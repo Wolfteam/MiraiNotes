@@ -14,51 +14,21 @@ using Serilog;
 
 namespace MiraiNotes.Shared.Services.Data
 {
-    public class TaskDataService : ITaskDataService
+    public class TaskDataService : BaseDataService, ITaskDataService
     {
         private readonly ILogger _logger;
-        private readonly ITelemetryService _telemetryService;
 
         public TaskDataService(ILogger logger, ITelemetryService telemetryService)
+            : base(telemetryService)
         {
             _logger = logger.ForContext<TaskDataService>();
-            _telemetryService = telemetryService;
-        }
-
-        public async Task<ResponseDto<GoogleTask>> AddAsync(GoogleTask entity)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information("AddAsync: Trying to add a new task {@Task}", entity);
-                var response = new ResponseDto<GoogleTask>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        await context.AddAsync(entity);
-                        response.Succeed = await context.SaveChangesAsync() > 0;
-                        response.Result = entity;
-                        _logger.Information("AddAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "AddAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
         }
 
         public async Task<ResponseDto<GoogleTask>> AddAsync(string taskListID, GoogleTask task)
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("AddAsync: Trying to add a new task {@Task}", task);
+                _logger.Information($"AddAsync: Trying to add a new task into taskListId = {taskListID}");
                 var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
@@ -94,35 +64,6 @@ namespace MiraiNotes.Shared.Services.Data
                     catch (Exception e)
                     {
                         _logger.Error(e, "AddAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
-        public async Task<ResponseDto<IEnumerable<GoogleTask>>> AddRangeAsync(IEnumerable<GoogleTask> entities)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"AddRangeAsync: Trying to add {entities.Count()} tasks");
-                var response = new ResponseDto<IEnumerable<GoogleTask>>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        await context.AddRangeAsync(entities);
-                        response.Succeed = await context.SaveChangesAsync() > 0;
-                        response.Result = entities;
-                        _logger.Information("AddRangeAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "AddRangeAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -173,72 +114,11 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
-        public async Task<ResponseDto<bool>> ExistsAsync(Expression<Func<GoogleTask, bool>> predicate)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"ExistsAsync: Trying to find the first task that matches {predicate.ToString()}");
-                var response = new ResponseDto<bool>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        response.Result = await context.Tasks
-                            .AsNoTracking()
-                            .Where(predicate)
-                            .CountAsync() == 1;
-                        response.Succeed = true;
-                        _logger.Information("ExistsAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "ExistsAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
-        public async Task<ResponseDto<GoogleTask>> FirstOrDefaultAsync(Expression<Func<GoogleTask, bool>> predicate)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"FirstOrDefaultAsync: Trying to find the first task that matches {predicate.ToString()}");
-                var response = new ResponseDto<GoogleTask>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        response.Result = await context
-                            .Tasks
-                            .FirstOrDefaultAsync(predicate);
-                        response.Succeed = true;
-                        _logger.Information("FirstOrDefaultAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "FirstOrDefaultAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
         public async Task<ResponseDto<GoogleTask>> FirstOrDefaultAsNoTrackingAsync(Expression<Func<GoogleTask, bool>> predicate)
         {
             return await Task.Run(async () =>
             {
-                _logger.Information($"FirstOrDefaultAsNoTrackingAsync: Trying to find the first task that matches {predicate.ToString()}");
+                _logger.Information($"FirstOrDefaultAsNoTrackingAsync: Trying to find the first task that matches predicate");
                 var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
@@ -258,67 +138,6 @@ namespace MiraiNotes.Shared.Services.Data
                     catch (Exception e)
                     {
                         _logger.Error(e, "FirstOrDefaultAsNoTrackingAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
-        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAllAsNoTrackingAsync()
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information("GetAllAsNoTrackingAsync: Trying to get all the task");
-                var response = new ResponseDto<IEnumerable<GoogleTask>>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        response.Result = await context
-                            .Tasks
-                            .AsNoTracking()
-                            .ToListAsync();
-                        response.Succeed = true;
-                        _logger.Information("GetAllAsNoTrackingAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GetAllAsNoTrackingAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
-        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAllAsync()
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information("GetAllAsync: Trying to get all the task");
-                var response = new ResponseDto<IEnumerable<GoogleTask>>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        response.Result = await context
-                            .Tasks
-                            .ToListAsync();
-                        response.Succeed = true;
-                        _logger.Information("GetAllAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GetAllAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -377,82 +196,11 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
-        public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> predicate)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"GetAsync: Getting all tasks with {predicate.ToString()}");
-                var response = new ResponseDto<IEnumerable<GoogleTask>>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        response.Result = await context
-                             .Tasks
-                             .Where(predicate)
-                             .ToListAsync();
-                        response.Succeed = true;
-                        _logger.Information("GetAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GetAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
-        public async Task<ResponseDto<GoogleTask>> GetAsync(Expression<Func<GoogleTask, bool>> filter, string includeProperties = "")
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"GetAsync: Getting all tasks with {filter.ToString()}");
-                var response = new ResponseDto<GoogleTask>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        IQueryable<GoogleTask> query = context.Tasks;
-                        if (filter != null)
-                        {
-                            query = query.Where(filter);
-                        }
-
-                        foreach (var includeProperty in includeProperties.Split
-                            (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            query = query.Include(includeProperty.Trim());
-                        }
-
-                        response.Result = await query.FirstOrDefaultAsync();
-                        response.Succeed = true;
-                        _logger.Information("GetAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GetAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
         public async Task<ResponseDto<IEnumerable<GoogleTask>>> GetAsync(Expression<Func<GoogleTask, bool>> filter = null, Func<IQueryable<GoogleTask>, IOrderedQueryable<GoogleTask>> orderBy = null, string includeProperties = "")
         {
             return await Task.Run(async () =>
             {
-                _logger.Information($"GetAsync: Getting all tasks with {filter.ToString()}");
+                _logger.Information($"GetAsync: Getting all tasks using the specified filter");
                 var response = new ResponseDto<IEnumerable<GoogleTask>>
                 {
                     Message = string.Empty,
@@ -495,41 +243,11 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
-        public async Task<ResponseDto<GoogleTask>> GetByIdAsync(object id)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"GetByIdAsync: Looking for task with id = {id}");
-                var response = new ResponseDto<GoogleTask>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        response.Result = await context
-                            .Tasks
-                            .FindAsync(id);
-                        response.Succeed = true;
-                        _logger.Information("GetByIdAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GetByIdAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
         public async Task<EmptyResponseDto> RemoveAsync(GoogleTask entity)
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("RemoveAsync: Trying to delete {@Task}", entity);
+                _logger.Information($"RemoveAsync: Trying to delete taskId = {entity.ID}");
                 var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
@@ -553,48 +271,11 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
-        public async Task<EmptyResponseDto> RemoveAsync(object id)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"RemoveAsync: Trying to delete task with id {id}");
-                var response = new EmptyResponseDto
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        var entity = await context.Tasks.FindAsync(id);
-                        if (entity == null)
-                        {
-                            response.Message = "Entity couldn't be removed cause it wasnt found";
-                            _logger.Warning("RemoveAsync: Task couldn't be removed cause it wasnt found");
-                        }
-                        else
-                        {
-                            context.Remove(entity);
-                            response.Succeed = await context.SaveChangesAsync() > 0;
-                        }
-                        _logger.Information("RemoveAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "RemoveAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
         public async Task<EmptyResponseDto> RemoveAsync(Expression<Func<GoogleTask, bool>> filter)
         {
             return await Task.Run(async () =>
             {
-                _logger.Information($"RemoveAsync: Trying to delete tasks that matches {filter.ToString()}");
+                _logger.Information($"RemoveAsync: Trying to delete tasks that matches filter");
                 var response = new EmptyResponseDto
                 {
                     Message = string.Empty,
@@ -659,7 +340,7 @@ namespace MiraiNotes.Shared.Services.Data
         {
             return await Task.Run(async () =>
             {
-                _logger.Information("UpdateAsync: Trying to update {@Task}", entity);
+                _logger.Information($"UpdateAsync: Trying to update taskId = {entity.ID}");
                 var response = new ResponseDto<GoogleTask>
                 {
                     Message = string.Empty,
@@ -677,38 +358,6 @@ namespace MiraiNotes.Shared.Services.Data
                     catch (Exception e)
                     {
                         _logger.Error(e, "UpdateAsync: An unknown error occurred");
-                        response.Message = GetExceptionMessage(e);
-                    }
-                }
-                return response;
-            }).ConfigureAwait(false);
-        }
-
-        public async Task<ResponseDto<IEnumerable<GoogleTask>>> UpdateRangeAsync(IEnumerable<GoogleTask> entities)
-        {
-            return await Task.Run(async () =>
-            {
-                _logger.Information($"UpdateRangeAsync: Trying to update {entities.Count()} tasks");
-                var response = new ResponseDto<IEnumerable<GoogleTask>>
-                {
-                    Message = string.Empty,
-                    Succeed = false
-                };
-                using (var context = new MiraiNotesContext())
-                {
-                    try
-                    {
-                        foreach (var entity in entities)
-                        {
-                            context.Entry(entity).State = EntityState.Modified;
-                        }
-                        response.Succeed = await context.SaveChangesAsync() > 0;
-                        response.Result = entities;
-                        _logger.Information("UpdateRangeAsync: Completed successfully");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "UpdateRangeAsync: An unknown error occurred");
                         response.Message = GetExceptionMessage(e);
                     }
                 }
@@ -1172,7 +821,6 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
-
         private async Task<string> GetLastestPosition(MiraiNotesContext context, string taskListId, string parentTask = null)
         {
             var query = context.Tasks
@@ -1187,19 +835,6 @@ namespace MiraiNotes.Shared.Services.Data
             var lastestPosition = ulong.Parse(lastTask?.Position ?? "0") + 1;
 
             return $"{lastestPosition:D20}";
-        }
-
-        private string GetExceptionMessage(Exception e)
-        {
-            string result = string.Empty;
-            string inner = e.InnerException?.Message;
-            if (!string.IsNullOrEmpty(inner))
-                result = $"{e.Message}. Inner Exception: {inner}";
-            else
-                result = $"{e.Message}. StackTrace: {e.StackTrace}";
-
-            _telemetryService.TrackError(e);
-            return result;
         }
     }
 }

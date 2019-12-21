@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.ApplicationModel.Background;
-using GalaSoft.MvvmLight.Messaging;
+﻿using GalaSoft.MvvmLight.Messaging;
 using MiraiNotes.Abstractions.Services;
-using MiraiNotes.Core.Dto;
+using MiraiNotes.Core.Models;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.ViewModels;
 using Serilog;
-using MiraiNotes.Core.Models;
+using System;
+using System.Linq;
+using Windows.ApplicationModel.Background;
 
 namespace MiraiNotes.UWP.BackgroundTasks
 {
@@ -20,7 +18,14 @@ namespace MiraiNotes.UWP.BackgroundTasks
         private readonly IMessenger _messenger;
         private readonly INotificationService _notificationService;
         private readonly bool _isAppRunning;
+        private readonly int? _taskListId;
         private BackgroundTaskDeferral _deferral;
+
+        public SyncBackgroundTask(int? taskListId)
+            : this()
+        {
+            _taskListId = taskListId;
+        }
 
         public SyncBackgroundTask()
         {
@@ -47,29 +52,32 @@ namespace MiraiNotes.UWP.BackgroundTasks
                 taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
 
             _deferral = taskInstance?.GetDeferral();
-            _logger.Information($"{nameof(SyncBackgroundTask)}: Started {(startedManually ? "manually" : "automatically" )}");
+            _logger.Information($"{nameof(SyncBackgroundTask)}: Started {(startedManually ? "manually" : "automatically")}");
 
             if (_isAppRunning)
             {
                 _messenger.Send(false, $"{MessageType.OPEN_PANE}");
                 _messenger.Send(
                     new Tuple<bool, string>(
-                        true, 
-                        $"Performing a {(startedManually ? "manual" : "automatic" )} full sync, please wait..."),
+                        true,
+                        $"Performing a {(startedManually ? "manual" : "automatic")} full sync, please wait..."),
                     $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
             }
 
-            var syncResults = new List<EmptyResponseDto>
-            {
-                await _syncService.SyncDownTaskListsAsync(true),
-                await _syncService.SyncDownTasksAsync(true),
-                await _syncService.SyncUpTaskListsAsync(true),
-                await _syncService.SyncUpTasksAsync(true)
-            };
+            bool syncOnlyOneTaskList = _taskListId.HasValue;
+            if (syncOnlyOneTaskList)
+                _logger.Information($"{nameof(SyncBackgroundTask)}: We will perform a partial sync for the " +
+                    $"tasklistId = {_taskListId.Value} and its associated tasks");
+            else
+                _logger.Information($"{nameof(SyncBackgroundTask)}: We will perform a full sync");
+
+            var syncResults = !syncOnlyOneTaskList
+                ? await _syncService.PerformFullSync(true)
+                : await _syncService.PerformSyncOnlyOn(_taskListId.Value);
 
             string message = syncResults.Any(r => !r.Succeed) ?
                 string.Join($".{Environment.NewLine}", syncResults.Where(r => !r.Succeed).Select(r => r.Message).Distinct()) :
-                $"A {(startedManually ? "manual" : "automatic" )} full sync was successfully performed.";
+                $"A {(startedManually ? "manual" : "automatic")} full sync was successfully performed.";
 
             if (string.IsNullOrEmpty(message))
                 message = "An unknown error occurred while trying to perform the sync operation.";

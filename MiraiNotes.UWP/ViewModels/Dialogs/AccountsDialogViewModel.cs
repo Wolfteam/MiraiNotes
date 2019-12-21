@@ -153,6 +153,7 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
                 await _dialogService.ShowMessageDialogAsync("Error", "Network is not available");
                 return;
             }
+            HideDialogRequest.Invoke();
 
             _messenger.Send(new Tuple<bool, string>(true, "Adding a new account..."), $"{MessageType.SHOW_MAIN_PROGRESS_BAR}");
             _logger.Information($"{nameof(AddAccountAsync)}: Trying to sign in with google...");
@@ -258,6 +259,10 @@ namespace MiraiNotes.UWP.ViewModels.Dialogs
 
             var now = DateTimeOffset.UtcNow;
             ResponseDto<GoogleUser> userSaveResponse;
+
+            if (!response.Succeed)
+                throw new Exception($"Couldnt check if userId = {user.ID} exists on db");
+
             if (!response.Result)
             {
                 userSaveResponse = await _dataService.UserService.AddAsync(new GoogleUser

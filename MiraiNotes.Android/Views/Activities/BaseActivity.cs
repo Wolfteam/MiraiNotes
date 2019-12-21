@@ -23,7 +23,7 @@ namespace MiraiNotes.Android.Views.Activities
             //When base.onCreate is called, it restores previous view and/or fragment states after orientation change, 
             //before the theme gets applied.
             var appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>();
-            SetAppTheme(appSettings.AppTheme, appSettings.AppHexAccentColor);
+            SetAppTheme(appSettings.AppTheme, appSettings.AppHexAccentColor, appSettings.UseDarkAmoledTheme);
 
             base.OnCreate(bundle);
             SetContentView(LayoutId);
@@ -52,6 +52,7 @@ namespace MiraiNotes.Android.Views.Activities
         public void SetAppTheme(
             AppThemeType appTheme,
             string appHexAccentColor,
+            bool useDarkAmoled,
             bool restartActivity = false)
         {
             appHexAccentColor = appHexAccentColor.ToLower();
@@ -156,6 +157,9 @@ namespace MiraiNotes.Android.Views.Activities
                 }
 
             }
+
+            if (useDarkAmoled && appTheme == AppThemeType.DARK)
+                Theme.ApplyStyle(Resource.Style.BlackTheme, true);
 
             if (!restartActivity)
                 return;

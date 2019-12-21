@@ -1,4 +1,5 @@
 ﻿using MiraiNotes.Core.Enums;
+using MiraiNotes.Core.Models;
 
 namespace MiraiNotes.Abstractions.Services
 {
@@ -22,5 +23,12 @@ namespace MiraiNotes.Abstractions.Services
         /// </summary>
         /// <param name="backgroundTask">The background task to start</param>
         void StartBackgroundTask(BackgroundTaskType backgroundTask);
+
+        /// <summary>
+        /// Manually starts a specific backgroun task
+        /// </summary>
+        /// <param name="backgroundTask">The background task to start</param>
+        /// <param name="parameter">A parameter that will be used by the <paramref name="backgroundTask"/></param>
+        void StartBackgroundTask(BackgroundTaskType backgroundTask, BackgroundTaskParameter parameter);
     }
 }

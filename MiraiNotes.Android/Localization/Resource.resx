@@ -197,7 +197,7 @@
     <value>This app uses Google Tasks to retrieve/update your task lists and tasks, it also allows you to interact with them offline and sync them later.</value>
   </data>
   <data name="AboutDonations" xml:space="preserve">
-    <value>I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.</value>
+    <value>I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email !</value>
   </data>
   <data name="AboutSupport" xml:space="preserve">
     <value>I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:</value>
@@ -543,5 +543,68 @@
   </data>
   <data name="SyncRunning" xml:space="preserve">
     <value>Syncing your task and tasklist...</value>
+  </data>
+  <data name="Share" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="UseDarkAmoledTheme" xml:space="preserve">
+    <value>Use dark amoled theme</value>
+  </data>
+  <data name="ChangeTaskList" xml:space="preserve">
+    <value>Change tasklist</value>
+  </data>
+  <data name="TaskWillBeSavedInto" xml:space="preserve">
+    <value>Task will be saved into: {0}</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="TaskListCantBeDeleted" xml:space="preserve">
+    <value>You cant delete this task list</value>
+  </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Selection mode</value>
+  </data>
+  <data name="XItemsSelected" xml:space="preserve">
+    <value>{0} task(s) selected</value>
+  </data>
+  <data name="DeleteSelectedTasks" xml:space="preserve">
+    <value>Delete selected tasks</value>
+  </data>
+  <data name="MarkSelectedTasksAsCompleted" xml:space="preserve">
+    <value>Mark selected tasks as completed</value>
+  </data>
+  <data name="MoveSelectedTasks" xml:space="preserve">
+    <value>Move selected tasks</value>
+  </data>
+  <data name="SelectUnselectAllTasks" xml:space="preserve">
+    <value>Select / Unselect all tasks</value>
+  </data>
+  <data name="DeleteMultipleTasksConfirmation" xml:space="preserve">
+    <value>Are you sure you wanna delete the selected tasks?</value>
+  </data>
+  <data name="DeleteXTasks" xml:space="preserve">
+    <value>Delete {0} task(s)</value>
+  </data>
+  <data name="MarkMultipleTasksAsCompletedConfirmation" xml:space="preserve">
+    <value>Are you sure you wanna mark {0} task(s) as completed</value>
+  </data>
+  <data name="SelectedTasksWereMarkedAsCompleted" xml:space="preserve">
+    <value>Selected tasks were marked as completed</value>
+  </data>
+  <data name="PleaseSelectAtLeastOneTask" xml:space="preserve">
+    <value>You need to select at least one task</value>
+  </data>
+  <data name="SelectedTasksAreAlreadyCompleted" xml:space="preserve">
+    <value>Selected tasks are already marked as completed</value>
+  </data>
+  <data name="SelectedTasksWereMoved" xml:space="preserve">
+    <value>Selected tasks were successfully moved to {0}</value>
+  </data>
+  <data name="XTasks" xml:space="preserve">
+    <value>{0} task(s)</value>
+  </data>
+  <data name="MoveTaskConfirmationC" xml:space="preserve">
+    <value>Are you sure you wanna move {0} to '{1}'  ?</value>
   </data>
 </root>

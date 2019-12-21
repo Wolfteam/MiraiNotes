@@ -51,8 +51,12 @@ namespace MiraiNotes.UWP.Pages
 
             try
             {
+                //if nothing is selected
                 if (listView.SelectedIndex == -1)
+                {
+                    vm.TaskListViewSelectedItemCommand.Execute(null);
                     return;
+                }
 
                 _selectionInProgress = true;
 
