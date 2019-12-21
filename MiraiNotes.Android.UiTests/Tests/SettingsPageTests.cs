@@ -28,6 +28,7 @@ namespace MiraiNotes.Android.UiTests.Tests
             //Assert
             //Since we are changing the theme, the activity must be restarted
             TasksPage.AssertOnPage(TimeSpan.FromSeconds(10));
+            TasksPage.OpenDrawer();
             var finalThemeColor = TasksPage.GetNavigationViewBgColor();
             Assert.True(currentThemeColor != finalThemeColor);
         }

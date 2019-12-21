@@ -9,7 +9,7 @@ namespace MiraiNotes.Android.UiTests.Tests
         {
         }
 
-        //[Ignore("REPL Tests only for Testing/Developing")]
+        [Ignore("REPL Tests only for Testing/Developing")]
         [Test]
         public void Repl()
             => App.Repl();
