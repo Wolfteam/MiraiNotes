@@ -598,4 +598,13 @@
   <data name="SelectedTasksAreAlreadyCompleted" xml:space="preserve">
     <value>Selected tasks are already marked as completed</value>
   </data>
+  <data name="SelectedTasksWereMoved" xml:space="preserve">
+    <value>Selected tasks were successfully moved to {0}</value>
+  </data>
+  <data name="XTasks" xml:space="preserve">
+    <value>{0} task(s)</value>
+  </data>
+  <data name="MoveTaskConfirmationC" xml:space="preserve">
+    <value>Are you sure you wanna move {0} to '{1}'  ?</value>
+  </data>
 </root>

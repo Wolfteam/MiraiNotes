@@ -502,7 +502,7 @@
     <value>Selecciona una lista de tareas</value>
   </data>
   <data name="MoveTaskConfirmationB" xml:space="preserve">
-    <value>¿ Estás seguro que deseas mover '{0}' hacia '{1}' ?</value>
+    <value>¿ Estás seguro que deseas mover '{0}' a '{1}' ?</value>
   </data>
   <data name="Move" xml:space="preserve">
     <value>Mover</value>
@@ -617,5 +617,14 @@
   </data>
   <data name="SelectedTasksAreAlreadyCompleted" xml:space="preserve">
     <value>Las tareas seleccionadas ya se encuentran marcadas como completadas</value>
+  </data>
+  <data name="SelectedTasksWereMoved" xml:space="preserve">
+    <value>Las tareas seleccionadas fueron exitosamente movidas a {0}</value>
+  </data>
+  <data name="XTasks" xml:space="preserve">
+    <value>{0} tarea(s)</value>
+  </data>
+  <data name="MoveTaskConfirmationC" xml:space="preserve">
+    <value>¿ Estás seguro que deseas mover {0} a '{1}' ?</value>
   </data>
 </root>

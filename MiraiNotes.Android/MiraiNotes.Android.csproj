@@ -164,6 +164,7 @@
     <Compile Include="Models\Results\AddEditTaskListDialogViewModelResult.cs" />
     <Compile Include="Models\Results\ChangeTaskStatusDialogViewModelResult.cs" />
     <Compile Include="Models\Results\DeleteTaskDialogViewModelResult.cs" />
+    <Compile Include="Models\Results\MoveTaskDialogViewModelResult.cs" />
     <Compile Include="Models\Results\NewTaskViewModelResult.cs" />
     <Compile Include="Models\Parameters\TaskMenuOptionsViewModelParameter.cs" />
     <Compile Include="Models\Parameters\TaskDateViewModelParameter.cs" />

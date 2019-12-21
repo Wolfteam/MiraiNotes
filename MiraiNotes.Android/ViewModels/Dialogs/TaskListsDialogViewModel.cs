@@ -97,11 +97,18 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             _hideDialog.Raise(true);
 
-            var parameter = MoveTaskDialogViewModelParameter.Instance(Parameter.TaskList, selectedTaskList, Parameter.Task);
-            bool wasMoved = await NavigationService.Navigate<MoveTaskDialogViewModel, MoveTaskDialogViewModelParameter, bool>(parameter);
-            if (wasMoved)
+            var parameter = Parameter.IsMultipleTasks
+                ? MoveTaskDialogViewModelParameter.Instance(Parameter.TaskList, selectedTaskList, Parameter.Tasks)
+                : MoveTaskDialogViewModelParameter.Instance(Parameter.TaskList, selectedTaskList, Parameter.Task);
+            var moveResult = await NavigationService.Navigate<
+                MoveTaskDialogViewModel,
+                MoveTaskDialogViewModelParameter,
+                MoveTaskDialogViewModelResult>(parameter);
+            if (moveResult?.WasMoved == true || moveResult?.PartiallyMoved == true)
             {
-                var result = TaskListsDialogViewModelResult.Moved(Parameter.TaskList);
+                var result = moveResult.PartiallyMoved
+                    ? TaskListsDialogViewModelResult.PartiallyMoved(Parameter.TaskList)
+                    : TaskListsDialogViewModelResult.Moved(Parameter.TaskList);
                 await NavigationService.Close(this, result);
             }
             else

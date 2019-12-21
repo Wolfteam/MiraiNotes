@@ -284,6 +284,12 @@ namespace MiraiNotes.Android.Views.Activities
                         tasksFragment.ViewModel.MarkSelectedTasksAsCompletedCommand.Execute();
                     }
                     break;
+                case Resource.Id.MoveSelectedTasks:
+                    {
+                        var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
+                        tasksFragment.ViewModel.MoveSelectedTasksCommand.Execute();
+                    }
+                    break;
                 default:
                     return false;
             }

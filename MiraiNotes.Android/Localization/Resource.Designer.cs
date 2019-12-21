@@ -691,6 +691,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you wanna move {0} to &apos;{1}&apos;  ?.
+        /// </summary>
+        public static string MoveTaskConfirmationC {
+            get {
+                return ResourceManager.GetString("MoveTaskConfirmationC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move to a different task list.
         /// </summary>
         public static string MoveToDifferentTaskList {
@@ -993,6 +1002,15 @@ namespace MiraiNotes.Android.Localization {
         public static string SelectedTasksWereMarkedAsCompleted {
             get {
                 return ResourceManager.GetString("SelectedTasksWereMarkedAsCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected tasks were successfully moved to {0}.
+        /// </summary>
+        public static string SelectedTasksWereMoved {
+            get {
+                return ResourceManager.GetString("SelectedTasksWereMoved", resourceCulture);
             }
         }
         
@@ -1551,6 +1569,15 @@ namespace MiraiNotes.Android.Localization {
         public static string XItemsSelected {
             get {
                 return ResourceManager.GetString("XItemsSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} task(s).
+        /// </summary>
+        public static string XTasks {
+            get {
+                return ResourceManager.GetString("XTasks", resourceCulture);
             }
         }
         
