@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
-    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame, AddToBackStack = true, Tag = nameof(NewTaskFragment))]
+    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.ContentFrame, AddToBackStack = true, Tag = nameof(NewTaskFragment), EnterAnimation = Resource.Animator.slide_enter_right_to_left, ExitAnimation = Resource.Animator.slide_exit_right_to_left, PopEnterAnimation = Resource.Animator.slide_enter_left_to_right, PopExitAnimation = Resource.Animator.slide_exit_left_to_right)]
     public class NewTaskFragment : BaseFragment<NewTaskViewModel>
     {
         private IMenu _menu;

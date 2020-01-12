@@ -5443,6 +5443,18 @@ namespace MiraiNotes.Android
 			// aapt resource value: 0x7F020009
 			public const int mtrl_fab_transformation_sheet_expand_spec = 2130837513;
 			
+			// aapt resource value: 0x7F02000A
+			public const int slide_enter_left_to_right = 2130837514;
+			
+			// aapt resource value: 0x7F02000B
+			public const int slide_enter_right_to_left = 2130837515;
+			
+			// aapt resource value: 0x7F02000C
+			public const int slide_exit_left_to_right = 2130837516;
+			
+			// aapt resource value: 0x7F02000D
+			public const int slide_exit_right_to_left = 2130837517;
+			
 			static Animator()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();

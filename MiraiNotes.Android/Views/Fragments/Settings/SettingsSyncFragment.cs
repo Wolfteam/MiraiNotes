@@ -9,7 +9,7 @@ using MvvmCross.ViewModels;
 
 namespace MiraiNotes.Android.Views.Fragments
 {
-    [MvxFragmentPresentation(typeof(SettingsMainViewModel), Resource.Id.SettingsContentFrame, AddToBackStack = true)]
+    [MvxFragmentPresentation(typeof(SettingsMainViewModel), Resource.Id.SettingsContentFrame, AddToBackStack = true, EnterAnimation = Resource.Animator.slide_enter_right_to_left, ExitAnimation = Resource.Animator.slide_exit_right_to_left, PopEnterAnimation = Resource.Animator.slide_enter_left_to_right, PopExitAnimation = Resource.Animator.slide_exit_left_to_right)]
     public class SettingsSyncFragment : MvxFragment<SettingsSyncViewModel>
     {
 
