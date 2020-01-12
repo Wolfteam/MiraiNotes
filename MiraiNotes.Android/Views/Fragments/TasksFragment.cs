@@ -1,4 +1,5 @@
-﻿using Android.Graphics;
+﻿using Android.Animation;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
@@ -6,6 +7,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using MiraiNotes.Android.Adapters;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
@@ -119,6 +121,13 @@ namespace MiraiNotes.Android.Views.Fragments
 
             SwipeCallback = new SwipeCallback(MainActivity, _taskRecyclerView, buttons);
             return view;
+        }
+
+        public override Animator OnCreateAnimator(int transit, bool enter, int nextAnim)
+        {
+            if (nextAnim == 0)
+                return base.OnCreateAnimator(transit, enter, nextAnim);
+            return AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
         }
 
         public void ShowFabMenu()

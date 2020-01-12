@@ -1,6 +1,8 @@
-﻿using Android.OS;
+﻿using Android.Animation;
+using Android.OS;
 using Android.Views;
 using Android.Widget;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.ViewModels.Settings;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Droid.Support.V4;
@@ -48,6 +50,13 @@ namespace MiraiNotes.Android.Views.Fragments
             base.OnResume();
             var gridView = Activity.FindViewById<MvxGridView>(Resource.Id.SettingsAccentColorsGridView);
             gridView.Post(() => SetSelectedItem(ViewModel.SelectedAccentColor));
+        }
+
+        public override Animator OnCreateAnimator(int transit, bool enter, int nextAnim)
+        {
+            if (nextAnim == 0)
+                return base.OnCreateAnimator(transit, enter, nextAnim);
+            return AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
         }
 
         private void SetSelectedItem(MvxColor color)

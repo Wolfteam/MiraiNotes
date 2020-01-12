@@ -1,6 +1,8 @@
-﻿using Android.OS;
+﻿using Android.Animation;
+using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Controls;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
@@ -22,6 +24,13 @@ namespace MiraiNotes.Android.Views.Fragments
             //this is required to populate the options menu from 
             //this fragment. it will call the invalidate options menu of the activity
             HasOptionsMenu = true;
+        }
+
+        public override Animator OnCreateAnimator(int transit, bool enter, int nextAnim)
+        {
+            if (nextAnim == 0)
+                return base.OnCreateAnimator(transit, enter, nextAnim);
+            return AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
