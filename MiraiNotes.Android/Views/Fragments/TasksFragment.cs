@@ -166,6 +166,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public void OnClick(int buttonId, int pos)
         {
+            ResetSwipedItems();
             switch (buttonId)
             {
                 case DeleteTaskButtonId:
@@ -177,7 +178,6 @@ namespace MiraiNotes.Android.Views.Fragments
                 default:
                     throw new ArgumentOutOfRangeException(nameof(buttonId), buttonId, "The provided buttonId is not valid");
             }
-            ResetSwipedItems();
         }
 
         private Color GetChangeTaskStatusColor(int position)

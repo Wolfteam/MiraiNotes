@@ -2,14 +2,12 @@
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
-using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Models;
 using MvvmCross;
 using MvvmCross.Base;
 using MvvmCross.Plugin.Messenger;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,6 +25,8 @@ namespace MiraiNotes.Android.Background
         private IMvxMessenger _messenger;
         private IDialogService _dialogService;
         private INotificationService _notificationService;
+        private ITelemetryService _telemetryService;
+        private INetworkService _networkService;
 
         public SyncTask(bool startedManually, int? taskListId)
         {
@@ -50,6 +50,8 @@ namespace MiraiNotes.Android.Background
                 _messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
                 _dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
                 _notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
+                _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
+                _networkService = Mvx.IoCProvider.Resolve<INetworkService>();
 
                 _logger.Information(
                     $"{nameof(Sync)}: Started {(_startedManually ? "manually" : "automatically")}");
@@ -65,11 +67,19 @@ namespace MiraiNotes.Android.Background
                 string msg = $"{_textProvider.Get("Syncing")}...";
                 await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this, msg: msg)));
 
+                if (!_networkService.IsInternetAvailable())
+                {
+                    _logger.Warning($"{nameof(Sync)}: Network is not available...");
+                    msg = _textProvider.Get("NetworkNotAvailable");
+                    await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this, false, msg)));
+                    return;
+                }
+
                 bool syncOnlyOneTaskList = _taskListId.HasValue;
                 if (syncOnlyOneTaskList)
                     _logger.Information($"{nameof(Sync)}: We will perform a partial sync for the " +
                         $"tasklistId = {_taskListId.Value} and its associated tasks");
-                else 
+                else
                     _logger.Information($"{nameof(Sync)}: We will perform a full sync");
 
                 var syncResults = !syncOnlyOneTaskList
@@ -126,6 +136,7 @@ namespace MiraiNotes.Android.Background
             catch (Exception e)
             {
                 _logger?.Error(e, $"{nameof(Sync)}: An unknown error occurred while trying to sync task / tasklists");
+                _telemetryService?.TrackError(e);
             }
         }
     }

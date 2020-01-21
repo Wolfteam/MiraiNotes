@@ -9,6 +9,9 @@ namespace MiraiNotes.Android.Bindings
         public static string PropertyName => "ShowSubTasks";
         public override Type TargetType => typeof(bool);
 
+        public const float Degree180 = 180;
+        public const float MinusDegree180 = -180;
+
         public SubTaskButtonAnimateBinding(ImageButton target) : base(target)
         {
         }
@@ -17,16 +20,17 @@ namespace MiraiNotes.Android.Bindings
         {
             var button = target as ImageButton;
             bool showSubTasks = (bool)value;
-            var degree = showSubTasks
-                ? 180
-                : -180;
+            float degree = showSubTasks
+                ? Degree180
+                : MinusDegree180;
 
             if (button.Rotation == degree)
                 return;
 
             if (button.Rotation == 0 && !showSubTasks)
                 return;
-            button.Animate().RotationBy(degree).SetDuration(250);
+
+            button.Animate().RotationBy(degree).SetDuration(250).Start();
         }
     }
 }

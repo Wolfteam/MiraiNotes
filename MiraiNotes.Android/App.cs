@@ -51,16 +51,16 @@ namespace MiraiNotes.Android
 
             Mvx.IoCProvider.RegisterSingleton(() => SetupLogging());
 
-            Mvx.IoCProvider.RegisterType<IAppSettingsService, AppSettingsService>();
-            Mvx.IoCProvider.RegisterType<IAndroidAppSettings, AppSettingsService>();
-            Mvx.IoCProvider.RegisterType<IDialogService, DialogService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IAppSettingsService, AppSettingsService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IAndroidAppSettings, AppSettingsService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IDialogService, DialogService>();
 
             Mvx.IoCProvider.RegisterType<IUserCredentialService, UserCredentialService>();
             Mvx.IoCProvider.RegisterType<INetworkService, NetworkService>();
             Mvx.IoCProvider.RegisterType<ISyncService, SyncService>();
             Mvx.IoCProvider.RegisterType<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
             Mvx.IoCProvider.RegisterType<INotificationService, NotificationService>();
-            Mvx.IoCProvider.RegisterType<ITelemetryService, TelemetryService>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<ITelemetryService, TelemetryService>();
 
             Mvx.IoCProvider.RegisterSingleton(CreateMapper);
 

@@ -361,8 +361,8 @@ namespace MiraiNotes.Android.ViewModels
             {
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(this);
                 await NavigationService.Navigate<
-                    DeleteTaskDialogViewModel, 
-                    DeleteTaskDialogViewModelParameter, 
+                    DeleteTaskDialogViewModel,
+                    DeleteTaskDialogViewModelParameter,
                     DeleteTaskDialogViewModelResult>(parameter);
             });
 
