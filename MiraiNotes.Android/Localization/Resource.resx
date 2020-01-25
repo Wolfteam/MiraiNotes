@@ -607,4 +607,10 @@
   <data name="MoveTaskConfirmationC" xml:space="preserve">
     <value>Are you sure you wanna move {0} to '{1}'  ?</value>
   </data>
+  <data name="SubTasks" xml:space="preserve">
+    <value>SubTasks</value>
+  </data>
+  <data name="CantAddSubTasks" xml:space="preserve">
+    <value>You can't add subtasks to a completed task</value>
+  </data>
 </root>

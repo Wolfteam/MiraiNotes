@@ -17,7 +17,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private TaskItemViewModel _task;
         private string _markAsTitle;
         private bool _showAddSubTaskButton;
-        private MvxInteraction<TaskItemViewModel> _shareTask = new MvxInteraction<TaskItemViewModel>();
+        private readonly MvxInteraction<TaskItemViewModel> _shareTask = new MvxInteraction<TaskItemViewModel>();
         #endregion
 
         #region Interactors
@@ -25,6 +25,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             => _shareTask;
 
         #endregion
+
         #region Properties
         public string MarkAsTitle
         {
@@ -67,7 +68,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             string statusMessage =
                 $"{(_task.IsCompleted ? GetText("Incompleted") : GetText("Completed"))}";
             MarkAsTitle = GetText("MarkTaskAs", statusMessage);
-            ShowAddSubTaskButton = !_task.HasParentTask;
+            ShowAddSubTaskButton = _task.CanAddSubTasks;
         }
 
         public override void SetCommands()
