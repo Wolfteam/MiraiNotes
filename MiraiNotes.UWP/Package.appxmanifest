@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="52493MiraiSoft.MiraiNotes" Publisher="CN=58BF90DC-3D34-433E-A12B-4C504DF78641" Version="1.1.2.0" />
+  <Identity Name="52493MiraiSoft.MiraiNotes" Publisher="CN=58BF90DC-3D34-433E-A12B-4C504DF78641" Version="1.1.3.0" />
   <mp:PhoneIdentity PhoneProductId="e2c92573-2529-41a6-86cf-eff6af39b78a" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Mirai Notes</DisplayName>
