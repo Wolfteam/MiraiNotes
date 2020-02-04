@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Shared.EntitiesConfiguration;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace MiraiNotes.Shared
 {
@@ -37,6 +39,25 @@ namespace MiraiNotes.Shared
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(GoogleTaskConfiguration).Assembly);
+
+            // SQLite does not have proper support for DateTimeOffset via Entity Framework Core, see the limitations
+            // here: https://docs.microsoft.com/en-us/ef/core/providers/sqlite/limitations#query-limitations
+            // To work around this, when the Sqlite database provider is used, all model properties of type DateTimeOffset
+            // use the DateTimeOffsetToBinaryConverter
+            // Based on: https://github.com/aspnet/EntityFrameworkCore/issues/10784#issuecomment-415769754
+            // This only supports millisecond precision, but should be sufficient for most use cases.
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var properties = entityType.ClrType.GetProperties().Where(p => p.PropertyType == typeof(DateTimeOffset)
+                                                                            || p.PropertyType == typeof(DateTimeOffset?));
+                foreach (var property in properties)
+                {
+                    modelBuilder
+                        .Entity(entityType.Name)
+                        .Property(property.Name)
+                        .HasConversion(new DateTimeOffsetToBinaryConverter());
+                }
+            }
         }
 
         public static void Init(IAppSettingsService appSettings, ILogger logger)
