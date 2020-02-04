@@ -9,7 +9,7 @@ namespace MiraiNotes.Android.Interfaces
         void ShowWarningToast(string message, bool longToast = false);
         void ShowSucceedToast(string message, bool longToast = false);
 
-        void ShowSnackBar(string msg, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false);
-        void ShowSnackBar(string msg, Action onClick, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false);
+        void ShowSnackBar(string msg, string action = "", bool? longSnackbar = false);
+        void ShowSnackBar(string msg, Action onClick, string action = "", bool? longSnackbar = false);
     }
 }

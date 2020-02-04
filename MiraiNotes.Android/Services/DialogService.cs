@@ -47,10 +47,10 @@ namespace MiraiNotes.Android.Services
             Toasty.Success(Application.Context, message, toastLength, true).Show();
         }
 
-        public void ShowSnackBar(string msg, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false)
+        public void ShowSnackBar(string msg, string action = "", bool? longSnackbar = false)
         {
             var ssb = FormatSnackbarText(msg);
-            var view = GetSnackbarView(displayOnContentFrame);
+            var view = GetSnackbarView();
             var duration = GetSnackbarLength(longSnackbar);
             var snackbar = Snackbar.Make(view, ssb, duration);
             if (!string.IsNullOrEmpty(action))
@@ -61,10 +61,10 @@ namespace MiraiNotes.Android.Services
             snackbar.Show();
         }
 
-        public void ShowSnackBar(string msg, Action onClick, string action = "", bool displayOnContentFrame = true, bool? longSnackbar = false)
+        public void ShowSnackBar(string msg, Action onClick, string action = "", bool? longSnackbar = false)
         {
             var ssb = FormatSnackbarText(msg);
-            var view = GetSnackbarView(displayOnContentFrame);
+            var view = GetSnackbarView();
             var duration = GetSnackbarLength(longSnackbar);
             var snackbar = Snackbar.Make(view, ssb, duration)
                 .SetAction(action, (v) => onClick.Invoke())
@@ -90,13 +90,10 @@ namespace MiraiNotes.Android.Services
                     : Snackbar.LengthShort
                 : Snackbar.LengthIndefinite;
 
-        private View GetSnackbarView(bool displayOnContentFrame)
+        private View GetSnackbarView()
         {
             var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-            var view = top.Activity.FindViewById(displayOnContentFrame
-                ? Resource.Id.ContentFrame
-                : Resource.Id.TaskViewLayout);
-
+            var view = top.Activity.FindViewById(Resource.Id.ContentFrame);
             return view;
         }
 
