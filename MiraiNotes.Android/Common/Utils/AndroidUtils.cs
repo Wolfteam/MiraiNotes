@@ -75,9 +75,9 @@ namespace MiraiNotes.Android.Common.Utils
                     return bitmap;
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                throw;
+                throw e;
             }
         }
 
@@ -160,6 +160,23 @@ namespace MiraiNotes.Android.Common.Utils
                     throw new IndexOutOfRangeException("The provided anim resource is not valid");
             }
             return animSet;
+        }
+
+        public static bool IsViewVisibleOnScreen(Context context, View view)
+        {
+            int deviceWidth = context.Resources.DisplayMetrics.WidthPixels;
+            int deviceHeight = context.Resources.DisplayMetrics.HeightPixels;
+
+            if (view == null)
+                return false;
+            if (!view.IsShown)
+                return false;
+
+            var actualPosition = new Rect();
+            view.GetGlobalVisibleRect(actualPosition);
+            var screen = new Rect(0, 0, deviceWidth, deviceHeight);
+
+            return actualPosition.Intersect(screen);
         }
     }
 }

@@ -129,6 +129,7 @@
             android:id="@+id/SubTaskRecyclerView"
             android:scrollbars="none"
             android:visibility="gone"
+            android:nestedScrollingEnabled="false"
             app:MvxItemTemplate="@layout/subtaskitem"
             app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks); ItemClick SubTaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
     </LinearLayout>

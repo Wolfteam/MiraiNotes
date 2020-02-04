@@ -277,7 +277,7 @@ namespace MiraiNotes.Android.ViewModels
 
         //For some reason, google doesnt allows to create subtask on a completed task..
         public bool CanAddSubTasks 
-            => !HasParentTask && CanBeMarkedAsCompleted;
+            => (!IsNew && !HasParentTask && CanBeMarkedAsCompleted) || (IsNew && !HasParentTask);
 
         public DateTimeOffset? RemindOn
         {

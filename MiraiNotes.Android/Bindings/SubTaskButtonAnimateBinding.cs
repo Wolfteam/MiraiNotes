@@ -1,4 +1,5 @@
 ﻿using Android.Widget;
+using MiraiNotes.Android.Common.Utils;
 using MvvmCross.Platforms.Android.Binding.Target;
 using System;
 
@@ -29,6 +30,12 @@ namespace MiraiNotes.Android.Bindings
 
             if (button.Rotation == 0 && !showSubTasks)
                 return;
+
+            if (!AndroidUtils.IsViewVisibleOnScreen(AndroidGlobals.ApplicationContext, button))
+            {
+                button.Rotation = degree;
+                return;
+            }
 
             button.Animate().RotationBy(degree).SetDuration(250).Start();
         }

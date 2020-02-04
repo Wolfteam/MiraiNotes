@@ -9,7 +9,6 @@ using MiraiNotes.Shared.Utils;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
-using MvvmCross.UI;
 using MvvmCross.ViewModels;
 using Plugin.Fingerprint.Abstractions;
 using Serilog;
@@ -25,13 +24,13 @@ namespace MiraiNotes.Android.ViewModels.Settings
         #region Members
         private ItemModel _selectedTaskListSortOrder;
         private ItemModel _selectedTaskSortOrder;
-        private readonly MvxInteraction<MvxColor> _onAccentColorSelected = new MvxInteraction<MvxColor>();
+        private readonly MvxInteraction<Color> _onAccentColorSelected = new MvxInteraction<Color>();
         private readonly IFingerprint _fingerprintService;
         private readonly IDialogService _dialogService;
         #endregion
 
         #region Interactors
-        public IMvxInteraction<MvxColor> OnAccentColorSelected
+        public IMvxInteraction<Color> OnAccentColorSelected
             => _onAccentColorSelected;
         #endregion        
 
@@ -50,7 +49,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
             }
         };
 
-        public List<MvxColor> AccentColors { get; }
+        public List<Color> AccentColors { get; }
 
         public List<ItemModel> TaskListSortTypes => new List<ItemModel>
         {
@@ -133,7 +132,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
             }
         }
 
-        public bool CanUseDarkAmoledTheme 
+        public bool CanUseDarkAmoledTheme
             => AppSettings.AppTheme == AppThemeType.DARK;
 
         public bool UseDarkAmoledTheme
@@ -147,17 +146,17 @@ namespace MiraiNotes.Android.ViewModels.Settings
             }
         }
 
-        public MvxColor SelectedAccentColor
+        public Color SelectedAccentColor
         {
             get
             {
                 var currentColor = AppSettings.AppHexAccentColor.ToColor();
-                var mvxColor = new MvxColor(currentColor.R, currentColor.G, currentColor.B, currentColor.A);
-                return AccentColors.First(color => color.ARGB == mvxColor.ARGB);
+                var color = Color.FromArgb(currentColor.A, currentColor.R, currentColor.G, currentColor.B);
+                return AccentColors.First(c => c == color);
             }
             set
             {
-                var selectedColor = Color.FromArgb(value.ARGB).ToHexString();
+                var selectedColor = Color.FromArgb(value.A, value.R, value.G, value.B).ToHexString();
                 if (AppSettings.AppHexAccentColor == selectedColor)
                     return;
                 AppSettings.AppHexAccentColor = selectedColor;
@@ -262,7 +261,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
         #endregion
 
         #region Commands
-        public IMvxCommand<MvxColor> AccentColorChangedCommand { get; private set; }
+        public IMvxCommand<Color> AccentColorChangedCommand { get; private set; }
         public IMvxAsyncCommand AskForPasswordWhenAppStartsCommand { get; private set; }
         public IMvxAsyncCommand AskForFingerPrintWhenAppStartsCommand { get; private set; }
         public IMvxCommand AskBeforeDiscardChangesCommand { get; private set; }
@@ -282,7 +281,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
         {
             AccentColors = AppConstants.AppAccentColors
                 .Select(hex => hex.ToColor())
-                .Select(color => new MvxColor(color.R, color.G, color.B, color.A))
+                .Select(color => Color.FromArgb(color.A, color.R, color.G, color.B))
                 .ToList();
 
             _fingerprintService = fingerprint;
@@ -292,7 +291,7 @@ namespace MiraiNotes.Android.ViewModels.Settings
         public override void SetCommands()
         {
             base.SetCommands();
-            AccentColorChangedCommand = new MvxCommand<MvxColor>(color =>
+            AccentColorChangedCommand = new MvxCommand<Color>(color =>
             {
                 _onAccentColorSelected.Raise(color);
                 SelectedAccentColor = color;
