@@ -26,7 +26,7 @@ namespace MiraiNotes.Shared
 #if Android
             databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), DatabaseName);
 #else
-            databasePath = DatabaseName;
+            databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DatabaseName);
 #endif
             optionsBuilder.UseSqlite($"Filename={databasePath}");
             //If you need to create a migration, uncomment this line, and comment the above ones
