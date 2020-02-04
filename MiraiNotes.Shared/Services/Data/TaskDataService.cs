@@ -798,7 +798,7 @@ namespace MiraiNotes.Shared.Services.Data
                     try
                     {
                         var query = context.Tasks
-                            .Where(t => t.TaskList.GoogleTaskListID == taskListId);
+                            .Where(t => t.TaskList.GoogleTaskListID == taskListId && t.LocalStatus != LocalStatus.CREATED);
 
                         if (!string.IsNullOrEmpty(parentTask))
                         {
