@@ -13,7 +13,7 @@ namespace MiraiNotes.Shared
     public class MiraiNotesContext : DbContext
     {
         private const string DatabaseName = "mirai-notes.db";
-        private const string CurrentMigration = "Migration_v1.0.0.0";
+        private const string CurrentMigration = "Migration_v1.1.4.0";
 
 
         public DbSet<GoogleUser> Users { get; set; }
