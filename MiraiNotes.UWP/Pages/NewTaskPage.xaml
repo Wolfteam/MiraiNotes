@@ -319,7 +319,7 @@
                 <AppBarButton
                     Command="{Binding NewSubTaskCommand}"
                     Icon="Add"
-                    IsEnabled="{Binding CurrentTask.HasParentTask, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    IsEnabled="{Binding CurrentTask.CanAddSubTasks, Mode=OneWay}"
                     Label="Add a sub task"
                     ToolTipService.ToolTip="Add a sub task to this task list" />
                 <AppBarSeparator Foreground="{ThemeResource SystemAccentColor}" />

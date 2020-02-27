@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_close_black_24dp"
-        android:background="?android:attr/selectableItemBackground"
+        android:background="?selectableItemBackgroundBorderless"
         android:layout_gravity="right|center_vertical"
         app:MvxBind="Visibility InvertedVisibility(CanBeSelected); Click DeleteSubTaskCommand"/>
 </LinearLayout>

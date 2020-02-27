@@ -1,13 +1,14 @@
-﻿using Android.App;
+﻿using Android.Animation;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Views;
 using Android.Widget;
-using Java.Lang;
 using MiraiNotes.Android.Listeners;
 using System;
+using System.Linq;
 using static Android.App.ActivityManager;
 using static Android.Graphics.Bitmap;
 using AndroidUtil = Android.Util;
@@ -74,9 +75,9 @@ namespace MiraiNotes.Android.Common.Utils
                     return bitmap;
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                throw;
+                throw e;
             }
         }
 
@@ -112,7 +113,7 @@ namespace MiraiNotes.Android.Common.Utils
             return px / ((float)context.Resources.DisplayMetrics.DensityDpi / dmd);
         }
 
-        public static void StartForegroundServiceCompat<T>(this Context context, Bundle args = null) 
+        public static void StartForegroundServiceCompat<T>(this Context context, Bundle args = null)
             where T : Service
         {
             var intent = new Intent(context, typeof(T));
@@ -129,6 +130,53 @@ namespace MiraiNotes.Android.Common.Utils
             {
                 context.StartService(intent);
             }
+        }
+
+        public static Animator CreateSlideAnimator(
+            Context context, 
+            int animeResId, 
+            float to = 0)
+        {
+            float deviceWidth = context.Resources.DisplayMetrics.WidthPixels;
+            var animSet = AnimatorInflater.LoadAnimator(context, animeResId) as AnimatorSet;
+            var anim = animSet.ChildAnimations.First() as ObjectAnimator;
+            deviceWidth += (float)(deviceWidth * 0.1);
+
+            switch (animeResId)
+            {
+                case Resource.Animator.slide_enter_left_to_right:
+                    anim.SetFloatValues(-deviceWidth, to);
+                    break;
+                case Resource.Animator.slide_enter_right_to_left:
+                    anim.SetFloatValues(deviceWidth, to);
+                    break;
+                case Resource.Animator.slide_exit_left_to_right:
+                    anim.SetFloatValues(to, deviceWidth);
+                    break;
+                case Resource.Animator.slide_exit_right_to_left:
+                    anim.SetFloatValues(to, -deviceWidth);
+                    break;
+                default:
+                    throw new IndexOutOfRangeException("The provided anim resource is not valid");
+            }
+            return animSet;
+        }
+
+        public static bool IsViewVisibleOnScreen(Context context, View view)
+        {
+            int deviceWidth = context.Resources.DisplayMetrics.WidthPixels;
+            int deviceHeight = context.Resources.DisplayMetrics.HeightPixels;
+
+            if (view == null)
+                return false;
+            if (!view.IsShown)
+                return false;
+
+            var actualPosition = new Rect();
+            view.GetGlobalVisibleRect(actualPosition);
+            var screen = new Rect(0, 0, deviceWidth, deviceHeight);
+
+            return actualPosition.Intersect(screen);
         }
     }
 }

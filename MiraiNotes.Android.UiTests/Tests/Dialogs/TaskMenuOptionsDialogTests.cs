@@ -77,7 +77,8 @@ namespace MiraiNotes.Android.UiTests.Tests.Dialogs
         public void AddSubTask_ToExistingTask_ShouldSaveIt(bool saveIt)
         {
             //Arrange
-            TaskMenuOptionsDialog.ShowMainDialog().ShowAddSubTaskDialog();
+            int taskIndex = TasksPage.GetFirstNotCompletedTaskIndex();
+            TaskMenuOptionsDialog.ShowMainDialog(taskIndex).ShowAddSubTaskDialog();
             string hint = TasksPage.GetHint();
 
             //Act
@@ -91,7 +92,8 @@ namespace MiraiNotes.Android.UiTests.Tests.Dialogs
         public void AddSubTask_EmptyTitle_MustShowAValidationError()
         {
             //Arrange
-            TaskMenuOptionsDialog.ShowMainDialog().ShowAddSubTaskDialog();
+            int taskIndex = TasksPage.GetFirstNotCompletedTaskIndex();
+            TaskMenuOptionsDialog.ShowMainDialog(taskIndex).ShowAddSubTaskDialog();
 
             //Act
             bool isInvalid = TaskMenuOptionsDialog.IsSubTaskTitleValid(string.Empty);

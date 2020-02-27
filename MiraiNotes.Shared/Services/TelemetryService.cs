@@ -1,6 +1,8 @@
-﻿using Microsoft.AppCenter;
+﻿#if !DEBUG
+using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+#endif
 using MiraiNotes.Abstractions.Services;
 using System;
 

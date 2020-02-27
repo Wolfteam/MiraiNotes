@@ -232,6 +232,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t add subtasks to a completed task.
+        /// </summary>
+        public static string CantAddSubTasks {
+            get {
+                return ResourceManager.GetString("CantAddSubTasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change tasklist.
         /// </summary>
         public static string ChangeTaskList {
@@ -1146,6 +1155,15 @@ namespace MiraiNotes.Android.Localization {
         public static string Spanish {
             get {
                 return ResourceManager.GetString("Spanish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubTasks.
+        /// </summary>
+        public static string SubTasks {
+            get {
+                return ResourceManager.GetString("SubTasks", resourceCulture);
             }
         }
         

@@ -3,6 +3,7 @@ using MiraiNotes.Android.Bindings;
 using MvvmCross.Binding.Bindings.Target.Construction;
 using MvvmCross.Converters;
 using MvvmCross.Droid.Support.V7.AppCompat;
+using MvvmCross.Droid.Support.V7.RecyclerView;
 using MvvmCross.Localization;
 using MvvmCross.ViewModels;
 
@@ -35,6 +36,10 @@ namespace MiraiNotes.Android
             registry.RegisterCustomBindingFactory<LinearLayout>(
                 IsSelectedBackgroundColorBinding.PropertyName,
                 view => new IsSelectedBackgroundColorBinding(view));
+
+            registry.RegisterCustomBindingFactory<MvxRecyclerView>(
+                ExpandCollapseSubTasksAnimateBinding.PropertyName,
+                view => new ExpandCollapseSubTasksAnimateBinding(view));
         }
     }
 }

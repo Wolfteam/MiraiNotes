@@ -1,4 +1,5 @@
-﻿using Android.Graphics;
+﻿using Android.Animation;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
@@ -6,6 +7,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using MiraiNotes.Android.Adapters;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
@@ -121,6 +123,13 @@ namespace MiraiNotes.Android.Views.Fragments
             return view;
         }
 
+        public override Animator OnCreateAnimator(int transit, bool enter, int nextAnim)
+        {
+            if (nextAnim == 0)
+                return base.OnCreateAnimator(transit, enter, nextAnim);
+            return AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
+        }
+
         public void ShowFabMenu()
         {
             IsFabOpen = true;
@@ -157,6 +166,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public void OnClick(int buttonId, int pos)
         {
+            ResetSwipedItems();
             switch (buttonId)
             {
                 case DeleteTaskButtonId:
@@ -168,7 +178,6 @@ namespace MiraiNotes.Android.Views.Fragments
                 default:
                     throw new ArgumentOutOfRangeException(nameof(buttonId), buttonId, "The provided buttonId is not valid");
             }
-            ResetSwipedItems();
         }
 
         private Color GetChangeTaskStatusColor(int position)

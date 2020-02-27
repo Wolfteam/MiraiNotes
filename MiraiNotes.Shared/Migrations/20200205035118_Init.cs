@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MiraiNotes.Data.Migrations
+namespace MiraiNotes.Shared.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,8 +17,8 @@ namespace MiraiNotes.Data.Migrations
                     Email = table.Column<string>(nullable: false),
                     PictureUrl = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(nullable: false)
+                    CreatedAt = table.Column<long>(nullable: false),
+                    UpdatedAt = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,8 +33,8 @@ namespace MiraiNotes.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     GoogleTaskListID = table.Column<string>(nullable: false),
                     Title = table.Column<string>(nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(nullable: false),
+                    CreatedAt = table.Column<long>(nullable: false),
+                    UpdatedAt = table.Column<long>(nullable: false),
                     LocalStatus = table.Column<int>(nullable: false),
                     ToBeSynced = table.Column<bool>(nullable: false),
                     UserID = table.Column<int>(nullable: false)
@@ -59,18 +58,20 @@ namespace MiraiNotes.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     GoogleTaskID = table.Column<string>(nullable: false),
                     Title = table.Column<string>(nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(nullable: false),
+                    CreatedAt = table.Column<long>(nullable: false),
+                    UpdatedAt = table.Column<long>(nullable: false),
                     ParentTask = table.Column<string>(nullable: true),
                     Position = table.Column<string>(nullable: true),
                     Notes = table.Column<string>(nullable: true),
                     Status = table.Column<string>(nullable: false),
-                    ToBeCompletedOn = table.Column<DateTimeOffset>(nullable: true),
-                    CompletedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ToBeCompletedOn = table.Column<long>(nullable: true),
+                    CompletedOn = table.Column<long>(nullable: true),
                     IsDeleted = table.Column<bool>(nullable: false),
                     IsHidden = table.Column<bool>(nullable: false),
                     LocalStatus = table.Column<int>(nullable: false),
                     ToBeSynced = table.Column<bool>(nullable: false),
+                    RemindOn = table.Column<long>(nullable: true),
+                    RemindOnGUID = table.Column<string>(nullable: true),
                     TaskListID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

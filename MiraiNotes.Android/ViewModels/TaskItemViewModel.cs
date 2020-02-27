@@ -275,6 +275,10 @@ namespace MiraiNotes.Android.ViewModels
             get => !string.IsNullOrEmpty(ParentTask);
         }
 
+        //For some reason, google doesnt allows to create subtask on a completed task..
+        public bool CanAddSubTasks 
+            => (!IsNew && !HasParentTask && CanBeMarkedAsCompleted) || (IsNew && !HasParentTask);
+
         public DateTimeOffset? RemindOn
         {
             get => _remindOn;
@@ -361,8 +365,8 @@ namespace MiraiNotes.Android.ViewModels
             {
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(this);
                 await NavigationService.Navigate<
-                    DeleteTaskDialogViewModel, 
-                    DeleteTaskDialogViewModelParameter, 
+                    DeleteTaskDialogViewModel,
+                    DeleteTaskDialogViewModelParameter,
                     DeleteTaskDialogViewModelResult>(parameter);
             });
 

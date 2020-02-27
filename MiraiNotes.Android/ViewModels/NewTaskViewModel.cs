@@ -173,6 +173,11 @@ namespace MiraiNotes.Android.ViewModels
 
             AddSubTaskCommand = new MvxAsyncCommand(async () =>
             {
+                if (!Task.CanAddSubTasks)
+                {
+                    _dialogService.ShowInfoToast(TextProvider.Get("CantAddSubTasks"), true);
+                    return;
+                }
                 var parameter = AddSubTaskDialogViewModelParameter.Instance(_currentTaskList.GoogleId, Task, true);
                 await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, bool>(parameter);
             });

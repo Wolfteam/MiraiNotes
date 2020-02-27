@@ -85,6 +85,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2.5"
+                android:paddingHorizontal="10dp"
                 android:orientation="vertical"
                 android:gravity="center_vertical|end">
 
@@ -115,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
-                    android:background="?android:attr/selectableItemBackground"
+                    android:background="?selectableItemBackgroundBorderless"
                     android:textSize="@dimen/task_item_content"
                     app:MvxBind="Click ShowSubTasksCommand; Visibility Visibility(HasSubTasks); ShowSubTasks ShowSubTasks"/>
             </LinearLayout>
@@ -126,7 +127,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:id="@+id/SubTaskRecyclerView"
-            android:scrollbars="vertical"
+            android:scrollbars="none"
+            android:visibility="gone"
+            android:nestedScrollingEnabled="false"
             app:MvxItemTemplate="@layout/subtaskitem"
             app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks); ItemClick SubTaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
     </LinearLayout>

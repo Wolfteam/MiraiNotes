@@ -169,6 +169,15 @@ namespace MiraiNotes.Android.UiTests.Pages
             return (paintFlag & 16) > 0;
         }
 
+        public int GetFirstNotCompletedTaskIndex(int startingFromIndex = 0)
+        {
+            while (IsTextStrikeThrough(startingFromIndex))
+            {
+                startingFromIndex++;
+            }
+            return startingFromIndex;
+        }
+
         public TasksPage ShowLogoutDialog()
         {
             App.Tap(x => x.Marked("Logout"));
