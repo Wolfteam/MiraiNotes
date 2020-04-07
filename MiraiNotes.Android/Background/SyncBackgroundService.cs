@@ -5,12 +5,13 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Services;
 using MvvmCross;
+using MvvmCross.Platforms.Android.Services;
 using System;
 
 namespace MiraiNotes.Android.Background
 {
     [Service]
-    public class SyncBackgroundService : IntentService
+    public class SyncBackgroundService : MvxIntentService
     {
         public const int SyncServiceId = 101;
         public const string IsServiceRunningKey = "IsSyncServiceRunning";
@@ -46,6 +47,7 @@ namespace MiraiNotes.Android.Background
 
         protected override void OnHandleIntent(Intent intent)
         {
+            base.OnHandleIntent(intent);
             try
             {
                 _appSettings.SetBoolean(IsServiceRunningKey, true);

@@ -271,7 +271,8 @@ namespace MiraiNotes.Android.ViewModels
                 true,
                 userSaved.Result.Email);
 
-            await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
+            if (!string.IsNullOrEmpty(user.ImageUrl))
+                await MiscellaneousUtils.DownloadProfileImage(user.ImageUrl, user.ID);
 
             //if you came this far, that means everything is ok!
             await NavigationService.Close(this);
@@ -383,6 +384,24 @@ namespace MiraiNotes.Android.ViewModels
             App.RegisterMockServices();
             var mockedGoogleApiService = Mvx.IoCProvider.Resolve<IGoogleApiService>();
             var mockedSyncService = Mvx.IoCProvider.Resolve<ISyncService>();
+            _userCredentialService.DeleteUserCredential(
+                ResourceType.ALL,
+                _userCredentialService.DefaultUsername);
+
+            _userCredentialService.SaveUserCredential(
+                ResourceType.LOGGED_USER_RESOURCE,
+                _userCredentialService.DefaultUsername,
+                _userCredentialService.DefaultUsername);
+
+            _userCredentialService.SaveUserCredential(
+                ResourceType.REFRESH_TOKEN_RESOURCE,
+                _userCredentialService.DefaultUsername,
+                "Fake refresh token");
+
+            _userCredentialService.SaveUserCredential(
+                ResourceType.TOKEN_RESOURCE,
+                _userCredentialService.DefaultUsername,
+                "Fake access token");
 
             return await SignIn(mockedGoogleApiService, mockedSyncService);
         }

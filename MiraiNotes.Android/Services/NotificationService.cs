@@ -79,7 +79,7 @@ namespace MiraiNotes.Android.Services
             var alarmManager = GetAlarmManager();
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
-                alarmManager.SetAlarmClock(new AlarmManager.AlarmClockInfo(milis, pendingIntent), pendingIntent);
+                alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, milis, pendingIntent);
             else if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
                 alarmManager.SetExact(AlarmType.RtcWakeup, milis, pendingIntent);
             else
@@ -139,7 +139,7 @@ namespace MiraiNotes.Android.Services
             //This avoid replacing an existing notification
             if (notification.Id == 0)
             {
-                notification.Id  = (int)DateTime.Now.Ticks;
+                notification.Id = (int)DateTime.Now.Ticks;
             }
             var builder = BuildSimpleNotification(notification);
             var notif = builder.Build();

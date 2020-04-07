@@ -103,12 +103,11 @@ namespace MiraiNotes.Android
             Mvx.IoCProvider.RegisterType<TaskListItemViewModel>();
 
             RegisterAppStart<LoginViewModel>();
-            //RegisterCustomAppStart<CustomAppStart>();
+
             // if you want to use a custom AppStart, you should replace the previous line with this one:
             // RegisterCustomAppStart<MyCustomAppStart>();
         }
 
-        //this shit is not logging to file system
         private ILogger SetupLogging()
         {
             const string fileOutputTemplate =
@@ -126,33 +125,35 @@ namespace MiraiNotes.Android
                 {$"{typeof(UserDataService).FullName}", "data_user_service_.txt" },
                 {$"{typeof(MiraiNotesDataService).FullName}", "data_main_service_.txt" },
                 //view models
-                {$"{typeof(AccountDialogViewModel).FullName}", "vm_account_dialog.txt" },
-                {$"{typeof(AddSubTaskDialogViewModel).FullName}", "vm_addsubtask_dialog" },
-                {$"{typeof(ChangeTaskStatusDialogViewModel).FullName}",  "vm_changetaskstatus_dialog.txt"},
-                {$"{typeof(DeleteTaskDialogViewModel).FullName}",  "vm_deletetask_dialog.txt"},
-                {$"{typeof(MoveTaskDialogViewModel).FullName}", "vm_movetask_dialog.txt" },
-                {$"{typeof(TaskListsDialogViewModel).FullName}",  "vm_tasklists_dialog.txt"},
-                {$"{typeof(PasswordDialogViewModel).FullName}", "vm_password_dialog.txt" },
-                {$"{typeof(AddEditTaskListDialogViewModel).FullName}",  "vm_add_edit_tasklists_dialog.txt"},
-                {$"{typeof(TaskMenuOptionsViewModel).FullName}", "vm_taskmenuoptions_dialog.txt" },
-                {$"{typeof(TaskDateDialogViewModel).FullName}",  "vm_taskdate_dialog.txt"},
-                {$"{typeof(DeleteAccountDialogViewModel).FullName}",  "vm_deleteaccount_dialog.txt"},
-                {$"{typeof(LogoutDialogViewModel).FullName}",  "vm_logout_dialog.txt"},
-                {$"{typeof(SettingsMainViewModel).FullName}", "vm_settings_main.txt" },
-                {$"{typeof(GoogleUserViewModel).FullName}",  "vm_google_user.txt"},
-                {$"{typeof(LoginViewModel).FullName}", "vm_login.txt" },
-                {$"{typeof(MainViewModel).FullName}", "vm_main.txt" },
-                {$"{typeof(MenuViewModel).FullName}",  "vm_menu.txt"},
-                {$"{typeof(NewTaskViewModel).FullName}","vm_newtask.txt"},
-                {$"{typeof(TasksViewModel).FullName}",  "vm_tasks.txt"},
-                {$"{typeof(DeleteTaskListDialogViewModel).FullName}",  "vm_deletetasklist_dialog.txt"},
-                {$"{typeof(ManageTaskListsDialogViewModel).FullName}",  "vm_managetasklists_dialog.txt"},
+                {$"{typeof(AccountDialogViewModel).FullName}", "vm_account_dialog_.txt" },
+                {$"{typeof(AddSubTaskDialogViewModel).FullName}", "vm_addsubtask_dialog_.txt" },
+                {$"{typeof(ChangeTaskStatusDialogViewModel).FullName}",  "vm_changetaskstatus_dialog_.txt"},
+                {$"{typeof(DeleteTaskDialogViewModel).FullName}",  "vm_deletetask_dialog_.txt"},
+                {$"{typeof(MoveTaskDialogViewModel).FullName}", "vm_movetask_dialog_.txt" },
+                {$"{typeof(TaskListsDialogViewModel).FullName}",  "vm_tasklists_dialog_.txt"},
+                {$"{typeof(PasswordDialogViewModel).FullName}", "vm_password_dialog_.txt" },
+                {$"{typeof(AddEditTaskListDialogViewModel).FullName}",  "vm_add_edit_tasklists_dialog_.txt"},
+                {$"{typeof(TaskMenuOptionsViewModel).FullName}", "vm_taskmenuoptions_dialog_.txt" },
+                {$"{typeof(TaskDateDialogViewModel).FullName}",  "vm_taskdate_dialog_.txt"},
+                {$"{typeof(DeleteAccountDialogViewModel).FullName}",  "vm_deleteaccount_dialog_.txt"},
+                {$"{typeof(LogoutDialogViewModel).FullName}",  "vm_logout_dialog_.txt"},
+                {$"{typeof(SettingsMainViewModel).FullName}", "vm_settings_main_.txt" },
+                {$"{typeof(GoogleUserViewModel).FullName}",  "vm_google_user_.txt"},
+                {$"{typeof(LoginViewModel).FullName}", "vm_login_.txt" },
+                {$"{typeof(MainViewModel).FullName}", "vm_main_.txt" },
+                {$"{typeof(MenuViewModel).FullName}",  "vm_menu_.txt"},
+                {$"{typeof(NewTaskViewModel).FullName}","vm_newtask_.txt"},
+                {$"{typeof(TasksViewModel).FullName}",  "vm_tasks_.txt"},
+                {$"{typeof(DeleteTaskListDialogViewModel).FullName}",  "vm_deletetasklist_dialog_.txt"},
+                {$"{typeof(ManageTaskListsDialogViewModel).FullName}",  "vm_managetasklists_dialog_.txt"},
                 //others
                 {$"{typeof(AuthenticatedHttpClientHandler).FullName}", "auth_http_handler_.txt" },
                 {$"{typeof(SyncBackgroundTask).FullName}",  "bg_sync_.txt"},
                 {$"{typeof(MarkTaskAsCompletedReceiver.MarkAsCompletedTask).FullName}",  "bg_marktaskascompleted_.txt"},
-                {$"{typeof(GoogleApiService).FullName}", "api_google.txt" },
-                {$"{typeof(SyncService).FullName}",  "sync_service_.txt"}
+                {$"{typeof(GoogleApiService).FullName}", "api_google_service_.txt" },
+                {$"{typeof(SyncService).FullName}",  "sync_service_.txt"},
+                {$"{typeof(NotificationSchedulerReceiver.NotificationSchedulerTask).FullName}",  "bg_notificationreceiver_.txt"},
+                {$"{typeof(BootBroadcastReceiver.RescheduleNotificationsTask).FullName}",  "bg_reschedulenotifications_.txt"},
             };
 
             foreach (var kvp in logs)

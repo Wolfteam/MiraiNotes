@@ -8,7 +8,7 @@ namespace MiraiNotes.Android.Views.Activities
         MainLauncher = true,
         Theme = "@style/Theme.Splash",
         NoHistory = true)]
-    public class SplashActivity : MvxSplashScreenAppCompatActivity<Setup<App>, App>
+    public class SplashActivity : MvxSplashScreenAppCompatActivity<Setup, App>
     {
         public SplashActivity()
         {
