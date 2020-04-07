@@ -83,7 +83,7 @@ namespace MiraiNotes.Abstractions.Data
         /// <param name="taskID">The task id</param>
         /// <param name="dateType">The type of date to remove</param>
         /// <returns><see cref="ResponseDto{GoogleTask}"/></returns>
-        Task<ResponseDto<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType);
+        Task<ResponseDto<GoogleTask>> RemoveNotificationDate(int taskID, TaskNotificationDateType dateType);
 
         /// <summary>
         /// Adds a notification date to the specified task

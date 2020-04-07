@@ -273,7 +273,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 var response = await _dataService
                     .TaskService
-                    .RemoveNotificationDate(task.GoogleId, dateType);
+                    .RemoveNotificationDate(task.Id, dateType);
 
                 if (!response.Succeed)
                 {

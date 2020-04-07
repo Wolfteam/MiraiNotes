@@ -867,7 +867,7 @@ namespace MiraiNotes.UWP.ViewModels
 
                 var response = await _dataService
                     .TaskService
-                    .RemoveNotificationDate(CurrentTask.TaskID, dateType);
+                    .RemoveNotificationDate(CurrentTask.Id, dateType);
 
                 if (!response.Succeed)
                 {

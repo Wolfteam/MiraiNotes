@@ -640,7 +640,7 @@ namespace MiraiNotes.Shared.Services.Data
             }).ConfigureAwait(false);
         }
 
-        public async Task<ResponseDto<GoogleTask>> RemoveNotificationDate(string taskID, TaskNotificationDateType dateType)
+        public async Task<ResponseDto<GoogleTask>> RemoveNotificationDate(int taskID, TaskNotificationDateType dateType)
         {
             return await Task.Run(async () =>
             {
@@ -658,7 +658,7 @@ namespace MiraiNotes.Shared.Services.Data
                     {
                         var taskToUpdate = await context
                             .Tasks
-                            .FirstOrDefaultAsync(t => t.GoogleTaskID == taskID);
+                            .FirstOrDefaultAsync(t => t.ID == taskID);
 
                         if (taskToUpdate == null)
                         {
