@@ -51,7 +51,7 @@ namespace MiraiNotes.Android.Background
             try
             {
                 _appSettings.SetBoolean(IsServiceRunningKey, true);
-                int taskListId = intent.Extras?.GetInt(TaskListIdToSyncKey, 0) ?? 0;
+                int taskListId = intent?.Extras?.GetInt(TaskListIdToSyncKey, 0) ?? 0;
 
                 var synTask = new SyncTask(true, taskListId > 0 ? taskListId : (int?)null);
                 synTask.Sync().GetAwaiter().GetResult();
