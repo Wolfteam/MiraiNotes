@@ -3,7 +3,6 @@ using Android.Content;
 using Android.Runtime;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
-using MiraiNotes.Android.Services;
 using MvvmCross;
 using MvvmCross.Platforms.Android.Services;
 using System;
@@ -30,11 +29,11 @@ namespace MiraiNotes.Android.Background
         {
             base.OnStartCommand(intent, flags, startId);
             var textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
-            var notificationService = Mvx.IoCProvider.Resolve<INotificationService>() as NotificationService;
+            var notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
             _appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>() as IAndroidAppSettings;
 
             var notification = notificationService
-                .BuildSimpleNotification(textProvider.Get("Syncing"), textProvider.Get("SyncRunning"))
+                .BuildSimpleNotification(textProvider.Get("Syncing"), textProvider.Get("SyncRunning"), true)
                 .SetOngoing(true)
                 .Build();
 

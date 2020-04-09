@@ -46,7 +46,7 @@ namespace MiraiNotes.Android.Background
         {
             private readonly ILogger _logger;
             private readonly ITelemetryService _telemetryService;
-            private readonly INotificationService _notificationService;
+            private readonly IAndroidNotificationService _notificationService;
             private readonly IMiraiNotesDataService _dataService;
             private readonly ITextProvider _textProvider;
             private readonly IMvxMessenger _messenger;
@@ -57,7 +57,7 @@ namespace MiraiNotes.Android.Background
                 _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<MarkAsCompletedTask>();
                 _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
                 _dataService = Mvx.IoCProvider.Resolve<IMiraiNotesDataService>();
-                _notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
+                _notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
                 _textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
                 _messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
 

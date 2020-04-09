@@ -24,7 +24,7 @@ namespace MiraiNotes.Android.Background
         private readonly IAppSettingsService _appSettings;
         private readonly IMvxMessenger _messenger;
         private readonly IDialogService _dialogService;
-        private readonly INotificationService _notificationService;
+        private readonly IAndroidNotificationService _notificationService;
         private readonly ITelemetryService _telemetryService;
         private readonly INetworkService _networkService;
 
@@ -40,7 +40,7 @@ namespace MiraiNotes.Android.Background
             _appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>();
             _messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
             _dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
-            _notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
+            _notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
             _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
             _networkService = Mvx.IoCProvider.Resolve<INetworkService>();
         }

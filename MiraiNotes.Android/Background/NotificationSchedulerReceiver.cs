@@ -3,7 +3,7 @@ using Android.Content;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Utils;
-using MiraiNotes.Android.Services;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MvvmCross;
@@ -59,7 +59,7 @@ namespace MiraiNotes.Android.Background
         {
             private readonly ILogger _logger;
             private readonly ITelemetryService _telemetryService;
-            private readonly NotificationService _notificationService;
+            private readonly IAndroidNotificationService _notificationService;
             private readonly IMiraiNotesDataService _dataService;
             private readonly TaskNotification _notification;
             private readonly TaskReminderNotification _reminderNotification;
@@ -67,13 +67,13 @@ namespace MiraiNotes.Android.Background
             public bool IsAReminder
                 => _reminderNotification != null;
 
-            public NotificationSchedulerTask(TaskNotification notification) 
+            public NotificationSchedulerTask(TaskNotification notification)
                 : this()
             {
                 _notification = notification;
             }
 
-            public NotificationSchedulerTask(TaskReminderNotification notification) 
+            public NotificationSchedulerTask(TaskReminderNotification notification)
                 : this()
             {
                 _reminderNotification = notification;
@@ -83,7 +83,7 @@ namespace MiraiNotes.Android.Background
             {
                 _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<NotificationSchedulerTask>();
                 _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
-                _notificationService = Mvx.IoCProvider.Resolve<INotificationService>() as NotificationService;
+                _notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
                 _dataService = Mvx.IoCProvider.Resolve<IMiraiNotesDataService>();
             }
 

@@ -20,7 +20,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
-        private readonly INotificationService _notificationService;
+        private readonly IAndroidNotificationService _notificationService;
 
         public DeleteTaskDialogViewModel(
             ITextProvider textProvider,
@@ -31,7 +31,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             ITelemetryService telemetryService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService,
-            INotificationService notificationService)
+            IAndroidNotificationService notificationService)
             : base(textProvider, messenger, logger.ForContext<DeleteTaskDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;

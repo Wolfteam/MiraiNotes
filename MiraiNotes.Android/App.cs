@@ -59,7 +59,7 @@ namespace MiraiNotes.Android
             Mvx.IoCProvider.RegisterType<INetworkService, NetworkService>();
             Mvx.IoCProvider.RegisterType<ISyncService, SyncService>();
             Mvx.IoCProvider.RegisterType<IBackgroundTaskManagerService, BackgroundTaskManagerService>();
-            Mvx.IoCProvider.RegisterType<INotificationService, NotificationService>();
+            Mvx.IoCProvider.RegisterType<IAndroidNotificationService, NotificationService>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<ITelemetryService, TelemetryService>();
 
             Mvx.IoCProvider.RegisterSingleton(CreateMapper);

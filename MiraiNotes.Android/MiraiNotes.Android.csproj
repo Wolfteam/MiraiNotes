@@ -139,6 +139,7 @@
     <Compile Include="Common\Converters\SettingsPageTypeToResourceDrawableConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
     <Compile Include="Common\Extensions\ObservableDictionary.cs" />
+    <Compile Include="Interfaces\IAndroidNotificationService.cs" />
     <Compile Include="Interfaces\IBaseViewModel.cs" />
     <Compile Include="Interfaces\IItemTouchHelperAdapter.cs" />
     <Compile Include="Interfaces\IOnStartDragListener.cs" />

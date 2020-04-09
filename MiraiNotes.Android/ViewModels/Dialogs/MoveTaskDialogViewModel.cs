@@ -23,7 +23,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
-        private readonly INotificationService _notificationService;
+        private readonly IAndroidNotificationService _notificationService;
 
         public MoveTaskDialogViewModel(
             ITextProvider textProvider,
@@ -34,7 +34,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IAppSettingsService appSettings,
             IMiraiNotesDataService dataService,
             IDialogService dialogService,
-            INotificationService notificationService)
+            IAndroidNotificationService notificationService)
             : base(textProvider, messenger, logger.ForContext<MoveTaskDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;

@@ -2,7 +2,7 @@
 using Android.Content;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
-using MiraiNotes.Android.Services;
+using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Helpers;
@@ -30,14 +30,14 @@ namespace MiraiNotes.Android.Background
         {
             private readonly ILogger _logger;
             private readonly ITelemetryService _telemetryService;
-            private readonly INotificationService _notificationService;
+            private readonly IAndroidNotificationService _notificationService;
             private readonly IMiraiNotesDataService _dataService;
 
             public RescheduleNotificationsTask()
             {
                 _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<RescheduleNotificationsTask>();
                 _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
-                _notificationService = Mvx.IoCProvider.Resolve<INotificationService>() as NotificationService;
+                _notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
                 _dataService = Mvx.IoCProvider.Resolve<IMiraiNotesDataService>();
             }
 
