@@ -26,7 +26,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private readonly IMiraiNotesDataService _dataService;
         private readonly IValidator _validator;
         private readonly IDialogService _dialogService;
-        private readonly INotificationService _notificationService;
+        private readonly IAndroidNotificationService _notificationService;
         private ObservableDictionary<string, string> _errors = new ObservableDictionary<string, string>();
 
         public DateTime MinDate
@@ -103,7 +103,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             IMiraiNotesDataService dataService,
             IValidatorFactory validatorFactory,
             IDialogService dialogService,
-            INotificationService notificationService)
+            IAndroidNotificationService notificationService)
             : base(textProvider, messenger, logger.ForContext<TaskDateDialogViewModel>(), navigationService, appSettings, telemetryService)
         {
             _dataService = dataService;
@@ -273,7 +273,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 var response = await _dataService
                     .TaskService
-                    .RemoveNotificationDate(task.GoogleId, dateType);
+                    .RemoveNotificationDate(task.Id, dateType);
 
                 if (!response.Succeed)
                 {

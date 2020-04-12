@@ -5,7 +5,6 @@ using Android.Media;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
-using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Background;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
@@ -19,7 +18,7 @@ using TaskStackBuilder = Android.Support.V4.App.TaskStackBuilder;
 
 namespace MiraiNotes.Android.Services
 {
-    public class NotificationService : INotificationService
+    public class NotificationService : IAndroidNotificationService
     {
         private readonly ITextProvider _textProvider;
 
@@ -28,6 +27,9 @@ namespace MiraiNotes.Android.Services
 
         public static string GeneralChannelId
             => $"{PackageName}.general";
+
+        public static string MutedChannelId
+            => $"{PackageName}.muted";
 
         private NotificationManager NotifManager
             => (NotificationManager)Application.Context.GetSystemService(Context.NotificationService);
@@ -79,7 +81,7 @@ namespace MiraiNotes.Android.Services
             var alarmManager = GetAlarmManager();
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
-                alarmManager.SetAlarmClock(new AlarmManager.AlarmClockInfo(milis, pendingIntent), pendingIntent);
+                alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, milis, pendingIntent);
             else if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
                 alarmManager.SetExact(AlarmType.RtcWakeup, milis, pendingIntent);
             else
@@ -139,42 +141,38 @@ namespace MiraiNotes.Android.Services
             //This avoid replacing an existing notification
             if (notification.Id == 0)
             {
-                notification.Id  = (int)DateTime.Now.Ticks;
+                notification.Id = (int)DateTime.Now.Ticks;
             }
             var builder = BuildSimpleNotification(notification);
             var notif = builder.Build();
             NotifManager.Notify(notification.Id, notif);
         }
 
-        public void ShowNotification(int id, string title, string content, bool ongoing)
-        {
-            var pendingIntent = GetIntentToMainActivity(id);
-
-            var notif = BuildSimpleNotification(title, content)
-                .SetOngoing(ongoing)
-                .SetContentIntent(pendingIntent)
-                .Build();
-            NotifManager.Notify(id, notif);
-        }
-
-        public NotificationCompat.Builder BuildSimpleNotification(string title, string content)
+        public NotificationCompat.Builder BuildSimpleNotification(string title, string content, bool soundMuted = false)
         {
             var iconDrawable = ContextCompat.GetDrawable(Application.Context, Resource.Drawable.ic_launcher);
             var bm = iconDrawable.ToBitmap();
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var generalChannel = new NotificationChannel(GeneralChannelId, "Notifications", NotificationImportance.Default)
+                if (!soundMuted)
                 {
-                    LightColor = Resource.Color.colorAccent,
-                    Description = "App notifications with sound"
-                };
-
-                generalChannel.EnableLights(true);
-                NotifManager.CreateNotificationChannel(generalChannel);
+                    CreateNotificationChannel(
+                        GeneralChannelId, 
+                        "Notifications", 
+                        "App notifications with sound");
+                }
+                else
+                {
+                    CreateNotificationChannel(
+                        MutedChannelId, 
+                        "Muted Notifications", 
+                        "App notifications without sound",
+                        importance: NotificationImportance.Low);
+                }
             }
 
-            var builder = new NotificationCompat.Builder(Application.Context, GeneralChannelId)
+            var builder = new NotificationCompat.Builder(Application.Context, soundMuted ? MutedChannelId : GeneralChannelId)
                 .SetContentTitle(title)
                 .SetSmallIcon(Resource.Drawable.ic_notification_logo)
                 .SetColor(Color.Red.ToArgb())
@@ -189,7 +187,10 @@ namespace MiraiNotes.Android.Services
                 //This are deprecated for android O +
 #pragma warning disable CS0618 // Type or member is obsolete
                 var soundUri = RingtoneManager.GetDefaultUri(RingtoneType.Notification);
-                builder.SetSound(soundUri);
+                if (!soundMuted)
+                    builder.SetSound(soundUri);
+                else
+                    builder.SetSound(null);
                 builder.SetPriority(NotificationCompat.PriorityDefault);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
@@ -197,7 +198,7 @@ namespace MiraiNotes.Android.Services
             return builder;
         }
 
-        public PendingIntent GetIntentToMainActivity(int notificationId)
+        private PendingIntent GetIntentToMainActivity(int notificationId)
         {
             //we use the main because we dont want to show the splash again..
             var resultIntent = new Intent(Application.Context, typeof(MainActivity));
@@ -230,6 +231,24 @@ namespace MiraiNotes.Android.Services
         {
             var alarmManager = Application.Context.GetSystemService(Context.AlarmService) as AlarmManager;
             return alarmManager;
+        }
+
+        private void CreateNotificationChannel(
+            string id,
+            string name,
+            string description,
+            bool muted = false,
+            NotificationImportance importance = NotificationImportance.Default)
+        {
+            var channel = new NotificationChannel(id, name, importance)
+            {
+                LightColor = Resource.Color.colorAccent,
+                Description = description,
+            };
+            if (muted)
+                channel.SetSound(null, null);
+            channel.EnableLights(true);
+            NotifManager.CreateNotificationChannel(channel);
         }
     }
 }

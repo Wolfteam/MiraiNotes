@@ -1,19 +1,16 @@
-using System;
 using MiraiNotes.Abstractions.Services;
-using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;
+using System;
+using Xamarin.Essentials;
 
 namespace MiraiNotes.Android.Services
 {
     public class UserCredentialService : IUserCredentialService
     {
-        private readonly IAndroidAppSettings _appSettings;
-        
         public string DefaultUsername => "DEFAULT_USERNAME";
 
-        public UserCredentialService(IAndroidAppSettings appSettings)
+        public UserCredentialService()
         {
-            _appSettings = appSettings;
         }
 
         public string GetCurrentLoggedUsername()
@@ -29,7 +26,7 @@ namespace MiraiNotes.Android.Services
                     $"Cant retrieve a resource of type {resource}");
 
             var key = $"{resource}_{username}";
-            return _appSettings.GetString(key);
+            return SecureStorage.GetAsync(key).GetAwaiter().GetResult();
         }
 
         public void DeleteUserCredential(ResourceType resource, string username)
@@ -43,18 +40,18 @@ namespace MiraiNotes.Android.Services
                     if (DefaultUsername != username)
                     {
                         key = $"{resourceName}_{DefaultUsername}";
-                        _appSettings.SetString(key, null);
+                        SecureStorage.Remove(key);
                     }
 
                     key = $"{resourceName}_{username}";
-                    _appSettings.SetString(key, null);
+                    SecureStorage.Remove(key);
                 }
 
                 return;
             }
 
             key = $"{resource}_{username}";
-            _appSettings.SetString(key, null);
+            SecureStorage.Remove(key);
         }
 
         public void SaveUserCredential(ResourceType resource, string username, string secret)
@@ -65,7 +62,7 @@ namespace MiraiNotes.Android.Services
                     $"Cant save a resource of type {resource}");
 
             var key = $"{resource}_{username}";
-            _appSettings.SetString(key, secret);
+            SecureStorage.SetAsync(key, secret).GetAwaiter().GetResult();
         }
 
         public void UpdateUserCredential(ResourceType resource, string username, bool updateUsername, string newValue)

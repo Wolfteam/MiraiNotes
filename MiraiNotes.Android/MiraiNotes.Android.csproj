@@ -57,9 +57,9 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <AotAssemblies>false</AotAssemblies>
+    <AotAssemblies>true</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
-    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
     <AndroidDexTool>dx</AndroidDexTool>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
@@ -80,6 +80,7 @@
     <Compile Include="Adapters\AccountsDialogAdapter.cs" />
     <Compile Include="Adapters\TasksAdapter.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="Background\BootBroadcastReceiver.cs" />
     <Compile Include="Background\NotificationSchedulerReceiver.cs" />
     <Compile Include="Background\SyncBackgroundTask.cs" />
     <Compile Include="Background\MarkTaskAsCompletedReceiver.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Common\Converters\SettingsPageTypeToResourceDrawableConverter.cs" />
     <Compile Include="CustomAppStart.cs" />
     <Compile Include="Common\Extensions\ObservableDictionary.cs" />
+    <Compile Include="Interfaces\IAndroidNotificationService.cs" />
     <Compile Include="Interfaces\IBaseViewModel.cs" />
     <Compile Include="Interfaces\IItemTouchHelperAdapter.cs" />
     <Compile Include="Interfaces\IOnStartDragListener.cs" />
@@ -279,7 +281,7 @@
       <Version>9.0.0</Version>
     </PackageReference>
     <PackageReference Include="FluentValidation">
-      <Version>8.6.1</Version>
+      <Version>8.6.2</Version>
     </PackageReference>
     <PackageReference Include="Karamunting.Android.GrenderG.Toasty">
       <Version>1.3.1</Version>
@@ -324,7 +326,7 @@
       <Version>0.1.37</Version>
     </PackageReference>
     <PackageReference Include="System.Buffers">
-      <Version>4.5.0</Version>
+      <Version>4.5.1</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
@@ -347,6 +349,9 @@
     </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.v7.AppCompat">
       <Version>28.0.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Essentials">
+      <Version>1.5.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,7 @@ using MvvmCross.ViewModels;
 
 namespace MiraiNotes.Android
 {
-    public class Setup<T> : MvxAppCompatSetup<T> where T : class, IMvxApplication, new()
+    public class Setup : MvxAppCompatSetup<App>
     {
         protected override IMvxApplication CreateApp()
             => new App();

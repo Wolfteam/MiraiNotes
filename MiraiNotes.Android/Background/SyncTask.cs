@@ -17,46 +17,43 @@ namespace MiraiNotes.Android.Background
     {
         private readonly bool _startedManually;
         private readonly int? _taskListId;
-        private ISyncService _syncService;
-        private IMvxMainThreadAsyncDispatcher _dispatcher;
-        private ILogger _logger;
-        private ITextProvider _textProvider;
-        private IAppSettingsService _appSettings;
-        private IMvxMessenger _messenger;
-        private IDialogService _dialogService;
-        private INotificationService _notificationService;
-        private ITelemetryService _telemetryService;
-        private INetworkService _networkService;
+        private readonly ISyncService _syncService;
+        private readonly IMvxMainThreadAsyncDispatcher _dispatcher;
+        private readonly ILogger _logger;
+        private readonly ITextProvider _textProvider;
+        private readonly IAppSettingsService _appSettings;
+        private readonly IMvxMessenger _messenger;
+        private readonly IDialogService _dialogService;
+        private readonly IAndroidNotificationService _notificationService;
+        private readonly ITelemetryService _telemetryService;
+        private readonly INetworkService _networkService;
 
         public SyncTask(bool startedManually, int? taskListId)
         {
             _startedManually = startedManually;
             _taskListId = taskListId;
+
+            _dispatcher = Mvx.IoCProvider.Resolve<IMvxMainThreadAsyncDispatcher>();
+            _syncService = Mvx.IoCProvider.Resolve<ISyncService>();
+            _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<SyncBackgroundTask>();
+            _textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
+            _appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>();
+            _messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
+            _dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
+            _notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
+            _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
+            _networkService = Mvx.IoCProvider.Resolve<INetworkService>();
         }
 
         public async Task Sync()
         {
             try
             {
-                if (!AndroidUtils.IsAppInForeground())
-                {
-                    new App().Initialize();
-                }
-                _dispatcher = Mvx.IoCProvider.Resolve<IMvxMainThreadAsyncDispatcher>();
-                _syncService = Mvx.IoCProvider.Resolve<ISyncService>();
-                _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<SyncBackgroundTask>();
-                _textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
-                _appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>();
-                _messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
-                _dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
-                _notificationService = Mvx.IoCProvider.Resolve<INotificationService>();
-                _telemetryService = Mvx.IoCProvider.Resolve<ITelemetryService>();
-                _networkService = Mvx.IoCProvider.Resolve<INetworkService>();
-
                 _logger.Information(
                     $"{nameof(Sync)}: Started {(_startedManually ? "manually" : "automatically")}");
 
-                bool isSyncServiceRunning = (_appSettings as IAndroidAppSettings).GetBoolean(SyncBackgroundService.IsServiceRunningKey);
+                bool isSyncServiceRunning = (_appSettings as IAndroidAppSettings)
+                    .GetBoolean(SyncBackgroundService.IsServiceRunningKey);
 
                 if (!_startedManually && isSyncServiceRunning)
                 {
