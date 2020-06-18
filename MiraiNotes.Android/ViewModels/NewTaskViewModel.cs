@@ -250,7 +250,15 @@ namespace MiraiNotes.Android.ViewModels
                 return;
             }
 
-            var task = _mapper.Map<TaskItemViewModel>(tasksResponse.Result.First(t => t.GoogleTaskID == taskId));
+            var taskInDb = tasksResponse.Result.FirstOrDefault(t => t.GoogleTaskID == taskId);
+            if (taskInDb is null)
+            {
+                Logger.Warning($"{nameof(InitView)}: GoogleTaskId = {taskId} does not exist in db");
+                _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
+                return;
+            }
+
+            var task = _mapper.Map<TaskItemViewModel>(taskInDb);
             var subTasks = tasksResponse.Result
                 .Where(t => t.ParentTask == taskId)
                 .OrderBy(t => t.Position);
