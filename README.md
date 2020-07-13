@@ -7,16 +7,16 @@ A simple UWP / Android notes app that provides synchronization with Google Task 
 [![Build status](https://build.appcenter.ms/v0.1/apps/d4d94262-b60a-4baa-9806-aad439e25298/branches/develop/badge)](https://appcenter.ms)
 ### Screenshots
 
-#### UWP
 <p align="center">
-  <img src="images/main_page.PNG">
+  <img src="images/promo.png">
 </p>
 
-#### Android
 <p align="center">
-  <img height="550" width="400" src="images/screenshot_2_android.png">
-  <img height="550" width="400" src="images/screenshot_1_android.png">
+  <img height="550" src="images/2.png">
+  <img height="550" src="images/1.png">
+  <img height="550" src="images/3.png">
 </p>
+
 
 ### Features
 * All the Google Task features: 
@@ -83,8 +83,8 @@ and that class must include something like this:
 
         public const string Password = "the db password";
     }    
- ````
- 
+````
+
 #### UWP
 * Just follow the above instructions (the ones in the Installation section) if you want to create a release package, otherwise just run in UwpDebug mode.
 
