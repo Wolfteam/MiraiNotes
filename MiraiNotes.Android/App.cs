@@ -1,11 +1,11 @@
-﻿using Android.App;
-using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation;
 using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.GoogleApi;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Background;
 using MiraiNotes.Android.Common;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Common.Validators;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Services;
@@ -112,8 +112,7 @@ namespace MiraiNotes.Android
         {
             const string fileOutputTemplate =
                 "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
-            var externalFolder = Application.Context.GetExternalFilesDir(null).AbsolutePath;
-            var basePath = Path.Combine(externalFolder, "Logs");
+            var basePath = AndroidUtils.GetLogsPath();
 
             var loggerConfig = new LoggerConfiguration().MinimumLevel
                 .Verbose();

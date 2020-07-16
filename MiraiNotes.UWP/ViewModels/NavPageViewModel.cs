@@ -18,22 +18,23 @@ using MiraiNotes.UWP.Helpers;
 using MiraiNotes.UWP.Interfaces;
 using MiraiNotes.UWP.Models;
 using MiraiNotes.UWP.Utils;
+using Serilog;
 
 namespace MiraiNotes.UWP.ViewModels
 {
     public class NavPageViewModel : BaseViewModel
     {
         #region Members
-
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
         private readonly INavigationService _navigationService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IMapper _mapper;
         private readonly IMiraiNotesDataService _dataService;
-        private readonly IDispatcherHelper _dispatcher;
         private readonly IAppSettingsService _appSettings;
         private readonly IBackgroundTaskManagerService _backgroundTaskManager;
+        private readonly ITelemetryService _telemetryService;
+        private readonly ILogger _logger;
 
         private object _selectedItem;
 
@@ -167,9 +168,10 @@ namespace MiraiNotes.UWP.ViewModels
             IUserCredentialService userCredentialService,
             IMapper mapper,
             IMiraiNotesDataService dataService,
-            IDispatcherHelper dispatcher,
             IAppSettingsService appSettings,
-            IBackgroundTaskManagerService backgroundTaskManager)
+            IBackgroundTaskManagerService backgroundTaskManager,
+            ILogger logger,
+            ITelemetryService telemetryService)
         {
             _dialogService = dialogService;
             _messenger = messenger;
@@ -177,9 +179,10 @@ namespace MiraiNotes.UWP.ViewModels
             _userCredentialService = userCredentialService;
             _mapper = mapper;
             _dataService = dataService;
-            _dispatcher = dispatcher;
             _appSettings = appSettings;
             _backgroundTaskManager = backgroundTaskManager;
+            _telemetryService = telemetryService;
+            _logger = logger.ForContext<NavPageViewModel>();
 
             RegisterMessages();
             SetCommands();
@@ -220,6 +223,7 @@ namespace MiraiNotes.UWP.ViewModels
         {
             PageLoadedCommand = new RelayCommand(async () =>
             {
+                DeleteOldLogs();
                 await LoadProfileInfo();
                 await InitViewAsync();
             });
@@ -589,6 +593,19 @@ namespace MiraiNotes.UWP.ViewModels
             _isSelectionInProgress = false;
         }
 
+        private void DeleteOldLogs()
+        {
+            try
+            {
+                _logger.Information($"{nameof(DeleteOldLogs)}: Deleting old log files...");
+                FileUtils.DeleteFilesInDirectory(MiscellaneousUtils.GetLogsPath(), DateTime.Now.AddDays(-3));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"{nameof(DeleteOldLogs)}: Unknown error while deleting old files..");
+                _telemetryService.TrackError(e);
+            }
+        }
         #endregion
     }
 }

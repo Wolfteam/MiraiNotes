@@ -178,5 +178,11 @@ namespace MiraiNotes.Android.Common.Utils
 
             return actualPosition.Intersect(screen);
         }
+
+        public static string GetLogsPath()
+        {
+            var externalFolder = Application.Context.GetExternalFilesDir(null).AbsolutePath;
+            return System.IO.Path.Combine(externalFolder, "Logs");
+        }
     }
 }

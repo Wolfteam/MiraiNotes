@@ -180,7 +180,7 @@ namespace MiraiNotes.UWP.ViewModels
         private ILogger SetupLogging()
         {
             const string fileOutputTemplate = "{Timestamp:dd-MM-yyyy HH:mm:ss.fff} [{Level}] {Message:lj}{NewLine}{Exception}";
-            string basePath = Path.Combine(MiscellaneousUtils.GetApplicationPath(), "Logs");
+            string basePath = MiscellaneousUtils.GetLogsPath();
             var logs = new Dictionary<string, string>
             {
                 {typeof(NavPageViewModel).Namespace, "vm_.log" },

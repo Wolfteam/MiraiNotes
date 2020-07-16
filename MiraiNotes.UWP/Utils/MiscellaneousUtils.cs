@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Media;
 
 namespace MiraiNotes.UWP.Utils
 {
-    public class MiscellaneousUtils
+    public static class MiscellaneousUtils
     {
         const string USER_IMAGE_FILE_NAME = "user_image.png";
 
@@ -28,7 +28,12 @@ namespace MiraiNotes.UWP.Utils
             var package = Package.Current;
             var packageId = package.Id;
             var version = packageId.Version;
-            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+            string appVersion = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+#if DEBUG
+            return $"{appVersion} - DEBUG";
+#else
+            return appVersion;
+#endif
         }
 
         /// <summary>
@@ -166,7 +171,7 @@ namespace MiraiNotes.UWP.Utils
             }
         }
 
-        public static T FindControl<T>(UIElement parent, string ControlName) where 
+        public static T FindControl<T>(UIElement parent, string ControlName) where
             T : FrameworkElement
         {
             if (parent == null)
@@ -189,5 +194,8 @@ namespace MiraiNotes.UWP.Utils
             }
             return result;
         }
+
+        public static string GetLogsPath()
+            => Path.Combine(GetApplicationPath(), "Logs");
     }
 }

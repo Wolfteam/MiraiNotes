@@ -528,7 +528,8 @@ namespace MiraiNotes.Android.ViewModels
         private void Validate()
         {
             Errors.Clear();
-            var validationResult = _validator.Validate(Task);
+            var validationContext = new ValidationContext<TaskItemViewModel>(Task);
+            var validationResult = _validator.Validate(validationContext);
             Errors.AddRange(validationResult.ToDictionary());
         }
 

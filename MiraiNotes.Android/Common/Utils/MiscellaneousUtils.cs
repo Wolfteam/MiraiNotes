@@ -1,9 +1,9 @@
+using Android.App;
+using Android.Content;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Android.App;
-using Android.Content;
 using AndroidGraphics = Android.Graphics;
 
 namespace MiraiNotes.Android.Common.Utils
@@ -16,9 +16,14 @@ namespace MiraiNotes.Android.Common.Utils
 
         public static string GetAppVersion()
         {
-            return Application.Context.PackageManager
+            string appVersion = Application.Context.PackageManager
                 .GetPackageInfo(Application.Context.PackageName, 0)
                 .VersionName;
+#if DEBUG
+            return $"{appVersion} - DEBUG";
+#else
+            return appVersion;
+#endif
         }
 
         public static async Task DownloadProfileImage(string url, string googleUserId)

@@ -144,7 +144,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         private void Validate()
         {
             Errors.Clear();
-            var validationResult = _validator.Validate(this);
+            var validationContext = new ValidationContext<AddSubTaskDialogViewModel>(this);
+            var validationResult = _validator.Validate(validationContext);
             Errors.AddRange(validationResult.ToDictionary());
             RaisePropertyChanged(() => IsSaveButtonEnabled);
         }

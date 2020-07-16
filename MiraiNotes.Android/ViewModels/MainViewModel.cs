@@ -1,17 +1,20 @@
 ﻿using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
+using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models;
 using MiraiNotes.Android.Models.Parameters;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Android.ViewModels.Settings;
 using MiraiNotes.Core.Enums;
+using MiraiNotes.Shared.Utils;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
 using MvvmCross.ViewModels;
 using Serilog;
+using System;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels
@@ -99,6 +102,22 @@ namespace MiraiNotes.Android.ViewModels
             _dialogService = dialogService;
             _dataService = dataService;
             _backgroundTaskManager = backgroundTaskManager;
+        }
+
+        public override Task Initialize()
+        {
+            try
+            {
+                Logger.Information($"{nameof(Prepare)}: Trying to delete old logs...");
+                var logsPath = AndroidUtils.GetLogsPath();
+                FileUtils.DeleteFilesInDirectory(logsPath, DateTime.Now.AddDays(-3));
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"{nameof(Prepare)}: Unknonw error while trying to delete old logs");
+                TelemetryService.TrackError(e);
+            }
+            return base.Initialize();
         }
 
         public override void SetCommands()
