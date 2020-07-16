@@ -613,4 +613,7 @@
   <data name="CantAddSubTasks" xml:space="preserve">
     <value>You can't add subtasks to a completed task</value>
   </data>
+  <data name="Authenticate" xml:space="preserve">
+    <value>Authenticate</value>
+  </data>
 </root>

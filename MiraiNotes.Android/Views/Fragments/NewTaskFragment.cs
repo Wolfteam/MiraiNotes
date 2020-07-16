@@ -1,7 +1,7 @@
 ﻿using Android.Animation;
 using Android.OS;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Controls;
 using MiraiNotes.Android.ViewModels;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.AppBarLayout
+<com.google.android.material.appbar.AppBarLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/AppBar"
@@ -12,4 +12,4 @@
         app:titleTextColor="?TextColor"
 		app:layout_scrollFlags="scroll|enterAlways"
         app:MvxBind="Title Title"/>
-</android.support.design.widget.AppBarLayout>
+</com.google.android.material.appbar.AppBarLayout>

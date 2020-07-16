@@ -1,11 +1,11 @@
 ﻿using Android.Animation;
 using Android.Graphics;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.Core.Content;
+using Google.Android.Material.FloatingActionButton;
 using MiraiNotes.Android.Adapters;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;

@@ -1,11 +1,11 @@
 using Android.App;
 using Android.Graphics;
-using Android.Support.Design.Widget;
 using Android.Text;
 using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using ES.DMoral.ToastyLib;
+using Google.Android.Material.Snackbar;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross;

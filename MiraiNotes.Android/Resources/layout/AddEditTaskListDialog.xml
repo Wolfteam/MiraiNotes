@@ -15,7 +15,7 @@
         android:layout_marginBottom="5dp"
         app:MvxBind="Text [NewTaskList]"/>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:errorEnabled="true"
@@ -23,21 +23,21 @@
         app:counterMaxLength="50"
         app:MvxBind="Error Errors['TaskListTitle']">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
             android:maxLength="50"
             android:inputType="textShortMessage"
             app:MvxBind="Text TaskListTitle; Hint [Title]"/>
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
-        <android.support.design.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ok"
@@ -46,7 +46,7 @@
         <Space
             android:layout_width="20dp"
             android:layout_height="wrap_content"/>
-        <android.support.design.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"

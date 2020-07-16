@@ -1,6 +1,6 @@
 ﻿using Android.OS;
-using Android.Support.Design.Widget;
 using Android.Views;
+using Google.Android.Material.BottomSheet;
 using MiraiNotes.Android.Common.Utils;
 using MvvmCross.Droid.Support.Design;
 using MvvmCross.Droid.Support.Design.Extensions;

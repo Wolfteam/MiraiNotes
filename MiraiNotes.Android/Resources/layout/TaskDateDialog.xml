@@ -85,7 +85,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
-        <android.support.design.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ok"
@@ -94,7 +94,7 @@
         <Space
             android:layout_width="20dp"
             android:layout_height="wrap_content"/>
-        <android.support.design.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"

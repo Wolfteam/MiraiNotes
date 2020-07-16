@@ -2,9 +2,9 @@
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Content;
 using Android.Text;
 using Android.Views;
+using AndroidX.Core.Content;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using System;

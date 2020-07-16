@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/MainFrame"
         android:fitsSystemWindows="true"
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:background="?AppBackground"/>
         <include
             layout="@layout/progressoverlay"/>
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
     <FrameLayout
         android:id="@+id/MenuFrame"
         android:layout_height="match_parent"

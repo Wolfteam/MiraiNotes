@@ -1,5 +1,5 @@
 
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -70,7 +70,7 @@
                     android:text="Reminder: Sunday, January 20, 2019"
                     app:MvxBind="Text Task.FullRemindOnText; Visibility Visibility(Task.HasAReminderDate)"/>
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/TaskTitle"
                     android:layout_margin="12dp"
                     android:layout_width="match_parent"
@@ -84,7 +84,7 @@
                     android:background="@android:color/transparent"
                     app:MvxBind="Text Task.Title; Error Errors['Title']; Hint [Title]"/>
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/TaskNotes"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
@@ -222,4 +222,4 @@
         </ScrollView>
     </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

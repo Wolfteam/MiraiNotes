@@ -2,9 +2,9 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Views;
+using AndroidX.Core.View;
 using MiraiNotes.Android.Models;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments;

@@ -1,7 +1,7 @@
 ﻿using Android.OS;
-using Android.Support.Design.Widget;
 using Android.Views;
 using Android.Widget;
+using Google.Android.Material.Navigation;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Activities;

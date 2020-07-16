@@ -58,7 +58,7 @@
                     android:textSize="@dimen/settings_font_size_content"
                     app:MvxBind="Text ['UseDarkAmoledTheme']"/>
 
-                <android.support.v7.widget.SwitchCompat
+                <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -219,7 +219,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text ['AskForPassword']"/>
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -248,7 +248,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text ['AskForFingerprint']"/>
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -277,7 +277,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text ['AskBeforeDiscardChanges']"/>
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

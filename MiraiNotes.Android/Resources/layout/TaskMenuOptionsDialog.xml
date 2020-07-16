@@ -27,7 +27,7 @@
         android:textSize="@dimen/task_item_title"
         app:MvxBind="Text [SelectAnOption]"/>
 
-    <android.support.design.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:textColor="@color/VividRedAccentColorPrimary"
         android:text="Delete task"
         style="@style/TaskMenuOptionButton"
@@ -35,7 +35,7 @@
         app:iconTint="@color/VividRedAccentColorPrimary"
         app:MvxBind="Text [DeleteTask]; Click DeleteTaskCommand"/>
 
-    <android.support.design.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:textColor="@color/DarkGreenAccentColorLight"
         android:text="Mark as completed"
         style="@style/TaskMenuOptionButton"
@@ -43,7 +43,7 @@
         app:iconTint="@color/DarkGreenAccentColorLight"
         app:MvxBind="Text MarkAsTitle; Click ChangeTaskStatusCommand"/>
 
-    <android.support.design.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:textColor="@color/LigthBlueAccentColorLight"
         android:text="Add a subtask"
         style="@style/TaskMenuOptionButton"
@@ -51,7 +51,7 @@
         app:iconTint="@color/LigthBlueAccentColorLight"
         app:MvxBind="Text [AddSubTask]; Visibility Visibility(ShowAddSubTaskButton); Click AddSubTaskCommand"/>
 
-    <android.support.design.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:textColor="?TextColor"
         android:text="Move to a different task list"
         style="@style/TaskMenuOptionButton"
@@ -59,7 +59,7 @@
         app:iconTint="?TextColor"
         app:MvxBind="Text [MoveToDifferentTaskList]; Click MoveTaskCommand"/>
 
-    <android.support.design.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:textColor="@color/OrangeAccentColorLight"
         android:text="Add a reminder"
         style="@style/TaskMenuOptionButton"
@@ -67,7 +67,7 @@
         app:iconTint="@color/OrangeAccentColorLight"
         app:MvxBind="Text [AddReminder]; Click AddReminderCommand"/>
 
-    <android.support.design.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:textColor="@color/PinkAccentColorDark"
         android:text="Share"
         style="@style/TaskMenuOptionButton"

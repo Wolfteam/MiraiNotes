@@ -1,7 +1,7 @@
 ﻿using Android.Content;
 using Android.Support.Design.Widget;
-using Android.Support.V4.View;
 using Android.Views;
+using AndroidX.Core.View;
 using Java.Lang;
 using AttributeSet = Android.Util.IAttributeSet;
 
