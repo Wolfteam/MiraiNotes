@@ -31,7 +31,7 @@ namespace MiraiNotes.Android.ViewModels
         public AppLanguageType CurrentAppLanguge
             => AppSettings.AppLanguage;
         public string this[string key]
-            => TextProvider.GetText(string.Empty, string.Empty, key);
+            => TextProvider.Get(key);
 
         /// <summary>
         /// This one is to set the apptollbar title
@@ -45,7 +45,7 @@ namespace MiraiNotes.Android.ViewModels
         }
         #endregion
 
-        public BaseViewModel(
+        protected BaseViewModel(
             ITextProvider textProvider,
             IMvxMessenger messenger,
             ILogger logger,
@@ -94,10 +94,10 @@ namespace MiraiNotes.Android.ViewModels
         }
 
         public string GetText(string key)
-            => TextProvider.GetText(string.Empty, string.Empty, key);
+            => TextProvider.Get(key);
 
         public string GetText(string key, params string[] args)
-            => TextProvider.GetText(string.Empty, string.Empty, key, args);
+            => TextProvider.Get(key, args);
     }
 
     public abstract class BaseViewModel<TParameter> : MvxViewModel<TParameter>, IBaseViewModel
@@ -122,7 +122,7 @@ namespace MiraiNotes.Android.ViewModels
         public AppLanguageType CurrentAppLanguge
             => AppSettings.AppLanguage;
         public string this[string key]
-            => TextProvider.GetText(string.Empty, string.Empty, key);
+            => TextProvider.Get(key);
         public TParameter Parameter { get; private set; }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace MiraiNotes.Android.ViewModels
         }
         #endregion
 
-        public BaseViewModel(
+        protected BaseViewModel(
             ITextProvider textProvider,
             IMvxMessenger messenger,
             ILogger logger,
@@ -191,10 +191,10 @@ namespace MiraiNotes.Android.ViewModels
         }
 
         public string GetText(string key)
-            => TextProvider.GetText(string.Empty, string.Empty, key);
+            => TextProvider.Get(key);
 
         public string GetText(string key, params string[] args)
-            => TextProvider.GetText(string.Empty, string.Empty, key, args);
+            => TextProvider.Get(key, args);
     }
 
     public abstract class BaseViewModel<TParameter, TResult>
@@ -220,9 +220,8 @@ namespace MiraiNotes.Android.ViewModels
         public AppLanguageType CurrentAppLanguge
             => AppSettings.AppLanguage;
         public string this[string key]
-            => TextProvider.GetText(string.Empty, string.Empty, key);
+            => TextProvider.Get(key);
         public TParameter Parameter { get; private set; }
-
 
         /// <summary>
         /// This one is to set the apptollbar title
@@ -236,7 +235,7 @@ namespace MiraiNotes.Android.ViewModels
         }
         #endregion
 
-        public BaseViewModel(
+        protected BaseViewModel(
             ITextProvider textProvider,
             IMvxMessenger messenger,
             ILogger logger,
@@ -293,9 +292,9 @@ namespace MiraiNotes.Android.ViewModels
         }
 
         public string GetText(string key)
-            => TextProvider.GetText(string.Empty, string.Empty, key);
+            => TextProvider.Get(key);
 
         public string GetText(string key, params string[] args)
-            => TextProvider.GetText(string.Empty, string.Empty, key, args);
+            => TextProvider.Get(key, args);
     }
 }
