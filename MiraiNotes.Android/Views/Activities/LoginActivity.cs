@@ -2,10 +2,11 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Preferences;
+using AndroidX.Preference;
 using Java.Interop;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments.Dialogs;
+using MvvmCross.Base;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.ViewModels;
 using AndroidUri = Android.Net.Uri;
@@ -35,10 +36,10 @@ namespace MiraiNotes.Android.Views.Activities
             set
             {
                 if (_loginRequest != null)
-                    _loginRequest.Requested -= (sender, args) => Login(args.Value);
+                    _loginRequest.Requested -= Login;
 
                 _loginRequest = value;
-                _loginRequest.Requested += (sender, args) => Login(args.Value);
+                _loginRequest.Requested += Login;
             }
         }
 
@@ -79,10 +80,10 @@ namespace MiraiNotes.Android.Views.Activities
             ViewModel.OnAuthCodeGrantedCommand.Execute(code);
         }
 
-        private void Login(string url)
+        private void Login(object sender, MvxValueEventArgs<string> args)
         {
             var intent = new Intent(Intent.ActionView);
-            intent.SetData(AndroidUri.Parse(url));
+            intent.SetData(AndroidUri.Parse(args.Value));
             StartActivityForResult(intent, 0);
         }
 

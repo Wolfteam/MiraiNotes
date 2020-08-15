@@ -1,9 +1,8 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Views;
+using AndroidX.RecyclerView.Widget;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using System;
@@ -25,7 +24,7 @@ namespace MiraiNotes.Android.Listeners
 
         public List<SwipeButton> Buttons { get; private set; } = new List<SwipeButton>();
         public virtual int ButtonWidth { get; set; } = (int)AndroidUtils.ToPixel(60, Application.Context);
-        public bool AnItemIsOpen 
+        public bool AnItemIsOpen
             => _swipedPos != -1;
 
         public bool IsSwipeEnabled = true;
@@ -33,7 +32,7 @@ namespace MiraiNotes.Android.Listeners
         private static readonly int _swipDirs = ItemTouchHelper.Left | ItemTouchHelper.Right;
 
         public SwipeCallbackBase(Context context, RecyclerView recyclerView)
-            :base(ItemTouchHelper.ActionStateIdle, _swipDirs)
+            : base(ItemTouchHelper.ActionStateIdle, _swipDirs)
         {
             Context = context;
             _recyclerView = recyclerView;

@@ -10,9 +10,16 @@ namespace MiraiNotes.Android.Services
         public bool IsInternetAvailable()
         {
             var connectivityManager =
-                (ConnectivityManager) Application.Context.GetSystemService(Context.ConnectivityService);
-            var activeNetworkInfo = connectivityManager.ActiveNetworkInfo;
-            return activeNetworkInfo != null && activeNetworkInfo.IsConnected;
+                (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
+            if (connectivityManager?.ActiveNetwork == null)
+                return false;
+            var activeNetwork = connectivityManager.GetNetworkCapabilities(connectivityManager.ActiveNetwork);
+            //TODO: CHECK THE ISCONNECTED 
+            return activeNetwork != null &&
+                   activeNetwork.HasCapability(NetCapability.Internet) &&
+                   (activeNetwork.HasTransport(TransportType.Wifi) ||
+                    activeNetwork.HasTransport(TransportType.Cellular) ||
+                    activeNetwork.HasTransport(TransportType.Ethernet));
         }
     }
 }

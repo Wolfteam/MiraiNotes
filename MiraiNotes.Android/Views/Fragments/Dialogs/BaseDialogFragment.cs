@@ -1,17 +1,18 @@
 ﻿using Android.OS;
 using Android.Views;
 using MiraiNotes.Android.Views.Activities;
-using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
+using MvvmCross.Platforms.Android.Views;
+using MvvmCross.Platforms.Android.Views.Fragments;
 using MvvmCross.ViewModels;
 
 namespace MiraiNotes.Android.Views.Fragments.Dialogs
 {
-    public abstract class BaseDialogFragment<TViewModel> : MvxAppCompatDialogFragment<TViewModel>
+    public abstract class BaseDialogFragment<TViewModel> : MvxDialogFragment<TViewModel>
         where TViewModel : class, IMvxViewModel
     {
-        public MvxAppCompatActivity ParentActivity
-            => (MvxAppCompatActivity)Activity;
+        public MvxActivity ParentActivity
+            => (MvxActivity)Activity;
 
         public MainActivity MainActivity
             => (MainActivity)Activity;

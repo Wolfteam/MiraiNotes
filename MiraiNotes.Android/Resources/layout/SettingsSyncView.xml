@@ -23,7 +23,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text [DefaultSyncInterval]"/>
 
-            <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
+            <MvvmCross.Platforms.Android.Binding.Views.MvxSpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:spinnerMode="dialog"

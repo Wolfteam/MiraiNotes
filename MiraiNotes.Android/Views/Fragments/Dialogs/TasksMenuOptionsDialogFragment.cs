@@ -19,16 +19,15 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
             set
             {
                 if (_shareTaskRequest != null)
-                    _shareTaskRequest.Requested -= ShareTask;
+                    _shareTaskRequest.Requested -= ShareTaskHandler;
 
                 _shareTaskRequest = value;
-                _shareTaskRequest.Requested += ShareTask;
+                _shareTaskRequest.Requested += ShareTaskHandler;
             }
         }
 
         public override int LayoutId
             => Resource.Layout.TaskMenuOptionsDialog;
-
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -41,7 +40,7 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
             return view;
         }
 
-        private void ShareTask(object sender, MvxValueEventArgs<TaskItemViewModel> args)
+        private void ShareTaskHandler(object sender, MvxValueEventArgs<TaskItemViewModel> args)
         {
             var task = args.Value;
             var sendIntent = new Intent();

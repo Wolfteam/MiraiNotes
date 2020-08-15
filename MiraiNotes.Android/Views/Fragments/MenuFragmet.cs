@@ -7,9 +7,9 @@ using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Activities;
 using MvvmCross.Base;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Droid.Support.V4;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
+using MvvmCross.Platforms.Android.Views.Fragments;
 using MvvmCross.ViewModels;
 using System;
 using System.Linq;
@@ -58,12 +58,10 @@ namespace MiraiNotes.Android.Views.Fragments
             set
             {
                 if (_onRefreshNumberOfTasksRequest != null)
-                    _onRefreshNumberOfTasksRequest.Requested -= (sender, args)
-                        => SetNumberOfTasksView(args.Value);
+                    _onRefreshNumberOfTasksRequest.Requested -= SetNumberOfTasksView;
 
                 _onRefreshNumberOfTasksRequest = value;
-                _onRefreshNumberOfTasksRequest.Requested += (sender, args)
-                    => SetNumberOfTasksView(args.Value);
+                _onRefreshNumberOfTasksRequest.Requested += SetNumberOfTasksView;
             }
         }
 
@@ -135,11 +133,9 @@ namespace MiraiNotes.Android.Views.Fragments
             var headerLayout = _navView.GetHeaderView(0);
             var circleImg = headerLayout.FindViewById<Refractored.Controls.CircleImageView>(Resource.Id.ProfileImg);
 
-            using (var img = await MiscellaneousUtils.GetImageBitmapAsync(eventArgs.Value))
-            {
-                if (img != null)
-                    circleImg?.SetImageBitmap(img);
-            }
+            using var img = await MiscellaneousUtils.GetImageBitmapAsync(eventArgs.Value);
+            if (img != null)
+                circleImg?.SetImageBitmap(img);
         }
 
         private void OnTaskListsLoaded(object sender, MvxValueEventArgs<bool> eventArgs)
@@ -192,18 +188,17 @@ namespace MiraiNotes.Android.Views.Fragments
                 ViewModel.OnTaskListSelectedCommand.Execute(selectedTaskListPosition);
         }
 
-        private void SetNumberOfTasksView(int position)
+        private void SetNumberOfTasksView(object sender, MvxValueEventArgs<int> args)
         {
             //workaround to avoid calling LayoutInflater when the activity is null
             if (!IsAdded)
                 return;
+            int position = args.Value;
             var taskList = ViewModel.TaskLists[position];
             var numberOfTaskView = GetNumberOfTasksView(taskList);
             var menuItem = _navView.Menu.FindItem(position);
-            if (menuItem == null)
-                return;
 
-            menuItem.SetActionView(numberOfTaskView);
+            menuItem?.SetActionView(numberOfTaskView);
         }
 
         private View GetNumberOfTasksView(TaskListItemViewModel taskList)

@@ -10,6 +10,7 @@ using MvvmCross;
 using MvvmCross.Platforms.Android;
 using System;
 using System.Threading.Tasks;
+using Android.App;
 
 namespace MiraiNotes.Android.Services
 {
@@ -79,7 +80,7 @@ namespace MiraiNotes.Android.Services
             {
                 case BackgroundTaskType.ANY:
                 case BackgroundTaskType.SYNC:
-                    WorkManager.Instance.CancelAllWorkByTag($"{SyncId}");
+                    WorkManager.GetInstance(Application.Context).CancelAllWorkByTag($"{SyncId}");
                     break;
                 case BackgroundTaskType.MARK_AS_COMPLETED:
                 default:
@@ -97,7 +98,7 @@ namespace MiraiNotes.Android.Services
                 .SetConstraints(constraints)
                 .AddTag($"{id}")
                 .Build();
-            WorkManager.Instance.EnqueueUniquePeriodicWork($"{id}", ExistingPeriodicWorkPolicy.Replace, workRequest);
+            WorkManager.GetInstance(Application.Context).EnqueueUniquePeriodicWork($"{id}", ExistingPeriodicWorkPolicy.Replace, workRequest);
             _dialogService.ShowSucceedToast(_textProvider.Get("JobWasScheduled"));
         }
     }

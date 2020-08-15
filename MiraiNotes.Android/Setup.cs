@@ -2,14 +2,14 @@
 using MiraiNotes.Android.Bindings;
 using MvvmCross.Binding.Bindings.Target.Construction;
 using MvvmCross.Converters;
-using MvvmCross.Droid.Support.V7.AppCompat;
-using MvvmCross.Droid.Support.V7.RecyclerView;
+using MvvmCross.DroidX.RecyclerView;
 using MvvmCross.Localization;
+using MvvmCross.Platforms.Android.Core;
 using MvvmCross.ViewModels;
 
 namespace MiraiNotes.Android
 {
-    public class Setup : MvxAppCompatSetup<App>
+    public class Setup : MvxAndroidSetup<App>
     {
         protected override IMvxApplication CreateApp()
             => new App();
@@ -24,7 +24,7 @@ namespace MiraiNotes.Android
         protected override void FillTargetFactories(IMvxTargetBindingFactoryRegistry registry)
         {
             base.FillTargetFactories(registry);
-            
+
             registry.RegisterCustomBindingFactory<ImageButton>(
                 SubTaskButtonAnimateBinding.PropertyName,
                 view => new SubTaskButtonAnimateBinding(view));

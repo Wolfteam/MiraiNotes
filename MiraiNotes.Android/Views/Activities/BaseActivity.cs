@@ -1,18 +1,18 @@
 ﻿using Android.Content;
 using Android.OS;
-using Android.Support.V7.Widget;
 using Android.Views.InputMethods;
+using AndroidX.AppCompat.Widget;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared;
 using MvvmCross;
-using MvvmCross.Droid.Support.V7.AppCompat;
+using MvvmCross.Platforms.Android.Views;
 using System;
 
 namespace MiraiNotes.Android.Views.Activities
 {
-    public abstract class BaseActivity<T> : MvxAppCompatActivity<T>
+    public abstract class BaseActivity<T> : MvxActivity<T>
         where T : BaseViewModel
     {
         public abstract int LayoutId { get; }
@@ -39,14 +39,13 @@ namespace MiraiNotes.Android.Views.Activities
         public void SetActionBar(bool isBackEnabled)
         {
             var toolbar = FindViewById<Toolbar>(Resource.Id.AppToolbar);
-            if (toolbar != null)
-            {
-                toolbar.ShowOverflowMenu();
-                toolbar.ShowContextMenu();
-                SetSupportActionBar(toolbar);
-                //SupportActionBar.Title = title;
-                SupportActionBar.SetDisplayHomeAsUpEnabled(isBackEnabled);
-            }
+            if (toolbar == null) 
+                return;
+            toolbar.ShowOverflowMenu();
+            toolbar.ShowContextMenu();
+            SetSupportActionBar(toolbar);
+            //SupportActionBar.Title = title;
+            SupportActionBar.SetDisplayHomeAsUpEnabled(isBackEnabled);
         }
 
         public void SetAppTheme(
@@ -181,9 +180,9 @@ namespace MiraiNotes.Android.Views.Activities
                 return;
 
             var inputMethodManager = (InputMethodManager)GetSystemService(InputMethodService);
-            inputMethodManager.HideSoftInputFromWindow(CurrentFocus.WindowToken, 0);
+            inputMethodManager?.HideSoftInputFromWindow(CurrentFocus?.WindowToken, 0);
 
-            CurrentFocus.ClearFocus();
+            CurrentFocus?.ClearFocus();
         }
     }
 }

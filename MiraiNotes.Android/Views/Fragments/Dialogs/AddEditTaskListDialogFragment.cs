@@ -7,7 +7,7 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
     [MvxDialogFragmentPresentation(ActivityHostViewModelType = typeof(MainViewModel), Tag = nameof(AddEditTaskListDialogFragment))]
     public class AddEditTaskListDialogFragment : BaseDialogFragment<AddEditTaskListDialogViewModel>
     {
-        public override int LayoutId 
+        public override int LayoutId
             => Resource.Layout.AddEditTaskListDialog;
     }
 }

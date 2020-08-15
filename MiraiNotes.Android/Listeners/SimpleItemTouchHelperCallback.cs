@@ -1,12 +1,11 @@
 ﻿using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using AndroidX.Core.Content;
+using AndroidX.RecyclerView.Widget;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross;
 using MvvmCross.Platforms.Android;
@@ -17,17 +16,16 @@ namespace MiraiNotes.Android.Listeners
     public class SimpleItemTouchHelperCallback : ItemTouchHelper.Callback
     {
         private readonly IItemTouchHelperAdapter _adapter;
-        private Button _rightButton;
-        private Button _leftButton;
-        private Drawable _rightToLefIcon;
-        private Drawable _leftToRightIcon;
-        private ColorDrawable _rightToLeftbackground;
-        private ColorDrawable _leftToRightBackground;
+        private readonly Button _rightButton;
+        private readonly Button _leftButton;
+        private readonly Drawable _rightToLefIcon;
+        private readonly Drawable _leftToRightIcon;
+        private readonly ColorDrawable _rightToLeftBackground;
+        private readonly ColorDrawable _leftToRightBackground;
         private bool _swypeIsHappening;
-        private Context _context;
+        private readonly Context _context;
         private bool _reachedMaxSwypeWidth;
         public RecyclerView.ViewHolder CurrentViewHolder;
-
 
         private bool _swipeEnabled = true;
         public static float AlphaFull = 1.0f;
@@ -38,14 +36,16 @@ namespace MiraiNotes.Android.Listeners
         public SimpleItemTouchHelperCallback(IItemTouchHelperAdapter adapter)
         {
             _adapter = adapter;
-            var algo = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-            _context = algo.Activity;
+            var currentTopActivity = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
+            _context = currentTopActivity.Activity;
 
             _rightToLefIcon = ContextCompat.GetDrawable(_context, Resource.Drawable.ic_delete_black_24dp);
-            _rightButton = new Button(_context);
+            _rightButton = new Button(_context)
+            {
+                Text = "Delete"
+            };
             //_rightButton.SetBackgroundColor(Color.Transparent);
-            _rightButton.Text = "Delete";
-            _rightToLeftbackground = new ColorDrawable(Color.Red);
+            _rightToLeftBackground = new ColorDrawable(Color.Red);
 
             _leftToRightIcon = ContextCompat.GetDrawable(_context, Resource.Drawable.ic_done_black_24dp);
             _leftButton = new Button(_context);
@@ -185,20 +185,20 @@ namespace MiraiNotes.Android.Listeners
                 //System.Diagnostics.Debug.WriteLine("Swyping to the left. Icon Left = {0}, icon right = {1}, iconTop = {2}, iconBottom = {3}", iconLeft, iconRight, iconTop, iconBottom);
 
                 _rightToLefIcon.SetBounds(iconLeft, iconTop, iconRight, iconBottom);
-                _rightToLeftbackground.SetBounds(
+                _rightToLeftBackground.SetBounds(
                     itemView.Right + ((int)dX) - backgroundCornerOffset,
                     itemView.Top,
                     itemView.Right,
                     itemView.Bottom);
 
-                _rightToLeftbackground.Draw(c);
+                _rightToLeftBackground.Draw(c);
                 _rightToLefIcon.Draw(c);
             }
             else
             { // view is unSwiped
 
                 _leftToRightBackground.SetBounds(0, 0, 0, 0);
-                _rightToLeftbackground.SetBounds(0, 0, 0, 0);
+                _rightToLeftBackground.SetBounds(0, 0, 0, 0);
                 _swypeIsHappening = false;
             }
 

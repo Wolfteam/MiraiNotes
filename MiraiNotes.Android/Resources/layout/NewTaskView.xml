@@ -72,9 +72,9 @@
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/TaskTitle"
-                    android:layout_margin="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
                     android:drawableLeft="@drawable/ic_note_black_24dp"
                     android:drawablePadding="16dp"
                     android:drawableTint="?IconColor"
@@ -86,11 +86,11 @@
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/TaskNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
                     android:layout_marginBottom="12dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_list_black_24dp"
                     android:drawablePadding="16dp"
                     android:drawableTint="?IconColor"
@@ -107,51 +107,45 @@
                     style="@style/Divider"
                     app:MvxBind="Visibility InvertedVisibility(Task.IsNew)"/>
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
+                <com.google.android.material.button.MaterialButton
                     android:text="Add / Edit reminder"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
-                    android:drawableStart="@drawable/ic_notifications_black_24dp"
-                    android:drawablePadding="10dp"
                     android:background="?android:attr/selectableItemBackground"
+                    android:textColor="?TextColor"
+                    style="@style/TaskMenuOptionButton"
+                    app:icon="@drawable/ic_notifications_black_24dp"
+                    app:iconTint="?TextColor"
                     app:MvxBind="Text [AddEditReminder]; Visibility InvertedVisibility(Task.IsNew); Click AddReminderCommand"/>
 
                 <View
                     style="@style/Divider"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/CompletitionDateButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
                     android:text="Add / Edit completition date"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
-                    android:drawableStart="@drawable/ic_calendar_24dp"
-                    android:drawablePadding="10dp"
                     android:background="?android:attr/selectableItemBackground"
+                    style="@style/TaskMenuOptionButton"
+                    android:textColor="?TextColor"
+                    app:icon="@drawable/ic_calendar_24dp"
+                    app:iconTint="?TextColor"
                     app:MvxBind="Text [AddEditCompletitionDate]; Click AddCompletitionDateCommand"/>
 
                 <View
                     style="@style/Divider"
                     app:MvxBind="Visibility InvertedVisibility(Task.IsNew)"/>
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
+                <com.google.android.material.button.MaterialButton
                     android:text="Move"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
-                    android:drawableStart="@drawable/ic_move_24dp"
-                    android:drawablePadding="10dp"
                     android:background="?android:attr/selectableItemBackground"
+                    style="@style/TaskMenuOptionButton"
+                    android:textColor="?TextColor"
+                    app:icon="@drawable/ic_move_24dp"
+                    app:iconTint="?TextColor"
                     app:MvxBind="Text [Move]; Visibility InvertedVisibility(Task.IsNew); Click MoveTaskCommand;"/>
 
                 <View
@@ -161,23 +155,21 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
                     android:paddingBottom="10dp"
                     android:orientation="vertical"
                     android:clickable="true"
                     android:background="?android:attr/selectableItemBackground"
                     app:MvxBind="Visibility Visibility(Task.IsNew); Click ChangeSelectedTaskListCommand">
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                    <com.google.android.material.button.MaterialButton
                         android:text="Change tasklist"
                         android:textAlignment="textStart"
                         android:textAllCaps="false"
-                        android:drawableStart="@drawable/ic_swap_horiz_black_24dp"
-                        android:drawablePadding="10dp"
                         android:clickable="false"
                         android:background="@android:color/transparent"
+                        style="@style/TaskMenuOptionButton"
+                        android:textColor="?TextColor"
+                        app:icon="@drawable/ic_swap_horiz_black_24dp"
+                        app:iconTint="?TextColor"
                         app:MvxBind="Text [ChangeTaskList];"/>
 
                     <TextView
@@ -198,20 +190,18 @@
                     style="@style/Divider"
                     app:MvxBind="Visibility InvertedVisibility(Task.HasParentTask)"/>
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
-                    android:drawableLeft="@drawable/ic_subdirectory_arrow_right_black_24dp"
-                    android:drawablePadding="10dp"
+                <com.google.android.material.button.MaterialButton
                     android:text="Add a subtask"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:background="?android:attr/selectableItemBackground"
+                    style="@style/TaskMenuOptionButton"
+                    android:textColor="?TextColor"
+                    app:icon="@drawable/ic_subdirectory_arrow_right_black_24dp"
+                    app:iconTint="?TextColor"
                     app:MvxBind="Text [AddSubTask]; Visibility InvertedVisibility(Task.HasParentTask); Click AddSubTaskCommand;"/>
 
-                <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+                <mvvmcross.droidx.recyclerview.MvxRecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"

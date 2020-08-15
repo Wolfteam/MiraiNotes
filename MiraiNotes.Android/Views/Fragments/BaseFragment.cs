@@ -1,12 +1,13 @@
 ﻿using Android.Content.Res;
 using Android.OS;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.Views.Activities;
-using MvvmCross.Droid.Support.V4;
-using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
+using MvvmCross.Platforms.Android.Views;
+using MvvmCross.Platforms.Android.Views.AppCompat;
+using MvvmCross.Platforms.Android.Views.Fragments;
 using MvvmCross.ViewModels;
 
 namespace MiraiNotes.Android.Views.Fragments
@@ -16,8 +17,8 @@ namespace MiraiNotes.Android.Views.Fragments
         public MvxActionBarDrawerToggle _drawerToggle;
         private Toolbar _toolbar;
 
-        public MvxAppCompatActivity ParentActivity
-            => (MvxAppCompatActivity)Activity;
+        public MvxActivity ParentActivity
+            => (MvxActivity)Activity;
 
         public MainActivity MainActivity
             => (MainActivity)Activity;
@@ -32,31 +33,30 @@ namespace MiraiNotes.Android.Views.Fragments
 
             _toolbar = view.FindViewById<Toolbar>(Resource.Id.AppToolbar);
 
-            if (_toolbar != null)
-            {
-                _toolbar.ShowOverflowMenu();
-                _toolbar.ShowContextMenu();
-                ParentActivity.SetSupportActionBar(_toolbar);
+            if (_toolbar == null) 
+                return view;
+            _toolbar.ShowOverflowMenu();
+            _toolbar.ShowContextMenu();
+            ParentActivity.SetSupportActionBar(_toolbar);
 
-                var drawerLayout = ((MainActivity)ParentActivity).DrawerLayout;
-                _drawerToggle = new MvxActionBarDrawerToggle(
-                    Activity,
-                    drawerLayout,
-                    _toolbar,
-                    Resource.String.Open,
-                    Resource.String.Close);
+            var drawerLayout = ((MainActivity)ParentActivity).DrawerLayout;
+            _drawerToggle = new MvxActionBarDrawerToggle(
+                Activity,
+                drawerLayout,
+                _toolbar,
+                Resource.String.Open,
+                Resource.String.Close);
 
-                // Set the drawer toggle as the DrawerListener 
-                drawerLayout.AddDrawerListener(_drawerToggle);
-                ParentActivity.SupportActionBar.SetDisplayHomeAsUpEnabled(false);
-                ParentActivity.SupportActionBar.SetHomeButtonEnabled(true);
+            // Set the drawer toggle as the DrawerListener 
+            drawerLayout.AddDrawerListener(_drawerToggle);
+            ParentActivity.SupportActionBar.SetDisplayHomeAsUpEnabled(false);
+            ParentActivity.SupportActionBar.SetHomeButtonEnabled(true);
 
-                _drawerToggle.DrawerOpened += (sender, args)
-                    => MainActivity?.HideSoftKeyboard();
-                MainActivity.DrawerLayout.AddDrawerListener(_drawerToggle);
+            _drawerToggle.DrawerOpened += (sender, args)
+                => MainActivity?.HideSoftKeyboard();
+            MainActivity.DrawerLayout.AddDrawerListener(_drawerToggle);
 
-                _drawerToggle.SyncState();
-            }
+            _drawerToggle.SyncState();
 
             return view;
         }

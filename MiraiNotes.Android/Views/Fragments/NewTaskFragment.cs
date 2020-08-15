@@ -28,9 +28,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public override Animator OnCreateAnimator(int transit, bool enter, int nextAnim)
         {
-            if (nextAnim == 0)
-                return base.OnCreateAnimator(transit, enter, nextAnim);
-            return AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
+            return nextAnim == 0 ? base.OnCreateAnimator(transit, enter, nextAnim) : AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

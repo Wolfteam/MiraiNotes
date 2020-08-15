@@ -5,7 +5,7 @@ namespace MiraiNotes.Android.Listeners
 {
     public class ClickListener : Java.Lang.Object, View.IOnClickListener
     {
-        private Action<View> _action;
+        private readonly Action<View> _action;
 
         public ClickListener(Action<View> action)
         {

@@ -48,7 +48,7 @@ namespace MiraiNotes.Android
                 new ResxTextProvider(Localization.Resource.ResourceManager,
                 Mvx.IoCProvider.Resolve<IMvxMessenger>()));
 
-            Mvx.IoCProvider.RegisterSingleton(() => SetupLogging());
+            Mvx.IoCProvider.RegisterSingleton(SetupLogging);
 
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAppSettingsService, AppSettingsService>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAndroidAppSettings, AppSettingsService>();

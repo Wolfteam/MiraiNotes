@@ -1,7 +1,7 @@
 ﻿using Android.Content;
 using Android.OS;
-using Android.Preferences;
 using Android.Views;
+using AndroidX.Preference;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MvvmCross.Base;

@@ -1,11 +1,11 @@
 ﻿using Android.App;
-using Android.Support.Design.Button;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.RecyclerView.Widget;
+using Google.Android.Material.Button;
 using MiraiNotes.Abstractions.Services;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Droid.Support.V7.RecyclerView;
+using MvvmCross.DroidX.RecyclerView;
 using MvvmCross.IoC;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;

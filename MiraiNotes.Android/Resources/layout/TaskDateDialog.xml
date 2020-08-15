@@ -42,12 +42,14 @@
             android:textSize="@dimen/font_size_medium"
             app:MvxBind="Text [OnThisDate] + ':'"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/TaskReminderDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Monday, January 1, 1999"
             android:background="?android:attr/selectableItemBackground"
+            android:textAlignment="center"
+            style="@style/TaskMenuOptionButton"
             app:MvxBind="Text DateText"/>
 
         <TextView
@@ -65,12 +67,14 @@
             android:textSize="@dimen/font_size_medium"
             app:MvxBind="Text [AtThisHour] + ':'; Visibility Visibility(IsAReminderDate)"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/TaskReminderTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="12:00 am"
             android:background="?android:attr/selectableItemBackground"
+            android:textAlignment="center"
+            style="@style/TaskMenuOptionButton"
             app:MvxBind="Text HourText; Visibility Visibility(IsAReminderDate)"/>
 
         <TextView
