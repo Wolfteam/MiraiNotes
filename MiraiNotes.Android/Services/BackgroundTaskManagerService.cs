@@ -59,12 +59,12 @@ namespace MiraiNotes.Android.Services
                 case BackgroundTaskType.SYNC:
                     await Task.Delay(10);
                     var top = Mvx.IoCProvider.Resolve<IMvxAndroidCurrentTopActivity>();
-                    Bundle bundle = null;
+                    var bundle = new Bundle();
                     if (parameter != null)
                     {
-                        bundle = new Bundle();
                         bundle.PutInt(SyncBackgroundService.TaskListIdToSyncKey, parameter.SyncOnlyTaskListId);
                     }
+                    bundle.PutBoolean(SyncBackgroundService.StartedManuallyKey, true);
                     top.Activity.StartForegroundServiceCompat<SyncBackgroundService>(bundle);
                     break;
                 case BackgroundTaskType.ANY:
