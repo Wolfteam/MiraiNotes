@@ -1,9 +1,6 @@
 <resources>
-  <!--In da future when we use androidx we might change to Theme.MaterialComponents instead of using the bridge theme
-    https://github.com/material-components/material-components-android/blob/master/docs/getting-started.md#material-components-themes-->
-
   <!--Splash-->
-  <style name="Theme.Splash" parent="Theme.AppCompat.NoActionBar">
+  <style name="Theme.Splash" parent="Theme.MaterialComponents.NoActionBar">
     <item name="android:windowBackground">@drawable/splash_centered</item>
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowFullscreen">true</item>
@@ -69,12 +66,15 @@
   </style>
 
   <!--TimePickerDialog-->
-  <style name="TimePickerDialogCustom" parent="Theme.AppCompat.Light.Dialog">
+  <style name="TimePickerDialogCustom" parent="Theme.MaterialComponents.Light.Dialog">
     <item name="colorAccent">?AccentColor</item>
     <item name="colorPrimary">?AccentColorDark</item>
     <item name="colorPrimaryDark">?AccentColorDark</item>
     <item name="android:windowBackground">?AppBackground</item>
     <item name="android:spinnerDropDownItemStyle">@style/SpinnerCustom</item>
+
+    <!--This fixes the button styles-->
+    <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
 
     <!--This changes the colors of minutes / seconds and the text inside a edittext-->
     <!--<item name="android:textColorPrimary">@color/PinkAccentColorLight</item>-->
@@ -82,13 +82,14 @@
     <!--This changes the colors of the little icon in the bottom left corner. On android 5 it changes the color of the hours / mins-->
     <item name="android:textColorSecondary">?TextColor</item>
 
-    <!--<item name="android:textColor">@color/LigthBlueAccentColorPrimary</item>-->
+    <!--This changes the text color inside the edit text view--> 
+    <item name="android:editTextColor">?AppBackgroundInverted</item>
     <!--<item name="android:popupBackground">?AppBackground</item>-->
     <!--<item name="android:popupMenuStyle">@style/CustomPopupMenu.Light</item>-->
   </style>
 
   <!--DatePickerDialog-->
-  <style name="DatePickerDialogCustom" parent="Theme.AppCompat.Light.Dialog">
+  <style name="DatePickerDialogCustom" parent="Theme.MaterialComponents.Light.Dialog">
     <item name="colorAccent">?AccentColor</item>
     <item name="colorPrimary">?AccentColorDark</item>
     <item name="colorPrimaryDark">?AccentColorDark</item>
@@ -99,6 +100,9 @@
 
     <!--This changes the colors of the week day-->
     <item name="android:textColorSecondary">?TextColor</item>
+
+    <!--This fixes the button styles-->
+    <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
   </style>
 
   <!--Spinner-->
@@ -111,14 +115,14 @@
   </style>
 
   <!--Menu option style-->
-  <style name="Actionbar.MenuTextStyle.Light" parent="ThemeOverlay.AppCompat.Light">
+  <style name="Actionbar.MenuTextStyle.Light" parent="ThemeOverlay.MaterialComponents.Light">
     <item name="android:textColor">@color/Black</item>
     <item name="android:textSize">18sp</item>
     <item name="android:windowBackground">@color/AppBackgroundLight</item>
     <item name="android:popupBackground">@color/AppBackgroundLight</item>
   </style>
 
-  <style name="Actionbar.MenuTextStyle.Dark" parent="ThemeOverlay.AppCompat.Dark">
+  <style name="Actionbar.MenuTextStyle.Dark" parent="ThemeOverlay.MaterialComponents.Dark">
     <item name="android:textColor">@color/White</item>
     <item name="android:textSize">18sp</item>
     <item name="android:windowBackground">@color/AppBackgroundDark</item>
@@ -127,7 +131,7 @@
 
   <!--AppThemes-->
   <!--Base Themes-->
-  <style name="Theme.MiraiNotes.Dark" parent="Theme.MaterialComponents.Bridge">
+  <style name="Theme.MiraiNotes.Dark" parent="Theme.MaterialComponents">
     <!--Since we are using a custom app bar, we must explicit set this values-->
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
@@ -161,7 +165,7 @@
     <item name="TextInvertedColor">@color/Black</item>
   </style>
 
-  <style name="Theme.MiraiNotes.Light" parent="Theme.MaterialComponents.Light.Bridge">
+  <style name="Theme.MiraiNotes.Light" parent="Theme.MaterialComponents.Light">
     <!--Since we are using a custom app bar, we must explicit set this values-->
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>

@@ -60,11 +60,11 @@
         app:MvxBind="Text [MoveToDifferentTaskList]; Click MoveTaskCommand"/>
 
     <com.google.android.material.button.MaterialButton
-        android:textColor="@color/OrangeAccentColorLight"
+        android:textColor="@color/OrangeAccentColorDark"
         android:text="Add a reminder"
         style="@style/TaskMenuOptionButton"
         app:icon="@drawable/ic_notifications_black_24dp"
-        app:iconTint="@color/OrangeAccentColorLight"
+        app:iconTint="@color/OrangeAccentColorDark"
         app:MvxBind="Text [AddReminder]; Click AddReminderCommand"/>
 
     <com.google.android.material.button.MaterialButton

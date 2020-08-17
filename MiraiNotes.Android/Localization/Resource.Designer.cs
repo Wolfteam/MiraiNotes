@@ -214,6 +214,15 @@ namespace MiraiNotes.Android.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authenticate.
+        /// </summary>
+        public static string Authenticate {
+            get {
+                return ResourceManager.GetString("Authenticate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An automatic full sync was successfully performed.
         /// </summary>
         public static string AutomaticSyncWasPerformed {

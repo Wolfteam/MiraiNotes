@@ -358,13 +358,9 @@ namespace MiraiNotes.Android.ViewModels
                 {
                     isAuthenticated = true;
                 }
-                else if (authResult.Status == FingerprintAuthenticationResultStatus.Canceled)
-                {
-                    break;
-                }
                 else
                 {
-                    _dialogService.ShowErrorToast(GetText("FingerprintAuthFailed"));
+                    break;
                 }
             }
 
