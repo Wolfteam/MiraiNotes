@@ -14,11 +14,11 @@ namespace MiraiNotes.Android.Background
         public const int SyncServiceId = 101;
         public const string IsServiceRunningKey = "IsSyncServiceRunning";
         public const string TaskListIdToSyncKey = "TaskListIdToSync";
+        public const string StartedManuallyKey = "StartedManually";
 
         public SyncBackgroundService()
             : base(nameof(SyncBackgroundService))
         {
-
         }
 
         protected override void OnHandleIntent(Intent intent)
@@ -38,8 +38,9 @@ namespace MiraiNotes.Android.Background
                 StartForeground(SyncServiceId, notification);
                 appSettings.SetBoolean(IsServiceRunningKey, true);
                 int taskListId = intent?.Extras?.GetInt(TaskListIdToSyncKey, 0) ?? 0;
+                bool startedManually = intent?.Extras?.GetBoolean(StartedManuallyKey, false) ?? false;
 
-                var synTask = new SyncTask(true, taskListId > 0 ? taskListId : (int?)null);
+                var synTask = new SyncTask(startedManually, taskListId > 0 ? taskListId : (int?)null);
                 synTask.Sync().GetAwaiter().GetResult();
             }
             catch (Exception)

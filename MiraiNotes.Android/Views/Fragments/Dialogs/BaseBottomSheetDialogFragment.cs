@@ -1,9 +1,10 @@
 ﻿using Android.OS;
-using Android.Support.Design.Widget;
 using Android.Views;
+using Google.Android.Material.BottomSheet;
 using MiraiNotes.Android.Common.Utils;
-using MvvmCross.Droid.Support.Design;
-using MvvmCross.Droid.Support.Design.Extensions;
+using MvvmCross.Base;
+using MvvmCross.DroidX.Material;
+using MvvmCross.DroidX.Material.Extensions;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.ViewModels;
 
@@ -20,12 +21,10 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
             set
             {
                 if (_hideDialogRequest != null)
-                    _hideDialogRequest.Requested -= (sender, args)
-                        => HideDialog(args.Value);
+                    _hideDialogRequest.Requested -= HideDialogHandler;
 
                 _hideDialogRequest = value;
-                _hideDialogRequest.Requested += (sender, args)
-                    => HideDialog(args.Value);
+                _hideDialogRequest.Requested += HideDialogHandler;
             }
         }
         public abstract int LayoutId { get; }
@@ -54,6 +53,11 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
                 parent.HideWithTranslateAnimation();
             else
                 parent.ShowWithTranslateAnimation();
+        }
+
+        private void HideDialogHandler(object sender  , MvxValueEventArgs<bool> args)
+        {
+            HideDialog(args.Value);
         }
     }
 }

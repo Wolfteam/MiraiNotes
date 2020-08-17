@@ -1,19 +1,19 @@
 ﻿using Android.Animation;
 using Android.Graphics;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.Core.Content;
+using AndroidX.RecyclerView.Widget;
+using Google.Android.Material.FloatingActionButton;
 using MiraiNotes.Android.Adapters;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Listeners;
 using MiraiNotes.Android.ViewModels;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Droid.Support.V4;
-using MvvmCross.Droid.Support.V7.RecyclerView;
+using MvvmCross.DroidX;
+using MvvmCross.DroidX.RecyclerView;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 using MvvmCross.ViewModels;
@@ -39,7 +39,6 @@ namespace MiraiNotes.Android.Views.Fragments
         private TasksAdapter _tasksAdapter;
         private MvxSwipeRefreshLayout _swipeRefreshLayout;
 
-
         public SwipeCallback SwipeCallback;
         private const int MoveTaskButtonId = 1;
         private const int DeleteTaskButtonId = 2;
@@ -51,15 +50,12 @@ namespace MiraiNotes.Android.Views.Fragments
             set
             {
                 if (_resetSwipedItemsRequest != null)
-                    _resetSwipedItemsRequest.Requested -= (sender, args)
-                        => ResetSwipedItems();
+                    _resetSwipedItemsRequest.Requested -= ResetSwipedItemsHandler;
 
                 _resetSwipedItemsRequest = value;
-                _resetSwipedItemsRequest.Requested += (sender, args)
-                        => ResetSwipedItems();
+                _resetSwipedItemsRequest.Requested += ResetSwipedItemsHandler;
             }
         }
-
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -125,9 +121,7 @@ namespace MiraiNotes.Android.Views.Fragments
 
         public override Animator OnCreateAnimator(int transit, bool enter, int nextAnim)
         {
-            if (nextAnim == 0)
-                return base.OnCreateAnimator(transit, enter, nextAnim);
-            return AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
+            return nextAnim == 0 ? base.OnCreateAnimator(transit, enter, nextAnim) : AndroidUtils.CreateSlideAnimator(Activity, nextAnim);
         }
 
         public void ShowFabMenu()
@@ -157,11 +151,10 @@ namespace MiraiNotes.Android.Views.Fragments
 
         private void OnFabAnimationEnd()
         {
-            if (!IsFabOpen)
-            {
-                _addNewTaskFabLayout.Visibility = ViewStates.Gone;
-                _addNewTaskListFabLayout.Visibility = ViewStates.Gone;
-            }
+            if (IsFabOpen)
+                return;
+            _addNewTaskFabLayout.Visibility = ViewStates.Gone;
+            _addNewTaskListFabLayout.Visibility = ViewStates.Gone;
         }
 
         public void OnClick(int buttonId, int pos)
@@ -212,6 +205,11 @@ namespace MiraiNotes.Android.Views.Fragments
         public void EnableSwipeToRefresh(bool enabled)
         {
             _swipeRefreshLayout.Enabled = enabled;
+        }
+
+        private void ResetSwipedItemsHandler(object sender, EventArgs args)
+        {
+            ResetSwipedItems();
         }
     }
 }

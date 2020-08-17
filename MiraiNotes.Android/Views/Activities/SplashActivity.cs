@@ -1,5 +1,5 @@
 ﻿using Android.App;
-using MvvmCross.Droid.Support.V7.AppCompat;
+using MvvmCross.Platforms.Android.Views;
 
 namespace MiraiNotes.Android.Views.Activities
 {
@@ -8,10 +8,7 @@ namespace MiraiNotes.Android.Views.Activities
         MainLauncher = true,
         Theme = "@style/Theme.Splash",
         NoHistory = true)]
-    public class SplashActivity : MvxSplashScreenAppCompatActivity<Setup, App>
+    public class SplashActivity : MvxSplashScreenActivity<Setup, App>
     {
-        public SplashActivity()
-        {
-        }
     }
 }

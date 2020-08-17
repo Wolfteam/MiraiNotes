@@ -1,7 +1,7 @@
 ﻿using Android.Graphics;
-using Android.Support.V4.Content;
 using Android.Util;
 using Android.Views;
+using AndroidX.Core.Content;
 using MvvmCross.Platforms.Android.Binding.Target;
 using System;
 
@@ -14,7 +14,6 @@ namespace MiraiNotes.Android.Bindings
         public IsSelectedBackgroundColorBinding(object target) : base(target)
         {
         }
-
 
         protected override void SetValueImpl(object target, object value)
         {

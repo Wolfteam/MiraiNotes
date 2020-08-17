@@ -1,5 +1,5 @@
 ﻿using Android.Content;
-using Android.Support.V7.Widget;
+using AndroidX.RecyclerView.Widget;
 using System.Collections.Generic;
 
 namespace MiraiNotes.Android.Listeners

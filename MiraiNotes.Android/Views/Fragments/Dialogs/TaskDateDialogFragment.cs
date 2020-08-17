@@ -3,6 +3,7 @@ using Android.OS;
 using Android.Text.Format;
 using Android.Views;
 using Android.Widget;
+using Google.Android.Material.Button;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.ViewModels.Dialogs;
@@ -23,8 +24,8 @@ namespace MiraiNotes.Android.Views.Fragments.Dialogs
         {
             var view = base.OnCreateView(inflater, container, savedInstanceState);
 
-            var dateButton = view.FindViewById<Button>(Resource.Id.TaskReminderDate);
-            var timeButton = view.FindViewById<Button>(Resource.Id.TaskReminderTime);
+            var dateButton = view.FindViewById<MaterialButton>(Resource.Id.TaskReminderDate);
+            var timeButton = view.FindViewById<MaterialButton>(Resource.Id.TaskReminderTime);
 
             dateButton.Click += (sender, args) =>
             {

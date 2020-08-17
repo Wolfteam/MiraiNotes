@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -122,7 +122,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+        <MvvmCross.DroidX.RecyclerView.MvxRecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -133,4 +133,4 @@
             app:MvxItemTemplate="@layout/subtaskitem"
             app:MvxBind="ItemsSource SubTasks; Visibility Visibility(ShowSubTasks); ItemClick SubTaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
     </LinearLayout>
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

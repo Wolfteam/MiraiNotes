@@ -5,7 +5,7 @@ namespace MiraiNotes.Android.Listeners
 {
     public class TasksFabListener : Java.Lang.Object, Animator.IAnimatorListener
     {
-        private Action _onAnimationEnd;
+        private readonly Action _onAnimationEnd;
         public TasksFabListener(Action onAnimationEnd)
         {
             _onAnimationEnd = onAnimationEnd;

@@ -1,7 +1,8 @@
 ﻿using Android.Content;
-using Android.Support.Design.Widget;
-using Android.Support.V4.View;
 using Android.Views;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.Core.View;
+using Google.Android.Material.Snackbar;
 using Java.Lang;
 using AttributeSet = Android.Util.IAttributeSet;
 
@@ -13,15 +14,12 @@ namespace MiraiNotes.Android.Common.Utils
     /// </summary>
     public class MoveUpwardBehavior : CoordinatorLayout.Behavior
     {
-
         public MoveUpwardBehavior() : base()
         {
-            
         }
 
         public MoveUpwardBehavior(Context context, AttributeSet attrs) : base(context, attrs)
         {
-
         }
 
         public override bool LayoutDependsOn(CoordinatorLayout parent, Object child, View dependency)

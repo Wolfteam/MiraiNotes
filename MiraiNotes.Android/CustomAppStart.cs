@@ -1,5 +1,4 @@
-﻿using Android.OS;
-using MiraiNotes.Abstractions.Data;
+﻿using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.ViewModels;
@@ -7,7 +6,6 @@ using MiraiNotes.Core.Enums;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using Serilog;
-using System;
 using System.Threading.Tasks;
 
 namespace MiraiNotes.Android
@@ -28,7 +26,6 @@ namespace MiraiNotes.Android
             IAppSettingsService appSettings,
             ISyncService syncService,
             IUserCredentialService userCredentialService,
-            IGoogleApiService googleAuthService,
             IMiraiNotesDataService dataService,
             IDialogService dialogService) : base(application, navigationService)
         {

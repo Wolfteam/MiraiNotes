@@ -1,7 +1,6 @@
 ﻿using Android.App;
 using Android.Views;
 using Android.Widget;
-using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.ViewModels;
 using System.Collections.Generic;
 

@@ -1,12 +1,11 @@
 ﻿using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Support.V4.View;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.Core.View;
+using AndroidX.RecyclerView.Widget;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.ViewModels;
-using MvvmCross.Binding.Extensions;
-using MvvmCross.Droid.Support.V7.RecyclerView;
+using MvvmCross.DroidX.RecyclerView;
 using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.ViewModels;
 using System.Linq;

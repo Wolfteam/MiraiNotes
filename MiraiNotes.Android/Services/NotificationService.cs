@@ -3,8 +3,8 @@ using Android.Content;
 using Android.Graphics;
 using Android.Media;
 using Android.OS;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using MiraiNotes.Android.Background;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
@@ -14,7 +14,7 @@ using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using Newtonsoft.Json;
 using System;
-using TaskStackBuilder = Android.Support.V4.App.TaskStackBuilder;
+using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
 
 namespace MiraiNotes.Android.Services
 {
@@ -158,15 +158,15 @@ namespace MiraiNotes.Android.Services
                 if (!soundMuted)
                 {
                     CreateNotificationChannel(
-                        GeneralChannelId, 
-                        "Notifications", 
+                        GeneralChannelId,
+                        "Notifications",
                         "App notifications with sound");
                 }
                 else
                 {
                     CreateNotificationChannel(
-                        MutedChannelId, 
-                        "Muted Notifications", 
+                        MutedChannelId,
+                        "Muted Notifications",
                         "App notifications without sound",
                         importance: NotificationImportance.Low);
                 }

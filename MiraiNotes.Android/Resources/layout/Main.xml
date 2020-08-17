@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/AppDrawerLayout"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/MainFrame"
         android:fitsSystemWindows="true"
         android:layout_width="match_parent"
@@ -19,14 +19,13 @@
             android:background="?AppBackground"/>
         <include
             layout="@layout/progressoverlay"/>
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
     <FrameLayout
         android:id="@+id/MenuFrame"
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:layout_gravity="left|start" />
-
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
 
 
 

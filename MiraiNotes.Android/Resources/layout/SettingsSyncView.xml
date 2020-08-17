@@ -23,7 +23,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text [DefaultSyncInterval]"/>
 
-            <MvvmCross.Droid.Support.V7.AppCompat.Widget.MvxAppCompatSpinner
+            <MvvmCross.Platforms.Android.Binding.Views.MvxSpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:spinnerMode="dialog"
@@ -51,7 +51,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text ['RunFullSyncWhenAppStarts']"/>
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -78,7 +78,7 @@
                 android:textSize="@dimen/settings_font_size_content"
                 app:MvxBind="Text ['RunFullSyncAfterSwitchingAccounts']"/>
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

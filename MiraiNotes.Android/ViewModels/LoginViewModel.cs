@@ -347,19 +347,20 @@ namespace MiraiNotes.Android.ViewModels
             var isAuthenticated = false;
             while (!isAuthenticated)
             {
-                var authResult = await _fingerprintService.AuthenticateAsync(GetText("FingerprintAuthMsg"));
+                var authRequest = new AuthenticationRequestConfiguration(GetText("Confirmation"), GetText("FingerprintAuthMsg"))
+                {
+                    CancelTitle = GetText("Cancel")
+                };
+
+                var authResult = await _fingerprintService.AuthenticateAsync(authRequest);
                 if (authResult.Status == FingerprintAuthenticationResultStatus.Succeeded &&
                     authResult.Authenticated)
                 {
                     isAuthenticated = true;
                 }
-                else if (authResult.Status == FingerprintAuthenticationResultStatus.Canceled)
-                {
-                    break;
-                }
                 else
                 {
-                    _dialogService.ShowErrorToast(GetText("FingerprintAuthFailed"));
+                    break;
                 }
             }
 

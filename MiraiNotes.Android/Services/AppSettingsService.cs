@@ -1,6 +1,6 @@
 using Android.App;
 using Android.Content;
-using Android.Preferences;
+using AndroidX.Preference;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Core.Enums;

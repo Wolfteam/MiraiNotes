@@ -12,7 +12,6 @@ using MiraiNotes.Android.Services;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Android.ViewModels.Settings;
-using MiraiNotes.Android.Views.Fragments.Dialogs;
 using MiraiNotes.Shared;
 using MiraiNotes.Shared.Helpers;
 using MiraiNotes.Shared.Services;
@@ -49,7 +48,7 @@ namespace MiraiNotes.Android
                 new ResxTextProvider(Localization.Resource.ResourceManager,
                 Mvx.IoCProvider.Resolve<IMvxMessenger>()));
 
-            Mvx.IoCProvider.RegisterSingleton(() => SetupLogging());
+            Mvx.IoCProvider.RegisterSingleton(SetupLogging);
 
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAppSettingsService, AppSettingsService>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAndroidAppSettings, AppSettingsService>();
@@ -76,7 +75,6 @@ namespace MiraiNotes.Android
             });
 
             Mvx.IoCProvider.RegisterType(() => CrossFingerprint.Current);
-            CrossFingerprint.SetDialogFragmentType<FingerprintCustomDialogFragment>();
 
             var client = new HttpClient(
                 new AuthenticatedHttpClientHandler(

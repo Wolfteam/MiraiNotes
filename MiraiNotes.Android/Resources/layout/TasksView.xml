@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -14,20 +14,20 @@
         android:layout_margin="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <MvxSwipeRefreshLayout
+        <mvvmcross.droidx.MvxSwipeRefreshLayout
             android:id="@+id/SwipeRefreshLayout"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             app:MvxBind="Refreshing IsBusy; RefreshCommand RefreshTasksCommand">
 
-            <MvvmCross.Droid.Support.V7.RecyclerView.MvxRecyclerView
+            <MvvmCross.DroidX.RecyclerView.MvxRecyclerView
                 android:id="@+id/TaskRecyclerView"
                 android:scrollbars="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:MvxItemTemplate="@layout/taskitem"
                 app:MvxBind="ItemsSource Tasks; ItemClick TaskSelectedCommand; ItemLongClick ShowMenuOptionsDialogCommand" />
-        </MvxSwipeRefreshLayout>
+        </mvvmcross.droidx.MvxSwipeRefreshLayout>
     </RelativeLayout>
 
     <View
@@ -55,7 +55,7 @@
             android:text="New Task List"
             app:MvxBind="Text [NewTaskList]"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/AddNewTaskListFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
             android:text="New Task"
             app:MvxBind="Text [NewTask]"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/AddNewTaskFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
         android:layout_gravity="bottom|end"
         app:layout_behavior="MiraiNotes.Android.Common.Utils.MoveUpwardBehavior">
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/AppFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -119,4 +119,4 @@
             app:srcCompat="@drawable/ic_add_black_24dp"/>
     </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

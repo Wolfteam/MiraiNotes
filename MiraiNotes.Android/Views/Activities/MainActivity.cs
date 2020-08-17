@@ -2,13 +2,14 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V4.View;
-using Android.Support.V4.Widget;
 using Android.Views;
+using AndroidX.Core.View;
+using AndroidX.DrawerLayout.Widget;
 using MiraiNotes.Android.Models;
 using MiraiNotes.Android.ViewModels;
 using MiraiNotes.Android.Views.Fragments;
 using MiraiNotes.Core.Enums;
+using MvvmCross.Base;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
 using MvvmCross.ViewModels;
@@ -36,19 +37,16 @@ namespace MiraiNotes.Android.Views.Activities
 
         public const string InitParamsKey = "InitParams";
 
-
         public IMvxInteraction<bool> ShowDrawerRequest
         {
             get => _showDrawerRequest;
             set
             {
                 if (_showDrawerRequest != null)
-                    _showDrawerRequest.Requested -= (sender, args)
-                        => ShowDrawer(args.Value);
+                    _showDrawerRequest.Requested -= ShowDrawerHandler;
 
                 _showDrawerRequest = value;
-                _showDrawerRequest.Requested += (sender, args)
-                        => ShowDrawer(args.Value);
+                _showDrawerRequest.Requested += ShowDrawerHandler;
             }
         }
         public IMvxInteraction<AppThemeChangedMsg> ChangeThemeRequest
@@ -57,71 +55,64 @@ namespace MiraiNotes.Android.Views.Activities
             set
             {
                 if (_changeThemeRequest != null)
-                    _changeThemeRequest.Requested -= (sender, args)
-                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
+                    _changeThemeRequest.Requested -= SetAppThemeHandler;
 
                 _changeThemeRequest = value;
-                _changeThemeRequest.Requested += (sender, args)
-                        => SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
+                _changeThemeRequest.Requested += SetAppThemeHandler;
             }
         }
+
         public IMvxInteraction ChangeLanguageRequest
         {
             get => _changeLanguageRequest;
             set
             {
                 if (_changeLanguageRequest != null)
-                    _changeLanguageRequest.Requested -= (sender, args)
-                        => RestartActivity();
+                    _changeLanguageRequest.Requested -= ChangeLanguageHandler;
 
                 _changeLanguageRequest = value;
-                _changeLanguageRequest.Requested += (sender, args)
-                        => RestartActivity();
+                _changeLanguageRequest.Requested += ChangeLanguageHandler;
             }
         }
+
         public IMvxInteraction HideKeyboardRequest
         {
             get => _hideKeyboardRequest;
             set
             {
                 if (_hideKeyboardRequest != null)
-                    _hideKeyboardRequest.Requested -= (sender, args)
-                        => HideSoftKeyboard();
+                    _hideKeyboardRequest.Requested -= HideKeyboardHandler;
 
                 _hideKeyboardRequest = value;
-                _hideKeyboardRequest.Requested += (sender, args)
-                        => HideSoftKeyboard();
+                _hideKeyboardRequest.Requested += HideKeyboardHandler;
             }
         }
+
         public IMvxInteraction<TaskSortType> UpdateTaskSortOrderRequest
         {
             get => _updateTaskSortOrderRequest;
             set
             {
                 if (_updateTaskSortOrderRequest != null)
-                    _updateTaskSortOrderRequest.Requested -= (sender, args)
-                        => SetSelectedTaskSortType(args.Value);
+                    _updateTaskSortOrderRequest.Requested -= SetSelectedTaskSortTypeHandler;
 
                 _updateTaskSortOrderRequest = value;
-                _updateTaskSortOrderRequest.Requested += (sender, args)
-                        => SetSelectedTaskSortType(args.Value);
+                _updateTaskSortOrderRequest.Requested += SetSelectedTaskSortTypeHandler;
             }
         }
+
         public IMvxInteraction<bool> ChangeTasksSelectionModeRequest
         {
             get => _changeTasksSelectionModeRequest;
             set
             {
                 if (_changeTasksSelectionModeRequest != null)
-                    _changeTasksSelectionModeRequest.Requested -= (sender, args)
-                        => StartSelectionMode(args.Value);
+                    _changeTasksSelectionModeRequest.Requested -= StartSelectionModeHandler;
 
                 _changeTasksSelectionModeRequest = value;
-                _changeTasksSelectionModeRequest.Requested += (sender, args)
-                        => StartSelectionMode(args.Value);
+                _changeTasksSelectionModeRequest.Requested += StartSelectionModeHandler;
             }
         }
-
 
         public DrawerLayout DrawerLayout { get; private set; }
         public override int LayoutId
@@ -269,25 +260,25 @@ namespace MiraiNotes.Android.Views.Activities
                     {
                         _allTasksAreSelected = !_allTasksAreSelected;
                         var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
-                        tasksFragment.ViewModel.SelectAllTasksCommand.Execute(_allTasksAreSelected);
+                        tasksFragment?.ViewModel.SelectAllTasksCommand.Execute(_allTasksAreSelected);
                     }
                     break;
                 case Resource.Id.DeleteSelectedTasks:
                     {
                         var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
-                        tasksFragment.ViewModel.DeleteSelectedTasksCommand.Execute();
+                        tasksFragment?.ViewModel.DeleteSelectedTasksCommand.Execute();
                     }
                     break;
                 case Resource.Id.MarkAsCompletedSelectedTasks:
                     {
                         var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
-                        tasksFragment.ViewModel.MarkSelectedTasksAsCompletedCommand.Execute();
+                        tasksFragment?.ViewModel.MarkSelectedTasksAsCompletedCommand.Execute();
                     }
                     break;
                 case Resource.Id.MoveSelectedTasks:
                     {
                         var tasksFragment = SupportFragmentManager.FindFragmentById(Resource.Id.ContentFrame) as TasksFragment;
-                        tasksFragment.ViewModel.MoveSelectedTasksCommand.Execute();
+                        tasksFragment?.ViewModel.MoveSelectedTasksCommand.Execute();
                     }
                     break;
                 default:
@@ -336,10 +327,9 @@ namespace MiraiNotes.Android.Views.Activities
 
         public void LockDrawer(bool lockDrawer)
         {
-            if (lockDrawer)
-                DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
-            else
-                DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
+            DrawerLayout.SetDrawerLockMode(lockDrawer
+                ? DrawerLayout.LockModeLockedClosed
+                : DrawerLayout.LockModeUnlocked);
         }
 
         public static Intent CreateIntent(int id, string key, string extra)
@@ -379,12 +369,37 @@ namespace MiraiNotes.Android.Views.Activities
             };
         }
 
-        private void SetSelectedTaskSortType(TaskSortType sortType)
+        public void ShowDrawerHandler(object sender, MvxValueEventArgs<bool> args)
+        {
+            ShowDrawer(args.Value);
+        }
+
+        private void ChangeLanguageHandler(object sender, EventArgs e)
+        {
+            RestartActivity();
+        }
+
+        private void HideKeyboardHandler(object sender, EventArgs e)
+        {
+            HideSoftKeyboard();
+        }
+
+        private void SetSelectedTaskSortTypeHandler(object sender, MvxValueEventArgs<TaskSortType> args)
         {
             //For some reason if the SorTask menu options item is visible, it wont automatically trigger the invalidate options
             //when clicked
             InvalidateOptionsMenu();
-            _selectedTaskSortType = sortType;
+            _selectedTaskSortType = args.Value;
+        }
+
+        private void StartSelectionModeHandler(object sender, MvxValueEventArgs<bool> args)
+        {
+            StartSelectionMode(args.Value);
+        }
+
+        private void SetAppThemeHandler(object sender, MvxValueEventArgs<AppThemeChangedMsg> args)
+        {
+            SetAppTheme(args.Value.AppTheme, args.Value.AccentColor, args.Value.UseDarkAmoledTheme, args.Value.RestartActivity);
         }
 
         private void StartSelectionMode(bool isInSelectionMode)

@@ -1,5 +1,5 @@
-﻿using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
+﻿using AndroidX.RecyclerView.Widget;
+using Google.Android.Material.FloatingActionButton;
 using System;
 
 namespace MiraiNotes.Android.Listeners
