@@ -237,7 +237,7 @@ namespace MiraiNotes.Android.ViewModels
             ShowProgressBar = true;
             var tasksResponse = await _dataService
                 .TaskService
-                .GetAsNoTrackingAsync(t => t.GoogleTaskID == taskId || t.ParentTask == taskId);
+                .GetAsNoTrackingAsync(t => t.LocalStatus != LocalStatus.DELETED && (t.GoogleTaskID == taskId || t.ParentTask == taskId));
 
             if (!tasksResponse.Succeed)
             {

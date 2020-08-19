@@ -254,7 +254,9 @@ namespace MiraiNotes.UWP.ViewModels
 
             ShowTaskProgressRing = true;
             if (string.IsNullOrEmpty(taskID))
+            {
                 CurrentTask = new TaskItemViewModel();
+            }
             else
             {
                 var ta = await _dataService
@@ -264,7 +266,7 @@ namespace MiraiNotes.UWP.ViewModels
                 var sts = await _dataService
                     .TaskService
                     .GetAsNoTrackingAsync(
-                        st => st.ParentTask == taskID,
+                        st => st.ParentTask == taskID && st.LocalStatus != LocalStatus.DELETED,
                         st => st.OrderBy(x => x.Position));
 
                 if (!ta.Succeed || !sts.Succeed)
