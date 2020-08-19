@@ -22,11 +22,14 @@ namespace MiraiNotes.Android.Background
         private readonly ILogger _logger;
         private readonly ITextProvider _textProvider;
         private readonly IAppSettingsService _appSettings;
+        private readonly IAndroidAppSettings _androidAppSettings;
         private readonly IMvxMessenger _messenger;
         private readonly IDialogService _dialogService;
         private readonly IAndroidNotificationService _notificationService;
         private readonly ITelemetryService _telemetryService;
         private readonly INetworkService _networkService;
+
+        private const string IsServiceRunningKey = "IsSyncServiceRunning";
 
         public SyncTask(bool startedManually, int? taskListId)
         {
@@ -38,6 +41,7 @@ namespace MiraiNotes.Android.Background
             _logger = Mvx.IoCProvider.Resolve<ILogger>().ForContext<SyncBackgroundTask>();
             _textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
             _appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>();
+            _androidAppSettings = _appSettings as IAndroidAppSettings;
             _messenger = Mvx.IoCProvider.Resolve<IMvxMessenger>();
             _dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
             _notificationService = Mvx.IoCProvider.Resolve<IAndroidNotificationService>();
@@ -52,14 +56,15 @@ namespace MiraiNotes.Android.Background
                 _logger.Information(
                     $"{nameof(Sync)}: Started {(_startedManually ? "manually" : "automatically")}");
 
-                bool isSyncServiceRunning = (_appSettings as IAndroidAppSettings)
-                    .GetBoolean(SyncBackgroundService.IsServiceRunningKey);
+                bool isSyncServiceRunning = _androidAppSettings.GetBoolean(IsServiceRunningKey);
 
                 if (!_startedManually && isSyncServiceRunning)
                 {
                     _logger.Warning($"{nameof(Sync)}: The sync bg service is already running...");
                     return;
                 }
+
+                _androidAppSettings.SetBoolean(IsServiceRunningKey, true);
 
                 string msg = $"{_textProvider.Get("Syncing")}...";
                 await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this, msg: msg)));
@@ -75,7 +80,7 @@ namespace MiraiNotes.Android.Background
                 bool syncOnlyOneTaskList = _taskListId.HasValue;
                 if (syncOnlyOneTaskList)
                     _logger.Information($"{nameof(Sync)}: We will perform a partial sync for the " +
-                        $"tasklistId = {_taskListId.Value} and its associated tasks");
+                                        $"tasklistId = {_taskListId.Value} and its associated tasks");
                 else
                     _logger.Information($"{nameof(Sync)}: We will perform a full sync");
 
@@ -95,9 +100,9 @@ namespace MiraiNotes.Android.Background
                     _logger.Error($"{nameof(Sync)}: Sync completed with errors = {errors}");
                 }
 
-                string message = syncResults.Any(r => !r.Succeed) ?
-                    _textProvider.Get("SyncUnknownError") :
-                    !_startedManually
+                string message = syncResults.Any(r => !r.Succeed)
+                    ? _textProvider.Get("SyncUnknownError")
+                    : !_startedManually
                         ? _textProvider.Get("SyncAutoCompleted")
                         : _textProvider.Get("SyncManualCompleted");
 
@@ -105,18 +110,19 @@ namespace MiraiNotes.Android.Background
                     message = "An unknown error occurred while trying to perform the sync operation.";
 
                 _logger.Information($"{nameof(Sync)}: results = {message}");
-                await _dispatcher.ExecuteOnMainThreadAsync(() => _messenger.Publish(new ShowProgressOverlayMsg(this, false)));
+                await _dispatcher.ExecuteOnMainThreadAsync(() =>
+                    _messenger.Publish(new ShowProgressOverlayMsg(this, false)));
 
                 bool isInForeground = AndroidUtils.IsAppInForeground();
                 if (!isInForeground && _appSettings.ShowToastNotificationAfterFullSync)
                 {
                     _logger.Information($"{nameof(Sync)}: App is not in foreground, showing a notification...");
-                    var notif = new TaskNotification
+                    var notification = new TaskNotification
                     {
                         Content = message,
                         Title = _textProvider.Get("SyncResults")
                     };
-                    _notificationService.ShowNotification(notif);
+                    _notificationService.ShowNotification(notification);
                 }
                 else if (isInForeground)
                 {
@@ -134,6 +140,10 @@ namespace MiraiNotes.Android.Background
             {
                 _logger?.Error(e, $"{nameof(Sync)}: An unknown error occurred while trying to sync task / tasklists");
                 _telemetryService?.TrackError(e);
+            }
+            finally
+            {
+                _androidAppSettings.SetBoolean(IsServiceRunningKey, false);
             }
         }
     }

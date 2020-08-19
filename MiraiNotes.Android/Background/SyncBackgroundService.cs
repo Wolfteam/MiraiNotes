@@ -1,6 +1,5 @@
 ﻿using Android.App;
 using Android.Content;
-using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
 using MvvmCross;
 using MvvmCross.Platforms.Android.Services;
@@ -12,7 +11,6 @@ namespace MiraiNotes.Android.Background
     public class SyncBackgroundService : MvxIntentService
     {
         public const int SyncServiceId = 101;
-        public const string IsServiceRunningKey = "IsSyncServiceRunning";
         public const string TaskListIdToSyncKey = "TaskListIdToSync";
         public const string StartedManuallyKey = "StartedManually";
 
@@ -24,7 +22,6 @@ namespace MiraiNotes.Android.Background
         protected override void OnHandleIntent(Intent intent)
         {
             base.OnHandleIntent(intent);
-            var appSettings = Mvx.IoCProvider.Resolve<IAppSettingsService>() as IAndroidAppSettings;
             try
             {
                 var textProvider = Mvx.IoCProvider.Resolve<ITextProvider>();
@@ -36,7 +33,7 @@ namespace MiraiNotes.Android.Background
                     .Build();
 
                 StartForeground(SyncServiceId, notification);
-                appSettings.SetBoolean(IsServiceRunningKey, true);
+
                 int taskListId = intent?.Extras?.GetInt(TaskListIdToSyncKey, 0) ?? 0;
                 bool startedManually = intent?.Extras?.GetBoolean(StartedManuallyKey, false) ?? false;
 
@@ -48,7 +45,6 @@ namespace MiraiNotes.Android.Background
             }
             finally
             {
-                appSettings.SetBoolean(IsServiceRunningKey, false);
                 StopSelf();
             }
         }
