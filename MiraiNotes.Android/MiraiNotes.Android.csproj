@@ -357,7 +357,7 @@
       <Version>1.0.0.1</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.AndroidX.Migration">
-      <Version>1.0.6.2</Version>
+      <Version>1.0.7</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.AndroidX.Work.Runtime">
       <Version>2.3.4.3</Version>
@@ -368,7 +368,7 @@
     <PackageReference Include="Xamarin.Google.Android.Material">
       <Version>1.0.0.1</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.AndroidX.Migration" Version="1.0.0-preview03" />
+    <PackageReference Include="Xamarin.AndroidX.Migration" Version="1.0.7" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\xml\" />
