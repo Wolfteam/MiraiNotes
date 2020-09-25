@@ -61,7 +61,7 @@
     <AotAssemblies>true</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
-    <AndroidDexTool>dx</AndroidDexTool>
+    <AndroidDexTool>d8</AndroidDexTool>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -69,6 +69,8 @@
     <BundleAssemblies>true</BundleAssemblies>
     <AndroidUseAapt2>true</AndroidUseAapt2>
     <AndroidPackageFormat>aab</AndroidPackageFormat>
+    <AndroidSupportedAbis>
+    </AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android.Export" />
