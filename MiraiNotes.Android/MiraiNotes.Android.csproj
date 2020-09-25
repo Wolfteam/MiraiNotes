@@ -360,7 +360,7 @@
       <Version>1.0.6.2</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.AndroidX.Work.Runtime">
-      <Version>2.3.4.3</Version>
+      <Version>2.3.4.6</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Essentials">
       <Version>1.5.3.2</Version>
