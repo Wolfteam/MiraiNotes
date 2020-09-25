@@ -58,7 +58,7 @@ namespace MiraiNotes.Android.UiTests.Pages
 
         public SettingsPage OpenAppThemeDialog()
         {
-            App.Tap(x => x.Class("MvxAppCompatSpinner").Index(0));
+            App.Tap(x => x.Class("MvxSpinner").Index(0));
             App.WaitForElement(x => _appThemeDialog);
             return this;
         }

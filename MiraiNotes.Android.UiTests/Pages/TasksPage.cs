@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Linq;
+using Xamarin.UITest;
 using Xamarin.UITest.Queries;
 using Query = System.Func<Xamarin.UITest.Queries.AppQuery, Xamarin.UITest.Queries.AppQuery>;
 
@@ -218,7 +219,6 @@ namespace MiraiNotes.Android.UiTests.Pages
         public TasksPage ShowSubTasks(int taskIndex = 0)
         {
             App.Tap(x => x.Id(TaskRecyclerViewId).Child().Index(taskIndex).Descendant("AppCompatImageButton"));
-
             return this;
         }
 
@@ -279,6 +279,11 @@ namespace MiraiNotes.Android.UiTests.Pages
         {
             var color = GetBackgroundColor(_navView);
             return color;
+        }
+
+        public void ScrollDownOnMainList()
+        {
+            App.ScrollDown(x => x.Id(TaskRecyclerViewId), ScrollStrategy.Gesture);
         }
     }
 }

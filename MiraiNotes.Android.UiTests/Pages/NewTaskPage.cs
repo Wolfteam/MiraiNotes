@@ -59,7 +59,7 @@ namespace MiraiNotes.Android.UiTests.Pages
 
             App.Tap(_saveChangesButton);
 
-            App.WaitForNoElement(_saveChangesButton);
+            App.WaitForNoElement(_saveChangesButton, timeout: TimeSpan.FromSeconds(5));
         }
 
         public NewTaskPage ShowAddSubTaskDialog()
@@ -128,7 +128,6 @@ namespace MiraiNotes.Android.UiTests.Pages
         {
             App.EnterText(_taskTitleEditText, title);
             App.DismissKeyboard();
-
             return this;
         }
 
@@ -153,7 +152,7 @@ namespace MiraiNotes.Android.UiTests.Pages
             return App.Query(x => x.Marked("Title cannot be empty")).Any();
         }
 
-        public bool IsTaskContentErrorValidationVisibile()
+        public bool IsTaskContentErrorValidationVisible()
         {
             App.Tap(_taskContentEditText);
             return App.Query(x => x.Marked("Notes cannot be empty")).Any();

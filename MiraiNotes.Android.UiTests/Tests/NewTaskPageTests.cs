@@ -60,7 +60,7 @@ namespace MiraiNotes.Android.UiTests.Tests
             //Assert
             int finalNumberOfTasks = TasksPage.GetCurrentNumberOfTasks();
             Assert.True(initialNumberOfTask + 1 == finalNumberOfTasks);
-            Assert.DoesNotThrow(() => TasksPage.ShowSubTasks(taskIndex));
+            Assert.DoesNotThrow(() => TasksPage.ShowSubTasks(taskIndex).ScrollDownOnMainList());
             int numberOfSubTasks = TasksPage.GetNumberOfSubTasks(taskIndex);
             Assert.True(numberOfSubTasks == subTasksToCreate);
             Assert.AreEqual(title, TasksPage.GetTaskTitle(taskIndex));
@@ -129,8 +129,17 @@ namespace MiraiNotes.Android.UiTests.Tests
 
             //Act - Assert
             Assert.Throws<Exception>(() => NewTaskPage.AddEditNewTask(title, content));
+
             Assert.True(NewTaskPage.IsTaskTitleErrorValidationVisible());
-            Assert.True(NewTaskPage.IsTaskContentErrorValidationVisibile());
+            NewTaskPage.SetTaskTitle("This is a title");
+            Assert.True(!NewTaskPage.IsTaskTitleErrorValidationVisible());
+
+            //For some reason i had to place this here...
+            App.WaitFor(() => true, postTimeout: TimeSpan.FromSeconds(5));
+
+            Assert.True(NewTaskPage.IsTaskContentErrorValidationVisible());
+            NewTaskPage.SetTaskContent("This is a content");
+            Assert.True(!NewTaskPage.IsTaskContentErrorValidationVisible());
         }
 
         [TestCase(true)]
