@@ -35,7 +35,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid Width="30" Height="30">
                     <Grid.Background>
-                        <SolidColorBrush Color="{x:Bind HexAccentColor, Mode=OneWay, Converter={StaticResource HexToColorConverter}}" />
+                        <SolidColorBrush Color="{x:Bind HexAccentColor, Converter={StaticResource HexToColorConverter}}" />
                     </Grid.Background>
                 </Grid>
                 <TextBlock
@@ -48,7 +48,7 @@
         <DataTemplate x:Key="AccentColorTemplate" x:DataType="localModels:AccentColorModel">
             <Grid Width="30" Height="30">
                 <Grid.Background>
-                    <SolidColorBrush Color="{x:Bind HexAccentColor, Mode=OneWay, Converter={StaticResource HexToColorConverter}}" />
+                    <SolidColorBrush Color="{x:Bind HexAccentColor, Converter={StaticResource HexToColorConverter}}" />
                 </Grid.Background>
             </Grid>
         </DataTemplate>

@@ -29,7 +29,7 @@
             <TextBlock HorizontalAlignment="Center" Text="Mirai Notes" />
             <TextBlock HorizontalAlignment="Center">
                 <Run Text="Version " />
-                <Run Text="{x:Bind localUtils:MiscellaneousUtils.GetAppVersion(), Mode=OneWay}" />
+                <Run Text="{x:Bind localUtils:MiscellaneousUtils.GetAppVersion()}" />
             </TextBlock>
         </StackPanel>
 

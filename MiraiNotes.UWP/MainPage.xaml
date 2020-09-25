@@ -117,7 +117,7 @@
                     <NavigationView.MenuItemTemplate>
                         <DataTemplate x:DataType="viewModels:TaskListItemViewModel">
                             <Grid
-                                Width="320"
+                                Width="{Binding ActualWidth, ElementName=PaneFooterStackPanel}"
                                 Height="40"
                                 Margin="-16,0,0,0"
                                 VerticalAlignment="Center">
@@ -183,7 +183,61 @@
                         </SplitView>
                     </NavigationView.Content>
                     <NavigationView.PaneFooter>
-                        <StackPanel HorizontalAlignment="Stretch">
+                        <StackPanel x:Name="PaneFooterStackPanel" HorizontalAlignment="Stretch">
+                            <interactivity:Interaction.Behaviors>
+                                <!--  This is to make the navigationmenuitem look good in compact mode  -->
+                                <core:DataTriggerBehavior Binding="{Binding IsPaneOpen, ElementName=NavigationView}" Value="False">
+                                    <core:ChangePropertyAction
+                                        PropertyName="HorizontalAlignment"
+                                        TargetObject="{Binding ElementName=PaneFooterStackPanel}"
+                                        Value="Left" />
+                                    <!--  Logout button  -->
+                                    <core:ChangePropertyAction
+                                        PropertyName="Width"
+                                        TargetObject="{Binding ElementName=LogoutButton}"
+                                        Value="48" />
+
+                                    <core:ChangePropertyAction
+                                        PropertyName="HorizontalAlignment"
+                                        TargetObject="{Binding ElementName=LogoutButton}"
+                                        Value="Left" />
+                                    <!--  Settings button  -->
+                                    <core:ChangePropertyAction
+                                        PropertyName="Width"
+                                        TargetObject="{Binding ElementName=SettingsButton}"
+                                        Value="48" />
+
+                                    <core:ChangePropertyAction
+                                        PropertyName="HorizontalAlignment"
+                                        TargetObject="{Binding ElementName=SettingsButton}"
+                                        Value="Left" />
+                                </core:DataTriggerBehavior>
+
+                                <core:DataTriggerBehavior Binding="{Binding IsPaneOpen, ElementName=NavigationView}" Value="True">
+                                    <core:ChangePropertyAction
+                                        PropertyName="HorizontalAlignment"
+                                        TargetObject="{Binding ElementName=PaneFooterStackPanel}"
+                                        Value="Stretch" />
+                                    <!--  Logout button  -->
+                                    <core:ChangePropertyAction
+                                        PropertyName="Width"
+                                        TargetObject="{Binding ElementName=LogoutButton}"
+                                        Value="{Binding Width, ElementName=PaneFooterStackPanel}" />
+                                    <core:ChangePropertyAction
+                                        PropertyName="HorizontalAlignment"
+                                        TargetObject="{Binding ElementName=LogoutButton}"
+                                        Value="Stretch" />
+                                    <!--  Settings button  -->
+                                    <core:ChangePropertyAction
+                                        PropertyName="Width"
+                                        TargetObject="{Binding ElementName=SettingsButton}"
+                                        Value="{Binding Width, ElementName=PaneFooterStackPanel}" />
+                                    <core:ChangePropertyAction
+                                        PropertyName="HorizontalAlignment"
+                                        TargetObject="{Binding ElementName=SettingsButton}"
+                                        Value="Stretch" />
+                                </core:DataTriggerBehavior>
+                            </interactivity:Interaction.Behaviors>
                             <StackPanel.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -195,7 +249,10 @@
                                 </Style>
                             </StackPanel.Resources>
                             <MenuFlyoutSeparator Background="{ThemeResource SystemAccentColor}" />
-                            <Button HorizontalContentAlignment="Stretch" Command="{Binding LogoutCommand}">
+                            <Button
+                                x:Name="LogoutButton"
+                                HorizontalContentAlignment="Stretch"
+                                Command="{Binding LogoutCommand}">
                                 <Grid Height="40">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -203,7 +260,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <PersonPicture
-                                        Height="30"
+                                        Width="28"
                                         DisplayName="{Binding CurrentUserName, Mode=OneWay}"
                                         Initials="{Binding CurrentUserInitials, Mode=OneWay}"
                                         ProfilePicture="{Binding CurrentUserProfileImagePath, Mode=OneWay}"
@@ -212,7 +269,6 @@
                                         Grid.Column="1"
                                         Margin="10,0,0,0"
                                         Text="Sign out" />
-
                                     <Button
                                         Grid.Column="2"
                                         HorizontalAlignment="Right"
@@ -221,7 +277,10 @@
                                     </Button>
                                 </Grid>
                             </Button>
-                            <Button Command="{Binding OpenSettingsCommand}" ToolTipService.ToolTip="Settings">
+                            <Button
+                                x:Name="SettingsButton"
+                                Command="{Binding OpenSettingsCommand}"
+                                ToolTipService.ToolTip="Settings">
                                 <Grid Height="40">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="30" />
