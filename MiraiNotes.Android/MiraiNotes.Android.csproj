@@ -313,7 +313,7 @@
       <Version>7.0.1</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugins.Fingerprint">
-      <Version>2.1.1</Version>
+      <Version>2.1.2</Version>
     </PackageReference>
     <PackageReference Include="Refit">
       <Version>5.2.1</Version>
