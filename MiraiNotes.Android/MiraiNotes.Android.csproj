@@ -301,7 +301,7 @@
       <Version>7.1.1</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.Color">
-      <Version>7.0.1</Version>
+      <Version>7.1.1</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.Messenger">
       <Version>7.0.1</Version>
