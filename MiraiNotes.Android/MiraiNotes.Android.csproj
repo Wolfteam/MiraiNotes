@@ -310,7 +310,7 @@
       <Version>7.1.1</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.Visibility">
-      <Version>7.1.1</Version>
+      <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugins.Fingerprint">
       <Version>2.1.2</Version>
