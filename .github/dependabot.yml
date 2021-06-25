@@ -1,0 +1,52 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  target-branch: develop
+  ignore:
+  - dependency-name: Xamarin.UITest
+    versions:
+    - 3.0.13
+    - 3.0.14
+    - 3.0.15
+    - 3.0.16
+  - dependency-name: Microsoft.EntityFrameworkCore.Design
+    versions:
+    - 5.0.2
+    - 5.0.3
+    - 5.0.4
+  - dependency-name: Microsoft.EntityFrameworkCore
+    versions:
+    - 5.0.2
+    - 5.0.3
+    - 5.0.4
+  - dependency-name: Microsoft.EntityFrameworkCore.Tools
+    versions:
+    - 5.0.2
+    - 5.0.3
+    - 5.0.4
+  - dependency-name: Microsoft.EntityFrameworkCore.Sqlite
+    versions:
+    - 5.0.2
+    - 5.0.3
+    - 5.0.4
+  - dependency-name: Xamarin.AndroidX.Annotation
+    versions:
+    - 1.1.0.8
+    - 1.1.0.9
+  - dependency-name: Refit
+    versions:
+    - 5.2.4
+    - 6.0.1
+    - 6.0.15
+    - 6.0.24
+    - 6.0.8
+  - dependency-name: Xamarin.AndroidX.Legacy.Support.V4
+    versions:
+    - 1.0.0.6
+  - dependency-name: Microsoft.NETCore.UniversalWindowsPlatform
+    versions:
+    - 6.2.11
