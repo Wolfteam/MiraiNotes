@@ -304,7 +304,7 @@
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.Messenger">
-      <Version>7.1.2</Version>
+      <Version>8.0.1</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Plugin.ResxLocalization">
       <Version>7.1.2</Version>
