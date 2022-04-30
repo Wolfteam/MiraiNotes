@@ -2,7 +2,6 @@
     x:Class="MiraiNotes.UWP.Pages.TasksPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Extensions="using:WinRTXamlToolkit.Controls.Extensions"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:converters="using:MiraiNotes.UWP.Converters"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
@@ -13,6 +12,7 @@
     xmlns:localModels="using:MiraiNotes.UWP.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Xaml.Interactions.Media"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:uc="using:MiraiNotes.UWP.Controls"
     DataContext="{Binding Tasks, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -103,7 +103,9 @@
                                             </Storyboard>
                                         </StackPanel.Resources>
                                         <Button
+                                            Margin="0,0,10,0"
                                             Background="Transparent"
+                                            BorderThickness="0"
                                             Command="{Binding ElementName=MainSplitViewContent, Path=DataContext.ShowSubTasksCommand}"
                                             CommandParameter="{Binding}"
                                             ToolTipService.ToolTip="Show / hide sub tasks"
@@ -486,50 +488,62 @@
                         <AppBarButton.Icon>
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE759;" />
                         </AppBarButton.Icon>
-                        <AppBarButton.Flyout>
-                            <Flyout Opened="TaskList_ComboBox_DropDownOpened">
-                                <ComboBox
-                                    x:Name="TaskList_ComboBox2"
-                                    DisplayMemberPath="Title"
-                                    IsEnabled="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                                    ItemsSource="{Binding TaskLists, Mode=OneWay}"
-                                    PlaceholderText="Pick a task list"
-                                    SelectedValuePath="TaskListID">
-                                    <ComboBox.HeaderTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Vertical">
-                                                <ProgressBar
-                                                    Width="130"
-                                                    IsIndeterminate="True"
-                                                    ShowError="False"
-                                                    ShowPaused="False"
-                                                    Visibility="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                                <TextBlock Text="Move selected tasks to:" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ComboBox.HeaderTemplate>
-                                    <interactivity:Interaction.Behaviors>
-                                        <core:EventTriggerBehavior EventName="SelectionChanged">
-                                            <core:EventTriggerBehavior.Actions>
-                                                <core:InvokeCommandAction Command="{Binding MoveSelectedTasksCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox2, Path=SelectedItem}" />
-                                            </core:EventTriggerBehavior.Actions>
-                                        </core:EventTriggerBehavior>
-                                    </interactivity:Interaction.Behaviors>
-                                </ComboBox>
-                            </Flyout>
-                        </AppBarButton.Flyout>
+                        <interactivity:Interaction.Behaviors>
+                            <core:EventTriggerBehavior EventName="Click">
+                                <core:ChangePropertyAction
+                                    PropertyName="IsOpen"
+                                    TargetObject="{Binding ElementName=MoveTaskTeachingTip}"
+                                    Value="True" />
+                                <core:InvokeCommandAction Command="{Binding MoveComboBoxOpenedCommand}" />
+                            </core:EventTriggerBehavior>
+                        </interactivity:Interaction.Behaviors>
                     </AppBarButton>
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
+        <muxc:TeachingTip
+            x:Name="MoveTaskTeachingTip"
+            IsLightDismissEnabled="True"
+            PreferredPlacement="Center">
+            <ComboBox
+                x:Name="TaskList_ComboBox2"
+                HorizontalAlignment="Stretch"
+                DisplayMemberPath="Title"
+                IsEnabled="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                ItemsSource="{Binding TaskLists, Mode=OneWay}"
+                PlaceholderText="Pick a task list"
+                SelectedValuePath="TaskListID">
+                <ComboBox.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <ProgressBar
+                                Width="130"
+                                IsIndeterminate="True"
+                                ShowError="False"
+                                ShowPaused="False"
+                                Visibility="{Binding ShowMoveTaskFlyoutProgressBar, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            <TextBlock Text="Move selected tasks to:" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.HeaderTemplate>
+                <interactivity:Interaction.Behaviors>
+                    <core:EventTriggerBehavior EventName="SelectionChanged">
+                        <core:EventTriggerBehavior.Actions>
+                            <core:InvokeCommandAction Command="{Binding MoveSelectedTasksCommand}" CommandParameter="{Binding ElementName=TaskList_ComboBox2, Path=SelectedItem}" />
+                            <core:ChangePropertyAction
+                                PropertyName="IsOpen"
+                                TargetObject="{Binding ElementName=MoveTaskTeachingTip}"
+                                Value="False" />
+                        </core:EventTriggerBehavior.Actions>
+                    </core:EventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+            </ComboBox>
+        </muxc:TeachingTip>
         <controls:InAppNotification
             x:Name="Task_InAppNotification"
-            AnimationDuration="00:00:00.1800000"
-            Background="{ThemeResource ColorDetailsBackground}"
             HorizontalOffset="12.88"
             ShowDismissButton="True"
             StackMode="QueueBehind"
-            VerticalOffset="200"
-            Visibility="Collapsed" />
+            VerticalOffset="200" />
     </Grid>
 </Page>

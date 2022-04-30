@@ -65,11 +65,12 @@
                                     </Style>
                                 </Grid.Style>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="10*" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock
                                     Grid.Column="0"
+                                    Grid.ColumnSpan="2"
                                     HorizontalAlignment="Center"
                                     FontSize="30"
                                     FontWeight="Bold"
@@ -81,6 +82,7 @@
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
                                     Background="Transparent"
+                                    BorderThickness="0"
                                     Click="ClosePaneButton_Click"
                                     IsTabStop="False"
                                     IsTapEnabled="False"
@@ -149,6 +151,7 @@
                                         HorizontalAlignment="Right"
                                         HorizontalContentAlignment="Right"
                                         Background="Transparent"
+                                        BorderThickness="0"
                                         Command="{Binding ElementName=NavigationView, Path=DataContext.UpdateTaskListCommand}"
                                         CommandParameter="{Binding}"
                                         ToolTipService.ToolTip="Update task list's title">
@@ -158,6 +161,7 @@
                                         HorizontalAlignment="Right"
                                         HorizontalContentAlignment="Right"
                                         Background="Transparent"
+                                        BorderThickness="0"
                                         Command="{Binding ElementName=NavigationView, Path=DataContext.DeleteTaskListCommand}"
                                         CommandParameter="{Binding}"
                                         ToolTipService.ToolTip="Delete this task list">

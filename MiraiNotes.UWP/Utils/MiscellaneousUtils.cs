@@ -3,6 +3,7 @@ using MiraiNotes.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -114,22 +115,24 @@ namespace MiraiNotes.UWP.Utils
                "SystemAccentColor","SystemColorHighlightColor", "SystemAccentColorLight2",
                "SystemAccentColorLight3","SystemAccentColorDark2", "SystemAccentColorDark3"
             };
+
+            var mergedDict = Application.Current.Resources.MergedDictionaries.First();
             foreach (var systemColor in systemColors)
-                Application.Current.Resources[systemColor] = accentColor;
+                mergedDict[systemColor] = accentColor;
 
 
             var brush = new SolidColorBrush(accentColor);
-            (Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush).Color = accentColor;
-            (Application.Current.Resources["SystemControlHighlightListAccentLowBrush"] as SolidColorBrush).Color = accentColor;
-            Application.Current.Resources["SystemControlHighlightListAccentHighBrush"] = brush;
-            Application.Current.Resources["NavigationViewSelectionIndicatorForeground"] = brush;
-            //Application.Current.Resources["SystemControlHighlightAltBaseHighBrush"] = accentColor;
-            //Application.Current.Resources["SystemControlForegroundBaseHighBrush"] = accentColor;
-            //Application.Current.Resources["SystemControlHighlightListMediumBrush"] = brush;
-            //Application.Current.Resources["SystemControlHighlightListLowBrush"] = brush;
-            //(Application.Current.Resources["SystemControlHighlightAccent3RevealAccent2BackgroundBrush"] as RevealBackgroundBrush).Color = accentColor;
-            //(Application.Current.Resources["SystemControlHighlightAccent3RevealBackgroundBrush"] as RevealBackgroundBrush).Color = accentColor;
-            //(Application.Current.Resources["SystemControlHighlightAccent2RevealBackgroundBrush"] as RevealBackgroundBrush).Color = accentColor;
+            (mergedDict["SystemControlHighlightAccentBrush"] as SolidColorBrush).Color = accentColor;
+            (mergedDict["SystemControlHighlightListAccentLowBrush"] as SolidColorBrush).Color = accentColor;
+            mergedDict["SystemControlHighlightListAccentHighBrush"] = brush;
+            mergedDict["NavigationViewSelectionIndicatorForeground"] = brush;
+            //mergedDict["SystemControlHighlightAltBaseHighBrush"] = accentColor;
+            //mergedDict["SystemControlForegroundBaseHighBrush"] = accentColor;
+            //mergedDict["SystemControlHighlightListMediumBrush"] = brush;
+            //mergedDict["SystemControlHighlightListLowBrush"] = brush;
+            //(mergedDict["SystemControlHighlightAccent3RevealAccent2BackgroundBrush"] as Microsoft.UI.Xaml.Media.RevealBackgroundBrush).Color = accentColor;
+            //(mergedDict["SystemControlHighlightAccent3RevealBackgroundBrush"] as Microsoft.UI.Xaml.Media.RevealBackgroundBrush).Color = accentColor;
+            //(mergedDict["SystemControlHighlightAccent2RevealBackgroundBrush"] as Microsoft.UI.Xaml.Media.RevealBackgroundBrush).Color = accentColor;
 
             // Set theme for window root.
             if (Window.Current.Content is FrameworkElement frameworkElement)

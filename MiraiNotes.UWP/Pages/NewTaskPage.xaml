@@ -10,6 +10,7 @@
     xmlns:local="using:MiraiNotes.UWP.Pages"
     xmlns:localExtensions="using:MiraiNotes.UWP.Extensions"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:sharedEnums="using:MiraiNotes.Core.Enums"
     DataContext="{Binding NewTask, Source={StaticResource Locator}}"
     mc:Ignorable="d">
@@ -109,6 +110,7 @@
                         Grid.Column="2"
                         Height="25"
                         Background="Transparent"
+                        BorderThickness="0"
                         Command="{Binding RemoveTaskNotificationDateCommand}"
                         CommandParameter="{x:Bind sharedEnums:TaskNotificationDateType.TO_BE_COMPLETED_DATE}">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
@@ -139,6 +141,7 @@
                     <Button
                         Height="25"
                         Background="Transparent"
+                        BorderThickness="0"
                         Command="{Binding RemoveTaskNotificationDateCommand}"
                         CommandParameter="{x:Bind sharedEnums:TaskNotificationDateType.REMINDER_DATE}">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
@@ -337,16 +340,14 @@
                     IsEnabled="{Binding CurrentTask.CanBeMarkedAsCompleted, Mode=OneWay}"
                     Label="To be completed on"
                     ToolTipService.ToolTip="Choose the date this task should be completed">
-                    <AppBarButton.Flyout>
-                        <Flyout Placement="Left">
-                            <CalendarDatePicker
-                                Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay, Converter={StaticResource DatetimeOffsetToLocalDatetimeOffsetConverter}}"
-                                DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
-                                Header="This task will be completed on:"
-                                MinDate="{Binding MinDate, Mode=OneWay}"
-                                PlaceholderText="To be completed on" />
-                        </Flyout>
-                    </AppBarButton.Flyout>
+                    <interactivity:Interaction.Behaviors>
+                        <core:EventTriggerBehavior EventName="Click">
+                            <core:ChangePropertyAction
+                                PropertyName="IsOpen"
+                                TargetObject="{Binding ElementName=ToBeCompletedOnTeachingTip}"
+                                Value="True" />
+                        </core:EventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
                 </AppBarButton>
                 <AppBarSeparator Foreground="{ThemeResource SystemAccentColor}" />
                 <AppBarButton
@@ -356,42 +357,81 @@
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC92;" />
                     </AppBarButton.Icon>
-                    <AppBarButton.Flyout>
-                        <Flyout Placement="Left">
-                            <StackPanel Orientation="Vertical">
-                                <CalendarDatePicker
-                                    Margin="0,0,0,5"
-                                    Date="{Binding CurrentTask.RemindOn, Mode=TwoWay}"
-                                    DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
-                                    Header="Remind me on this date:"
-                                    MinDate="{Binding MinDate, Mode=OneWay}"
-                                    PlaceholderText="Remind on" />
-                                <TimePicker
-                                    Header="At this hour:"
-                                    IsEnabled="{Binding CurrentTask.HasAReminderDate, Mode=OneWay}"
-                                    Time="{Binding CurrentTask.RemindOnTime, Mode=TwoWay}" />
-                            </StackPanel>
-                        </Flyout>
-                    </AppBarButton.Flyout>
+                    <interactivity:Interaction.Behaviors>
+                        <core:EventTriggerBehavior EventName="Click">
+                            <core:ChangePropertyAction
+                                PropertyName="IsOpen"
+                                TargetObject="{Binding ElementName=AddReminderTeachingTip}"
+                                Value="True" />
+                        </core:EventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
                 </AppBarButton>
                 <AppBarButton
                     AllowFocusOnInteraction="True"
                     Icon="List"
                     Label="Save this task to"
                     ToolTipService.ToolTip="Select the task list where this task will be saved">
-                    <AppBarButton.Flyout>
-                        <Flyout Placement="Left">
-                            <ComboBox
-                                DisplayMemberPath="Title"
-                                Header="Task List:"
-                                ItemsSource="{Binding TaskLists, Mode=OneWay}"
-                                PlaceholderText="Pick a task list"
-                                SelectedItem="{Binding SelectedTaskList, Mode=TwoWay}"
-                                SelectedValuePath="TaskListID" />
-                        </Flyout>
-                    </AppBarButton.Flyout>
+                    <interactivity:Interaction.Behaviors>
+                        <core:EventTriggerBehavior EventName="Click">
+                            <core:ChangePropertyAction
+                                PropertyName="IsOpen"
+                                TargetObject="{Binding ElementName=MoveTaskTeachingTip}"
+                                Value="True" />
+                        </core:EventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
                 </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
+
+        <muxc:TeachingTip
+            x:Name="ToBeCompletedOnTeachingTip"
+            Grid.Row="1"
+            IsLightDismissEnabled="True"
+            PreferredPlacement="Center">
+            <CalendarDatePicker
+                HorizontalAlignment="Stretch"
+                Date="{Binding CurrentTask.ToBeCompletedOn, Mode=TwoWay, Converter={StaticResource DatetimeOffsetToLocalDatetimeOffsetConverter}}"
+                DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
+                Header="This task will be completed on:"
+                MinDate="{Binding MinDate, Mode=OneWay}"
+                PlaceholderText="To be completed on" />
+        </muxc:TeachingTip>
+
+        <muxc:TeachingTip
+            x:Name="AddReminderTeachingTip"
+            Grid.Row="1"
+            IsLightDismissEnabled="True"
+            PreferredPlacement="Center">
+            <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical">
+                <CalendarDatePicker
+                    Margin="0,0,0,5"
+                    HorizontalAlignment="Stretch"
+                    Date="{Binding CurrentTask.RemindOn, Mode=TwoWay}"
+                    DateFormat="{}{dayofweek.full}‎, ‎{month.full}‎ ‎{day.integer}‎, ‎{year.full}"
+                    Header="Remind me on this date:"
+                    MinDate="{Binding MinDate, Mode=OneWay}"
+                    PlaceholderText="Remind on" />
+                <TimePicker
+                    HorizontalAlignment="Stretch"
+                    Header="At this hour:"
+                    IsEnabled="{Binding CurrentTask.HasAReminderDate, Mode=OneWay}"
+                    Time="{Binding CurrentTask.RemindOnTime, Mode=TwoWay}" />
+            </StackPanel>
+        </muxc:TeachingTip>
+
+        <muxc:TeachingTip
+            x:Name="MoveTaskTeachingTip"
+            Grid.Row="1"
+            IsLightDismissEnabled="True"
+            PreferredPlacement="Center">
+            <ComboBox
+                HorizontalAlignment="Stretch"
+                DisplayMemberPath="Title"
+                Header="Task List:"
+                ItemsSource="{Binding TaskLists, Mode=OneWay}"
+                PlaceholderText="Pick a task list"
+                SelectedItem="{Binding SelectedTaskList, Mode=TwoWay}"
+                SelectedValuePath="TaskListID" />
+        </muxc:TeachingTip>
     </Grid>
 </Page>

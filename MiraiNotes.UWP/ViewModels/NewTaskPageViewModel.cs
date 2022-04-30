@@ -816,7 +816,7 @@ namespace MiraiNotes.UWP.ViewModels
 
             if (subTask.IsNew)
             {
-                CurrentTask.SubTasks?.Remove(subTask);
+                CurrentTask.RemoveSubTask(subTask);
                 return;
             }
 
@@ -840,7 +840,7 @@ namespace MiraiNotes.UWP.ViewModels
                 return;
             }
 
-            CurrentTask.SubTasks?.Remove(subTask);
+            CurrentTask.RemoveSubTask(subTask);
             _messenger.Send(
                 new KeyValuePair<string, string>(CurrentTask.TaskID, subTask.TaskID),
                 $"{MessageType.SUBTASK_DELETED_FROM_PANE_FRAME}");

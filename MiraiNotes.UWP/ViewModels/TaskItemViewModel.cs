@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using MiraiNotes.Core.Enums;
+﻿using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
+using System;
+using System.Collections.ObjectModel;
 using Template10.Validation;
 
 namespace MiraiNotes.UWP.ViewModels
@@ -100,6 +100,8 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 Write(value);
                 RaisePropertyChanged(nameof(ToBeCompletedOn));
+                RaisePropertyChanged(nameof(CompletitionDateText));
+                RaisePropertyChanged(nameof(FullCompletitionDateText));
             }
         }
 
@@ -175,15 +177,15 @@ namespace MiraiNotes.UWP.ViewModels
                 {
                     if (difference == 0)
                         return "Today";
-                    else if (difference == 1)
+                    if (difference == 1)
                         return $"{difference} day ago";
-                    else
-                        return $"{difference} days ago";
+
+                    return $"{difference} days ago";
                 }
-                else if (difference == -1)
+                if (difference == -1)
                     return "Tomorrow";
-                else
-                    return $"{ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
+
+                return $"{ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
             }
         }
 
@@ -198,13 +200,13 @@ namespace MiraiNotes.UWP.ViewModels
                 {
                     if (difference == 0)
                         return "This task is marked to be completed Today";
-                    else
-                        return $"This task was marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
+
+                    return $"This task was marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
                 }
-                else if (difference == -1)
+                if (difference == -1)
                     return "This task is marked to be completed Tomorrow";
-                else
-                    return $"This task is marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
+
+                return $"This task is marked to be completed on {ToBeCompletedOn.Value:ddd, MMM d, yyyy}";
             }
         }
 
@@ -275,11 +277,12 @@ namespace MiraiNotes.UWP.ViewModels
             {
                 if (_remindOn.HasValue)
                 {
-                    long timeDiff = DateTimeOffset.Now.TimeOfDay.Ticks - value.Value.Ticks;
+                    var newValue = value.Value;
+                    long timeDiff = DateTimeOffset.Now.TimeOfDay.Ticks - newValue.Ticks;
                     if (timeDiff > 0)
-                        value = DateTimeOffset.Now.TimeOfDay;
+                        newValue = DateTimeOffset.Now.TimeOfDay;
 
-                    RemindOn = RemindOn.Value.Date + value;
+                    RemindOn = RemindOn.Value.Date + newValue;
                     RaisePropertyChanged(nameof(RemindOn));
                     RaisePropertyChanged(nameof(HasAReminderDate));
                     RaisePropertyChanged(nameof(RemindOnDateText));
@@ -294,5 +297,11 @@ namespace MiraiNotes.UWP.ViewModels
             !RemindOn.HasValue
             ? string.Empty
             : RemindOn.Value.ToString("ddd, MMM d HH:mm");
+
+        public void RemoveSubTask(TaskItemViewModel subTask)
+        {
+            SubTasks?.Remove(subTask);
+            RaisePropertyChanged(nameof(HasSubTasks));
+        }
     }
 }

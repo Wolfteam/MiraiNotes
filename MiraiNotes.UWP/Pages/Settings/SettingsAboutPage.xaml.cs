@@ -37,7 +37,7 @@ namespace MiraiNotes.UWP.Pages.Settings
         private async void ShowComposeNewEmailAsync()
         {
             var emailMessage = new EmailMessage();
-            emailMessage.To.Add(new EmailRecipient("mimo4325@gmail.com"));
+            emailMessage.To.Add(new EmailRecipient("miraisoft20@gmail.com"));
             emailMessage.Subject = "Mirai Notes - Donations";
             string messageBody = "Hello, i would like to buy you a coffee :D";
             emailMessage.Body = messageBody;

@@ -38,7 +38,10 @@ namespace MiraiNotes.UWP.Pages
 
         private void ShowInAppNotification(string message)
         {
-            Task_InAppNotification.Show(message);
+            int ms = (int)TimeSpan.FromSeconds(3).TotalMilliseconds;
+            //For some reason, I need to set the content to make this sh*t work
+            Task_InAppNotification.Content = message;
+            Task_InAppNotification.Show(message, ms);
         }
 
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -88,7 +91,6 @@ namespace MiraiNotes.UWP.Pages
             {
                 _selectionInProgress = false;
             }
-
         }
     }
 }
