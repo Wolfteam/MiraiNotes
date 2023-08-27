@@ -1,5 +1,6 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -7,7 +8,7 @@ using Serilog;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class LogoutDialogViewModel : BaseConfirmationDialogViewModel<bool?, bool>
+    public class LogoutDialogViewModel : BaseConfirmationDialogViewModel<bool?, NavigationBoolResult>
     {
         public LogoutDialogViewModel(
             ITextProvider textProvider,
@@ -33,8 +34,8 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public override void SetCommands()
         {
             base.SetCommands();
-            OkCommand = new MvxAsyncCommand(() => NavigationService.Close(this, true));
-            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
+            OkCommand = new MvxAsyncCommand(() => NavigationService.Close(this, NavigationBoolResult.Succeed()));
+            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, NavigationBoolResult.Fail()));
         }
     }
 }

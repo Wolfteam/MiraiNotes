@@ -2,6 +2,7 @@
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class DeleteTaskListDialogViewModel : BaseConfirmationDialogViewModel<TaskListItemViewModel, bool>
+    public class DeleteTaskListDialogViewModel : BaseConfirmationDialogViewModel<TaskListItemViewModel, NavigationBoolResult>
     {
         private readonly IMiraiNotesDataService _dataService;
         private readonly IDialogService _dialogService;
@@ -42,7 +43,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         {
             base.SetCommands();
             OkCommand = new MvxAsyncCommand(() => DeleteTaskList(Parameter));
-            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
+            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, NavigationBoolResult.Fail()));
         }
 
         public async Task DeleteTaskList(TaskListItemViewModel taskList)
@@ -59,7 +60,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     $"{nameof(DeleteTaskList)}: Couldn't retrieve the selected task list = {taskList.Title}" +
                     $"Error = {dbResponse.Message}");
                 _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                await NavigationService.Close(this, false);
+                await NavigationService.Close(this, NavigationBoolResult.Fail());
                 return;
             }
 
@@ -88,7 +89,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                     $"{nameof(DeleteTaskList)}: Coudln't delete the task list = {taskList.Title}" +
                     $"Error = {dbResponse.Message}");
                 _dialogService.ShowErrorToast(GetText("DatabaseUnknownError"));
-                await NavigationService.Close(this, false);
+                await NavigationService.Close(this, NavigationBoolResult.Fail());
 
                 return;
             }
@@ -99,7 +100,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
             _dialogService.ShowSucceedToast(GetText("TaskListWasRemoved"));
 
-            await NavigationService.Close(this, true);
+            await NavigationService.Close(this, NavigationBoolResult.Fail());
         }
     }
 }

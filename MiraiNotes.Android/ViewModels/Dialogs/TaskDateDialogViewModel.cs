@@ -6,6 +6,7 @@ using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
 using MiraiNotes.Shared.Helpers;
@@ -19,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class TaskDateDialogViewModel : BaseConfirmationDialogViewModel<TaskDateViewModelParameter, bool>
+    public class TaskDateDialogViewModel : BaseConfirmationDialogViewModel<TaskDateViewModelParameter, NavigationBoolResult>
     {
         private string _reminderDate;
         private string _reminderHour;
@@ -32,7 +33,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public DateTime MinDate
             => DateTime.Now.AddMinutes(5);
 
-        public bool IsAReminderDate 
+        public bool IsAReminderDate
             => Parameter.DateType == TaskNotificationDateType.REMINDER_DATE;
 
         public string CurrentContentText
@@ -42,14 +43,14 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 string text = string.Empty;
                 if (!Parameter.Task.HasAReminderDate && !Parameter.Task.HasAToBeCompletedDate)
                     return text;
-               
+
                 if (Parameter.DateType == TaskNotificationDateType.REMINDER_DATE &&
                     Parameter.Task.RemindOn.HasValue)
                 {
                     string date = Parameter.Task.RemindOn.Value.ToString("f", TextProvider.CurrentCulture);
                     text = GetText("ReminderDateIsSetTo", date);
                 }
-                else if (Parameter.DateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE && 
+                else if (Parameter.DateType == TaskNotificationDateType.TO_BE_COMPLETED_DATE &&
                     Parameter.Task.ToBeCompletedOn.HasValue)
                 {
                     text = Parameter.Task.FullToBeCompletedOnText;
@@ -147,7 +148,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public override void SetCommands()
         {
             base.SetCommands();
-            OkCommand = new MvxAsyncCommand(async() =>
+            OkCommand = new MvxAsyncCommand(async () =>
             {
                 Validate();
 
@@ -161,9 +162,9 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 SendUpdatedDateMsg();
 
-                await NavigationService.Close(this, true);
+                await NavigationService.Close(this, NavigationBoolResult.Succeed());
             });
-            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
+            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, NavigationBoolResult.Fail()));
             DeleteCurrentMomentCommand = new MvxAsyncCommand(() => RemoveNotificationDate(Parameter.DateType));
         }
 

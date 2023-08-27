@@ -98,7 +98,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             {
                 var parameter = AddSubTaskDialogViewModelParameter.Instance(_taskList.GoogleId, _task);
                 await NavigationService.Close(this);
-                await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, bool>(parameter);
+                await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, NavigationBoolResult>(parameter);
             });
 
             MoveTaskCommand = new MvxAsyncCommand(async () =>
@@ -113,7 +113,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             {
                 var parameter = TaskDateViewModelParameter.Instance(_taskList, _task, Core.Enums.TaskNotificationDateType.REMINDER_DATE);
                 await NavigationService.Close(this);
-                await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, bool>(parameter);
+                await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, NavigationBoolResult>(parameter);
             });
 
             ShareCommand = new MvxAsyncCommand(async() =>

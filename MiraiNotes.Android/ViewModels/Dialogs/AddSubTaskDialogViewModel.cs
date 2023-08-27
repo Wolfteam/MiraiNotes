@@ -7,6 +7,7 @@ using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Core.Entities;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Shared.Helpers;
@@ -21,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class AddSubTaskDialogViewModel : BaseConfirmationDialogViewModel<AddSubTaskDialogViewModelParameter, bool>
+    public class AddSubTaskDialogViewModel : BaseConfirmationDialogViewModel<AddSubTaskDialogViewModelParameter, NavigationBoolResult>
     {
         private readonly IValidator _validator;
         private readonly IMiraiNotesDataService _dataService;
@@ -74,7 +75,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             base.SetCommands();
 
             OkCommand = new MvxAsyncCommand(SaveSubTask);
-            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
+            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, NavigationBoolResult.Fail()));
         }
 
 
@@ -96,7 +97,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                 _dialogService.ShowInfoToast(GetText("SubTaskWasAdded"));
 
-                await NavigationService.Close(this, true);
+                await NavigationService.Close(this, NavigationBoolResult.Succeed());
             }
             else
             {
@@ -128,7 +129,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
 
                     _dialogService.ShowSucceedToast(GetText("SubTaskWasCreated"));
 
-                    await NavigationService.Close(this, true);
+                    await NavigationService.Close(this, NavigationBoolResult.Succeed());
                 }
                 else
                 {

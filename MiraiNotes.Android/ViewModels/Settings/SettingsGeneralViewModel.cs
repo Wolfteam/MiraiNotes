@@ -1,6 +1,7 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Enums;
 using MiraiNotes.Core.Models;
@@ -302,10 +303,10 @@ namespace MiraiNotes.Android.ViewModels.Settings
 
                 if (prompt)
                 {
-                    var result = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(false);
-                    AskForPasswordWhenAppStarts = result;
+                    var result = await NavigationService.Navigate<PasswordDialogViewModel, bool, NavigationBoolResult>(false);
+                    AskForPasswordWhenAppStarts = result?.Result ?? false;
 
-                    if (result)
+                    if (AskForPasswordWhenAppStarts)
                         AskForFingerPrintWhenAppStarts = false;
                 }
                 else

@@ -2,6 +2,7 @@ using MiraiNotes.Abstractions.Data;
 using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Core.Dto;
 using MiraiNotes.Core.Entities;
@@ -372,11 +373,11 @@ namespace MiraiNotes.Android.ViewModels
 
         private async Task<bool> LoginWithPassword()
         {
-            var passwordMatches = await NavigationService.Navigate<PasswordDialogViewModel, bool, bool>(true);
-            if (passwordMatches)
+            var passwordMatches = await NavigationService.Navigate<PasswordDialogViewModel, bool, NavigationBoolResult>(true);
+            if (passwordMatches?.Result ?? false)
                 await GoToMainPage();
 
-            return passwordMatches;
+            return passwordMatches?.Result ?? false;
         }
 
 #if DEBUG

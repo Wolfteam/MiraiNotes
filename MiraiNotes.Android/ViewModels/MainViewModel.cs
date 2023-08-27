@@ -5,6 +5,7 @@ using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
 using MiraiNotes.Android.Models;
 using MiraiNotes.Android.Models.Parameters;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MiraiNotes.Android.ViewModels.Settings;
 using MiraiNotes.Core.Enums;
@@ -128,9 +129,9 @@ namespace MiraiNotes.Android.ViewModels
             OnAccountsSelectedCommand = new MvxAsyncCommand(OnAccountsSelected);
             LogoutCommand = new MvxAsyncCommand(async () =>
             {
-                bool logout = await NavigationService.Navigate<LogoutDialogViewModel, bool?, bool>(null);
+                var logout = await NavigationService.Navigate<LogoutDialogViewModel, bool?, NavigationBoolResult>(null);
 
-                if (logout)
+                if (logout?.Result ?? false)
                     await Logout();
             });
             InitViewCommand = new MvxAsyncCommand<bool>((orientationChanged) =>

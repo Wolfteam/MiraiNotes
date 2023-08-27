@@ -1,6 +1,7 @@
 ﻿using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.Plugin.Messenger;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class DeleteAccountDialogViewModel : BaseConfirmationDialogViewModel<GoogleUserViewModel, bool>
+    public class DeleteAccountDialogViewModel : BaseConfirmationDialogViewModel<GoogleUserViewModel, NavigationBoolResult>
     {
         public DeleteAccountDialogViewModel(
             ITextProvider textProvider,
@@ -35,15 +36,15 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
         public override void SetCommands()
         {
             base.SetCommands();
-            OkCommand = new MvxAsyncCommand(() => DeleteAccount());
-            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, false));
+            OkCommand = new MvxAsyncCommand(DeleteAccount);
+            CloseCommand = new MvxAsyncCommand(() => NavigationService.Close(this, NavigationBoolResult.Fail()));
         }
 
 
         private async Task DeleteAccount()
         {
             Messenger.Publish(new AccountChangeRequestMsg(this, true, false, Parameter));
-            await NavigationService.Close(this, true);
+            await NavigationService.Close(this, NavigationBoolResult.Succeed());
         }
     }
 }

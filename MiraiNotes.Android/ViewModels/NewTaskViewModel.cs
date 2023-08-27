@@ -61,7 +61,7 @@ namespace MiraiNotes.Android.ViewModels
             set => SetProperty(ref _task, value);
         }
 
-        public string SelectedTaskListText 
+        public string SelectedTaskListText
             => TextProvider.Get("TaskWillBeSavedInto", _selectedTaskList.Title);
 
         public ObservableDictionary<string, string> Errors
@@ -105,8 +105,8 @@ namespace MiraiNotes.Android.ViewModels
         {
             base.Prepare(parameter);
 
-            _currentTaskList = 
-                _selectedTaskList = 
+            _currentTaskList =
+                _selectedTaskList =
                     parameter.TaskList;
             _selectedTaskId = parameter.TaskId;
 
@@ -139,10 +139,10 @@ namespace MiraiNotes.Android.ViewModels
                     return;
                 }
 
-                bool close = await NavigationService
-                    .Navigate<AskBeforeDiscardChangesDialogViewModel, TaskItemViewModel, bool>(Task);
+                var closeResult = await NavigationService
+                    .Navigate<AskBeforeDiscardChangesDialogViewModel, TaskItemViewModel, NavigationBoolResult>(Task);
 
-                if (close)
+                if (closeResult.Result)
                     await NavigationService.Close(this, result);
             });
 
@@ -153,8 +153,8 @@ namespace MiraiNotes.Android.ViewModels
 
                 var parameter = DeleteTaskDialogViewModelParameter.Delete(Task);
                 var deleteResult = await NavigationService.Navigate<
-                    DeleteTaskDialogViewModel, 
-                    DeleteTaskDialogViewModelParameter, 
+                    DeleteTaskDialogViewModel,
+                    DeleteTaskDialogViewModelParameter,
                     DeleteTaskDialogViewModelResult>(parameter);
 
                 ShowProgressBar = false;
@@ -179,7 +179,7 @@ namespace MiraiNotes.Android.ViewModels
                     return;
                 }
                 var parameter = AddSubTaskDialogViewModelParameter.Instance(_currentTaskList.GoogleId, Task, true);
-                await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, bool>(parameter);
+                await NavigationService.Navigate<AddSubTaskDialogViewModel, AddSubTaskDialogViewModelParameter, NavigationBoolResult>(parameter);
             });
 
             MoveTaskCommand = new MvxAsyncCommand(async () =>
@@ -199,7 +199,7 @@ namespace MiraiNotes.Android.ViewModels
                 return AddDate(TaskNotificationDateType.TO_BE_COMPLETED_DATE);
             });
 
-            ChangeSelectedTaskListCommand = new MvxAsyncCommand(async() =>
+            ChangeSelectedTaskListCommand = new MvxAsyncCommand(async () =>
             {
                 bool sameTaskList = _selectedTaskList.GoogleId == _currentTaskList.GoogleId;
                 var parameter = TaskListsDialogViewModelParameter.SelectTaskList(sameTaskList ? _currentTaskList : _selectedTaskList);
@@ -585,7 +585,7 @@ namespace MiraiNotes.Android.ViewModels
         private async Task AddDate(TaskNotificationDateType dateType)
         {
             var parameter = TaskDateViewModelParameter.Instance(_currentTaskList, Task, dateType, true);
-            await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, bool>(parameter);
+            await NavigationService.Navigate<TaskDateDialogViewModel, TaskDateViewModelParameter, NavigationBoolResult>(parameter);
         }
     }
 }

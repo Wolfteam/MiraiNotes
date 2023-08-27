@@ -2,6 +2,7 @@
 using MiraiNotes.Android.Common.Messages;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Android.ViewModels.Dialogs;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
@@ -89,8 +90,8 @@ namespace MiraiNotes.Android.ViewModels
             base.SetCommands();
             ChangeCurrentAccountCommand = new MvxCommand(() =>
                 Messenger.Publish(new AccountChangeRequestMsg(this, false, true, this)));
-            DeleteAccountCommand = new MvxAsyncCommand(() => 
-                NavigationService.Navigate<DeleteAccountDialogViewModel, GoogleUserViewModel, bool>(this));
+            DeleteAccountCommand = new MvxAsyncCommand(() =>
+                NavigationService.Navigate<DeleteAccountDialogViewModel, GoogleUserViewModel, NavigationBoolResult>(this));
         }
     }
 }

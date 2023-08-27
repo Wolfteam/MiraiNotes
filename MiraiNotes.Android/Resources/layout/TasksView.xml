@@ -61,8 +61,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginLeft="10dp"
-            android:background="@color/material_grey_850"
             app:fabSize="mini"
+            app:backgroundTint="?AccentColor"
             app:srcCompat="@drawable/ic_add_black_24dp"
             app:MvxBind="Click AddNewTaskListCommand"/>
     </LinearLayout>
@@ -93,8 +93,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginLeft="10dp"
-            android:background="@color/material_grey_850"
             app:fabSize="mini"
+            app:backgroundTint="?AccentColor"
             app:srcCompat="@drawable/ic_add_black_24dp"
             app:MvxBind="Click AddNewTaskCommand" />
     </LinearLayout>
@@ -113,9 +113,9 @@
             android:id="@+id/AppFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/material_grey_850"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
+            app:backgroundTint="?AccentColor"
             app:srcCompat="@drawable/ic_add_black_24dp"/>
     </LinearLayout>
 

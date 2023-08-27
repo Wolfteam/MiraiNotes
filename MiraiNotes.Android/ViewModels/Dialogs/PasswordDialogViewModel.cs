@@ -4,6 +4,7 @@ using MiraiNotes.Abstractions.Services;
 using MiraiNotes.Android.Common.Extensions;
 using MiraiNotes.Android.Common.Utils;
 using MiraiNotes.Android.Interfaces;
+using MiraiNotes.Android.Models.Results;
 using MiraiNotes.Core.Enums;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.ViewModels.Dialogs
 {
-    public class PasswordDialogViewModel : BaseViewModel<bool, bool>
+    public class PasswordDialogViewModel : BaseViewModel<bool, NavigationBoolResult>
     {
         #region Members
         private readonly IUserCredentialService _credentialService;
@@ -116,7 +117,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             base.SetCommands();
             SaveChangesCommand = new MvxAsyncCommand(SaveChanges);
             CloseCommand = new MvxAsyncCommand(async () =>
-                await NavigationService.Close(this, false));
+                await NavigationService.Close(this, NavigationBoolResult.Fail()));
         }
 
         private async Task SaveChanges()
@@ -131,7 +132,7 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
                 await SavePassword();
             }
 
-            await NavigationService.Close(this, true);
+            await NavigationService.Close(this, NavigationBoolResult.Succeed());
         }
 
         private async Task SavePassword()

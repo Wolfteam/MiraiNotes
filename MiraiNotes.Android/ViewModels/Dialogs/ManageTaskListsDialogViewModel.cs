@@ -118,10 +118,10 @@ namespace MiraiNotes.Android.ViewModels.Dialogs
             }
             else
             {
-                bool wasDeleted = await NavigationService
-                    .Navigate<DeleteTaskListDialogViewModel, TaskListItemViewModel, bool>(msg.TaskList);
+                var wasDeleted = await NavigationService
+                    .Navigate<DeleteTaskListDialogViewModel, TaskListItemViewModel, NavigationBoolResult>(msg.TaskList);
 
-                if (!wasDeleted)
+                if (!(wasDeleted?.Result ?? false))
                 {
                     _hideDialog.Raise(false);
                 }
