@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.Background
 {
-    [BroadcastReceiver(Enabled = true, Label = "Mark task as completed broadcast receiver")]
+    [BroadcastReceiver(Enabled = true, Label = "Mark task as completed broadcast receiver", Exported = false)]
     public class MarkTaskAsCompletedReceiver : MvxBroadcastReceiver
     {
         public const string MarkTaskAsCompletedKey = "MarkTaskAsCompleted";

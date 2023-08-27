@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.Background
 {
-    [BroadcastReceiver(Enabled = true, Label = "Notification Broadcast Receiver")]
+    [BroadcastReceiver(Enabled = true, Label = "Notification Broadcast Receiver", Exported = false)]
     public class NotificationSchedulerReceiver : MvxBroadcastReceiver
     {
         public const string LocalNotificationKey = "LocalNotification";

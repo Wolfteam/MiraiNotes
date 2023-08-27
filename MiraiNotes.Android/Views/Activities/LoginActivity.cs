@@ -16,7 +16,8 @@ namespace MiraiNotes.Android.Views.Activities
     [Activity(
         Label = "@string/app_name",
         NoHistory = true,
-        LaunchMode = LaunchMode.SingleTask
+        LaunchMode = LaunchMode.SingleTask,
+        Exported = false
     )]
     [IntentFilter(
         actions: new[] { Intent.ActionView },
@@ -84,7 +85,6 @@ namespace MiraiNotes.Android.Views.Activities
         {
             var intent = new Intent(Intent.ActionView);
             intent.SetData(AndroidUri.Parse(args.Value));
-            StartActivityForResult(intent, 0);
         }
 
 #if DEBUG

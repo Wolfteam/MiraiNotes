@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MiraiNotes.Android.Background
 {
-    [BroadcastReceiver(Enabled = true, Label = "Boot receiver")]
+    [BroadcastReceiver(Enabled = true, Label = "Boot receiver", Exported = false)]
     [IntentFilter(new[] { Intent.ActionBootCompleted, Intent.ActionLockedBootCompleted })]
     public class BootBroadcastReceiver : MvxBroadcastReceiver
     {
